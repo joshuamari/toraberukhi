@@ -36,7 +36,7 @@ $conn_pcs_disable->beginTransaction();
 
 #region main query
 try {
-    $checkID = "SELECT `is_active` FROM `khi_details` WHERE `number` = :empID AND `is_active` = 1";
+    $checkID = "SELECT `is_active` FROM `khi_details` WHERE `number` = :empID";
     $checkIDStmt = $conn_pcs_disable->prepare($checkID);
     $checkIDStmt->execute([":empID" => "$empID"]);
     $checkCount = $checkIDStmt->rowCount();
@@ -64,10 +64,10 @@ try {
         }
     } else {
         $isActive = $checkIDStmt->fetchColumn();
-        if($isActive == 0) {
+        if ($isActive == 0) {
             $updateUser = "UPDATE `khi_details` SET `surname` = :lname, `firstname` = :fname, `group_id` = :grpID, `is_active` = 1 WHERE `number` = :empID";
             $updateUserStmt = $conn_pcs_disable->prepare($updateUser);
-            if($updateUserStmt->execute([":empID" => "$empID", ":lname" => "$lname", ":fname" => "$fname", ":grpID" => "$grpID"])) {
+            if ($updateUserStmt->execute([":empID" => "$empID", ":lname" => "$lname", ":fname" => "$fname", ":grpID" => "$grpID"])) {
                 if ($empacc == 1) {
                     $insertAccess = "INSERT INTO `khi_user_permissions`(`permission_id`, `employee_id`) VALUES (1, :empID)";
                     $insertAccessStmt = $conn_pcs_disable->prepare($insertAccess);
@@ -84,10 +84,11 @@ try {
                     $message["message"] = "User successfully added";
                 }
             }
+        } else {
+            $conn_pcs_disable->rollBack();
+            $message["isSuccess"] = 0;
+            $message["message"] = "User ID already registered";
         }
-        $conn_pcs_disable->rollBack();
-        $message["isSuccess"] = 0;
-        $message["message"] = "User ID already registered";
     }
 } catch (Exception $e) {
     $conn_pcs_disable->rollBack();
