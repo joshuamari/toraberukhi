@@ -27,7 +27,7 @@ try {
 
     $expireQ = "SELECT CONCAT(el.firstname,' ',el.surname) AS ename, TIMESTAMPDIFF(DAY, CURDATE(), pd.passport_expiry) AS expiring_in, el.id FROM `passport_details` AS pd 
     JOIN kdtphdb_new.employee_list AS el ON pd.emp_number = el.id WHERE el.group_id IN ($groups) AND pd.passport_expiry >= CURDATE() AND  pd.passport_expiry <= DATE_ADD(CURDATE(), 
-    INTERVAL 10 MONTH) AND el.emp_status = 1 OR pd.passport_expiry < CURDATE() ORDER BY CASE WHEN pd.passport_expiry >= CURDATE() THEN 1 ELSE pd.passport_expiry END";
+    INTERVAL 10 MONTH) AND (el.emp_status = 1 OR pd.passport_expiry < CURDATE()) ORDER BY CASE WHEN pd.passport_expiry >= CURDATE() THEN 1 ELSE pd.passport_expiry END";
     $expireStmt = $connpcs->prepare($expireQ);
     $expireStmt->execute();
     $expireArr = $expireStmt->fetchAll();
