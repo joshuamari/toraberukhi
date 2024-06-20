@@ -42,7 +42,7 @@ checkAccess()
       });
     } else {
       alert(emp.message);
-      window.location.href = `${rootFolder}`;
+      window.location.href = `${rootFolder}/PCSKHI/Login`;
     }
   })
   .catch((error) => {
@@ -197,7 +197,7 @@ function getGroups() {
         } else if (xhr.status === 500) {
           reject("Internal Server Error: There was a server error.");
         } else {
-          reject("An unspecified error occurred.");
+          reject("An unspecified error occurred while fetching groups.");
         }
       },
     });
@@ -240,7 +240,7 @@ function getEmployees() {
         } else if (xhr.status === 500) {
           reject("Internal Server Error: There was a server error.");
         } else {
-          reject("An unspecified error occurred.");
+          reject("An unspecified error occurred while fetching employees.");
         }
       },
     });

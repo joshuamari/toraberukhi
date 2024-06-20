@@ -36,7 +36,7 @@ let groupList = [];
 //       });
 //     } else {
 //       alert("Access denied");
-//       window.location.href = `${rootFolder}`;
+//       window.location.href = `${rootFolder}/PCSKHI/Login`;
 //     }
 //   })
 //   .catch((error) => {
@@ -68,7 +68,7 @@ checkAccess()
       });
     } else {
       alert(emp.message);
-      window.location.href = `${rootFolder}`;
+      window.location.href = `${rootFolder}/PCSKHI/Login`;
     }
   })
   .catch((error) => {

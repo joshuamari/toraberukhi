@@ -40,7 +40,7 @@ checkAccess()
       });
     } else {
       alert(emp.message);
-      window.location.href = `${rootFolder}`;
+      window.location.href = `${rootFolder}/PCSKHI/Login`;
     }
   })
   .catch((error) => {

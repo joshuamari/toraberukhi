@@ -36,7 +36,7 @@ checkAccess()
       });
     } else {
       alert(emp.message);
-      window.location.href = `${rootFolder}/PCSKHI/login`;
+      window.location.href = `${rootFolder}/PCSKHI/Login`;
     }
   })
   .catch((error) => {
