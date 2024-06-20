@@ -342,7 +342,6 @@ function dispatchGraph(dData) {
       labels: months,
       datasets: [
         {
-          label: "Monthly Dispatch Rate",
           data: rates,
           backgroundColor: "#dcfce7", // Fill color under the line
           borderColor: "#22c55e", // Line color
@@ -354,6 +353,23 @@ function dispatchGraph(dData) {
       scales: {
         y: {
           beginAtZero: true,
+        },
+      },
+      plugins: {
+        legend: {
+          display: false, // Disable the legend
+        },
+        tooltip: {
+          callbacks: {
+            label: function (tooltipItem) {
+              var value = tooltipItem.raw;
+              return (
+                value +
+                " " +
+                (value > 1 ? "dispatch members" : "dispatch member")
+              );
+            },
+          },
         },
       },
     },
