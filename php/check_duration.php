@@ -1,6 +1,6 @@
 <?php
 #region DB Connect
-require_once '../../dbconn/dbconnectpcs.php';
+require_once '../dbconn/dbconnectpcs.php';
 // require_once '../dbconn/globalFunctions.php';
 #endregion
 
