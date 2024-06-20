@@ -12,7 +12,7 @@ date_default_timezone_set('Asia/Manila');
 
 #regio set variables
 $summary = [];
-$months = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+$months = ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"];
 $yNow = date("Y");
 $firstday = $yNow . "-01-01";
 $lastday = $yNow . "-12-31";
@@ -21,15 +21,14 @@ $lastday = $yNow . "-12-31";
 try {
     foreach ($months as $month) {
         $totalPerMonth = [];
-        $startDate = $yNow . "-" . $month . "-01";
         $endDate = $yNow . "-" . $month . "-31";
 
         $dateObj   = DateTime::createFromFormat('!m', $month);
         $monthName = $dateObj->format('F');
 
-        $getSummary = "SELECT COUNT(*) as `total` FROM `dispatch_list` WHERE `dispatch_from` BETWEEN :startDate AND :endDate";
+        $getSummary = "SELECT COUNT(*) as `total` FROM `dispatch_list` WHERE :endDate BETWEEN `dispatch_from` AND `dispatch_to`";
         $getSummaryStmt = $connpcs->prepare($getSummary);
-        $getSummaryStmt->execute([":startDate" => "$startDate", ":endDate" => "$endDate"]);
+        $getSummaryStmt->execute([":endDate" => "$endDate"]);
         $total = $getSummaryStmt->fetchColumn();
 
         $totalPerMonth['month'] = $monthName;
