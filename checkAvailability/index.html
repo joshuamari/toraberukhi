@@ -153,16 +153,7 @@
                 <span id="editentryDays" class="fw-medium fs-5">0</span>
               </div>
             </div>
-            <!-- <div class="row mb-2">
-            <label
-              for="editentryPYear"
-              class="col-sm-4 col-form-label col-form-label-sm"
-              >Total Days Past 1 Year</label
-            >
-            <div class="col-sm-8 d-flex align-items-center">
-              <span id="editentryPYear" class="fw-medium fs-5">0</span>
-            </div>
-          </div> -->
+     
           </div>
         </div>
 
@@ -274,7 +265,7 @@
               <div id="menu">
                 <i class="bx bx-menu-alt-left fs-3"></i>
               </div>
-              <h1 class="fw-semibold m-0">Employee Dispatch Management</h1>
+              <h1 class="fw-semibold m-0">Dispatch Request by KHI</h1>
             </div>
         <div class="main w-100 d-flex h-[calc(100%-30px)]">
         
@@ -289,9 +280,7 @@
                     class="select "
                     id="grpSel"
                   >
-                    <option value="">SYS</option>
-                    <option value="">SYS1</option>
-                    <option value="">SYS2</option>
+             
                   </select>
                 </div>
               </div>
@@ -303,9 +292,7 @@
                     class="select "
                     id="empSel"
                   >
-                    <option value="">Collene Medrano</option>
-                    <option value="">Kit Medrano</option>
-                    <option value="">Kwinkad</option>
+                    
                   </select>
                 </div>
               </div>
@@ -317,8 +304,7 @@
                     class="select "
                     id="locSel"
                   >
-                    <option value="0" hidden>Kobe</option>
-                    <option value="">Koba</option>
+                   
                   </select>
                 </div>
               </div>
@@ -554,20 +540,16 @@
                   </div>
                 </div>
                 <div
-                  class="d-flex totalThisYear flex-column shadow-sm gap-3 p-3 h-[135px]"
+                  class="d-flex totalThisYear flex-column shadow-sm p-3 gap-3
+                  "
                 >
                   <div class="label">
                     Estimated Total Days of Dispatch this Year
                   </div>
-                  <div>
-                    <div class="count" id="rangeCount">0 days</div>
-                    <!-- <div class="progress" role="progressbar">
-                       <div
-                         class="progress-bar progress-bar-striped bg-success"
-                         style="width: 49%"
-                       ></div>
-                     </div> -->
-                    <div class="prog-cont">
+                  <div class="flex flex-col">
+                    <div class="count" id="rangeCount"></div>
+                   
+                    <div class="prog-cont ">
                       <div class="progress mb-1" role="progressbar">
                         <div
                           id="progBar"
@@ -580,9 +562,8 @@
                           class="bx bx-error-circle"
                           style="vertical-align: middle"
                         ></i
-                        ><span class="ps-1"
-                          >Warning: Total dispatch days will exceed 183 days for
-                          this year.</span
+                        ><span class="ps-1" 
+                          ></span
                         ></small
                       >
                     </div>

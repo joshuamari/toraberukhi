@@ -528,12 +528,25 @@ function fillHistory(dlist) {
       row.append(
         `<td  data-f-name="Arial" data-f-sz="9"  data-a-h="center" data-a-v="middle" 	data-b-a-s="thin" data-b-a-c="000000">${item.toDate}</td>`
       );
-      row.append(
-        `<td  data-f-name="Arial" data-f-sz="9"  data-a-h="center" data-a-v="middle" 	data-b-a-s="thin" data-b-a-c="000000">${item.duration}</td>`
-      );
-      row.append(
-        `<td  data-f-name="Arial" data-f-sz="9"  data-a-h="center" data-a-v="middle" 	data-b-a-s="thin" data-b-a-c="000000">${item.pastOne}</td>`
-      );
+      if (item.duration > 183) {
+        row.append(
+          `<td class="redText" data-f-name="Arial" data-f-sz="9"  data-a-h="center" data-a-v="middle" 	data-b-a-s="thin" data-b-a-c="000000" data-f-color="FFFF0000">${item.duration}</td>`
+        );
+      } else {
+        row.append(
+          `<td  data-f-name="Arial" data-f-sz="9"  data-a-h="center" data-a-v="middle" 	data-b-a-s="thin" data-b-a-c="000000">${item.duration}</td>`
+        );
+      }
+
+      if (item.pastOne > 183) {
+        row.append(
+          `<td class="redText" data-f-name="Arial" data-f-sz="9"  data-a-h="center" data-a-v="middle" 	data-b-a-s="thin" data-b-a-c="000000" data-f-color="FFFF0000">${item.pastOne}</td>`
+        );
+      } else {
+        row.append(
+          `<td  data-f-name="Arial" data-f-sz="9"  data-a-h="center" data-a-v="middle" 	data-b-a-s="thin" data-b-a-c="000000" >${item.pastOne}</td>`
+        );
+      }
 
       row.append(`<td data-exclude='true'>
         <div class="d-flex gap-2">
@@ -594,9 +607,18 @@ function countTotal() {
   if (dd == 1) {
     countText = `1 day`;
   } else {
-    countText = `${dd} days`;
+    if (dd > 183) {
+      $("#rangeCount").addClass("redText");
+      countText = `${dd} days`;
+      console.log("lagpas");
+    } else {
+      $("#rangeCount").removeClass("redText");
+      countText = `${dd} days`;
+    }
   }
+
   $("#rangeCount").text(countText);
+
   setBar(dd);
   colorBar(dd);
 }
@@ -605,11 +627,15 @@ function setBar(dd) {
   $("#progBar").css("width", `${wd}%`);
 }
 function colorBar(dd) {
+  $("#daysWarning span").text(
+    "Warning: Total dispatch days exceeds 183 days for this year."
+  );
   $("#daysWarning").addClass("d-none");
   if (dd >= full) {
     $("#progBar")
       .addClass("bg-danger")
       .removeClass("bg-[var(--tertiary)] bg-warning");
+
     if (dd > full) {
       $("#daysWarning").removeClass("d-none");
     }
@@ -967,9 +993,16 @@ function fillYearly(yrl) {
   <td data-f-name="Arial" data-f-sz="9" data-f-bold="true" data-a-h="center" data-a-v="middle" 	data-b-a-s="thin" data-b-a-c="000000">Total Days in Japan</td> </tr>`;
   Object.entries(yrl).forEach(([key, value]) => {
     $(`#y${x}`).text(key);
-    $(`#y${x}-days`).text(value);
 
-    yrRow += `<tr class='d-none'><td data-f-name='Arial' data-f-sz='9' data-a-h='center' data-a-v='middle' data-b-a-s='thin' data-b-a-c='000000'>${key}</td><td data-f-name='Arial' data-f-sz='9' data-a-h='center' data-a-v='middle' data-b-a-s='thin' data-b-a-c='000000'>${value}</td></tr>`;
+    $(`#y${x}-days`).text(value);
+    if (value > 183) {
+      $(`#y${x}-days`).addClass("redText");
+      yrRow += `<tr class='d-none'><td data-f-name='Arial' data-f-sz='9' data-a-h='center' data-a-v='middle' data-b-a-s='thin' data-b-a-c='000000'>${key}</td><td data-f-name='Arial' data-f-sz='9' data-a-h='center' data-a-v='middle' data-b-a-s='thin' data-b-a-c='000000' data-f-color='FFFF0000'>${value}</td></tr>`;
+    } else {
+      $(`#y${x}-days`).removeClass("redText");
+      yrRow += `<tr class='d-none'><td data-f-name='Arial' data-f-sz='9' data-a-h='center' data-a-v='middle' data-b-a-s='thin' data-b-a-c='000000'>${key}</td><td data-f-name='Arial' data-f-sz='9' data-a-h='center' data-a-v='middle' data-b-a-s='thin' data-b-a-c='000000'>${value}</td></tr>`;
+    }
+
     x++;
   });
   $("#histTable").append(yrRow);
