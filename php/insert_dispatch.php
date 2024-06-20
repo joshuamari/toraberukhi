@@ -1,7 +1,7 @@
 <?php
 #region DB Connect
-require_once '../../dbconn/dbconnectpcs.php';
-require_once '../../dbconn/globalFunctions.php';
+require_once '../dbconn/dbconnectpcs.php';
+require_once '../global/globalFunctions.php';
 #endregion
 
 #region set timezone
@@ -56,7 +56,7 @@ try {
     $checkConflictStmt = $connpcs->prepare($checkConflict);
     $checkConflictStmt->execute([":empNumber" => "$empNumber", ":dateFrom" => "$dateFrom", ":dateTo" => "$dateTo"]);
     $checkCount = $checkConflictStmt->fetchColumn();
-    if($checkCount > 0) {
+    if ($checkCount > 0) {
         $msg["isSuccess"] = false;
         $msg['error'] = "Dispatch conflict";
     }

@@ -1,8 +1,8 @@
 <?php
 #region DB Connect
-require_once '../dbconn/dbconnectpcs.php';
-require_once '../dbconn/dbconnectnew.php';
-require_once '../global/globalFunctions.php';
+require_once '../../dbconn/dbconnectpcs.php';
+require_once '../../dbconn/dbconnectnew.php';
+require_once '../../global/globalFunctions.php';
 session_start();
 #endregion
 

@@ -1,6 +1,6 @@
 <?php
 #region DB Connect
-require_once '../../dbconn/dbconnectpcs.php';
+require_once '../dbconn/dbconnectpcs.php';
 #endregion
 
 #region set timezone
@@ -32,7 +32,6 @@ try {
     $total[$yearPast] = totalDuration($startPast, $endPast, $yearPast);
     $total[$yearNow] = totalDuration($startNow, $endNow, $yearNow);
     $total[$yearFuture] = totalDuration($startFuture, $endFuture, $yearFuture);
-
 } catch (Exception $e) {
     echo "Connection failed: " . $e->getMessage();
 }
@@ -42,7 +41,7 @@ echo json_encode($total);
 
 #region function
 function totalDuration($startYear, $endYear, $dateNow)
-{ 
+{
     global $empID, $connpcs;
     $totalDays = 0;
 
@@ -50,10 +49,10 @@ function totalDuration($startYear, $endYear, $dateNow)
     ((`dispatch_from` >= :startYear AND `dispatch_from` <= :endYear) OR (`dispatch_to` <= :endYear AND `dispatch_to` >= :startYear))";
     $yearNowStmt = $connpcs->prepare($yearNowQ);
     $yearNowStmt->execute([":empID" => "$empID", ":startYear" => "$startYear", ":endYear" => "$endYear"]);
-    if($yearNowStmt->rowCount() > 0) {
+    if ($yearNowStmt->rowCount() > 0) {
         $dispatch = $yearNowStmt->fetchAll();
 
-        foreach($dispatch as $val) {
+        foreach ($dispatch as $val) {
             $dateFrom = $val["dispatch_from"];
             $dateTo = $val["dispatch_to"];
             $daysDiff = getDuration($dateFrom, $dateTo, $dateNow);
@@ -70,7 +69,7 @@ function getDuration($dateFrom, $dateTo, $dateNow)
     $dateFromYear = date("Y", strtotime($dateFrom));
     $dateToYear = date("Y", strtotime($dateTo));
 
-    if($dateFrom > $dateTo) {
+    if ($dateFrom > $dateTo) {
         return 0;
     }
 

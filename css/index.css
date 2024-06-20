@@ -1,174 +1,250 @@
+
 .main .left {
-  width: 100%;
-  padding: 30px;
-}
-.ctaCard {
+  width: 400px;
   height: 100%;
+  font-size: 14px !important;
 }
-.ctaCard .contain {
-  background-color: var(--main);
-  padding: 50px;
+.cards {
+  gap: 20px;
+  grid-template-columns: 1fr 1fr 1fr;
 }
-.cta .right p {
-  font-size: 1rem;
+.card:not(:nth-of-type(3)) {
+  min-width: 300px;
+  /* width: 400px !important; */
+  position: relative;
+  border: 0 !important;
+  border-radius: 8px !important;
 }
-.ctaCard .contain .left h1 {
-  font-size: 48px;
-}
-th,td{
-  white-space: nowrap;
-}
-.btn-checkAvail {
-  background-color: var(--tertiary);
-  cursor: pointer;
-  border-radius: 30px;
-  border: none;
-  color: #fff;
-  padding: 20px 40px;
-  font-size: 20px;
-  transition: background-color 0.3s ease-in-out;
-  white-space: nowrap;
-}
-.btn-checkAvail:hover {
-  background-color: var(--darkest);
-}
-.left .bottom table {
-  white-space: nowrap;
-}
-.left .bottom table th {
-  font-weight: medium;
-  text-transform: uppercase;
-  font-size: 12px;
-  /* text-transform: uppercase; */
-}
-.table-container table thead tr th:first-of-type {
-  border-top-left-radius: 8px;
-  border-bottom-left-radius: 8px;
-}
-.table-container table thead tr th:last-of-type {
-  border-top-right-radius: 8px;
-  border-bottom-right-radius: 8px;
+.card:nth-of-type(3) {
+  min-width: 215px;
+  /* background-color: var(--main); */
+  position: relative;
+  border: 0 !important;
+  border-radius: 8px !important;
 }
 
-
-.table-container table thead tr th {
-  background-color: var(--tableheader);
-  padding: 1.25rem 0.75rem;
-  text-transform: uppercase;
-  font-size: 12px;
-  font-weight: 600;
-  white-space: nowrap;
+.btn-dispatch {
+  background-color: var(--secondary) !important;
+  font-weight: 500;
+  transition: background-color 0.25s ease-in-out;
 }
-.table-container table td{
-  white-space: nowrap;
+.btn-dispatch:hover {
+  background-color: var(--tertiary) !important;
 }
-table tbody tr:hover {
-  background-color: #ededed;
+.btn-clear {
+  border: 1px solid var(--text-color) !important;
+  font-weight: 500;
 }
-.waveImg {
-  transform: rotate(-30deg);
-  pointer-events: none;
+.btn-clear:hover {
+  background-color: #a7a7a7 !important;
+  border-color: #a7a7a7 !important;
 }
 
-.right {
-  background-color: var(--main);
-
-  width: 480px;
+.main .right {
+  width: calc(100% - 400px);
+  border-left: 2px solid #c7c7c7;
+  border-top: 0;
+}
+.main .right .empDetails, .main .right .empmoreDetails{
+  padding: 0 30px;
+}
+.table-cont {
+  height: calc(100% - 44px);
 }
 
-.expire.short {
+.passport .passportDetail label,
+.visa .visaDetail label {
+  position: absolute;
+  top: -0px;
+  left: 0;
+  font-size: 10px;
+  font-weight: 500;
+}
+.passport .passportDetail span,
+.visa .visaDetail span {
+  font-weight: 500;
+}
+.passportDetail,
+.visaDetail {
+  padding: 10px 0 0 0;
+}
+.passport .imgContainer,
+.visa .imgContainer {
+  width: 120px;
+  height: 130px;
+}
+.passport .imgContainer img,
+.visa .imgContainer img {
+  width: 100%;
+  height: auto;
+}
+
+.status {
+  bottom: 10%;
+  left: 0;
+  text-align: center;
+}
+.status span {
+  font-size: 100px;
+  font-weight: 700;
+  opacity: 0.2;
+  line-height: 50px;
+  color: #53b85d;
+}
+.status span.invalid {
   color: var(--red-color);
+}
+
+.dispatch-hist table thead th {
+  text-transform: uppercase;
+  font-size: 12px !important;
+  text-wrap: nowrap;
+}
+.dispatch-hist table tbody td {
+  font-size: 14px;
+  vertical-align: middle;
+}
+.dispatch-hist table tbody tr:hover {
+  background-color: #e6e6e6;
+}
+.btn-edit,
+.btn-delete {
+  border: none;
+  background-color: transparent;
+}
+.btn-edit:hover {
+  color: var(--yellow-color) !important;
+}
+.btn-delete:hover {
+  color: var(--red-color) !important;
+}
+.totalThisYear {
+  border-radius: 8px;
+  background-color: #fff;
+}
+.totalThisYear .label {
+  font-size: 14px;
+
+  text-transform: uppercase;
+}
+.totalThisYear .count {
+  font-size: 36px;
   font-weight: 700;
 }
-.passportExp,
-.visaExp {
-  height: calc(100% - 117px);
+.dispatch-hist .top .title {
+  font-size: 20px;
+  font-weight: 500;
 }
-.passportExp thead th,
-.visaExp thead th {
-  font-weight: medium;
-  text-transform: uppercase;
-  font-size: 12px;
+.prog-cont small {
+  color: var(--red-color);
 }
+.emptyState-pass,
+.emptyState-visa {
+  opacity: 0.25;
+}
+.empDetails span {
+  font-size: 14px !important;
+  font-weight: 600;
+}
+.empDetails h5 {
+  font-size: 30px;
+  font-weight: 700;
+}
+.btn-updateEmp {
+  background-color: var(--secondary) !important;
 
-.alert2 .imgCont,
-.alert1 .imgCont {
-  pointer-events: none;
-  position: absolute;
-  bottom: 0;
-  right: -35px;
-  width: 50%;
 }
-.alert2 .imgCont img,
-.alert1 .imgCont img {
-  opacity: 0.015;
-}
+.btn-updateEmp:hover {
+  background-color: var(--tertiary) !important;
 
-.cta {
-  height: 100%;
-  gap: 50px;
+}
+.empDetails div:first-of-type {
+  display: flex;
   flex-direction: column;
+  align-items: start;
 }
-.cta h1 {
-  padding-top: 85px;
+.emptyState i {
+  font-size: 300px;
 }
-.picTravel {
-  position: absolute;
-  bottom: -100px;
-  right: -50px;
-  pointer-events: none;
+.emptyState i,
+.emptyState .title,
+.emptyState .text {
+  opacity: 0.55;
 }
-.picWave {
-  position: absolute;
-  bottom: 120px;
-  left: -250px;
-  pointer-events: none;
+.main .right .empmoreDetails{
+  padding-bottom: 30px;
 }
-@media (max-width: 886px) {
-  .main .left {
-    width: 100%;
-    height: 100%;
-  }
-  .right {
-    width: 100%;
-    height: 100%;
-    padding: 0 20px 20px 20px !important;
-  }
-  .left .bottom {
-    height: 500px;
-  }
+.totalDays{
+  font-weight: 700;
+  font-size: 28px;
 }
-@media (max-width: 1024px) {
-  .main .left {
-    padding: 20px;
-  }
-  .cta .rightt p {
-    font-size: 14px !important;
-  }
-  .cta {
-    gap: 50px !important;
-  }
-  .picWave {
-    bottom: -80px !important;
-    left: 10px !important;
-  }
-}
-@media (max-width: 1350px) {
-  .ctaCard .contain .left h1 {
-    font-size: 32px;
+
+@media (max-width: 842px) {
+  .left {
+    width: 100% !important;
   }
 
-  .picTravel {
-    bottom: -150px;
-    right: -130px;
+}
+@media (max-width: 954px) {
+  .cards {
+    flex-direction: column;
+    align-items: center;
   }
-  .picWave {
-    bottom: -100px;
-    left: -50px;
+  .cards .card {
+    width: 100%;
+  }
+  .main {
+    height: 100% !important;
+  }
+  .emptyState i {
+    font-size: 80px !important;
+  }
+
+}
+@media (max-width: 1030px) {
+  .empDetails {
+    flex-direction: column;
+  }
+  .empDetails div:first-of-type {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .emptyState i {
+    font-size: 100px !important;
+  }.cards{
+    grid-template-columns: 1fr !important;
   }
 }
-@media (max-width: 1570px) {
-  .ctaCard .contain .left h1 {
-    font-size: 38px;
+@media (max-width: 1340px){
+  .main{
+    flex-direction: column;
+  }
+  .main .left, .main .right{
+    width: 100%;
+  }
+  .main .right{
+    border-left: 0;
+    border-top: 2px solid #c7c7c7;
+    padding: 30px 0;
+  }
+  .main .right .empDetails, .main .right .empmoreDetails{
+    padding: 0;
+  }
+  .main .left{
+    height: auto;
+  }
+
+} 
+@media (max-width: 1490px) {
+ 
+  .emptyState i {
+    font-size: 200px;
+  }
+}
+@media (max-width: 1587px){
+ 
+  .cards{
+    grid-template-columns: 1fr 1fr ;
   }
 }
