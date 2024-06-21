@@ -251,8 +251,9 @@ function fillEmployees(emps) {
   tableFD.empty();
   $.each(emps, function (index, item) {
     var row = $(`<tr d-id=${item.empID}>`);
+    const fullName = capitalizeWords(`${item.sname}, ${item.fname}`);
     row.append(`<td>${item.id}</td>`);
-    row.append(`<td>${item.sname}, ${item.fname}</td>`);
+    row.append(`<td>${fullName}</td>`);
     row.append(`<td grp-id='${item.group.id}'>${item.group.abbr}</td>`);
     row.append(`<td>${accessTypes[item.type]}</td>`);
     const options =
@@ -366,9 +367,17 @@ function fillEmployeeDetails() {
   const sName = empDetails.surname;
   const initials = getInitials(fName, sName);
   const grpName = empDetails.group;
-  $("#empLabel").html(`${fName} ${sName}`);
+  const fullName = capitalizeWords(`${fName} ${sName}`);
+  $("#empLabel").html(`${fullName}`);
   $("#empInitials").html(`${initials}`);
   $("#grpLabel").html(`${grpName}`);
+}
+function capitalizeWords(str) {
+  return str
+    .toLowerCase()
+    .split(" ")
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
 }
 function getInitials(firstname, surname) {
   let initials = "";
@@ -459,8 +468,8 @@ function resetAddModal() {
 function fillEditModal(empnum) {
   $("#empIdEdit").val(empnum);
   let empdeets = employees.find((emp) => emp.id == empnum);
-  $("#empFNameEdit").val(empdeets.fname);
-  $("#empLNameEdit").val(empdeets.sname);
+  $("#empFNameEdit").val(capitalizeWords(empdeets.fname));
+  $("#empLNameEdit").val(capitalizeWords(empdeets.sname));
   $("#editGroup").val(empdeets.group.id);
   $("#empAccessEdit").val(empdeets.type);
   $("#editUserModal").modal("show");

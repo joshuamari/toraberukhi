@@ -121,7 +121,7 @@ function fillDispatchList(dlist) {
         visaVal = "Invalid";
       }
       var row = $("<tr>");
-      row.append(`<td>${item.name}</td>`);
+      row.append(`<td>${capitalizeWords(item.name)}</td>`);
       row.append(`<td>${item.location}</td>`);
       row.append(`<td>${item.from}</td>`);
       row.append(`<td>${item.to}</td>`);
@@ -168,7 +168,7 @@ function fillPassport(eplist) {
       var row = $(`<tr class="rowEmp" emp-id="${item.id}">`);
       var untilText = formatDays(item.until);
       var isShort = item.until < 300 ? "short" : "";
-      row.append(`<td>${item.name}</td>`);
+      row.append(`<td>${capitalizeWords(item.name)}</td>`);
       row.append(`<td class="expire ${isShort}">${untilText}</td>`);
       tableBody.append(row);
     });
@@ -209,7 +209,7 @@ function fillVisa(evlist) {
       var row = $(`<tr class="rowEmp" emp-id="${item.id}">`);
       var untilText = formatDays(item.until);
       var isShort = item.until < 210 ? "short" : "";
-      row.append(`<td>${item.name}</td>`);
+      row.append(`<td>${capitalizeWords(item.name)}</td>`);
       row.append(`<td class="expire ${isShort}">${untilText}</td>`);
       tableBody.append(row);
     });
@@ -278,9 +278,17 @@ function fillEmployeeDetails() {
   const sName = empDetails.surname;
   const initials = getInitials(fName, sName);
   const grpName = empDetails.group;
-  $("#empLabel").html(`${fName} ${sName}`);
+  const fullName = capitalizeWords(`${fName} ${sName}`);
+  $("#empLabel").html(`${fullName}`);
   $("#empInitials").html(`${initials}`);
   $("#grpLabel").html(`${grpName}`);
+}
+function capitalizeWords(str) {
+  return str
+    .toLowerCase()
+    .split(" ")
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
 }
 function getInitials(firstname, surname) {
   let initials = "";

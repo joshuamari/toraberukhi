@@ -329,9 +329,17 @@ function fillEmployeeDetails() {
   const sName = empDetails.surname;
   const initials = getInitials(fName, sName);
   const grpName = empDetails.group;
-  $("#empLabel").html(`${fName} ${sName}`);
+  const fullName = capitalizeWords(`${fName} ${sName}`);
+  $("#empLabel").html(`${fullName}`);
   $("#empInitials").html(`${initials}`);
   $("#grpLabel").html(`${grpName}`);
+}
+function capitalizeWords(str) {
+  return str
+    .toLowerCase()
+    .split(" ")
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
 }
 function getInitials(firstname, surname) {
   let initials = "";

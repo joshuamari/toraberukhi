@@ -314,7 +314,7 @@ function fillEmployees(emps) {
   $.each(emps, function (index, item) {
     var option = $("<option>")
       // .attr("value", item.id)
-      .text(item.name)
+      .text(capitalizeWords(item.name))
       .attr("emp-id", item.id);
     empSelect.append(option);
   });
@@ -868,9 +868,17 @@ function fillEmployeeDetails() {
   const sName = empDetails.surname;
   const initials = getInitials(fName, sName);
   const grpName = empDetails.group;
-  $("#empLabel").html(`${fName} ${sName}`);
+  const fullName = capitalizeWords(`${fName} ${sName}`);
+  $("#empLabel").html(`${fullName}`);
   $("#empInitials").html(`${initials}`);
   $("#grpLabel").html(`${grpName}`);
+}
+function capitalizeWords(str) {
+  return str
+    .toLowerCase()
+    .split(" ")
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
 }
 function getInitials(firstname, surname) {
   let initials = "";
