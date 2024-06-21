@@ -14,14 +14,21 @@ date_default_timezone_set('Asia/Manila');
 $summary = [];
 $months = ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"];
 $yNow = date("Y");
-$firstday = $yNow . "-01-01";
-$lastday = $yNow . "-12-31";
 #endregion
 
+if (!empty($_SESSION["IDKHI"])) {
+    $userID = $_SESSION["IDKHI"];
+    $userID = hex2bin($userID);
+    $userID = base64_decode(urldecode($userID));
+}
+
 try {
+    // $groups = getGroups($userID);
+
     foreach ($months as $month) {
         $totalPerMonth = [];
-        $endDate = $yNow . "-" . $month . "-31";
+        $endDate = date('Y-m-t', strtotime($yNow . '-' . $month));
+        $montn = date("F", strtotime($endDate));
 
         $dateObj   = DateTime::createFromFormat('!m', $month);
         $monthName = $dateObj->format('F');
@@ -31,7 +38,7 @@ try {
         $getSummaryStmt->execute([":endDate" => "$endDate"]);
         $total = $getSummaryStmt->fetchColumn();
 
-        $totalPerMonth['month'] = $monthName;
+        $totalPerMonth['month'] = $montn;
         $totalPerMonth['rate'] = $total;
 
         $summary[] = $totalPerMonth;

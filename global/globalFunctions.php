@@ -65,8 +65,8 @@ function getGroups($empnum)
     // echo $allGroupAccess;
     $myGroups = array();
     if (!$allGroupAccess) {
-        $groupsQ = "SELECT gl.id AS `id`, gl.name AS `name`, gl.abbreviation AS `abbr` FROM kdtphdb_new.group_list AS gl JOIN pcosdb.khi_details AS kd 
-        ON gl.id = kd.group_id WHERE kd.number = :empnum";
+        $groupsQ = "SELECT gl.id AS `id`, gl.name AS `name`, gl.abbreviation AS `abbr` FROM kdtphdb_new.group_list AS gl JOIN pcosdb.khi_user_groups AS ku 
+        ON gl.id = ku.group_id WHERE ku.user_id = :empnum";
         $groupsStmt = $connnew->prepare($groupsQ);
         $groupsStmt->execute([":empnum" => $empnum]);
         if ($groupsStmt->rowCount() > 0) {
