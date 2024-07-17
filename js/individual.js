@@ -27,10 +27,11 @@ checkAccess()
         getGroups()
           .then((grps) => {
             fillGroups(grps);
-            Promise.all([getEmployees(), getLocations()])
-              .then(([emps, locs]) => {
+            Promise.all([getEmployees(), getLocations() /*, getInviteTypes()*/])
+              .then(([emps, locs /*, invs*/]) => {
                 fillEmployees(emps);
                 fillLocations(locs);
+                //fillInvitations(invs);
               })
               .catch((error) => {
                 alert(`${error}`);
@@ -790,6 +791,41 @@ function fillLocations(locs) {
       .attr("loc-id", item.id);
     locSelect.append(option);
     $("#editentryLocation").append(option.clone());
+  });
+}
+function getInviteTypes() {
+  return new Promise((resolve, reject) => {
+    $.ajax({
+      type: "GET",
+      url: "php/get_invite.php",
+      dataType: "json",
+      success: function (response) {
+        const locs = response;
+        resolve(locs);
+      },
+      error: function (xhr, status, error) {
+        if (xhr.status === 404) {
+          reject("Not Found Error: The requested resource was not found.");
+        } else if (xhr.status === 500) {
+          reject("Internal Server Error: There was a server error.");
+        } else {
+          reject("An unspecified error occurred fetching locations.");
+        }
+      },
+    });
+  });
+}
+function fillInvitations(invis) {
+  var invSelect = $("#inviteSel");
+  invSelect.html("<option value='0'>Select Invitation Type</option>");
+  $("#editentryInvite").empty();
+  $.each(invis, function (index, item) {
+    var option = $("<option>")
+      .attr("value", item.id)
+      .text(item.name)
+      .attr("loc-id", item.id);
+    invSelect.append(option);
+    $("#editentryInvite").append(option.clone());
   });
 }
 function deleteDispatch() {
