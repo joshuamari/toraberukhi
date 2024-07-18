@@ -73,13 +73,13 @@ if (!empty($_POST['project_name'])) {
   $msg["isSuccess"] = false;
   $msg['error'] = "Project Name is Missing";
 }
-
-$site_dispatch = 0;
+// die(json_encode((int) $_POST['site_dispatch']));
+$site_dispatch = FALSE;
 if (!empty($_POST['site_dispatch'])) {
   $site_dispatch = $_POST['site_dispatch'];
-} else {
-  $msg["isSuccess"] = false;
-  $msg['error'] = "Site Dispatch Checkbox is Missing";
+// } else {
+//   $msg["isSuccess"] = false;
+//   $msg['error'] = "Site Dispatch Checkbox is Missing";
 }
 
 $allowance = 0;
