@@ -719,6 +719,7 @@ function insertDispatch() {
             dispatch_days = dd;
             fillYearly(yrl);
             $("#startDate").val("");
+            $("#empSel").val(0);
             $("#endDate").val("");
             $("#daysCount").text("");
             to_add = 0;
