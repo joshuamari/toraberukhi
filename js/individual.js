@@ -751,7 +751,7 @@ function insertDispatch() {
       workOrder: workOrder,
       project_name: projName,
       allowance: salary,
-      site_dispatch: JSON.stringify(siteDispatch),
+      site_dispatch: siteDispatch,
     },
     dataType: "json",
     success: function (response) {
