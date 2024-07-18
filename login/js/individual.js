@@ -88,7 +88,6 @@ function checkAccess() {
       url: "../global/check_login.php",
       dataType: "json",
       success: function (data) {
-        // console.log(data);
         const acc = data;
         resolve(acc);
       },
@@ -98,7 +97,7 @@ function checkAccess() {
         } else if (xhr.status === 500) {
           reject("Internal Server Error: There was a server error.");
         } else {
-          reject("An unspecified error occurred.1");
+          reject("An unspecified error occurred.1s");
         }
       },
     });
