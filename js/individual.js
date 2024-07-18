@@ -734,7 +734,7 @@ function insertDispatch() {
   }
   $.ajax({
     type: "POST",
-    url: "php/insert_dispatch.php",
+    url: "php/dump.php",
     data: {
       reqDept: reqDept,
       reqName: reqName,
@@ -761,9 +761,19 @@ function insertDispatch() {
             fillHistory(dHistory);
             dispatch_days = dd;
             fillYearly(yrl);
+            $("#reqDeptInput").val("");
+            $("#reqNameInput").val("");
+            $("#grpSel").val(0);
+            $("#empSel").val(0);
             $("#startDate").val("");
             $("#endDate").val("");
             $("#daysCount").text("");
+            $("#locSel").val(0);
+            $("#specLocInput").val("");
+            $("#inviteSel").val(0);
+            $("#workOrder").val("");
+            $("#projName").val("");
+            $("#salary").val("");
             to_add = 0;
             countTotal();
             showToast("success", "Successfully added a dispatch entry.");
@@ -787,12 +797,14 @@ function insertDispatch() {
   });
 }
 function clearInput() {
-  $("#grpSel, #empSel, #locSel, #startDate, #endDate").removeClass(
-    "bg-red-100  border-red-400"
-  );
+  $(
+    "#reqDeptInput, #reqNameInput, #grpSel, #empSel, #startDate, #endDate, #locSel, #specLocInput, #inviteSel, #workOrder, #projName, #salary"
+  ).removeClass("bg-red-100  border-red-400");
   $(".errTxt").remove();
-  $("#grpSel, #empSel, #locSel").val(0);
-  $("#startDate, #endDate").val("");
+  $("#grpSel, #empSel, #locSel, #inviteSel").val(0);
+  $(
+    "#reqDeptInput, #reqNameInput, #startDate, #endDate, #specLocInput, #inviteSel, #workOrder, #projName, #salary"
+  ).val("");
   to_add = 0;
   $("#daysCount").text("");
   $("#empSel").change();
