@@ -48,6 +48,13 @@
   margin-left: 0;
   width: 95%;
 }
+/* .input[type="checkbox"] {
+  /* d-flex align-items-center h-100 
+  display: flex;
+  align-items: center;
+  height: 100%;
+  float: right;
+} */
 .select {
   display: block;
   width: 95%;

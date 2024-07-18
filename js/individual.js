@@ -648,6 +648,7 @@ function colorBar(dd) {
       .removeClass("bg-warning bg-danger");
   }
 }
+
 function insertDispatch() {
   const reqDept = $("#reqDeptInput").val();
   const reqName = $("#reqNameInput").val();
@@ -661,7 +662,9 @@ function insertDispatch() {
   const workOrder = $("#workOrder").val();
   const projName = $("#projName").val();
   const salary = $("#salary").val();
+  const siteDispatch = $("#siteDispatch").is(":checked");
   let ctr = 0;
+
   toggleLoadingAnimation(true);
   if (!reqDept) {
     $("#reqDeptInput").addClass("bg-red-100  border-red-400");
@@ -732,21 +735,23 @@ function insertDispatch() {
     toggleLoadingAnimation(false);
     return;
   }
+
   $.ajax({
     type: "POST",
-    url: "php/dump.php",
+    url: "php/insert_request.php",
     data: {
-      reqDept: reqDept,
-      reqName: reqName,
+      request_dept: reqDept,
+      request_name: reqName,
       empID: empID,
       dateFrom: startD,
       dateTo: endD,
       locID: locID,
-      specLoc: specLoc,
-      inviteID: inviteID,
+      spec_loc: specLoc,
+      inviID: inviteID,
       workOrder: workOrder,
-      projName: projName,
-      salary: salary,
+      project_name: projName,
+      allowance: salary,
+      site_dispatch: JSON.stringify(siteDispatch),
     },
     dataType: "json",
     success: function (response) {
