@@ -25,6 +25,9 @@
 .left {
   overflow-y: scroll;
 }
+.right {
+  overflow-y: scroll;
+}
 ::-webkit-scrollbar {
   width: 0px;
   background: transparent;
@@ -43,7 +46,7 @@
 }
 .input[type="date"] {
   margin-left: 0;
-  width: 100%;
+  width: 95%;
 }
 .select {
   display: block;
@@ -149,6 +152,10 @@
 .work-hist table tbody tr:hover {
   background-color: #e6e6e6;
 }
+.work-hist table thead th {
+  text-align: center;
+  vertical-align: middle;
+}
 .btn-edit,
 .btn-delete {
   border: none;
@@ -223,6 +230,10 @@
 @media (max-width: 842px) {
   .left {
     width: 100% !important;
+    height: 80% !important;
+  }
+  .btn-dispatch {
+    font-size: 13px;
   }
 }
 @media (max-width: 954px) {
@@ -274,7 +285,7 @@
     padding: 0;
   }
   .main .left {
-    height: auto;
+    height: 80%;
   }
 }
 @media (max-width: 1490px) {

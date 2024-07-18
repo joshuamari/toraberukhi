@@ -861,7 +861,7 @@ function getInviteTypes() {
         } else if (xhr.status === 500) {
           reject("Internal Server Error: There was a server error.");
         } else {
-          reject("An unspecified error occurred fetching locations.");
+          reject("An unspecified error occurred fetching invitation types.");
         }
       },
     });
