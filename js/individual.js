@@ -1,15 +1,5 @@
 //#region GLOBALS
-switch (document.location.hostname) {
-  case "kdt-ph":
-    rootFolder = "//kdt-ph/";
-    break;
-  case "localhost":
-    rootFolder = "//localhost/";
-    break;
-  default:
-    rootFolder = "//kdt-ph/";
-    break;
-}
+const rootFolder = document.location.hostname;
 let empDetails = [];
 var dispatch_days = 0;
 var to_add = 0;
