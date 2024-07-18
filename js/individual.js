@@ -1,5 +1,5 @@
 //#region GLOBALS
-const rootFolder = document.location.hostname;
+const rootFolder = `//${document.location.hostname}`;
 let empDetails = [];
 var dispatch_days = 0;
 var to_add = 0;

@@ -1,5 +1,5 @@
 //#region GLOBALS
-const rootFolder = document.location.hostname;
+const rootFolder = `//${document.location.hostname}`;
 const dispTableID = ["eList"];
 let empDetails = [];
 let accessTypes = {
