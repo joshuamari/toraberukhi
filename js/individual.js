@@ -27,11 +27,11 @@ checkAccess()
         getGroups()
           .then((grps) => {
             fillGroups(grps);
-            Promise.all([getEmployees(), getLocations() /*, getInviteTypes()*/])
-              .then(([emps, locs /*, invs*/]) => {
+            Promise.all([getEmployees(), getLocations(), getInviteTypes()])
+              .then(([emps, locs, invs]) => {
                 fillEmployees(emps);
                 fillLocations(locs);
-                //fillInvitations(invs);
+                fillInvitations(invs);
               })
               .catch((error) => {
                 alert(`${error}`);
@@ -651,13 +651,28 @@ function colorBar(dd) {
   }
 }
 function insertDispatch() {
+  const reqDept = $("#reqDeptInput").val();
+  const reqName = $("#reqNameInput").val();
   const grp = $("#grpSel").find("option:selected").attr("grp-id");
   const empID = $("#empSel").find("option:selected").attr("emp-id");
-  const locID = $("#locSel").find("option:selected").attr("loc-id");
   const startD = $("#startDate").val();
   const endD = $("#endDate").val();
+  const locID = $("#locSel").find("option:selected").attr("loc-id");
+  const specLoc = $("#specLocInput").val();
+  const inviteID = $("#inviteSel").find("option:selected").attr("inv-id");
+  const workOrder = $("#workOrder").val();
+  const projName = $("#projName").val();
+  const salary = $("#salary").val();
   let ctr = 0;
   toggleLoadingAnimation(true);
+  if (!reqDept) {
+    $("#reqDeptInput").addClass("bg-red-100  border-red-400");
+    ctr++;
+  }
+  if (!reqName) {
+    $("#reqNameInput").addClass("bg-red-100  border-red-400");
+    ctr++;
+  }
   if (!grp) {
     $("#grpSel").addClass("bg-red-100  border-red-400");
     ctr++;
@@ -666,16 +681,36 @@ function insertDispatch() {
     $("#empSel").addClass("bg-red-100  border-red-400");
     ctr++;
   }
-  if (!locID) {
-    $("#locSel").addClass("bg-red-100  border-red-400");
-    ctr++;
-  }
   if (!startD) {
     $("#startDate").addClass("bg-red-100  border-red-400");
     ctr++;
   }
   if (!endD) {
     $("#endDate").addClass("bg-red-100  border-red-400");
+    ctr++;
+  }
+  if (!locID) {
+    $("#locSel").addClass("bg-red-100  border-red-400");
+    ctr++;
+  }
+  if (!specLoc) {
+    $("#specLocInput").addClass("bg-red-100  border-red-400");
+    ctr++;
+  }
+  if (!inviteID) {
+    $("#inviteSel").addClass("bg-red-100  border-red-400");
+    ctr++;
+  }
+  if (!workOrder) {
+    $("#workOrder").addClass("bg-red-100  border-red-400");
+    ctr++;
+  }
+  if (!projName) {
+    $("#projName").addClass("bg-red-100  border-red-400");
+    ctr++;
+  }
+  if (!salary) {
+    $("#salary").addClass("bg-red-100  border-red-400");
     ctr++;
   }
   if (ctr > 0) {
@@ -703,10 +738,17 @@ function insertDispatch() {
     type: "POST",
     url: "php/insert_dispatch.php",
     data: {
+      reqDept: reqDept,
+      reqName: reqName,
       empID: empID,
-      locID: locID,
       dateFrom: startD,
       dateTo: endD,
+      locID: locID,
+      specLoc: specLoc,
+      inviteID: inviteID,
+      workOrder: workOrder,
+      projName: projName,
+      salary: salary,
     },
     dataType: "json",
     success: function (response) {
@@ -797,11 +839,11 @@ function getInviteTypes() {
   return new Promise((resolve, reject) => {
     $.ajax({
       type: "GET",
-      url: "php/get_invite.php",
+      url: "php/get_invitation.php",
       dataType: "json",
       success: function (response) {
-        const locs = response;
-        resolve(locs);
+        const invis = response;
+        resolve(invis);
       },
       error: function (xhr, status, error) {
         if (xhr.status === 404) {
@@ -822,8 +864,8 @@ function fillInvitations(invis) {
   $.each(invis, function (index, item) {
     var option = $("<option>")
       .attr("value", item.id)
-      .text(item.name)
-      .attr("loc-id", item.id);
+      .text(item.type)
+      .attr("inv-id", item.id);
     invSelect.append(option);
     $("#editentryInvite").append(option.clone());
   });

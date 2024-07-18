@@ -134,16 +134,19 @@
   color: var(--red-color);
 }
 
-.dispatch-hist table thead th {
+.dispatch-hist table thead th,
+.work-hist table thead th {
   text-transform: uppercase;
   font-size: 12px !important;
   text-wrap: nowrap;
 }
-.dispatch-hist table tbody td {
+.dispatch-hist table tbody td,
+.work-hist table tbody td {
   font-size: 14px;
   vertical-align: middle;
 }
-.dispatch-hist table tbody tr:hover {
+.dispatch-hist table tbody tr:hover,
+.work-hist table tbody tr:hover {
   background-color: #e6e6e6;
 }
 .btn-edit,
@@ -170,7 +173,8 @@
   font-size: 36px;
   font-weight: 700;
 }
-.dispatch-hist .top .title {
+.dispatch-hist .top .title,
+.work-hist .top .title {
   font-size: 20px;
   font-weight: 500;
 }

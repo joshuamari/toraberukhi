@@ -116,11 +116,12 @@
                 </select>
               </div>
             </div>
-            <!-- <div class="row mb-2">
+            <!--  -->
+            <div class="row mb-2">
               <label
                 for="editentryInvite"
                 class="col-sm-4 col-form-label col-form-label-sm"
-                >Invite Type</label
+                >Invitation Type</label
               >
               <div class="col-sm-8">
                 <select class="select" id="editentryInvite">
@@ -129,7 +130,8 @@
                   <option value="3">Not Required</option>
                 </select>
               </div>
-            </div> -->
+            </div>
+            <!--  -->
             <div class="row mb-2">
               <label
                 for="editentryDateJ"
@@ -715,7 +717,205 @@
                     </table>
                   </div>
                 </div>
-              </div>
+                <div class="work-hist h-full pb-6 xl:pb-0">
+                  <div class="top flex justify-content-between">
+                    <div class="title pb-3">Work History</div>
+                    <div>
+                      <button class="btn btn-success bg-[var(--darkest)]" id="btnExport">
+                        Export table
+                      </button>
+                    </div>
+                  </div>
+                  <div class="table-cont overflow-auto min-h-[200px]">
+                    <table class="table" id="histTable">
+                      <thead class="sticky top-0 bg-gray-200">
+                        <tr>
+                          <!-- <th data-exclude="true">No.</th>
+                          <th
+                            data-f-name="Arial"
+                            data-f-sz="9"
+                            data-f-bold="true"
+                            data-a-h="center"
+                            data-a-v="middle"
+                            data-b-a-s="thin"
+                            data-b-a-c="000000"
+                          >
+                            Location
+                          </th>
+                          <th data-exclude="true"></th> -->
+                          <th 
+                            data-exclude="true"
+                            rowspan="2"
+                            class="text-center align-middle"
+                            >
+                            No.
+                          </th>
+                          <th
+                            data-f-name="Arial"
+                            data-f-sz="9"
+                            data-f-bold="true"
+                            data-a-h="center"
+                            data-a-v="middle"
+                            data-b-a-s="thin"
+                            data-b-a-c="000000"
+                            colspan="2"
+                            class="text-center align-middle"
+                          >
+                            Start
+                          </th>
+                          <th
+                            data-f-name="Arial"
+                            data-f-sz="9"
+                            data-f-bold="true"
+                            data-a-h="center"
+                            data-a-v="middle"
+                            data-b-a-s="thin"
+                            data-b-a-c="000000"
+                            colspan="2"
+                            class="text-center align-middle"
+                          >
+                            End
+                          </th>
+                          <th
+                            data-f-name="Arial"
+                            data-f-sz="9"
+                            data-f-bold="true"
+                            data-a-h="center"
+                            data-a-v="middle"
+                            data-b-a-s="thin"
+                            data-b-a-c="000000"
+                            rowspan="2"
+                            class="text-center align-middle"
+                          >
+                            Company's Name
+                          </th>
+                          <th
+                            data-f-name="Arial"
+                            data-f-sz="9"
+                            data-f-bold="true"
+                            data-a-h="center"
+                            data-a-v="middle"
+                            data-b-a-s="thin"
+                            data-b-a-c="000000"
+                            rowspan="2"
+                            class="text-center align-middle"
+                          >
+                            Company's Business
+                          </th>
+                          <th
+                            data-f-name="Arial"
+                            data-f-sz="9"
+                            data-f-bold="true"
+                            data-a-h="center"
+                            data-a-v="middle"
+                            data-b-a-s="thin"
+                            data-b-a-c="000000"
+                            rowspan="2"
+                            class="text-center align-middle"
+                          >
+                            Business Content
+                          </th>
+                          <th
+                            data-f-name="Arial"
+                            data-f-sz="9"
+                            data-f-bold="true"
+                            data-a-h="center"
+                            data-a-v="middle"
+                            data-b-a-s="thin"
+                            data-b-a-c="000000"
+                            rowspan="2"
+                            class="text-center align-middle"
+                          >
+                            Work Location
+                          </th>
+
+                          <th 
+                            data-exclude="true"
+                            rowspan="2"
+                          ></th>
+                        </tr>
+                        <tr>
+                          <th
+                            data-f-name="Arial"
+                            data-f-sz="9"
+                            data-f-bold="true"
+                            data-a-h="center"
+                            data-a-v="middle"
+                            data-b-a-s="thin"
+                            data-b-a-c="000000"
+                            class="text-center align-middle"
+                          >
+                            Year
+                          </th>
+                          <th
+                            data-f-name="Arial"
+                            data-f-sz="9"
+                            data-f-bold="true"
+                            data-a-h="center"
+                            data-a-v="middle"
+                            data-b-a-s="thin"
+                            data-b-a-c="000000"
+                            class="text-center align-middle"
+                          >
+                            Month
+                          </th>
+                          <th
+                          data-f-name="Arial"
+                          data-f-sz="9"
+                          data-f-bold="true"
+                          data-a-h="center"
+                          data-a-v="middle"
+                          data-b-a-s="thin"
+                          data-b-a-c="000000"
+                          class="text-center align-middle"
+                          >
+                          Year
+                          </th>
+                          <th
+                            data-f-name="Arial"
+                            data-f-sz="9"
+                            data-f-bold="true"
+                            data-a-h="center"
+                            data-a-v="middle"
+                            data-b-a-s="thin"
+                            data-b-a-c="000000"
+                            class="text-center align-middle"
+                          >
+                            Month
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody id="wList">
+                        <tr>
+                          <td colspan="10" class="text-center">No data found</td>
+                        </tr>
+                        <!-- <tr>
+                            <td>1</td>
+                            <td>Kobe</td>
+                            <td>07 AUG 2023</td>
+                            <td>20 NOV 2023</td>
+                            <td>105</td>
+                            <td>105</td>
+                            <td>
+                              <div class="d-flex gap-2">
+                              <button
+                                class="btn-delete"
+                                title="Delete Entry"
+                                data-bs-toggle="modal"
+                                data-bs-target="#deleteEntry"
+                              >
+                                <i class="bx bx-trash fs-5" ></i>
+                              </button>
+                            </div>
+                            </td>
+                            
+                          </td>
+                          </tr> -->
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div> <!--end of emp details -->
             </div>
             <div
               class="emptyState h-100 d-flex justify-content-center align-items-center flex-column gap-2 pb-5"
