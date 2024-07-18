@@ -1,7 +1,6 @@
 <?php
 #region DB Connect
 require_once '../dbconn/dbconnectpcs.php';
-// require_once './config.php';
 #endregion
 
 #region set timezone
