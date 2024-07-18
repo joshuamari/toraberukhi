@@ -17,10 +17,11 @@ checkAccess()
         getGroups()
           .then((grps) => {
             fillGroups(grps);
-            Promise.all([getEmployees(), getLocations()])
-              .then(([emps, locs]) => {
+            Promise.all([getEmployees(), getLocations(), getInviteTypes()])
+              .then(([emps, locs, invs]) => {
                 fillEmployees(emps);
                 fillLocations(locs);
+                fillInvitations(invs);
               })
               .catch((error) => {
                 alert(`${error}`);
@@ -637,14 +638,32 @@ function colorBar(dd) {
       .removeClass("bg-warning bg-danger");
   }
 }
+
 function insertDispatch() {
+  const reqDept = $("#reqDeptInput").val();
+  const reqName = $("#reqNameInput").val();
   const grp = $("#grpSel").find("option:selected").attr("grp-id");
   const empID = $("#empSel").find("option:selected").attr("emp-id");
-  const locID = $("#locSel").find("option:selected").attr("loc-id");
   const startD = $("#startDate").val();
   const endD = $("#endDate").val();
+  const locID = $("#locSel").find("option:selected").attr("loc-id");
+  const specLoc = $("#specLocInput").val();
+  const inviteID = $("#inviteSel").find("option:selected").attr("inv-id");
+  const workOrder = $("#workOrder").val();
+  const projName = $("#projName").val();
+  const salary = $("#salary").val();
+  const siteDispatch = $("#siteDispatch").is(":checked");
   let ctr = 0;
+
   toggleLoadingAnimation(true);
+  if (!reqDept) {
+    $("#reqDeptInput").addClass("bg-red-100  border-red-400");
+    ctr++;
+  }
+  if (!reqName) {
+    $("#reqNameInput").addClass("bg-red-100  border-red-400");
+    ctr++;
+  }
   if (!grp) {
     $("#grpSel").addClass("bg-red-100  border-red-400");
     ctr++;
@@ -653,16 +672,36 @@ function insertDispatch() {
     $("#empSel").addClass("bg-red-100  border-red-400");
     ctr++;
   }
-  if (!locID) {
-    $("#locSel").addClass("bg-red-100  border-red-400");
-    ctr++;
-  }
   if (!startD) {
     $("#startDate").addClass("bg-red-100  border-red-400");
     ctr++;
   }
   if (!endD) {
     $("#endDate").addClass("bg-red-100  border-red-400");
+    ctr++;
+  }
+  if (!locID) {
+    $("#locSel").addClass("bg-red-100  border-red-400");
+    ctr++;
+  }
+  if (!specLoc) {
+    $("#specLocInput").addClass("bg-red-100  border-red-400");
+    ctr++;
+  }
+  if (!inviteID) {
+    $("#inviteSel").addClass("bg-red-100  border-red-400");
+    ctr++;
+  }
+  if (!workOrder) {
+    $("#workOrder").addClass("bg-red-100  border-red-400");
+    ctr++;
+  }
+  if (!projName) {
+    $("#projName").addClass("bg-red-100  border-red-400");
+    ctr++;
+  }
+  if (!salary) {
+    $("#salary").addClass("bg-red-100  border-red-400");
     ctr++;
   }
   if (ctr > 0) {
@@ -686,14 +725,23 @@ function insertDispatch() {
     toggleLoadingAnimation(false);
     return;
   }
+
   $.ajax({
     type: "POST",
-    url: "php/insert_dispatch.php",
+    url: "php/insert_request.php",
     data: {
+      request_dept: reqDept,
+      request_name: reqName,
       empID: empID,
-      locID: locID,
       dateFrom: startD,
       dateTo: endD,
+      locID: locID,
+      spec_loc: specLoc,
+      inviID: inviteID,
+      workOrder: workOrder,
+      project_name: projName,
+      allowance: salary,
+      site_dispatch: siteDispatch,
     },
     dataType: "json",
     success: function (response) {
@@ -708,9 +756,19 @@ function insertDispatch() {
             fillHistory(dHistory);
             dispatch_days = dd;
             fillYearly(yrl);
+            $("#reqDeptInput").val("");
+            $("#reqNameInput").val("");
+            $("#grpSel").val(0);
+            $("#empSel").val(0);
             $("#startDate").val("");
             $("#endDate").val("");
             $("#daysCount").text("");
+            $("#locSel").val(0);
+            $("#specLocInput").val("");
+            $("#inviteSel").val(0);
+            $("#workOrder").val("");
+            $("#projName").val("");
+            $("#salary").val("");
             to_add = 0;
             countTotal();
             showToast("success", "Successfully added a dispatch entry.");
@@ -734,12 +792,14 @@ function insertDispatch() {
   });
 }
 function clearInput() {
-  $("#grpSel, #empSel, #locSel, #startDate, #endDate").removeClass(
-    "bg-red-100  border-red-400"
-  );
+  $(
+    "#reqDeptInput, #reqNameInput, #grpSel, #empSel, #startDate, #endDate, #locSel, #specLocInput, #inviteSel, #workOrder, #projName, #salary"
+  ).removeClass("bg-red-100  border-red-400");
   $(".errTxt").remove();
-  $("#grpSel, #empSel, #locSel").val(0);
-  $("#startDate, #endDate").val("");
+  $("#grpSel, #empSel, #locSel, #inviteSel").val(0);
+  $(
+    "#reqDeptInput, #reqNameInput, #startDate, #endDate, #specLocInput, #inviteSel, #workOrder, #projName, #salary"
+  ).val("");
   to_add = 0;
   $("#daysCount").text("");
   $("#empSel").change();
@@ -778,6 +838,41 @@ function fillLocations(locs) {
       .attr("loc-id", item.id);
     locSelect.append(option);
     $("#editentryLocation").append(option.clone());
+  });
+}
+function getInviteTypes() {
+  return new Promise((resolve, reject) => {
+    $.ajax({
+      type: "GET",
+      url: "php/get_invitation.php",
+      dataType: "json",
+      success: function (response) {
+        const invis = response;
+        resolve(invis);
+      },
+      error: function (xhr, status, error) {
+        if (xhr.status === 404) {
+          reject("Not Found Error: The requested resource was not found.");
+        } else if (xhr.status === 500) {
+          reject("Internal Server Error: There was a server error.");
+        } else {
+          reject("An unspecified error occurred fetching invitation types.");
+        }
+      },
+    });
+  });
+}
+function fillInvitations(invis) {
+  var invSelect = $("#inviteSel");
+  invSelect.html("<option value='0'>Select Invitation Type</option>");
+  $("#editentryInvite").empty();
+  $.each(invis, function (index, item) {
+    var option = $("<option>")
+      .attr("value", item.id)
+      .text(item.type)
+      .attr("inv-id", item.id);
+    invSelect.append(option);
+    $("#editentryInvite").append(option.clone());
   });
 }
 function deleteDispatch() {
