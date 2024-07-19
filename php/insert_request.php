@@ -101,56 +101,65 @@ if (!empty($_POST['request_name'])) {
   $msg["isSuccess"] = false;
   $msg['error'] = "Requester is Missing";
 }
+
+// for conflicting entries
+$checkConflict = "SELECT COUNT(*) FROM `request_list` WHERE `emp_number` = :empNumber AND (`dispatch_from` BETWEEN :dateFrom AND :dateTo OR `dispatch_to` BETWEEN :dateFrom AND :dateTo)";
+$checkConflictStmt = $connpcs->prepare($checkConflict);
+$checkConflictStmt->execute([":empNumber" => "$empNumber", ":dateFrom" => "$dateFrom", ":dateTo" => "$dateTo"]);
+$checkCount = $checkConflictStmt->fetchColumn();
+if ($checkCount > 0) {
+    $msg["isSuccess"] = false;
+    $msg['error'] = "Dispatch conflict";
+}
 #endregion
 
 #region Entries Query
 try {
-    if (empty($msg)) {
-        $insertQ = "INSERT INTO `request_list`(`emp_number`, 
-                                               `location_id`, 
-                                               `specific_loc`, 
-                                               `dipsatch_from`, 
-                                               `dispatch_to`, 
-                                               `invitation_id`, 
-                                               `work_order`, 
-                                               `project_name`, 
-                                               `site_dispatch`, 
-                                               `allowance`, 
-                                               `request_by_dept`, 
-                                               `request_by_name`) 
-                    VALUES (:empNumber,
-                            :locID,
-                            :spec_loc,
-                            :dateFrom,
-                            :dateTo,
-                            :inviID,
-                            :workOrder,
-                            :project_name,
-                            :site_dispatch,
-                            :allowance,
-                            :request_dept,
-                            :request_name)";
-        $insertStmt = $connpcs->prepare($insertQ);
-        $insertStmt->execute([":empNumber" => $empNumber, 
-                              ":locID" => $locID,
-                              ":spec_loc" => $spec_loc,
-                              ":dateFrom" => $dateFrom, 
-                              ":dateTo" => $dateTo, 
-                              ":inviID" => $inviID,
-                              ":workOrder" => $workOrder,
-                              ":project_name" => $project_name,
-                              ":site_dispatch" => $site_dispatch,
-                              ":allowance" => $allowance,
-                              ":request_dept" => $request_dept,
-                              ":request_name" => $request_name]);
-        $msg["isSuccess"] = true;
-        $msg["error"] = "Adding dispatch successfull";
+  if (empty($msg)) {
+      $insertQ = "INSERT INTO `request_list`(`emp_number`, 
+                                              `location_id`, 
+                                              `specific_loc`, 
+                                              `dispatch_from`, 
+                                              `dispatch_to`, 
+                                              `invitation_id`, 
+                                              `work_order`, 
+                                              `project_name`, 
+                                              `site_dispatch`, 
+                                              `allowance`, 
+                                              `request_by_dept`, 
+                                              `request_by_name`) 
+                  VALUES (:empNumber,
+                          :locID,
+                          :spec_loc,
+                          :dateFrom,
+                          :dateTo,
+                          :inviID,
+                          :workOrder,
+                          :project_name,
+                          :site_dispatch,
+                          :allowance,
+                          :request_dept,
+                          :request_name)";
+      $insertStmt = $connpcs->prepare($insertQ);
+      $insertStmt->execute([":empNumber" => $empNumber, 
+                            ":locID" => $locID,
+                            ":spec_loc" => $spec_loc,
+                            ":dateFrom" => $dateFrom, 
+                            ":dateTo" => $dateTo, 
+                            ":inviID" => $inviID,
+                            ":workOrder" => $workOrder,
+                            ":project_name" => $project_name,
+                            ":site_dispatch" => $site_dispatch,
+                            ":allowance" => $allowance,
+                            ":request_dept" => $request_dept,
+                            ":request_name" => $request_name]);
+      $msg["isSuccess"] = true;
+      $msg["error"] = "Adding dispatch successfull";
     }
 } catch (Exception $e) {
     $msg["isSuccess"] = false;
     $msg['error'] =  "Connection failed: " . $e->getMessage();
 }
-
 #endregion
-// echo json_encode(array('errors' => $errorMsg), JSON_PRETTY_PRINT);
+
 echo json_encode($msg);
