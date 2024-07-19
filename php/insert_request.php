@@ -189,9 +189,10 @@ $insertStmt->execute([":userID" => $userID,
                       ":request_name" => $request_name]);
 $msg["isSuccess"] = true;
 $msg["error"] = "Adding dispatch successfull";
-echo json_encode($msg);
 } catch (Exception $e) {
     $msg["isSuccess"] = false;
     $msg['error'] =  "Connection failed: " . $e->getMessage();
 }
+
+echo json_encode($msg);
 #endregion
