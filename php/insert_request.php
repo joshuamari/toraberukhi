@@ -188,7 +188,7 @@ $insertStmt->execute([":userID" => $userID,
                       ":request_dept" => $request_dept,
                       ":request_name" => $request_name]);
 $msg["isSuccess"] = true;
-$msg["error"] = "Adding dispatch successfull";
+$msg["error"] = "Adding dispatch successful";
 } catch (Exception $e) {
     $msg["isSuccess"] = false;
     $msg['error'] =  "Connection failed: " . $e->getMessage();
