@@ -36,4 +36,4 @@ try {
   $msg['error'] = "Failed to retrieve the data" . $e->getMessage();
 }
 
-echo json_encode($msg['result']);
+echo json_encode($msg);

@@ -10,7 +10,7 @@ date_default_timezone_set('Asia/Manila');
 #region Initialize Variable
 $msg = array();
 $work_histID =  $empNumber = 0; 
-$date_yearStart = $date_monthStart = $date_yearEnd = $date_monthEnd = $comp_name = $comp_business = $busi_content = $work_loc = NULL;
+$date_monthYearStart = $date_yearEnd = $comp_name = $comp_business = $busi_content = $work_loc = NULL;
 #end region
 
 #region get values
@@ -18,36 +18,18 @@ if (!empty($_POST['work_histID'])) {
 	$work_histID = $_POST['work_histID'];
 }
 
-if (!empty($_POST['empID'])) {
-	$empNumber = $_POST['empID'];
-}
-
-if (!empty($_POST['date_yearStart'])) {
-	$date_yearStart = $_POST['date_yearStart'];
+if (!empty($_POST['date_monthYearStart'])) {
+	$date_monthYearStart = $_POST['date_monthYearStart'];
 } else {
 	$msg["isSuccess"] = false;
-	$msg['error'][] = "Start 'Year' is Missing";
+	$msg['error'][] = "Start 'Month' and 'Year' is Missing";
 }
 
-if (!empty($_POST['date_monthStart'])) {
-	$date_monthStart = sprintf('%02d', $_POST['date_monthStart']);
+if (!empty($_POST['date_monthYearEnd'])) {
+	$date_monthYearEnd = $_POST['date_monthYearEnd'];
 } else {
 	$msg["isSuccess"] = false;
-	$msg['error'][] = "Start 'Month' is Missing";
-}
-
-if (!empty($_POST['date_yearEnd'])) {
-	$date_yearEnd = $_POST['date_yearEnd'];
-} else {
-	$msg["isSuccess"] = false;
-	$msg['error'][] = "End 'Year' is Missing";
-}
-
-if (!empty($_POST['date_monthEnd'])) {
-	$date_monthEnd = sprintf('%02d', $_POST['date_monthEnd']);
-} else {
-	$msg["isSuccess"] = false;
-	$msg['error'][] = "End 'Month' is Missing";
+	$msg['error'][] = "End 'Month' and 'Year' is Missing";
 }
 
 if (!empty($_POST['comp_name'])) {
@@ -85,14 +67,13 @@ if (!empty($msg)) {
 #end region
 
 #setting up dates
-$date_Start = date($date_yearStart . "-" . $date_monthStart . "-01");
-$date_End = date($date_yearEnd . "-" . $date_monthEnd . "-01");
+$date_Start = date($date_monthYearStart . "-01");
+$date_End = date($date_monthYearEnd . "-01");
 #end region
 
 #region Entries Query
 try {
-	$updateQ = "UPDATE `work_history` SET `emp_id` = :empNumber, 
-                                        `start_date` = :date_Start, 
+	$updateQ = "UPDATE `work_history` SET `start_date` = :date_Start, 
 																				`end_date` = :date_End, 
 																				 `comp_name` = :comp_name, 
 																				 `comp_business` = :comp_business, 
@@ -101,7 +82,7 @@ try {
                                     WHERE work_hist_id = :wh_id";
 
 	$updateStmt = $connpcs->prepare($updateQ);
-	if($updateStmt->execute([":empNumber" => $empNumber, ":date_Start" => $date_Start, ":date_End" => $date_End, ":comp_name" => $comp_name,
+	if($updateStmt->execute([":date_Start" => $date_Start, ":date_End" => $date_End, ":comp_name" => $comp_name,
 											     ":comp_business" => $comp_business, ":busi_content" => $busi_content, ":work_loc" => $work_loc, ":wh_id" => $work_histID])) {
     $msg["isSuccess"] = true;
     $msg["error"] = "Update successful";
