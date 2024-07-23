@@ -100,14 +100,14 @@ try {
 												":comp_business" => $comp_business,
 												":busi_content" => $busi_content,
 												":work_loc" => $work_loc]);
-		if ($insertStmt->rowCount() > 0) {
-			$msg["isSuccess"] = true;
-			$msg["error"] = "Adding Work History successful";
-		}
-		else {
-			$msg["isSuccess"] = false;
-			$msg["error"] = "Adding Work History unsuccessful";
-		}
+	if ($insertStmt->rowCount() > 0) {
+		$msg["isSuccess"] = true;
+		$msg["error"] = "Adding Work History successfully";
+	}
+	else {
+		$msg["isSuccess"] = false;
+		$msg["error"] = "Adding Work History unsuccessful";
+	}
 } catch (Exception $e) {
 	$msg["isSuccess"] = false;
 	$msg['error'] =  "Connection failed: " . $e->getMessage();
