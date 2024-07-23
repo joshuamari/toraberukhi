@@ -24,6 +24,7 @@
 
 .left {
   overflow-y: scroll;
+  /* position: relative; */
 }
 .right {
   overflow-y: scroll;
@@ -46,15 +47,8 @@
 }
 .input[type="date"] {
   margin-left: 0;
-  width: 95%;
+  /* width: 100%; */
 }
-/* .input[type="checkbox"] {
-  /* d-flex align-items-center h-100 
-  display: flex;
-  align-items: center;
-  height: 100%;
-  float: right;
-} */
 .select {
   display: block;
   width: 95%;
@@ -69,6 +63,70 @@
   background-size: 16px 12px;
   border-radius: 0.5rem;
   border: 1px solid #dee2e6;
+}
+
+.sticky-buttons {
+  position: sticky;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  justify-items: end;
+  align-items: end;
+  gap: 2px;
+  background-color: var(--gray-100);
+  border-radius: 20px 20px 0px 0px;
+  height: 100px;
+  margin: 0px 3px;
+  width: 100%;
+  box-shadow: 0px -3px 1px 1px rgba(0, 0, 0, 0.25);
+}
+
+.lbl-viewForm {
+  visibility: hidden;
+}
+
+input[type="checkbox"] {
+  display: none;
+}
+
+.toggle {
+  cursor: pointer;
+  color: #15803d;
+  width: 35px;
+  height: 20px;
+  background: #999999;
+  display: block;
+  border-radius: 100px;
+  position: relative;
+  padding: 5px 5px;
+}
+
+.toggle:after {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 15px;
+  height: 15px;
+  background: #fff;
+  border-radius: 40px;
+  transition: 0.3s;
+}
+
+input:checked + .toggle {
+  background: #22c55e;
+}
+
+input:checked + .toggle:after {
+  content: "\2714";
+  text-align: center;
+  font-size: 10px;
+  left: calc(100% - 5px);
+  transform: translateX(-100%);
+}
+
+.toggle:active:after {
+  width: 25px;
 }
 
 .btn-dispatch {
@@ -163,6 +221,14 @@
   text-align: center;
   vertical-align: middle;
 }
+.work-hist table {
+  outline: 2px solid white;
+  outline-offset: -2px;
+}
+.dispatch-hist table th,
+.work-hist table th {
+  outline: thin solid var(--gray-100);
+}
 .btn-edit,
 .btn-delete {
   border: none;
@@ -232,15 +298,123 @@
 .totalDays {
   font-weight: 700;
   font-size: 28px;
+  width: 75px;
+}
+
+@media screen and (min-width: 0px) and (max-width: 1340px) {
+  .pageTitle h1 {
+    font-size: 18px;
+  }
+  /* .input,
+  .select {
+    max-width: 95%;
+  } */
+  .left {
+    position: absolute;
+    overflow: hidden;
+    z-index: 100;
+  }
+  #left.changeSize {
+    background: var(--gray-100);
+    overflow: scroll;
+    height: 100vh;
+    z-index: 100;
+  }
+  .right {
+    margin-top: 200px;
+  }
+  .sticky-buttons {
+    display: none;
+    /* width: 98%; */
+    /* height: 25%; */
+    /* margin-top: 15px; */
+    /* display: flex; */
+    /* justify-content: end; */
+    /* padding: 0px 5px; */
+    /* align-items: center; */
+  }
+  .sticky-buttons.appear {
+    width: 97%;
+    height: 25%;
+    margin-top: 15px;
+    margin-bottom: 15px;
+    display: flex;
+    justify-content: end;
+    padding-bottom: 10px;
+    padding: 0px 5px;
+  }
+  .submit-btns {
+    display: flex;
+    /* justify-items: center; */
+    justify-content: end;
+    align-content: end;
+    width: 100%;
+    /* padding-left: 40px; */
+    /* float: right; */
+  }
+  .count-total-days {
+    display: flex;
+    justify-content: end;
+  }
+  #daysCount {
+    padding-top: 8px;
+  }
+  .btn-dispatch {
+    width: 190px;
+    margin-left: 5px;
+  }
+  .btn-clear {
+    width: 70px;
+    padding: 3px 8px;
+  }
+
+  .chkbx-viewForm {
+    display: none;
+  }
+  .viewForm {
+    /* max-height: 40%; */
+    opacity: 1;
+    overflow: hidden;
+    visibility: visible;
+    transition: max-height 1s;
+  }
+  .chkbx-viewForm:checked + .viewForm {
+    max-height: 120vh;
+    opacity: 1;
+    visibility: visible;
+  }
+  .lbl-viewForm {
+    position: sticky;
+    top: 0;
+    visibility: visible;
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    padding: 10px;
+    color: var(--text-color);
+    background: var(--gray-100);
+    cursor: pointer;
+    z-index: 100;
+  }
+  .viewForm {
+    background: transparent;
+  }
 }
 
 @media (max-width: 842px) {
   .left {
     width: 100% !important;
-    height: 80% !important;
+    height: 30%;
   }
-  .btn-dispatch {
-    font-size: 13px;
+  .sticky-buttons .btn {
+    font-size: 12px;
+  }
+  .input[type="date"] {
+    width: 100%;
+  }
+  .calendars {
+    display: flex;
+    flex-wrap: wrap;
   }
 }
 @media (max-width: 954px) {
@@ -274,6 +448,13 @@
     grid-template-columns: 1fr !important;
   }
 }
+@media screen and (min-width: 888px) and (max-width: 1340px) {
+  /* .input,
+  .select,
+  .lbl-viewForm {
+    max-width: calc(100% - 30%);
+  } */
+}
 @media (max-width: 1340px) {
   .main {
     flex-direction: column;
@@ -292,7 +473,9 @@
     padding: 0;
   }
   .main .left {
-    height: 80%;
+    /* height: 80%; */
+    height: calc(100% - 700px);
+    width: calc(100% - 300px);
   }
 }
 @media (max-width: 1490px) {
