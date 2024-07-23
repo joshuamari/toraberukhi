@@ -93,13 +93,16 @@ $(document).on("change", "#empSel", function () {
     getDispatchHistory(),
     getDispatchDays(),
     getYearly(),
+    getWorkHistory(),
   ])
-    .then(([pass, vsa, dlst, dd, yrl]) => {
+    .then(([pass, vsa, dlst, dd, yrl, wlst]) => {
       fillPassport(pass);
       fillVisa(vsa);
       dispatch_days = dd;
       dHistory = dlst;
-      fillHistory(dHistory);
+      fillDispatchHistory(dHistory);
+      wHistory = wlst;
+      fillWorkHistory(wHistory);
       countTotal();
       fillYearly(yrl);
       toggleLoadingAnimation(false);
@@ -124,7 +127,7 @@ $(document).on("change", "#dToggle", function () {
   getDispatchHistory()
     .then((dlst) => {
       dHistory = dlst;
-      fillHistory(dHistory);
+      fillDispatchHistory(dHistory);
     })
     .catch((error) => {
       alert(`${error}`);
@@ -155,7 +158,7 @@ $(document).on("click", "#btn-deleteEntry", function () {
       Promise.all([getDispatchHistory(), getDispatchDays(), getYearly()])
         .then(([dlst, dd, yrl]) => {
           dHistory = dlst;
-          fillHistory(dHistory);
+          fillDispatchHistory(dHistory);
           dispatch_days = dd;
           fillYearly(yrl);
           countTotal();
@@ -185,7 +188,7 @@ $(document).on("click", "#btn-saveEntry", function () {
       Promise.all([getDispatchHistory(), getDispatchDays(), getYearly()])
         .then(([dlst, dd, yrl]) => {
           dHistory = dlst;
-          fillHistory(dHistory);
+          fillDispatchHistory(dHistory);
           dispatch_days = dd;
           fillYearly(yrl);
           countTotal();
@@ -223,7 +226,7 @@ $(document).on("click", ".rmvToast", function () {
 });
 $(document).on(
   "click",
-  "#grpSel, #empSel, #locSel, #startDate, #endDate",
+  "#reqDeptInput, #reqNameInput, #grpSel, #empSel, #startDate, #endDate, #locSel, #specLocInput, #inviteSel, #workOrder, #projName, #allowance",
   function () {
     $(this).removeClass("bg-red-100  border-red-400");
     $(".errTxt").remove();
@@ -243,6 +246,29 @@ $(document).on("click", "#logoutBtn", function () {
     .catch((error) => {
       alert(`${error}`);
     });
+});
+// $(document).on("click", "#viewAll", function () {
+//   $("#left").toggleClass("changeSize");
+//   $(".right").toggleClass("changeSize");
+//   $(".sticky-buttons").toggleClass("appear");
+//   $("body").addClass("overflow-hidden");
+//   $(this).text($(this).text() == "-" ? "+" : "-");
+// });
+
+$(".lbl-viewForm").click(function () {
+  $(this).text(
+    $(this).text() == "Hide Dispatch Form"
+      ? "View Dispatch Form"
+      : "Hide Dispatch Form"
+  );
+
+  // $(".sticky-buttons").fadeToggle(1000);
+  $("#left").toggleClass("changeSize");
+  $(".sticky-buttons").toggleClass("appear");
+
+  const checking = $("#check").is(":checked");
+  console.log(checking);
+  console.log("ok");
 });
 //#endregion
 
@@ -473,6 +499,103 @@ function fillVisa(vsa) {
     $("#visaEmpty").removeClass("d-none");
   }
 }
+function getWorkHistory() {
+  const empID = $("#empSel").find("option:selected").attr("emp-id");
+  const yScope = $("#dToggle").val();
+  return new Promise((resolve, reject) => {
+    if (empID === undefined) {
+      resolve([]);
+    }
+    $.ajax({
+      type: "POST",
+      url: "php/get_work_history.php",
+      data: {
+        empID: empID,
+        yScope: yScope,
+      },
+      dataType: "json",
+      success: function (response) {
+        console.log(response);
+        return;
+        const wList = response;
+        resolve(wList);
+      },
+      error: function (xhr, status, error) {
+        if (xhr.status === 404) {
+          reject("Not Found Error: The requested resource was not found.");
+        } else if (xhr.status === 500) {
+          reject("Internal Server Error: There was a server error.");
+        } else {
+          reject("An unspecified error occurred while fetching work history.");
+        }
+      },
+    });
+  });
+}
+function fillWorkHistory(wList) {
+  var tableBody = $("#wList");
+  tableBody.empty();
+  if (wList.length === 0) {
+    var noDataRow = $(
+      "<tr><td colspan='7' class='text-center'>No data found</td></tr>"
+    );
+    tableBody.append(noDataRow);
+  } else {
+    $.each(wList, function (index, item) {
+      var row = $(`<tr d-id=${item.id}>`);
+      row.append(`<td data-exclude='true'>${index + 1}</td>`);
+      row.append(
+        `<td  data-f-name="Arial" data-f-sz="9"  data-a-h="center" data-a-v="middle" 	data-b-a-s="thin" data-b-a-c="000000">${item.locationName}</td>`
+      );
+      row.append(
+        `<td  data-f-name="Arial" data-f-sz="9"  data-a-h="center" data-a-v="middle" 	data-b-a-s="thin" data-b-a-c="000000">${item.fromDate}</td>`
+      );
+      row.append(
+        `<td  data-f-name="Arial" data-f-sz="9"  data-a-h="center" data-a-v="middle" 	data-b-a-s="thin" data-b-a-c="000000">${item.toDate}</td>`
+      );
+      if (item.duration > 183) {
+        row.append(
+          `<td class="redText" data-f-name="Arial" data-f-sz="9"  data-a-h="center" data-a-v="middle" 	data-b-a-s="thin" data-b-a-c="000000" data-f-color="FFFF0000">${item.duration}</td>`
+        );
+      } else {
+        row.append(
+          `<td  data-f-name="Arial" data-f-sz="9"  data-a-h="center" data-a-v="middle" 	data-b-a-s="thin" data-b-a-c="000000">${item.duration}</td>`
+        );
+      }
+
+      if (item.pastOne > 183) {
+        row.append(
+          `<td class="redText" data-f-name="Arial" data-f-sz="9"  data-a-h="center" data-a-v="middle" 	data-b-a-s="thin" data-b-a-c="000000" data-f-color="FFFF0000">${item.pastOne}</td>`
+        );
+      } else {
+        row.append(
+          `<td  data-f-name="Arial" data-f-sz="9"  data-a-h="center" data-a-v="middle" 	data-b-a-s="thin" data-b-a-c="000000" >${item.pastOne}</td>`
+        );
+      }
+
+      row.append(`<td data-exclude='true'>
+        <div class="d-flex gap-2">
+        <button
+          class="btn-edit"
+          title="Edit Entry"
+          
+        >
+        <i class='bx bxs-edit fs-5' ></i>
+        </button>
+        <button
+          class="btn-delete"
+          title="Delete Entry"
+          data-bs-toggle="modal"
+          data-bs-target="#deleteEntry"
+        >
+          <i class="bx bx-trash fs-5"></i>
+        </button>
+      </div></td>`);
+
+      tableBody.append(row);
+    });
+  }
+}
 function getDispatchHistory() {
   const empID = $("#empSel").find("option:selected").attr("emp-id");
   const yScope = $("#dToggle").val();
@@ -506,7 +629,7 @@ function getDispatchHistory() {
     });
   });
 }
-function fillHistory(dlist) {
+function fillDispatchHistory(dlist) {
   var tableBody = $("#dList");
   tableBody.empty();
   if (dlist.length === 0) {
@@ -661,7 +784,7 @@ function insertDispatch() {
   const inviteID = $("#inviteSel").find("option:selected").attr("inv-id");
   const workOrder = $("#workOrder").val();
   const projName = $("#projName").val();
-  const salary = $("#salary").val();
+  const allowance = $("#allowance").val();
   const siteDispatch = $("#siteDispatch").is(":checked");
   let ctr = 0;
 
@@ -710,12 +833,12 @@ function insertDispatch() {
     $("#projName").addClass("bg-red-100  border-red-400");
     ctr++;
   }
-  if (!salary) {
-    $("#salary").addClass("bg-red-100  border-red-400");
+  if (!allowance) {
+    $("#allowance").addClass("bg-red-100  border-red-400");
     ctr++;
   }
   if (ctr > 0) {
-    $(".form").append(`
+    $(".error-msg").html(`
     <div class="errTxt mb-3 flex items-center gap-1">
     <i class='bx bx-info-circle text-red-600'></i>
     <p class="text-red-600">Please complete all fields.</p>
@@ -750,7 +873,7 @@ function insertDispatch() {
       inviID: inviteID,
       workOrder: workOrder,
       project_name: projName,
-      allowance: salary,
+      allowance: allowance,
       site_dispatch: siteDispatch,
     },
     dataType: "json",
@@ -763,7 +886,7 @@ function insertDispatch() {
         Promise.all([getDispatchHistory(), getDispatchDays(), getYearly()])
           .then(([dlst, dd, yrl]) => {
             dHistory = dlst;
-            fillHistory(dHistory);
+            fillDispatchHistory(dHistory);
             dispatch_days = dd;
             fillYearly(yrl);
             $("#reqDeptInput").val("");
@@ -772,13 +895,13 @@ function insertDispatch() {
             $("#empSel").val(0);
             $("#startDate").val("");
             $("#endDate").val("");
-            $("#daysCount").text("");
+            $("#daysCount").text("0 Day");
             $("#locSel").val(0);
             $("#specLocInput").val("");
             $("#inviteSel").val(0);
             $("#workOrder").val("");
             $("#projName").val("");
-            $("#salary").val("");
+            $("#allowance").val("");
             to_add = 0;
             countTotal();
             showToast("success", "Successfully added a dispatch entry.");
@@ -803,15 +926,15 @@ function insertDispatch() {
 }
 function clearInput() {
   $(
-    "#reqDeptInput, #reqNameInput, #grpSel, #empSel, #startDate, #endDate, #locSel, #specLocInput, #inviteSel, #workOrder, #projName, #salary"
+    "#reqDeptInput, #reqNameInput, #grpSel, #empSel, #startDate, #endDate, #locSel, #specLocInput, #inviteSel, #workOrder, #projName, #allowance"
   ).removeClass("bg-red-100  border-red-400");
   $(".errTxt").remove();
   $("#grpSel, #empSel, #locSel, #inviteSel").val(0);
   $(
-    "#reqDeptInput, #reqNameInput, #startDate, #endDate, #specLocInput, #inviteSel, #workOrder, #projName, #salary"
+    "#reqDeptInput, #reqNameInput, #startDate, #endDate, #specLocInput, #workOrder, #projName, #allowance"
   ).val("");
   to_add = 0;
-  $("#daysCount").text("");
+  $("#daysCount").text("0 Day");
   $("#empSel").change();
 }
 

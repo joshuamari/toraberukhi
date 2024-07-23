@@ -109,7 +109,7 @@ try {
         $insertQ = "INSERT INTO `request_list`(`emp_number`, 
                                                `location_id`, 
                                                `specific_loc`, 
-                                               `dipsatch_from`, 
+                                               `dispatch_from`, 
                                                `dispatch_to`, 
                                                `invitation_id`, 
                                                `work_order`, 
