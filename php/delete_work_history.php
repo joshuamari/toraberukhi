@@ -24,7 +24,7 @@ if (!empty($_POST["work_histID"])) {
 
 #region main function
 try {
-  $deleteQ = "DELETE FROM work_history WHERE work_hist_id = :wh_id";
+  $deleteQ = "DELETE FROM `work_history` WHERE `work_hist_id` = :wh_id";
   $deleteStmt = $connpcs->prepare($deleteQ);
   $deleteStmt->execute([":wh_id" => $work_histID]);
   if ($deleteStmt->rowCount() > 0) {

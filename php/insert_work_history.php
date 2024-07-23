@@ -8,9 +8,11 @@ date_default_timezone_set('Asia/Manila');
 #endregion
 
 #region Initialize Variable
+$empNumber =  $comp_name = $comp_business = $busi_content = $work_loc = NULL;
 $msg = array();
 
-$empNumber = NULL;
+#region get variables
+
 if (!empty($_POST['empID'])) {
 	$empNumber = $_POST['empID'];
 } else {
@@ -22,58 +24,66 @@ if (!empty($_POST['date_monthYearStart'])) {
 	$date_monthYearStart = $_POST['date_monthYearStart'];
 } else {
 	$msg["isSuccess"] = false;
-	$msg['error'][] = "Start 'Month' and 'Year' is Missing";
+	$msg['error'][] = "Start Month and Year";
 }
 
 if (!empty($_POST['date_monthYearEnd'])) {
 	$date_monthYearEnd = $_POST['date_monthYearEnd'];
 } else {
 	$msg["isSuccess"] = false;
-	$msg['error'][] = "End 'Month' and 'Year' is Missing";
+	$msg['error'][] = "End Month and Year";
 }
 
-$comp_name = '';
 if (!empty($_POST['comp_name'])) {
 	$comp_name = $_POST['comp_name'];
 } else {
 	$msg["isSuccess"] = false;
-	$msg['error'][] = "Company Name is Missing";
+	$msg['error'][] = "Company Name";
 }
 
-$comp_business = '';
 if (!empty($_POST['comp_business'])) {
 	$comp_business = $_POST['comp_business'];
 } else {
 	$msg["isSuccess"] = false;
-	$msg['error'][] = "Company Business is Missing";
+	$msg['error'][] = "Company Business";
 }
 
-$busi_content = '';
 if (!empty($_POST['business_cont'])) {
 	$busi_content = $_POST['business_cont'];
 } else {
 	$msg["isSuccess"] = false;
-	$msg['error'][] = "Business Content is Missing";
+	$msg['error'][] = "Business Content";
 }
 
-$work_loc = '';
 if (!empty($_POST['work_loc'])) {
 	$work_loc = $_POST['work_loc'];
 } else {
 	$msg["isSuccess"] = false;
-	$msg['error'][] = "Work Location is Missing";
+	$msg['error'][] = "Work Location";
 }
 
+#for separtion of error
 if (!empty($msg)) {
-	$msg['error'] = implode(", ", $msg['error']);
+	if (count($msg['error']) > 1) {
+		$errorString = '';
+		foreach ($msg['error'] as $result) {
+			if ($result === end($msg['error'])) {
+				$errorString .= "and '$result' Missing";
+			}
+			else {
+				$errorString .= "'$result', ";
+			}
+		}
+		$msg['error'] = $errorString;
+	}
 	die(json_encode($msg));
 }
-#end region
+#endregion
 
 #setting up dates
 $date_Start = date($date_monthYearStart . "-01");
 $date_End = date($date_monthYearEnd . "-01");
-#end region
+#endregion
 
 #region Entries Query
 try {
@@ -112,5 +122,6 @@ try {
 	$msg["isSuccess"] = false;
 	$msg['error'] =  "Connection failed: " . $e->getMessage();
 }
+#endregion
 
 echo json_encode($msg);

@@ -23,9 +23,9 @@ if (!empty($_POST["empID"])) {
 }
 
 try {
-  $getQ = "SELECT work_hist_id as id, MONTH(start_date) as start_month, YEAR(start_date) as start_year, MONTH(end_date) as end_month, YEAR(end_date) as end_year, comp_name, comp_business, business_cont, work_loc 
+  $getQ = "SELECT `work_hist_id` as `id`, MONTH(`start_date`) as `start_month`, YEAR(`start_date`) as `start_year`, MONTH(`end_date`) as `end_month`, YEAR(`end_date`) as `end_year`, `comp_name`, `comp_business`, `business_cont`, `work_loc` 
            FROM `work_history`
-           WHERE emp_id = :empNum";
+           WHERE `emp_id`= :empNum";
   $getStmt = $connpcs->prepare($getQ);
   $getStmt->execute([":empNum" => $empNum]);
   if($getStmt->rowCount() > 0) {
