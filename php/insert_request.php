@@ -28,7 +28,7 @@ if (!empty($_POST['empID'])) {
     $empNumber = $_POST['empID'];
 } else {
     $msg["isSuccess"] = false;
-    $msg['error'][] = "Employee Number Missing";
+    $msg['error'][] = "Employee Number";
 }
 
 $locID = 0;
@@ -36,7 +36,7 @@ if (!empty($_POST['locID'])) {
     $locID = $_POST['locID'];
 } else {
     $msg["isSuccess"] = false;
-    $msg['error'][] = "Location Missing";
+    $msg['error'][] = "Location";
 }
 
 $spec_loc = '';
@@ -44,7 +44,7 @@ if (!empty($_POST['spec_loc'])) {
     $spec_loc = $_POST['spec_loc'];
 } else {
     $msg["isSuccess"] = false;
-    $msg['error'][] = "Specific Location Missing";
+    $msg['error'][] = "Specific Location";
 }
 
 $dateFrom = date("Y-m-d");
@@ -52,7 +52,7 @@ if (!empty($_POST['dateFrom'])) {
     $dateFrom = $_POST['dateFrom'];
 } else {
     $msg["isSuccess"] = false;
-    $msg['error'][] = "Date From Missing";
+    $msg['error'][] = "Date From";
 }
 
 $dateTo = date("Y-m-d");
@@ -60,7 +60,7 @@ if (!empty($_POST['dateTo'])) {
     $dateTo = $_POST['dateTo'];
 } else {
     $msg["isSuccess"] = false;
-    $msg['error'][] = "Date To Missing";
+    $msg['error'][] = "Date To";
 }
 
 $inviID = 0;
@@ -68,7 +68,7 @@ if (!empty($_POST['inviID'])) {
   $inviID = $_POST['inviID'];
 } else {
   $msg["isSuccess"] = false;
-  $msg['error'][] = "Invitation Type is Missing";
+  $msg['error'][] = "Invitation Type";
 }
 
 $workOrder = '';
@@ -76,7 +76,7 @@ if (!empty($_POST['workOrder'])) {
   $workOrder = $_POST['workOrder'];
 } else {
   $msg["isSuccess"] = false;
-  $msg['error'][] = "Word Order is Missing";
+  $msg['error'][] = "Word Order";
 }
 
 $project_name = '';
@@ -84,7 +84,7 @@ if (!empty($_POST['project_name'])) {
   $project_name = $_POST['project_name'];
 } else {
   $msg["isSuccess"] = false;
-  $msg['error'][] = "Project Name is Missing";
+  $msg['error'][] = "Project Name";
 }
 $site_dispatch = FALSE;
 if (!empty($_POST['site_dispatch'])) {
@@ -96,7 +96,7 @@ if (!empty($_POST['allowance'])) {
   $allowance = $_POST['allowance'];
 } else {
   $msg["isSuccess"] = false;
-  $msg['error'][] = "Allowance is Missing";
+  $msg['error'][] = "Allowance";
 }
 
 $request_dept = '';
@@ -104,7 +104,7 @@ if (!empty($_POST['request_dept'])) {
   $request_dept = $_POST['request_dept'];
 } else {
   $msg["isSuccess"] = false;
-  $msg['error'][] = "Requesting Department is Missing";
+  $msg['error'][] = "Requesting Department";
 }
 
 $request_name = '';
@@ -112,12 +112,24 @@ if (!empty($_POST['request_name'])) {
   $request_name = $_POST['request_name'];
 } else {
   $msg["isSuccess"] = false;
-  $msg['error'][] = "Requester is Missing";
+  $msg['error'][] = "Requester";
 }
 
+#for separtion of error
 if (!empty($msg)) {
-  $msg['error'] = implode(", ", $msg['error']);
-  die(json_encode($msg));
+	if (count($msg['error']) > 1) {
+		$errorString = '';
+		foreach ($msg['error'] as $result) {
+			if ($result === end($msg['error'])) {
+				$errorString .= "and '$result' Missing";
+			}
+			else {
+				$errorString .= "'$result', ";
+			}
+		}
+		$msg['error'] = $errorString;
+	}
+	die(json_encode($msg));
 }
 #endregion
 
@@ -147,48 +159,55 @@ if ($checkCount > 0) {
 
 #region Entries Query
 try {
-$insertQ = "INSERT INTO `request_list`(`requester_id`,
-                                        `emp_number`, 
-                                        `location_id`, 
-                                        `specific_loc`, 
-                                        `dispatch_from`, 
-                                        `dispatch_to`, 
-                                        `invitation_id`, 
-                                        `work_order`, 
-                                        `project_name`, 
-                                        `site_dispatch`, 
-                                        `allowance`, 
-                                        `request_by_dept`, 
-                                        `request_by_name`) 
-            VALUES (:userID,
-                    :empNumber,
-                    :locID,
-                    :spec_loc,
-                    :dateFrom,
-                    :dateTo,
-                    :inviID,
-                    :workOrder,
-                    :project_name,
-                    :site_dispatch,
-                    :allowance,
-                    :request_dept,
-                    :request_name)";
-$insertStmt = $connpcs->prepare($insertQ);
-$insertStmt->execute([":userID" => $userID,
-                      ":empNumber" => $empNumber, 
-                      ":locID" => $locID,
-                      ":spec_loc" => $spec_loc,
-                      ":dateFrom" => $dateFrom, 
-                      ":dateTo" => $dateTo, 
-                      ":inviID" => $inviID,
-                      ":workOrder" => $workOrder,
-                      ":project_name" => $project_name,
-                      ":site_dispatch" => $site_dispatch,
-                      ":allowance" => $allowance,
-                      ":request_dept" => $request_dept,
-                      ":request_name" => $request_name]);
-$msg["isSuccess"] = true;
-$msg["error"] = "Adding dispatch successful";
+  $insertQ = "INSERT INTO `request_list`(`requester_id`,
+                                          `emp_number`, 
+                                          `location_id`, 
+                                          `specific_loc`, 
+                                          `dispatch_from`, 
+                                          `dispatch_to`, 
+                                          `invitation_id`, 
+                                          `work_order`, 
+                                          `project_name`, 
+                                          `site_dispatch`, 
+                                          `allowance`, 
+                                          `request_by_dept`, 
+                                          `request_by_name`) 
+              VALUES (:userID,
+                      :empNumber,
+                      :locID,
+                      :spec_loc,
+                      :dateFrom,
+                      :dateTo,
+                      :inviID,
+                      :workOrder,
+                      :project_name,
+                      :site_dispatch,
+                      :allowance,
+                      :request_dept,
+                      :request_name)";
+  $insertStmt = $connpcs->prepare($insertQ);
+  $insertStmt->execute([":userID" => $userID,
+                        ":empNumber" => $empNumber, 
+                        ":locID" => $locID,
+                        ":spec_loc" => $spec_loc,
+                        ":dateFrom" => $dateFrom, 
+                        ":dateTo" => $dateTo, 
+                        ":inviID" => $inviID,
+                        ":workOrder" => $workOrder,
+                        ":project_name" => $project_name,
+                        ":site_dispatch" => $site_dispatch,
+                        ":allowance" => $allowance,
+                        ":request_dept" => $request_dept,
+                        ":request_name" => $request_name]);
+
+  if ($insertStmt->rowCount() > 0) {
+    $msg["isSuccess"] = true;
+    $msg["error"] = "Adding Work History successfully";
+  }
+  else {
+    $msg["isSuccess"] = false;
+    $msg["error"] = "Adding Work History unsuccessful";
+  }
 } catch (Exception $e) {
     $msg["isSuccess"] = false;
     $msg['error'] =  "Connection failed: " . $e->getMessage();

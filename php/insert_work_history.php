@@ -8,9 +8,11 @@ date_default_timezone_set('Asia/Manila');
 #endregion
 
 #region Initialize Variable
+$empNumber =  $comp_name = $comp_business = $busi_content = $work_loc = NULL;
 $msg = array();
 
-$empNumber = NULL;
+#region get variables
+
 if (!empty($_POST['empID'])) {
 	$empNumber = $_POST['empID'];
 } else {
@@ -18,80 +20,70 @@ if (!empty($_POST['empID'])) {
 	$msg['error'][] = "Employee Number Missing";
 }
 
-$date_yearStart = date("Y");
-if (!empty($_POST['date_yearStart'])) {
-	$date_yearStart = $_POST['date_yearStart'];
+if (!empty($_POST['date_monthYearStart'])) {
+	$date_monthYearStart = $_POST['date_monthYearStart'];
 } else {
 	$msg["isSuccess"] = false;
-	$msg['error'][] = "Start 'Year' is Missing";
+	$msg['error'][] = "Start Month and Year";
 }
 
-$date_monthStart = date("m");
-if (!empty($_POST['date_monthStart'])) {
-	$date_monthStart = sprintf('%02d', $_POST['date_monthStart']);
+if (!empty($_POST['date_monthYearEnd'])) {
+	$date_monthYearEnd = $_POST['date_monthYearEnd'];
 } else {
 	$msg["isSuccess"] = false;
-	$msg['error'][] = "Start 'Month' is Missing";
+	$msg['error'][] = "End Month and Year";
 }
 
-$date_yearEnd = date("Y");
-if (!empty($_POST['date_yearEnd'])) {
-	$date_yearEnd = $_POST['date_yearEnd'];
-} else {
-	$msg["isSuccess"] = false;
-	$msg['error'][] = "End 'Year' is Missing";
-}
-
-$date_monthEnd = date("m");
-if (!empty($_POST['date_monthEnd'])) {
-	$date_monthEnd = sprintf('%02d', $_POST['date_monthEnd']);
-} else {
-	$msg["isSuccess"] = false;
-	$msg['error'][] = "End 'Month' is Missing";
-}
-
-$comp_name = '';
 if (!empty($_POST['comp_name'])) {
 	$comp_name = $_POST['comp_name'];
 } else {
 	$msg["isSuccess"] = false;
-	$msg['error'][] = "Company Name is Missing";
+	$msg['error'][] = "Company Name";
 }
 
-$comp_business = '';
 if (!empty($_POST['comp_business'])) {
 	$comp_business = $_POST['comp_business'];
 } else {
 	$msg["isSuccess"] = false;
-	$msg['error'][] = "Company Business is Missing";
+	$msg['error'][] = "Company Business";
 }
 
-$busi_content = '';
 if (!empty($_POST['business_cont'])) {
 	$busi_content = $_POST['business_cont'];
 } else {
 	$msg["isSuccess"] = false;
-	$msg['error'][] = "Business Content is Missing";
+	$msg['error'][] = "Business Content";
 }
 
-$work_loc = '';
 if (!empty($_POST['work_loc'])) {
 	$work_loc = $_POST['work_loc'];
 } else {
 	$msg["isSuccess"] = false;
-	$msg['error'][] = "Work Location is Missing";
+	$msg['error'][] = "Work Location";
 }
 
+#for separtion of error
 if (!empty($msg)) {
-	$msg['error'] = implode(", ", $msg['error']);
+	if (count($msg['error']) > 1) {
+		$errorString = '';
+		foreach ($msg['error'] as $result) {
+			if ($result === end($msg['error'])) {
+				$errorString .= "and '$result' Missing";
+			}
+			else {
+				$errorString .= "'$result', ";
+			}
+		}
+		$msg['error'] = $errorString;
+	}
 	die(json_encode($msg));
 }
-#end region
+#endregion
 
 #setting up dates
-$date_Start = date($date_yearStart . "-" . $date_monthStart . "-01");
-$date_End = date($date_yearEnd . "-" . $date_monthEnd . "-01");
-#end region
+$date_Start = date($date_monthYearStart . "-01");
+$date_End = date($date_monthYearEnd . "-01");
+#endregion
 
 #region Entries Query
 try {
@@ -112,17 +104,24 @@ try {
 
 	$insertStmt = $connpcs->prepare($insertQ);
 	$insertStmt->execute([":empNumber" => $empNumber,
-											 ":date_Start" => $date_Start,
-											 ":date_End" => $date_End,
-											 ":comp_name" => $comp_name,
-											 ":comp_business" => $comp_business,
-											 ":busi_content" => $busi_content,
-											 ":work_loc" => $work_loc]);
-	$msg["isSuccess"] = true;
-	$msg["error"] = "Adding Work History successful";
+												":date_Start" => $date_Start,
+												":date_End" => $date_End,
+												":comp_name" => $comp_name,
+												":comp_business" => $comp_business,
+												":busi_content" => $busi_content,
+												":work_loc" => $work_loc]);
+	if ($insertStmt->rowCount() > 0) {
+		$msg["isSuccess"] = true;
+		$msg["error"] = "Adding Work History successfully";
+	}
+	else {
+		$msg["isSuccess"] = false;
+		$msg["error"] = "Adding Work History unsuccessful";
+	}
 } catch (Exception $e) {
 	$msg["isSuccess"] = false;
 	$msg['error'] =  "Connection failed: " . $e->getMessage();
 }
+#endregion
 
 echo json_encode($msg);

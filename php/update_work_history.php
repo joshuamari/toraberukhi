@@ -22,46 +22,58 @@ if (!empty($_POST['date_monthYearStart'])) {
 	$date_monthYearStart = $_POST['date_monthYearStart'];
 } else {
 	$msg["isSuccess"] = false;
-	$msg['error'][] = "Start 'Month' and 'Year' is Missing";
+	$msg['error'][] = "Start Month and Year";
 }
 
 if (!empty($_POST['date_monthYearEnd'])) {
 	$date_monthYearEnd = $_POST['date_monthYearEnd'];
 } else {
 	$msg["isSuccess"] = false;
-	$msg['error'][] = "End 'Month' and 'Year' is Missing";
+	$msg['error'][] = "End Month and Year";
 }
 
 if (!empty($_POST['comp_name'])) {
 	$comp_name = $_POST['comp_name'];
 } else {
 	$msg["isSuccess"] = false;
-	$msg['error'][] = "Company Name is Missing";
+	$msg['error'][] = "Company Name";
 }
 
 if (!empty($_POST['comp_business'])) {
 	$comp_business = $_POST['comp_business'];
 } else {
 	$msg["isSuccess"] = false;
-	$msg['error'][] = "Company Business is Missing";
+	$msg['error'][] = "Company Business";
 }
 
 if (!empty($_POST['business_cont'])) {
 	$busi_content = $_POST['business_cont'];
 } else {
 	$msg["isSuccess"] = false;
-	$msg['error'][] = "Business Content is Missing";
+	$msg['error'][] = "Business Content";
 }
 
 if (!empty($_POST['work_loc'])) {
 	$work_loc = $_POST['work_loc'];
 } else {
 	$msg["isSuccess"] = false;
-	$msg['error'][] = "Work Location is Missing";
+	$msg['error'][] = "Work Location";
 }
 
+#for separtion of error
 if (!empty($msg)) {
-	$msg['error'] = implode(", ", $msg['error']);
+	if (count($msg['error']) > 1) {
+		$errorString = '';
+		foreach ($msg['error'] as $result) {
+			if ($result === end($msg['error'])) {
+				$errorString .= "and '$result' Missing";
+			}
+			else {
+				$errorString .= "'$result', ";
+			}
+		}
+		$msg['error'] = $errorString;
+	}
 	die(json_encode($msg));
 }
 #end region
@@ -79,17 +91,18 @@ try {
 																				 `comp_business` = :comp_business, 
 																				 `business_cont` = :busi_content, 
 																				 `work_loc` = :work_loc
-                                    WHERE work_hist_id = :wh_id";
+                                    WHERE `work_hist_id` = :wh_id";
 
 	$updateStmt = $connpcs->prepare($updateQ);
-	if($updateStmt->execute([":date_Start" => $date_Start, ":date_End" => $date_End, ":comp_name" => $comp_name,
-											     ":comp_business" => $comp_business, ":busi_content" => $busi_content, ":work_loc" => $work_loc, ":wh_id" => $work_histID])) {
+	$updateStmt->execute([":date_Start" => $date_Start, ":date_End" => $date_End, ":comp_name" => $comp_name,
+											     ":comp_business" => $comp_business, ":busi_content" => $busi_content, ":work_loc" => $work_loc, ":wh_id" => $work_histID]);
+	if($updateStmt->rowCount() > 0) {
     $msg["isSuccess"] = true;
     $msg["error"] = "Update successful";
   }
   else {
     $msg["isSuccess"] = false;
-    $msg["error"] = "Error updating";
+    $msg["error"] = "No changes has been made";
   }
 } catch (Exception $e) {
   echo "Connection failed: " . $e->getMessage();
