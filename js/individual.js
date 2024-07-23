@@ -501,7 +501,7 @@ function fillVisa(vsa) {
 }
 function getWorkHistory() {
   const empID = $("#empSel").find("option:selected").attr("emp-id");
-  const yScope = $("#dToggle").val();
+  // const yScope = $("#dToggle").val();
   return new Promise((resolve, reject) => {
     if (empID === undefined) {
       resolve([]);
@@ -511,13 +511,12 @@ function getWorkHistory() {
       url: "php/get_work_history.php",
       data: {
         empID: empID,
-        yScope: yScope,
+        // yScope: yScope,
       },
       dataType: "json",
       success: function (response) {
-        console.log(response);
-        return;
-        const wList = response;
+        console.log("work: ", response.result);
+        const wList = response.result;
         resolve(wList);
       },
       error: function (xhr, status, error) {
@@ -545,14 +544,30 @@ function fillWorkHistory(wList) {
       var row = $(`<tr d-id=${item.id}>`);
       row.append(`<td data-exclude='true'>${index + 1}</td>`);
       row.append(
-        `<td  data-f-name="Arial" data-f-sz="9"  data-a-h="center" data-a-v="middle" 	data-b-a-s="thin" data-b-a-c="000000">${item.locationName}</td>`
+        `<td  data-f-name="Arial" data-f-sz="9"  data-a-h="center" data-a-v="middle" 	data-b-a-s="thin" data-b-a-c="000000">${item.start_year}</td>`
       );
       row.append(
-        `<td  data-f-name="Arial" data-f-sz="9"  data-a-h="center" data-a-v="middle" 	data-b-a-s="thin" data-b-a-c="000000">${item.fromDate}</td>`
+        `<td  data-f-name="Arial" data-f-sz="9"  data-a-h="center" data-a-v="middle" 	data-b-a-s="thin" data-b-a-c="000000">${item.start_month}</td>`
       );
       row.append(
-        `<td  data-f-name="Arial" data-f-sz="9"  data-a-h="center" data-a-v="middle" 	data-b-a-s="thin" data-b-a-c="000000">${item.toDate}</td>`
+        `<td  data-f-name="Arial" data-f-sz="9"  data-a-h="center" data-a-v="middle" 	data-b-a-s="thin" data-b-a-c="000000">${item.end_year}</td>`
       );
+      row.append(
+        `<td  data-f-name="Arial" data-f-sz="9"  data-a-h="center" data-a-v="middle" 	data-b-a-s="thin" data-b-a-c="000000">${item.end_month}</td>`
+      );
+      row.append(
+        `<td  data-f-name="Arial" data-f-sz="9"  data-a-h="center" data-a-v="middle" 	data-b-a-s="thin" data-b-a-c="000000">${item.comp_name}</td>`
+      );
+      row.append(
+        `<td  data-f-name="Arial" data-f-sz="9"  data-a-h="center" data-a-v="middle" 	data-b-a-s="thin" data-b-a-c="000000">${item.comp_business}</td>`
+      );
+      row.append(
+        `<td  data-f-name="Arial" data-f-sz="9"  data-a-h="center" data-a-v="middle" 	data-b-a-s="thin" data-b-a-c="000000">${item.business_cont}</td>`
+      );
+      row.append(
+        `<td  data-f-name="Arial" data-f-sz="9"  data-a-h="center" data-a-v="middle" 	data-b-a-s="thin" data-b-a-c="000000">${item.work_loc}</td>`
+      );
+      /*
       if (item.duration > 183) {
         row.append(
           `<td class="redText" data-f-name="Arial" data-f-sz="9"  data-a-h="center" data-a-v="middle" 	data-b-a-s="thin" data-b-a-c="000000" data-f-color="FFFF0000">${item.duration}</td>`
@@ -571,7 +586,7 @@ function fillWorkHistory(wList) {
         row.append(
           `<td  data-f-name="Arial" data-f-sz="9"  data-a-h="center" data-a-v="middle" 	data-b-a-s="thin" data-b-a-c="000000" >${item.pastOne}</td>`
         );
-      }
+      }*/
 
       row.append(`<td data-exclude='true'>
         <div class="d-flex gap-2">
@@ -612,6 +627,7 @@ function getDispatchHistory() {
       },
       dataType: "json",
       success: function (response) {
+        console.log("dispatch: ", response);
         const dList = response;
         resolve(dList);
       },

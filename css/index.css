@@ -225,6 +225,7 @@ input:checked + .toggle:after {
   outline: 2px solid white;
   outline-offset: -2px;
 }
+.dispatch-hist table th,
 .work-hist table th {
   outline: thin solid var(--gray-100);
 }
