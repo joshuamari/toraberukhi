@@ -14,25 +14,30 @@ $work_histID = 0;
 
 #region get values
 if (!empty($_POST["work_histID"])) {
-    $work_histID = $_POST["work_histID"];
+  $work_histID = $_POST["work_histID"];
 } else {
-    $msg['isSuccess'] = false;
-    $msg['error'] = "No work history ID";
-    die(json_encode($msg));
+  $msg['isSuccess'] = false;
+  $msg['error'] = "No work history ID";
+  die(json_encode($msg));
 }
 #endregion
 
 #region main function
 try {
-    $deleteQ = "DELETE FROM work_history WHERE work_hist_id = :wh_id";
-    $deleteStmt = $connpcs->prepare($deleteQ);
-    if ($deleteStmt->execute([":wh_id" => "$work_histID"])) {
-        $msg["isSuccess"] = true;
-        $msg["error"] = "Successfully deleted";
-    }
+  $deleteQ = "DELETE FROM work_history WHERE work_hist_id = :wh_id";
+  $deleteStmt = $connpcs->prepare($deleteQ);
+  $deleteStmt->execute([":wh_id" => $work_histID]);
+  if ($deleteStmt->rowCount() > 0) {
+    $msg["isSuccess"] = true;
+    $msg["error"] = "Successfully deleted";
+  }
+  else {
+    $msg["isSuccess"] = false;
+    $msg["error"] = "No Entries deleted";
+  }
 } catch (Exception $e) {
-    $msg['isSuccess'] = false;
-    $msg['error'] = "Failed to delete" . $e->getMessage();
+  $msg['isSuccess'] = false;
+  $msg['error'] = "Failed to delete" . $e->getMessage();
 }
 
 echo json_encode($msg);

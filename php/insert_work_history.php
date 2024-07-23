@@ -18,36 +18,18 @@ if (!empty($_POST['empID'])) {
 	$msg['error'][] = "Employee Number Missing";
 }
 
-$date_yearStart = date("Y");
-if (!empty($_POST['date_yearStart'])) {
-	$date_yearStart = $_POST['date_yearStart'];
+if (!empty($_POST['date_monthYearStart'])) {
+	$date_monthYearStart = $_POST['date_monthYearStart'];
 } else {
 	$msg["isSuccess"] = false;
-	$msg['error'][] = "Start 'Year' is Missing";
+	$msg['error'][] = "Start 'Month' and 'Year' is Missing";
 }
 
-$date_monthStart = date("m");
-if (!empty($_POST['date_monthStart'])) {
-	$date_monthStart = sprintf('%02d', $_POST['date_monthStart']);
+if (!empty($_POST['date_monthYearEnd'])) {
+	$date_monthYearEnd = $_POST['date_monthYearEnd'];
 } else {
 	$msg["isSuccess"] = false;
-	$msg['error'][] = "Start 'Month' is Missing";
-}
-
-$date_yearEnd = date("Y");
-if (!empty($_POST['date_yearEnd'])) {
-	$date_yearEnd = $_POST['date_yearEnd'];
-} else {
-	$msg["isSuccess"] = false;
-	$msg['error'][] = "End 'Year' is Missing";
-}
-
-$date_monthEnd = date("m");
-if (!empty($_POST['date_monthEnd'])) {
-	$date_monthEnd = sprintf('%02d', $_POST['date_monthEnd']);
-} else {
-	$msg["isSuccess"] = false;
-	$msg['error'][] = "End 'Month' is Missing";
+	$msg['error'][] = "End 'Month' and 'Year' is Missing";
 }
 
 $comp_name = '';
@@ -89,8 +71,8 @@ if (!empty($msg)) {
 #end region
 
 #setting up dates
-$date_Start = date($date_yearStart . "-" . $date_monthStart . "-01");
-$date_End = date($date_yearEnd . "-" . $date_monthEnd . "-01");
+$date_Start = date($date_monthYearStart . "-01");
+$date_End = date($date_monthYearEnd . "-01");
 #end region
 
 #region Entries Query
@@ -112,14 +94,20 @@ try {
 
 	$insertStmt = $connpcs->prepare($insertQ);
 	$insertStmt->execute([":empNumber" => $empNumber,
-											 ":date_Start" => $date_Start,
-											 ":date_End" => $date_End,
-											 ":comp_name" => $comp_name,
-											 ":comp_business" => $comp_business,
-											 ":busi_content" => $busi_content,
-											 ":work_loc" => $work_loc]);
-	$msg["isSuccess"] = true;
-	$msg["error"] = "Adding Work History successful";
+												":date_Start" => $date_Start,
+												":date_End" => $date_End,
+												":comp_name" => $comp_name,
+												":comp_business" => $comp_business,
+												":busi_content" => $busi_content,
+												":work_loc" => $work_loc]);
+		if ($insertStmt->rowCount() > 0) {
+			$msg["isSuccess"] = true;
+			$msg["error"] = "Adding Work History successful";
+		}
+		else {
+			$msg["isSuccess"] = false;
+			$msg["error"] = "Adding Work History unsuccessful";
+		}
 } catch (Exception $e) {
 	$msg["isSuccess"] = false;
 	$msg['error'] =  "Connection failed: " . $e->getMessage();

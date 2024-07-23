@@ -82,14 +82,15 @@ try {
                                     WHERE work_hist_id = :wh_id";
 
 	$updateStmt = $connpcs->prepare($updateQ);
-	if($updateStmt->execute([":date_Start" => $date_Start, ":date_End" => $date_End, ":comp_name" => $comp_name,
-											     ":comp_business" => $comp_business, ":busi_content" => $busi_content, ":work_loc" => $work_loc, ":wh_id" => $work_histID])) {
+	$updateStmt->execute([":date_Start" => $date_Start, ":date_End" => $date_End, ":comp_name" => $comp_name,
+											     ":comp_business" => $comp_business, ":busi_content" => $busi_content, ":work_loc" => $work_loc, ":wh_id" => $work_histID]);
+	if($updateStmt->rowCount() > 0) {
     $msg["isSuccess"] = true;
     $msg["error"] = "Update successful";
   }
   else {
     $msg["isSuccess"] = false;
-    $msg["error"] = "Error updating";
+    $msg["error"] = "No changes has been made";
   }
 } catch (Exception $e) {
   echo "Connection failed: " . $e->getMessage();

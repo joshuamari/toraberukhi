@@ -25,11 +25,16 @@ try {
            FROM `work_history`
            WHERE emp_id = :empNum";
   $getStmt = $connpcs->prepare($getQ);
-  if($getStmt->execute([":empNum" => $empNum])) {
+  $getStmt->execute([":empNum" => $empNum]);
+  if($getStmt->rowCount() > 0) {
     $result = $getStmt->fetchAll();
     $msg['result'] = $result;
     $msg["isSuccess"] = true;
     $msg["error"] = "Successfully retieve the data";
+  }
+  else {
+    $msg["isSuccess"] = false;
+    $msg["error"] = "Employee No." . $empNum . " has no data to retrieve";
   }
 } catch (Exception $e) {
   $msg['isSuccess'] = false;
