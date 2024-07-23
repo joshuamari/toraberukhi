@@ -8,6 +8,8 @@ date_default_timezone_set('Asia/Manila');
 #endregion
 
 #region Initialize Variable
+$msg = array();
+$msg['result'] = array();
 $empNum = 0;
 #endregion
 

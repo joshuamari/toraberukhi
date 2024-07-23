@@ -147,48 +147,55 @@ if ($checkCount > 0) {
 
 #region Entries Query
 try {
-$insertQ = "INSERT INTO `request_list`(`requester_id`,
-                                        `emp_number`, 
-                                        `location_id`, 
-                                        `specific_loc`, 
-                                        `dispatch_from`, 
-                                        `dispatch_to`, 
-                                        `invitation_id`, 
-                                        `work_order`, 
-                                        `project_name`, 
-                                        `site_dispatch`, 
-                                        `allowance`, 
-                                        `request_by_dept`, 
-                                        `request_by_name`) 
-            VALUES (:userID,
-                    :empNumber,
-                    :locID,
-                    :spec_loc,
-                    :dateFrom,
-                    :dateTo,
-                    :inviID,
-                    :workOrder,
-                    :project_name,
-                    :site_dispatch,
-                    :allowance,
-                    :request_dept,
-                    :request_name)";
-$insertStmt = $connpcs->prepare($insertQ);
-$insertStmt->execute([":userID" => $userID,
-                      ":empNumber" => $empNumber, 
-                      ":locID" => $locID,
-                      ":spec_loc" => $spec_loc,
-                      ":dateFrom" => $dateFrom, 
-                      ":dateTo" => $dateTo, 
-                      ":inviID" => $inviID,
-                      ":workOrder" => $workOrder,
-                      ":project_name" => $project_name,
-                      ":site_dispatch" => $site_dispatch,
-                      ":allowance" => $allowance,
-                      ":request_dept" => $request_dept,
-                      ":request_name" => $request_name]);
-$msg["isSuccess"] = true;
-$msg["error"] = "Adding dispatch successful";
+  $insertQ = "INSERT INTO `request_list`(`requester_id`,
+                                          `emp_number`, 
+                                          `location_id`, 
+                                          `specific_loc`, 
+                                          `dispatch_from`, 
+                                          `dispatch_to`, 
+                                          `invitation_id`, 
+                                          `work_order`, 
+                                          `project_name`, 
+                                          `site_dispatch`, 
+                                          `allowance`, 
+                                          `request_by_dept`, 
+                                          `request_by_name`) 
+              VALUES (:userID,
+                      :empNumber,
+                      :locID,
+                      :spec_loc,
+                      :dateFrom,
+                      :dateTo,
+                      :inviID,
+                      :workOrder,
+                      :project_name,
+                      :site_dispatch,
+                      :allowance,
+                      :request_dept,
+                      :request_name)";
+  $insertStmt = $connpcs->prepare($insertQ);
+  $insertStmt->execute([":userID" => $userID,
+                        ":empNumber" => $empNumber, 
+                        ":locID" => $locID,
+                        ":spec_loc" => $spec_loc,
+                        ":dateFrom" => $dateFrom, 
+                        ":dateTo" => $dateTo, 
+                        ":inviID" => $inviID,
+                        ":workOrder" => $workOrder,
+                        ":project_name" => $project_name,
+                        ":site_dispatch" => $site_dispatch,
+                        ":allowance" => $allowance,
+                        ":request_dept" => $request_dept,
+                        ":request_name" => $request_name]);
+
+  if ($insertStmt->rowCount() > 0) {
+    $msg["isSuccess"] = true;
+    $msg["error"] = "Adding Work History successfully";
+  }
+  else {
+    $msg["isSuccess"] = false;
+    $msg["error"] = "Adding Work History unsuccessful";
+  }
 } catch (Exception $e) {
     $msg["isSuccess"] = false;
     $msg['error'] =  "Connection failed: " . $e->getMessage();
