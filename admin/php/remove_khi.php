@@ -19,13 +19,13 @@ if (!empty($_POST['empID'])) {
     $msg["isSuccess"] = false;
     $msg['error'] = "Employee Number Missing";
 }
-$conn_pcs_disable->beginTransaction();
+$connpcs->beginTransaction();
 $insertQ = "UPDATE `khi_details` SET `is_active` = 0 WHERE `number` = :empNumber";
-$insertStmt = $conn_pcs_disable->prepare($insertQ);
+$insertStmt = $connpcs->prepare($insertQ);
 $removeQ = "DELETE FROM `khi_user_permissions` WHERE `employee_id`=:empNumber";
-$removeStmt = $conn_pcs_disable->prepare($removeQ);
+$removeStmt = $connpcs->prepare($removeQ);
 $deleteG = "DELETE FROM `khi_user_groups` WHERE `user_id` = :empNumber";
-$deleteGStmt = $conn_pcs_disable->prepare($deleteG);
+$deleteGStmt = $connpcs->prepare($deleteG);
 #endregion
 
 #region Entries Query
@@ -33,17 +33,17 @@ try {
     if (empty($msg)) {
         if ($insertStmt->execute([":empNumber" => $empNumber])) {
             if ($removeStmt->execute([":empNumber" => $empNumber]) && $deleteGStmt->execute([":empNumber" => $empNumber])) {
-                $conn_pcs_disable->commit();
+                $connpcs->commit();
                 $msg["isSuccess"] = true;
                 $msg["error"] = "KHI Member Deleted Successfully";
             } else {
-                $conn_pcs_disable->rollBack();
+                $connpcs->rollBack();
             }
         } else {
-            $conn_pcs_disable->rollBack();
+            $connpcs->rollBack();
         }
     } else {
-        $conn_pcs_disable->rollBack();
+        $connpcs->rollBack();
     }
 } catch (Exception $e) {
     $msg["isSuccess"] = false;

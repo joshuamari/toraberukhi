@@ -13,73 +13,114 @@ date_default_timezone_set('Asia/Manila');
 #region Initialize Variable
 $groupID = $empnum = $empacc = 0;
 $fname = $lname = "";
+$msg = array();
 #endregion
 
 #region Set Variable Values
 if (!empty($_POST["empID"])) {
     $empID = $_POST["empID"];
+} else {
+  $msg['isSuccess'] = 0;
+  $msg['message'][] = 'Employee ID';
 }
 if (!empty($_POST["fname"])) {
     $fname = $_POST["fname"];
+} else {
+  $msg['isSuccess'] = 0;
+  $msg['message'][] = 'First Name';
 }
 if (!empty($_POST["lname"])) {
     $lname = $_POST["lname"];
+} else {
+  $msg['isSuccess'] = 0;
+  $msg['message'][] = 'Last Name';
 }
 if (!empty($_POST["grpID"])) {
     $grpID = $_POST["grpID"];
+} else {
+  $msg['isSuccess'] = 0;
+  $msg['message'][] = 'Group';
 }
 if (!empty($_POST["empacc"])) {
     $empacc = $_POST["empacc"];
+} else {
+  $msg['isSuccess'] = 0;
+  $msg['message'][] = 'Access Type';
 }
-$conn_pcs_disable->beginTransaction();
+if (!empty($_POST["empemail"])) {
+  $empEMAIL = $_POST["empemail"];
+} else {
+  $msg['isSuccess'] = 0;
+  $msg['message'][] = 'Employee Email';
+}
+#for separation of error
+if (!empty($msg)) {
+	if (count($msg['message']) > 1) {
+		$errorString = '';
+		foreach ($msg['message'] as $result) {
+			if ($result === end($msg['message'])) {
+				$errorString .= "and '$result' Missing";
+			}
+			else {
+				$errorString .= "'$result', ";
+			}
+		}
+		$msg['message'] = $errorString;
+	} else {
+    $msg['message'] = implode("", $msg['message']);
+    $msg['message'] .= " Missing";
+  }
+	die(json_encode($msg));
+}
+$connpcs->beginTransaction();
 #endregion
 
 #region main query
 try {
     $checkID = "SELECT `is_active` FROM `khi_details` WHERE `number` = :empID";
-    $checkIDStmt = $conn_pcs_disable->prepare($checkID);
+    $checkIDStmt = $connpcs->prepare($checkID);
     $checkIDStmt->execute([":empID" => "$empID"]);
     $checkCount = $checkIDStmt->rowCount();
     $isActive = $checkIDStmt->fetchColumn();
 
     if ($checkCount == 0) {
-        $insertUser = "INSERT INTO `khi_details`(`number`, `surname`, `firstname`, `group_id`, `is_active`) 
-        VALUES (:empID, :lname, :fname, :grpID, 1)";
+        $insertUser = "INSERT INTO `khi_details`(`number`, `surname`, `firstname`, `group_id`, `email`, `is_active`) 
+        VALUES (:empID, :lname, :fname, :grpID, :email, 1)";
     } else {
         if ($isActive == 0) {
-            $insertUser = "UPDATE `khi_details` SET `surname` = :lname, `firstname` = :fname, `group_id` = :grpID, `is_active` = 1 WHERE `number` = :empID";
+            $insertUser = "UPDATE `khi_details` SET `surname` = :lname, `firstname` = :fname, `group_id` = :grpID, `email` = :email, `is_active` = 1 WHERE `number` = :empID";
         } else {
-            $conn_pcs_disable->rollBack();
+            $connpcs->rollBack();
             $message["isSuccess"] = 0;
             $message["message"] = "User ID already registered";
         }
     }
 
-    $insertUserStmt = $conn_pcs_disable->prepare($insertUser);
-    if ($insertUserStmt->execute([":empID" => "$empID", ":lname" => "$lname", ":fname" => "$fname", ":grpID" => "$grpID"])) {
+    $insertUserStmt = $connpcs->prepare($insertUser);
+    if ($insertUserStmt->execute([":empID" => "$empID", ":lname" => "$lname", ":fname" => "$fname", ":grpID" => "$grpID", ":email" => $empEMAIL])) {
         if ($empacc == 1) {
             $insertAccess = "INSERT INTO `khi_user_permissions`(`permission_id`, `employee_id`) VALUES (1, :empID)";
-            $insertAccessStmt = $conn_pcs_disable->prepare($insertAccess);
+            $insertAccessStmt = $connpcs->prepare($insertAccess);
             if ($insertAccessStmt->execute([":empID" => "$empID"])) {
             } else {
-                $conn_pcs_disable->rollBack();
+                $connpcs->rollBack();
             }
         }
 
         $insertGroups = "INSERT INTO `khi_user_groups`(`user_id`,`group_id`) VALUE (:empID, :grpID)";
-        $insertGroupsStmt = $conn_pcs_disable->prepare($insertGroups);
+        $insertGroupsStmt = $connpcs->prepare($insertGroups);
         if($insertGroupsStmt->execute([":empID" => "$empID", ":grpID" => "$grpID"])) {
-            $conn_pcs_disable->commit();
+            $connpcs->commit();
             $message["isSuccess"] = 1;
             $message["message"] = "User successfully added";
         } else {
-            $conn_pcs_disable->rollBack();
+            $connpcs->rollBack();
         }
     } else {
-        $conn_pcs_disable->rollBack();
+        $connpcs->rollBack();
     }
 } catch (Exception $e) {
-    $conn_pcs_disable->rollBack();
+    $connpcs->rollBack();
     echo "Connection failed: " . $e->getMessage();
 }
 #endregion

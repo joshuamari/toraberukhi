@@ -96,9 +96,9 @@ function getKHIMembers($empnum)
     $group_ids = array_map(function ($group) {
         return $group['id'];
     }, $myGroups);
-    $grpStmt = "AND kd.group_id IN (" . implode(',', $group_ids) . ")";
-    $memsQ = "SELECT kd.number ,kd.surname, kd.firstname, gl.id, gl.abbreviation FROM pcosdb.khi_details AS kd JOIN kdtphdb_new.group_list AS gl ON kd.group_id = gl.id WHERE 
-    kd.is_active = 1 $grpStmt ORDER BY `number`";
+    $grpStmt = "AND kd.`group_id` IN (" . implode(',', $group_ids) . ")";
+    $memsQ = "SELECT kd.`number` ,kd.`surname`, kd.`firstname`, gl.`id`, gl.`abbreviation`, kd.`email` FROM `pcosdb`.`khi_details` AS kd JOIN `kdtphdb_new`.`group_list` AS gl ON kd.`group_id` = gl.`id` WHERE 
+    kd.`is_active` = 1 $grpStmt ORDER BY `number`";
     $memsStmt = $connpcs->prepare($memsQ);
     $memsStmt->execute();
     if ($memsStmt->rowCount() > 0) {
@@ -110,6 +110,7 @@ function getKHIMembers($empnum)
             $khi_sname = $mem['surname'];
             $group_id = $mem['id'];
             $group_abbr = $mem['abbreviation'];
+            $emp_email = $mem['email'];
             $adminType = allGroupAccess($khi_id) ? 1 : 0;
             $output['id'] = $khi_id;
             $output['fname'] = $khi_fname;
@@ -117,6 +118,7 @@ function getKHIMembers($empnum)
             $output['group']['id'] = $group_id;
             $output['group']['abbr'] = $group_abbr;
             $output['type'] = $adminType;
+            $output['email'] = $emp_email;
             array_push($members, $output);
         }
     }
