@@ -79,7 +79,7 @@ $(document).on("click", "#addUser", function () {
 });
 $(document).on(
   "click",
-  "#empId, #empFName, #empLName, #empGroup, #empAccess",
+  "#empId, #empFName, #empLName, #empGroup, #empAccess, #empEmail",
   function () {
     $(this).removeClass("border-[var(--red-color)] bg-red-200");
     $(this).siblings("small").addClass("hidden");
@@ -131,6 +131,9 @@ $(document).on("click", "#saveBtn", function () {
           employees = emps;
           searchEmployee(employees);
         });
+      }
+      else {
+        showToast("error", `${res.message}`);
       }
     })
     .catch((error) => {
@@ -382,6 +385,7 @@ function addUser() {
   var empLName = $("#empLName").val();
   var empGroup = $("#empGroup").val();
   var empAccess = $("#empAccessAdd").val();
+  var empEMAIL = $("#empEmail").val();
   var ctr = 0;
 
   if (!empId) {
@@ -409,6 +413,11 @@ function addUser() {
     $("#empAccess").siblings("small").removeClass("hidden");
     ctr++;
   }
+  if (!empEMAIL) {
+    $("#empEmail").addClass("border-[var(--red-color)] bg-red-200");
+    $("#empEmail").siblings("small").removeClass("hidden");
+    ctr++;
+  }
   return new Promise((resolve, reject) => {
     if (ctr > 0) {
       resolve({ isSuccess: false, error: "Incomplete Fields" });
@@ -422,6 +431,7 @@ function addUser() {
           lname: empLName,
           grpID: empGroup,
           empacc: empAccess,
+          empemail: empEMAIL,
         },
         dataType: "json",
         success: function (response) {
@@ -462,6 +472,7 @@ function fillEditModal(empnum) {
   $("#empLNameEdit").val(capitalizeWords(empdeets.sname));
   $("#editGroup").val(empdeets.group.id);
   $("#empAccessEdit").val(empdeets.type);
+  $("#empEmailEdit").val(empdeets.email);
   $("#editUserModal").modal("show");
 }
 function fillRemoveModal(empnum, empname) {
@@ -499,6 +510,7 @@ function saveUser() {
   const empnumber = $("#empIdEdit").val();
   const groupid = $("#editGroup").val();
   const accessid = $("#empAccessEdit").val();
+  const emp_email = $("#empEmailEdit").val();
   return new Promise((resolve, reject) => {
     $.ajax({
       type: "POST",
@@ -507,6 +519,7 @@ function saveUser() {
         empID: empnumber,
         grpID: groupid,
         empacc: accessid,
+        empemail: emp_email,
       },
       dataType: "json",
       success: function (response) {

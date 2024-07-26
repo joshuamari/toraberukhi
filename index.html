@@ -275,7 +275,7 @@
       </div>
       <div class="content h-screen">
         <div class="main flex  h-full">
-          <div class="flex flex-col gap-3 p-[14px] md:p-8 h-full w-full">
+          <div class="flex flex-col p-[14px] md:p-8 h-full w-full">
             <div class="pageTitle w-100 gap-3 d-flex">
               <div id="menu">
                 <i class="bx bx-menu-alt-left fs-3"></i>
@@ -284,124 +284,137 @@
             </div>
         <div class="main w-100 d-flex h-[calc(100%-30px)]">
         
+          <div class="left pl-0 pr-6 lg:pr-6 py-6 pt-0" id="left">
+            <label for="check" class="lbl-viewForm">View Dispatch Form</label>
+            <input type="checkbox" class="chkbx-viewForm" id="check">
+            <div class="viewForm">
 
-          <div class="left  pl-3 pr-11 lg:pr-6 py-6 pt-0">
-            <div class="form">
+              <div class="form pl-3">
 
-              <div class="mb-3 row">
-                <label for="" class="col-form-label">Requester's Department:</label>
-                  <input type="text" name="" class="input" id="reqDeptInput" placeholder="Department">
-              </div>
-              <div class="mb-3 row">
-                <label for="" class="col-form-label">Requester's Name:</label>
-                  <input type="text" name="" class="input" id="reqNameInput" placeholder="Name">
-              </div>
+                <div class="mb-1 row">
+                  <label for="" class="col-form-label pl-0">Group:</label>
+                    <select
+                      name=""
+                      class="select "
+                      id="grpSel"
+                    >
+              
+                    </select>
+                </div>
 
-              <div class="mb-3 row">
-                <label for="" class="col-form-label">Group:</label>
-                  <select
-                    name=""
-                    class="select "
-                    id="grpSel"
+                <div class="mb-1 row">
+                  <label for="" class="col-form-label pl-0">Dispatch Name:</label>
+                    <select
+                      name=""
+                      class="select "
+                      id="empSel"
+                    >
+                      
+                    </select>
+                </div>
+
+                <div class="calendars mb-1 ml-[-10px] d-flex flex-row">
+                  <div class="col-sm-6">
+                    <label for="" class="col-form-label pl-0"
+                    >Date to Japan:</label
                   >
-             
-                  </select>
-              </div>
-
-              <div class="mb-3 row">
-                <label for="" class="col-form-label">Dispatch Name:</label>
-                  <select
-                    name=""
-                    class="select "
-                    id="empSel"
-                  >
-                    
-                  </select>
-              </div>
-
-              <div class="mb-3 row">
-                <label for="" class="col-form-label"
-                  >Date to Japan:</label
-                >
-                    <input
-                      type="date"
-                      class="input  ddates"
-                      id="startDate"
+                  <input
+                    type="date"
+                    class="input  ddates"
+                    id="startDate"
                     />
-              </div>
-              <div class="mb-3 row">
-                <label for="" class="col-form-label"
-                  >Date to Philippines:</label
-                >
+                  </div>
+                  <!-- <div class="col-sm-1"></div> -->
+                  <div class="col-sm-6">
+                    <label for="" class="col-form-label pl-0"
+                    >Date to Philippines:</label
+                  >
                     <input
                       type="date"
                       class="input ddates"
                       id="endDate"
                     />
-              </div>
-              <div class="mb-3 row">
-                <label for="" class="col-sm-6 col-form-label">Total days:</label>
-                <div class="col-sm-6">
-                  <h5
-                    class="d-flex float-right align-items-center h-100"
-                    id="daysCount"
-                  ></h5>
+                  </div>
                 </div>
-              </div>
-              <div class="mb-3 row">
-                <label for="" class="col-form-label">Location:</label>
-                  <select
-                    name=""
-                    class="select "
-                    id="locSel"
-                  >
-                   
-                  </select>
-              </div>
-
-              <div class="mb-3 row">
-                <label for="" class="col-form-label">Specific Location:</label>
-                  <input type="text" name="" class="input" id="specLocInput" placeholder="Location">
-              </div>
-              <div class="mb-3 row">
-                <label for="" class="col-form-label">Invitation Type:</label>
+                  
+                <div class="mb-1 row">
+                  <label for="" class="col-form-label pl-0">Location:</label>
                     <select
-                    name=""
-                    class="select "
-                    id="inviteSel"
-                  >
-                   
-                  </select>
-              </div>
-              <div class="mb-3 row">
-                <label for="" class="col-form-label">Work Order Number:</label>
-                  <input type="text" name="" class="input" id="workOrder" placeholder="W/O">
-              </div>
-              <div class="mb-3 row">
-                <label for="" class="col-form-label">Project Name:</label>
-                  <input type="text" name="" class="input" id="projName" placeholder="Project Name">
-              </div>
-              <div class="mb-3 row">
-                <label for="" class="col-sm-9 col-form-label">Site Dispatch Training Application</label>
-                <div class="col-sm-3">
-                    <input type="checkbox" name="" class="d-flex float-right align-items-center h-100 mr-5" id="siteDispatch">
+                      name=""
+                      class="select "
+                      id="locSel"
+                    >
+                    
+                    </select>
+                </div>
+
+                <div class="mb-1 row">
+                  <label for="" class="col-form-label pl-0">Specific Location:</label>
+                    <input type="text" name="" class="input" id="specLocInput" placeholder="Location">
+                </div>
+                <div class="mb-1 row">
+                  <label for="" class="col-form-label pl-0">Invitation Type:</label>
+                      <select
+                      name=""
+                      class="select "
+                      id="inviteSel"
+                    >
+                    
+                    </select>
+                </div>
+                <div class="mb-1 row">
+                  <label for="" class="col-form-label pl-0">Work Order:</label>
+                    <input type="text" name="" class="input" id="workOrder" placeholder="W/O">
+                </div>
+                <div class="mb-1 row">
+                  <label for="" class="col-form-label pl-0">Project Name:</label>
+                    <input type="text" name="" class="input" id="projName" placeholder="Project Name">
+                </div>
+
+                <div class="mb-1 row">
+                  <label for="" class="col-sm-9 col-form-label pl-0">Site Dispatch Training Application</label>
+                  <div class="col-sm-3 d-flex justify-center pt-2">
+                      <!-- <input type="checkbox" name="" class="d-flex float-right align-items-center h-100 mr-5" id="siteDispatch"> -->
+                        <input id="siteDispatch" type="checkbox"/><label for="siteDispatch" class="toggle"></label>
+                  </div>
+                </div>
+
+                <div class="mb-1 row">
+                  <label for="" class="col-form-label pl-0">Allowance:</label>
+                    <input type="number" name="" class="input" id="allowance" placeholder="Allowance">
+                </div>
+                
+                <div class="mb-1 row">
+                  <label for="" class="col-form-label pl-0">Requester's Department:</label>
+                    <input type="text" name="" class="input" id="reqDeptInput" placeholder="Department">
+                </div>
+                <div class="mb-1 row">
+                  <label for="" class="col-form-label pl-0">Requester's Name:</label>
+                    <input type="text" name="" class="input" id="reqNameInput" placeholder="Name">
+                </div>
+                <div class="error-msg mb-1 row">
+
                 </div>
               </div>
-              <div class="mb-3 row">
-                <label for="" class="col-form-label">Salary:</label>
-                  <input type="text" name="" class="input" id="salary" placeholder="Salary">
+              <div class="sticky-buttons align-middle pr-5 pt-3 mb-2">
+                <div class="count-total-days">
+                  <label for="" class="col-form-label pl-0 pr-5">Total days:</label>
+                    <h5
+                      class="d-flex float-right align-items-center h-100"
+                      id="daysCount"
+                    > 0 Day</h5>
+                </div>
+                <div class="submit-btns">
+                  <button class="btn btn-clear" id="btnClear">Clear</button>
+                  <button class="btn btn-dispatch" id="btnApply">
+                    Send Dispatch Request
+                  </button>
+                </div>
               </div>
-              
-            </div>
-            <div class="d-flex justify-content-end gap-2 mt-4">
-              <button class="btn btn-clear" id="btnClear">Clear</button>
-              <button class="btn btn-dispatch" id="btnApply">
-                Send Dispatch Request
-              </button>
             </div>
           </div>
+        
           
-          <!-- // // // // // -->
           <div class="right h-full relative" id="appendHere">
             <div class="d-flex withContent d-none flex-column gap-3 h-full">
               <div
@@ -731,22 +744,9 @@
                     </div>
                   </div>
                   <div class="table-cont overflow-auto min-h-[300px]">
-                    <table class="table" id="histTable">
+                    <table class="table" id="workhistTable">
                       <thead class="sticky top-0 bg-gray-200">
                         <tr>
-                          <!-- <th data-exclude="true">No.</th>
-                          <th
-                            data-f-name="Arial"
-                            data-f-sz="9"
-                            data-f-bold="true"
-                            data-a-h="center"
-                            data-a-v="middle"
-                            data-b-a-s="thin"
-                            data-b-a-c="000000"
-                          >
-                            Location
-                          </th>
-                          <th data-exclude="true"></th> -->
                           <th 
                             data-exclude="true"
                             rowspan="2"
@@ -921,5 +921,5 @@
         </div>
       </div>
     </div>
-  </body>
+</body>
 </html>
