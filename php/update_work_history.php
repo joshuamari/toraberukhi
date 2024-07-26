@@ -74,6 +74,10 @@ if (!empty($msg)) {
 		}
 		$msg['error'] = $errorString;
 	}
+  else {
+    $msg['error'] = implode("", $msg['error']);
+    $msg['error'] .= " Missing";
+  }
 	die(json_encode($msg));
 }
 #end region
