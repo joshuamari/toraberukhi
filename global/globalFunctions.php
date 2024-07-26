@@ -37,7 +37,7 @@ function getMembers($empnum, $groups)
     global $connnew;
     $members = array();
     $yearMonth = date("Y-m-01");
-    if($groups != 0) {
+    if ($groups != 0) {
         $myGroups = explode(",", $groups);
     } else {
         $myGroups = getGroups($empnum);
@@ -127,5 +127,15 @@ function getKHIMembers($empnum)
 function arraySort($a, $b)
 {
     return strcmp($a["name"], $b["name"]);
+}
+function getID()
+{
+    $empID = 0;
+    if (!empty($_SESSION["IDKHI"])) {
+        $empID = $_SESSION["IDKHI"];
+        $empID = hex2bin($empID);
+        $empID = base64_decode(urldecode($empID));
+    }
+    return $empID;
 }
 #endregion
