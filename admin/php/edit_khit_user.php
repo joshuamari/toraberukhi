@@ -27,7 +27,7 @@ if (!empty($_POST["grpID"])) {
   $msg['isSuccess'] = 0;
   $msg['message'][] = 'Group ID';
 }
-if (!empty($_POST["empacc"])) {
+if (isset($_POST["empacc"])) {
     $empacc = $_POST["empacc"];
 } else {
   $msg['isSuccess'] = 0;
@@ -61,29 +61,36 @@ if (!empty($msg)) {
 $connpcs->beginTransaction();
 #endregion
 
+$permChanges = TRUE;
+
 #region main query
 try {
-    $editUser = "UPDATE `khi_details` SET `group_id` = :grpID, `email` = :empEMAIL WHERE `number` = :empID";
-    $editUserStmt = $connpcs->prepare($editUser);
-    if ($editUserStmt->execute([":grpID" => "$grpID", ":empID" => "$empID", ":empEMAIL" => "$empEMAIL"])) {
-        if ($empacc == 0) {
-            $editPerm = "DELETE FROM `khi_user_permissions` WHERE `employee_id` = :empID";
-        } else {
-            $editPerm = "INSERT INTO `khi_user_permissions`(`permission_id`, `employee_id`) VALUES (1, :empID)";
-        }
+  $editUser = "UPDATE `khi_details` SET `group_id` = :grpID, `email` = :empEMAIL WHERE `number` = :empID";
+  $editUserStmt = $connpcs->prepare($editUser);
+  $editUserStmt->execute([":grpID" => "$grpID", ":empID" => "$empID", ":empEMAIL" => "$empEMAIL"]);
 
-        $editPermStmt = $connpcs->prepare($editPerm);
-        $editPermStmt->execute([":empID" => "$empID"]);
-        if ($editUserStmt->rowCount() > 0) {
-            $connpcs->commit();
-            $message["isSuccess"] = 1;
-            $message["message"] = "User successfully updated";
-        } else {
-            $connpcs->rollBack();
-            $message["isSuccess"] = 0;
-            $message["message"] = "No change has been made";
-        }
-    }
+  $delPerm = "DELETE FROM `khi_user_permissions` WHERE `employee_id` = :empID";
+  $delPermStmt = $connpcs->prepare($delPerm);
+  $delPermStmt->execute([":empID" => "$empID"]);
+  $counterPerm = 0;
+
+  if ($empacc == 1) {
+    $editPerm = "INSERT INTO `khi_user_permissions`(`permission_id`, `employee_id`) VALUES (1, :empID)";
+    $editPermStmt = $connpcs->prepare($editPerm);
+    $editPermStmt->execute([":empID" => "$empID"]);
+    $counterPerm = $editPermStmt->rowCount();
+  }
+
+  if ($editUserStmt->rowCount() > 0 || ($delPermStmt->rowCount() != $counterPerm)) {
+      $connpcs->commit();
+      $message["isSuccess"] = 1;
+      $message["message"] = "User successfully updated";
+  } else {
+      $connpcs->rollBack();
+      $message["isSuccess"] = 0;
+      $message["message"] = "No change has been made";
+  }
+    // }
 } catch (Exception $e) {
     $connpcs->rollBack();
     echo "Connection failed: " . $e->getMessage();

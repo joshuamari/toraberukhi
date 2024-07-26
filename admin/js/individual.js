@@ -143,7 +143,7 @@ $(document).on("click", "#saveBtn", function () {
         });
       }
       else {
-        showToast("error", "No Change has been made");
+        showToast("error", `${res.message}`);
       }
     })
     .catch((error) => {
@@ -521,6 +521,7 @@ function saveUser() {
   const groupid = $("#editGroup").val();
   const accessid = $("#empAccessEdit").val();
   const emp_email = $("#empEmailEdit").val();
+  console.log(accessid);
   return new Promise((resolve, reject) => {
     $.ajax({
       type: "POST",
@@ -533,6 +534,7 @@ function saveUser() {
       },
       dataType: "json",
       success: function (response) {
+        console.log(response);
         const res = response;
         resolve(res);
       },
