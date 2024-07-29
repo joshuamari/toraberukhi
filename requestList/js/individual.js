@@ -484,7 +484,7 @@ function formatStatus(status) {
     `  Dispatch Request<span class="status lg ${statusString} ms-3">${statusString}</span>`
   );
   if (status !== null) {
-    $("#modiLabel").text(`${statusString}:`);
+    $("#modiLabel").text(`${statusString}`);
   }
 }
 function formatVisaPassport(visa, passport) {
