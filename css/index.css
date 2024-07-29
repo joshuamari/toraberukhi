@@ -229,27 +229,25 @@ input:checked + .toggle:after {
 
 .dispatch-hist table thead th {
   background-color: var(--tableheader);
-    font-size: 12px !important;
-    text-transform: uppercase;
-    white-space: nowrap;
-    vertical-align: middle;
-    color: var(--text-color);
-    padding: 0.75rem;
-    border-top: 1px solid #ebebeb;
-    border-bottom: 1px solid #ebebeb;
+  font-size: 12px !important;
+  text-transform: uppercase;
+  white-space: nowrap;
+  vertical-align: middle;
+  color: var(--text-color);
+  padding: 0.75rem;
+  border-top: 1px solid #ebebeb;
+  border-bottom: 1px solid #ebebeb;
 }
 
-.dispatch-hist table thead tr th:first-of-type{
+.dispatch-hist table thead tr th:first-of-type {
   border-top-left-radius: 8px;
-    border-bottom-left-radius: 8px;
-    border-left: 1px solid #ebebeb;
-
+  border-bottom-left-radius: 8px;
+  border-left: 1px solid #ebebeb;
 }
-.dispatch-hist table thead  th:last-of-type{
+.dispatch-hist table thead th:last-of-type {
   border-top-right-radius: 8px;
   border-bottom-right-radius: 8px;
   border-right: 1px solid #ebebeb;
-
 }
 
 .dispatch-hist table tbody td,
@@ -269,13 +267,14 @@ input:checked + .toggle:after {
 .work-hist table thead th {
   text-transform: uppercase;
   font-size: 12px !important;
-border: 1px solid var(--gray);
+  border: 1px solid var(--gray);
   word-wrap: break-word;
   background-color: var(--tableheader);
 }
-.work-hist table td{
+.work-hist table td {
   border: 1px solid var(--gray);
   background-color: #fff;
+  text-align: center;
 }
 .work-hist table .add-work {
   cursor: pointer;
@@ -363,19 +362,17 @@ border: 1px solid var(--gray);
   width: 75px;
 }
 
-
-#attachmentModal p{
+#attachmentModal p {
   font-size: 14px;
   font-family: "Arial", sans-serif;
- line-height: normal;
-
-  
+  line-height: normal;
 }
-#attachmentModal td, #attachmentModal th{
+#attachmentModal td,
+#attachmentModal th {
   margin: 0 !important;
   padding: 0 10px;
   background-color: #fff;
-  font-family:"Arial", sans-serif;
+  font-family: "Arial", sans-serif;
   border: 0.5px solid #000;
   border-radius: 0;
   text-transform: none;
@@ -383,37 +380,32 @@ border: 1px solid var(--gray);
   border-left: 0;
   line-height: normal;
   vertical-align: middle;
- 
 }
-#attachmentModal th{
+#attachmentModal th {
   height: 20px;
-  
-
 }
 
-#attachmentModal td{
+#attachmentModal td {
   border-top: 0;
   cursor: default;
-  
 }
-#attachmentModal th.sm{
+#attachmentModal th.sm {
   max-width: 45px;
   min-width: 45px;
   width: 45px;
 }
-#attachmentModal td.sm{
+#attachmentModal td.sm {
   text-align: center;
- 
 }
-#attachmentModal td.sm i{
-   vertical-align: middle;
+#attachmentModal td.sm i {
+  vertical-align: middle;
 }
-#attachmentModal tr:nth-of-type(4n+1) td:first-child,
-#attachmentModal th:first-of-type{
+#attachmentModal tr:nth-of-type(4n + 1) td:first-child,
+#attachmentModal th:first-of-type {
   border-left: 0.5px solid #000;
 }
 
-#toPrint2 th{
+#toPrint2 th {
   background-color: var(--main);
   border: 0.5px solid #000;
   border-radius: 0;
@@ -423,20 +415,21 @@ border: 1px solid var(--gray);
   border-left: 0;
   font-family: "Arial", sans-serif;
 }
-#toPrint2 td{
+#toPrint2 td {
   text-transform: none;
   cursor: auto;
   text-align: center;
   white-space: normal;
   font-family: "Arial", sans-serif;
- 
-  border: 0.5px solid #000; border-left: 0;
+
+  border: 0.5px solid #000;
+  border-left: 0;
 }
-#toPrint2 tr th:first-of-type ,
-#toPrint2 td:first-of-type{
+#toPrint2 tr th:first-of-type,
+#toPrint2 td:first-of-type {
   border-left: 1px solid #000;
 }
-#toPrint2 tr:nth-of-type(2) th{
+#toPrint2 tr:nth-of-type(2) th {
   border-top: 0;
 }
 
