@@ -17,7 +17,6 @@ date_default_timezone_set('Asia/Manila');
 $result = [
     "isSuccess" => FALSE,
     "message" => "",
-    "data" => array()
 ];
 $userID = getID();
 $requestID = 0;
@@ -38,18 +37,22 @@ if (!empty($_GET['request_id'])) {
 
 #region main function
 try {
-    $getQ = "SELECT * FROM `request_list` WHERE `request_id`=:request_id";
+    $getQ = "SELECT * FROM `request_list` rl WHERE `request_id`=:request_id";
     $getStmt = $connpcs->prepare($getQ);
     $getStmt->execute([":request_id" => $requestID]);
     if ($getStmt->rowCount() > 0) {
         $details = $getStmt->fetch();
         $details['emp_name'] = getName($details['emp_number']);
+        $details['requester_name'] = getName($details['requester_id']);
         $details['start'] = date("d M Y", strtotime($details['dispatch_from']));
         $details['end'] = date("d M Y", strtotime($details['dispatch_to']));
         $details['date_request'] = date("d M Y", strtotime($details['date_requested']));
+        $details['location'] = getLocationName($details['location_id']);
+        // $details['work_history'] = getWorkHistory($details['emp_number']);
         $result['isSuccess'] = TRUE;
         $result['message'] = 'Successfully fetched data';
-        $result['data'] = $details;
+        $result['data']['dispatch_request'] = $details;
+        $result['data']['work_history'] = getWorkHistory($details['emp_number']);
     } else {
         $result['message'] = '0 results';
     }

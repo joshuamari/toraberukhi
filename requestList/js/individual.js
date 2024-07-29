@@ -228,6 +228,7 @@ let monthNames2 = [
 let reqList = [];
 let cardData = [];
 
+let printData = {};
 let sortDateAsc = false;
 //#endregion
 checkAccess()
@@ -336,6 +337,15 @@ $(document).on("click", ".tab", function () {
 $(document).on("click", "td", function () {
   var rowID = $(this).closest("tr").attr("req-id");
   fillOpenModal(rowID);
+  getRequestData(rowID)
+    .then((res) => {
+      if (res.isSuccess) {
+        printData = res.data;
+      }
+    })
+    .catch((error) => {
+      alert(`Error: ${error}`);
+    });
 });
 $(document).on("click", "#openModal .btn-close", function () {
   $("#openModal").modal("hide");
@@ -359,12 +369,12 @@ $(document).on("click", "#sortDate", function () {
   searchFilter(reqList);
 });
 $(document).on("click", "#attachment", function () {
-  fillAttachment(samplePrintData);
+  fillAttachment(printData);
   $("#openModal .btn-close").click();
   $("#attachmentModal").modal("show");
 });
 $(document).on("click", "#attachment2", function () {
-  fillAttachment2(samplePrintData);
+  fillAttachment2(printData);
   $("#openModal .btn-close").click();
   $("#attachmentModal2").modal("show");
 });
@@ -379,6 +389,31 @@ $(document).on("click", "#btnBack2", function () {
 //#endregion
 
 //#region FUNCTIONS
+function getRequestData(req_id) {
+  return new Promise((resolve, reject) => {
+    $.ajax({
+      type: "GET",
+      url: "php/get_request_data.php",
+      data: {
+        request_id: req_id,
+      },
+      dataType: "json",
+      success: function (response) {
+        const res = response;
+        resolve(res);
+      },
+      error: function (xhr, status, error) {
+        if (xhr.status === 404) {
+          reject("Not Found Error: The requested resource was not found.");
+        } else if (xhr.status === 500) {
+          reject("Internal Server Error: There was a server error.");
+        } else {
+          reject("An unspecified error occurred while fetching request data.");
+        }
+      },
+    });
+  });
+}
 function fillAttachment(data) {
   $(".siteDispatch").empty();
   $("#printJap, #printPh, #printThird").text("");
@@ -432,6 +467,11 @@ function fillAttachment(data) {
   $("#printProject").text(project);
   $("#printSalary").text(salary);
   $("#printDate").text(date);
+}
+function formatName(name) {
+  const [last, given] = name.split(",");
+  const surname = last.toUpperCase();
+  return given + " " + surname;
 }
 function fillAttachment2(data) {
   var dates = data.dispatch_request.date_request;

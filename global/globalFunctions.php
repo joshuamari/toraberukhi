@@ -259,14 +259,14 @@ function emailRequest($details)
     $headers .= "Content-type:text/html;charset=UTF-8" . "\r\n";
     $headers .= "From: kdt_toraberur@global.kawasaki.com" . "\r\n";
     $subject = 'Dispatch Request Notification(TEST ONLY)';
-    $CCarray = array('medrano_c-kdt@global.kawasaki.com', 'hernandez-kdt@global.kawasaki.com', 'reyes_d-kdt@global.kawasaki.com', 'cabiso-kdt@global.kawasaki.com', 'coquia-kdt@global.kawasaki.com'); //TESTING
+    $CCarray = array('medrano_c-kdt@global.kawasaki.com', 'hernandez-kdt@global.kawasaki.com', 'reyes_d-kdt@global.kawasaki.com', 'cabiso-kdt@global.kawasaki.com', 'coquia-kdt@global.kawasaki.com'); //COMMENT PAG PROD
     $khidetails = getKHIUserDetails($details['requester_id']);
     $admins = getAdminEmails();
     $khipic = getKHIPICEmail($details['emp_group'], $details['requester_id']);
-    // $CCarray = $khipic;//PROD
-    $emails = array("coquia-kdt@global.kawasaki.com", "medrano_c-kdt@global.kawasaki.com"); //TESTING
-    // $emails = $admins;//PROD
-    // $emails[] = getPresEmail();//PROD
+    // $CCarray = $khipic;//UNCOMMENT PAG PROD
+    $emails = array("coquia-kdt@global.kawasaki.com", "medrano_c-kdt@global.kawasaki.com"); //COMMENT PAG PROD
+    // $emails = $admins;//UNCOMMENT PAG PROD
+    // $emails[] = getPresEmail();//UNCOMMENT PAG PROD
     $CC = implode(",", $CCarray);
     $email_to = implode(",", $emails);
     $headers .= "CC: " . $CC;
@@ -304,5 +304,29 @@ function countDays($start, $end)
     $date2 = date_create($end);
     $diff = date_diff($date1, $date2);
     return  (int)$diff->format("%a") + 1;
+}
+function getWorkHistory($id)
+{
+    global $connpcs;
+    $workHistory = array();
+    $workQ = "SELECT * FROM `work_history` WHERE `emp_id`=:id ORDER BY `start_date`";
+    $workStmt = $connpcs->prepare($workQ);
+    $workStmt->execute([":id" => $id]);
+    if ($workStmt->rowCount() > 0) {
+        $workArr = $workStmt->fetchAll();
+        foreach ($workArr as $work) {
+            $output = array();
+            $output['company_name'] = $work['comp_name'];
+            $output['company_business'] = $work['comp_business'];
+            $output['business_content'] = $work['business_cont'];
+            $output['location'] = $work['work_loc'];
+            $output['start_year'] = date("Y", strtotime($work['start_date']));
+            $output['start_month'] = date("n", strtotime($work['start_date']));
+            $output['end_year'] = !empty($work['end_date']) ? date("Y", strtotime($work['end_date'])) : null;
+            $output['end_month'] = !empty($work['end_date']) ? date("n", strtotime($work['end_date'])) : null;
+            $workHistory[] = $output;
+        }
+    }
+    return $workHistory;
 }
 #endregion
