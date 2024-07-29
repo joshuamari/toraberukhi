@@ -27,11 +27,10 @@ if (!empty($_POST['date_monthYearStart'])) {
 	$msg['error'][] = "Start Month and Year";
 }
 
+$date_End = NULL;
 if (!empty($_POST['date_monthYearEnd'])) {
 	$date_monthYearEnd = $_POST['date_monthYearEnd'];
-} else {
-	$msg["isSuccess"] = false;
-	$msg['error'][] = "End Month and Year";
+	$date_End = date($date_monthYearEnd . "-01");
 }
 
 if (!empty($_POST['comp_name'])) {
@@ -69,24 +68,21 @@ if (!empty($msg)) {
 		foreach ($msg['error'] as $result) {
 			if ($result === end($msg['error'])) {
 				$errorString .= "and '$result' Missing";
-			}
-			else {
+			} else {
 				$errorString .= "'$result', ";
 			}
 		}
 		$msg['error'] = $errorString;
+	} else {
+		$msg['error'] = implode("", $msg['error']);
+		$msg['error'] .= " Missing";
 	}
-  else {
-    $msg['error'] = implode("", $msg['error']);
-    $msg['error'] .= " Missing";
-  }
 	die(json_encode($msg));
 }
 #endregion
 
 #setting up dates
 $date_Start = date($date_monthYearStart . "-01");
-$date_End = date($date_monthYearEnd . "-01");
 #endregion
 
 #region Entries Query
@@ -107,18 +103,19 @@ try {
 											:work_loc)";
 
 	$insertStmt = $connpcs->prepare($insertQ);
-	$insertStmt->execute([":empNumber" => $empNumber,
-												":date_Start" => $date_Start,
-												":date_End" => $date_End,
-												":comp_name" => $comp_name,
-												":comp_business" => $comp_business,
-												":busi_content" => $busi_content,
-												":work_loc" => $work_loc]);
+	$insertStmt->execute([
+		":empNumber" => $empNumber,
+		":date_Start" => $date_Start,
+		":date_End" => $date_End,
+		":comp_name" => $comp_name,
+		":comp_business" => $comp_business,
+		":busi_content" => $busi_content,
+		":work_loc" => $work_loc
+	]);
 	if ($insertStmt->rowCount() > 0) {
 		$msg["isSuccess"] = true;
 		$msg["error"] = "Successfully Added Work History";
-	}
-	else {
+	} else {
 		$msg["isSuccess"] = false;
 		$msg["error"] = "Failed to Add Work History";
 	}

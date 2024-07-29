@@ -685,10 +685,14 @@ function fillWorkHistory(wList) {
         `<td  data-f-name="Arial" data-f-sz="9"  data-a-h="center" data-a-v="middle" 	data-b-a-s="thin" data-b-a-c="000000">${item.start_month}</td>`
       );
       row.append(
-        `<td  data-f-name="Arial" data-f-sz="9"  data-a-h="center" data-a-v="middle" 	data-b-a-s="thin" data-b-a-c="000000">${item.end_year}</td>`
+        `<td  data-f-name="Arial" data-f-sz="9"  data-a-h="center" data-a-v="middle" 	data-b-a-s="thin" data-b-a-c="000000">${
+          item.end_year ? item.end_year : ""
+        }</td>`
       );
       row.append(
-        `<td  data-f-name="Arial" data-f-sz="9"  data-a-h="center" data-a-v="middle" 	data-b-a-s="thin" data-b-a-c="000000">${item.end_month}</td>`
+        `<td  data-f-name="Arial" data-f-sz="9"  data-a-h="center" data-a-v="middle" 	data-b-a-s="thin" data-b-a-c="000000">${
+          item.end_month ? item.end_month : ""
+        }</td>`
       );
       row.append(
         `<td  data-f-name="Arial" data-f-sz="9"  data-a-h="center" data-a-v="middle" 	data-b-a-s="thin" data-b-a-c="000000">${item.comp_name}</td>`
@@ -1243,12 +1247,6 @@ function addWorkHistory() {
     $(".dateError").addClass("block flex items-center gap-1 text-red-600");
     errcount++;
   }
-  if (!endMonthYear) {
-    $("#addEndMonthYear").addClass("bg-red-100  border-red-400");
-    $(".dateError").removeClass("hidden");
-    $(".dateError").addClass("block flex items-center gap-1 text-red-600");
-    errcount++;
-  }
   if (!comp_business) {
     $("#addcompanyBusiness").addClass("bg-red-100  border-red-400");
     $(".BusiError").removeClass("hidden");
@@ -1268,7 +1266,7 @@ function addWorkHistory() {
     errcount++;
   }
   return new Promise((resolve, reject) => {
-    if (endMonthYear < startMonthYear) {
+    if (endMonthYear && endMonthYear < startMonthYear) {
       $("#addEndMonthYear").val("");
       $("#addStartMonthYear").val("");
       $("#addEndMonthYear").addClass("bg-red-100  border-red-400");
@@ -1437,12 +1435,6 @@ function saveEditWorkHistEntry() {
     $(".dateError").addClass("block flex items-center gap-1 text-red-600");
     errcount++;
   }
-  if (!endMonthYear) {
-    $("#edit-EndMonthYear").addClass("bg-red-100  border-red-400");
-    $(".dateError").removeClass("hidden");
-    $(".dateError").addClass("block flex items-center gap-1 text-red-600");
-    errcount++;
-  }
   if (!compBusiness) {
     $("#edit-companyBusiness").addClass("bg-red-100  border-red-400");
     $(".BusiError").removeClass("hidden");
@@ -1463,7 +1455,7 @@ function saveEditWorkHistEntry() {
   }
 
   return new Promise((resolve, reject) => {
-    if (endMonthYear < startMonthYear) {
+    if (endMonthYear && endMonthYear < startMonthYear) {
       $("#addEndMonthYear").val("");
       $("#addStartMonthYear").val("");
       $("#addEndMonthYear").addClass("bg-red-100  border-red-400");
