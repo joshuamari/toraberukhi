@@ -11,7 +11,6 @@ checkAccess()
   .then((emp) => {
     if (emp.isSuccess) {
       empDetails = emp.data;
-      console.log(empDetails);
       $(document).ready(function () {
         fillEmployeeDetails();
         getYears();
@@ -1579,9 +1578,8 @@ function getEditWorkHistDetails(editworkID) {
   } else {
     newEndMonth = end_month;
   }
-  const stMonthYear = st_year.concat("-", newStMonth);
-  const endMonthYear = end_year.concat("-", newEndMonth);
-
+  const stMonthYear = `${st_year}-${newStMonth}`;
+  const endMonthYear = `${end_year}-${newEndMonth}`;
   $("#edit-StartMonthYear").val(stMonthYear);
   $("#edit-EndMonthYear").val(endMonthYear);
   $("#edit-companyName").val(comp_name);

@@ -341,6 +341,17 @@ $(document).on("click", "#openModal .btn-close", function () {
 $(document).on("input", "#searchbar", function () {
   searchFilter(reqList);
 });
+$(document).on("click", "#logoutBtn", function () {
+  logOut()
+    .then((res) => {
+      if (res.isSuccess) {
+        window.location.href = `${rootFolder}/PCSKHI/Login`;
+      }
+    })
+    .catch((error) => {
+      alert(`${error}`);
+    });
+});
 //#endregion
 
 //#region FUNCTIONS
@@ -710,5 +721,28 @@ function toggleLoadingAnimation(show) {
   } else {
     $("#loadingAnimation").remove();
   }
+}
+function logOut() {
+  return new Promise((resolve, reject) => {
+    $.ajax({
+      type: "GET",
+      url: "../global/logout.php",
+      dataType: "json",
+      success: function (response) {
+        console.log(response);
+        const res = response;
+        resolve(res);
+      },
+      error: function (xhr, status, error) {
+        if (xhr.status === 404) {
+          reject("Not Found Error: The requested resource was not found.");
+        } else if (xhr.status === 500) {
+          reject("Internal Server Error: There was a server error.");
+        } else {
+          reject("An unspecified error occurred while logging out.");
+        }
+      },
+    });
+  });
 }
 //#endregion

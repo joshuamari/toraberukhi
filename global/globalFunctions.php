@@ -222,6 +222,82 @@ function getKHIPICEmail($group_id, $exclude = 0)
     }
     return $khiEmail;
 }
+function getRequestDetails($request_id)
+{
+    global $connpcs;
+    $details = array();
+    $detailsQ = "SELECT * FROM `request_list` WHERE `request_id`=:request_id";
+    $detailsStmt = $connpcs->prepare($detailsQ);
+    $detailsStmt->execute([":request_id" => $request_id]);
+    $details = $detailsStmt->fetch();
+    $details['emp_group'] = groupByID($details['emp_number']);
+    return $details;
+}
+function getKHIUserDetails($id)
+{
+    global $connpcs;
+    $khidetails = array();
+    $khidQ = "SELECT `surname`,`email` FROM `khi_details` WHERE `number`=:id";
+    $khidStmt = $connpcs->prepare($khidQ);
+    $khidStmt->execute([":id" => $id]);
+    $khidetails = $khidStmt->fetch();
+    return $khidetails;
+}
+function getLocationName($id)
+{
+    global $connpcs;
+    $name = '';
+    $nameQ = "SELECT `location_name` FROM `location_list` WHERE `location_id`=:id";
+    $nameStmt = $connpcs->prepare($nameQ);
+    $nameStmt->execute([":id" => $id]);
+    $name = $nameStmt->fetchColumn();
+    return $name;
+}
+function emailRequest($details)
+{
+    $headers = "MIME-Version: 1.0" . "\r\n";
+    $headers .= "Content-type:text/html;charset=UTF-8" . "\r\n";
+    $headers .= "From: kdt_toraberur@global.kawasaki.com" . "\r\n";
+    $subject = 'Dispatch Request Notification(TEST ONLY)';
+    $CCarray = array('medrano_c-kdt@global.kawasaki.com', 'hernandez-kdt@global.kawasaki.com', 'reyes_d-kdt@global.kawasaki.com', 'cabiso-kdt@global.kawasaki.com', 'coquia-kdt@global.kawasaki.com'); //TESTING
+    $khidetails = getKHIUserDetails($details['requester_id']);
+    $admins = getAdminEmails();
+    $khipic = getKHIPICEmail($details['emp_group'], $details['requester_id']);
+    // $CCarray = $khipic;//PROD
+    $emails = array("coquia-kdt@global.kawasaki.com", "medrano_c-kdt@global.kawasaki.com"); //TESTING
+    // $emails = $admins;//PROD
+    // $emails[] = getPresEmail();//PROD
+    $CC = implode(",", $CCarray);
+    $email_to = implode(",", $emails);
+    $headers .= "CC: " . $CC;
+    $msg = "
+                <html>
+                <head>
+                <title>Dispatch Request</title>
+                </head>
+                <body>
+        <p>Dear KDT,</p>
+        <p>A new request has been submitted by " . ucwords(strtolower($khidetails['surname'])) . "-san.</p>
+        <p>Details:</p>
+        <p>Employee: " . getName($details['emp_number']) . "</p>
+        <p>Date From: " . $details['dispatch_from'] . "</p>
+        <p>Date To: " . $details['dispatch_to'] . "</p>
+        <p>Location: " . getLocationName($details['location_id']) . "</p>
+        <p>Date Requested: " . $details['date_requested'] . "</p>
+        <p>If you have any questions or need further assistance, please do not hesitate to contact us.</p>
+        <p>Best regards,</p>
+        <p>トラベる<br>KHI Design & Technical Service, Inc.</p>
+         <p style='margin-top: 20px; font-size: 12px; color: #999;'>Please do not reply to this email as it is system generated.</p>
+                </body>
+                </html>
+            ";
+    if (mail($email_to, $subject, $msg, $headers)) {
+        return TRUE;
+    } else {
+        return FALSE;
+    }
+    //baguhin yung $CCarray pag prod na.
+}
 function countDays($start, $end)
 {
     $date1 = date_create($start);
