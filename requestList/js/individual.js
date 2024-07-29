@@ -242,6 +242,7 @@ checkAccess()
             groupList = grps;
             fillGroups(groupList);
             reqList = reqs["data"];
+            console.log(reqList);
             cardData = counts;
             fillCards();
             $(".tab")[0].click();
@@ -413,6 +414,12 @@ function getRequestData(req_id) {
       },
     });
   });
+}
+function formatDate(date) {
+  var [year, month, day] = date.split("-");
+  monthName = monthNames2[parseInt(month) - 1];
+
+  return day + " " + monthName + " " + year;
 }
 function fillAttachment(data) {
   $(".siteDispatch").empty();
@@ -627,6 +634,7 @@ function fillOpenModal(trID) {
   const duration = req.duration;
   const reqGrp = req.requester_group;
   const modi = req.modified;
+
   const empnum = req.emp_number;
   const [last, given] = name.split(",");
   const surname = last.toUpperCase();
@@ -642,9 +650,16 @@ function fillOpenModal(trID) {
   $("#modalLoc").text(location);
   $("#modalCountry").text(country);
   $("#modalReqGrp").text(reqGrp);
-  $("#modalModiDate").text(modi);
+
   $("#attachment").text(`${empnum}_${surname}${first}_DispatchRequest`);
   $("#attachment2").text(`${empnum}_${surname}${first}_WorkHistory`);
+
+  if (!modi) {
+    $("#modalModiDate").text("");
+  } else {
+    var [date, time] = modi.split(" ");
+    $("#modalModiDate").text(formatDate(date) + " " + time);
+  }
 
   if (duration > 1) {
     $("#modalDuration").html(
