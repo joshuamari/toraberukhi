@@ -102,11 +102,11 @@ try {
 												":work_loc" => $work_loc]);
 	if ($insertStmt->rowCount() > 0) {
 		$msg["isSuccess"] = true;
-		$msg["error"] = "Adding Work History successfully";
+		$msg["error"] = "Successfully Added Work History";
 	}
 	else {
 		$msg["isSuccess"] = false;
-		$msg["error"] = "Adding Work History unsuccessful";
+		$msg["error"] = "Failed to Add Work History";
 	}
 } catch (Exception $e) {
 	$msg["isSuccess"] = false;

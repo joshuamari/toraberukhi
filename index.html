@@ -116,20 +116,6 @@
                 </select>
               </div>
             </div>
-            <!-- <div class="row mb-2">
-              <label
-                for="editentryInvite"
-                class="col-sm-4 col-form-label col-form-label-sm"
-                >Invitation Type</label
-              >
-              <div class="col-sm-8">
-                <select class="select" id="editentryInvite">
-                  <option value="1">Multiple</option>
-                  <option value="2">Single</option>
-                  <option value="3">Not Required</option>
-                </select>
-              </div>
-            </div> -->
             <div class="row mb-2">
               <label
                 for="editentryDateJ"
@@ -183,6 +169,345 @@
             e-id="0"
           >
             Save
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Work History Modal -->
+  <div
+    class="modal fade"
+    id="addNewWork"
+    data-bs-backdrop="static"
+    data-bs-keyboard="false"
+    tabindex="-1"
+    aria-labelledby="staticBackdropLabel"
+    aria-hidden="true"
+  >
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="staticBackdropLabel">Add Work History Entry</h1>
+          <button
+            type="button"
+            class="btn-wh-close"
+            data-bs-dismiss="modal"
+            aria-label="Close"
+          ></button>
+        </div>
+        <div class="modal-body">
+          <div class="d-grid">
+            
+            <div class="row mb-2">
+              <label
+                for="addcompanyName"
+                class="col-form-label col-form-label-sm"
+                >Company Name</label
+              >
+              <div>
+                <input
+                  type="text"
+                  class="input company-name"
+                  id="addcompanyName"
+                  placeholder="Company Name"
+                />
+              </div>
+            </div>
+            <small class="compNameError hidden">Please Complete the Field</small>
+
+            <div class="MYDates mb-2 d-flex flex-row">
+              <div class="col-sm-6">
+                <label
+                  for="addStartMonthYear"
+                  class="col-form-label col-form-label-sm"
+                  >Start Month and Year</label
+                >
+                <input
+                  type="month"
+                  class="input add-start-year"
+                  id="addStartMonthYear"
+                  min="1900-01"
+                  max="2025-12"
+                />
+              </div>
+
+              <div class="col-sm-6">
+                <label
+                  for="addEndMonthYear"
+                  class="col-form-label col-form-label-sm"
+                  >End Month and Year</label
+                >
+                <input
+                  type="month"
+                  class="input add-start-year"
+                  id="addEndMonthYear"
+                  min="1900-01"
+                  max="2025-12"
+                />
+              </div>
+            </div>
+            <small class="dateError hidden">Please Complete the Fields</small>
+
+            <div class="row mb-2">
+              <label
+                for="addcompanyBusiness"
+                class="col-form-label col-form-label-sm"
+                >Company Business</label
+              >
+              <div>
+                <input
+                  type="text"
+                  class="input company-business"
+                  id="addcompanyBusiness"
+                  placeholder="Company Business"
+                />
+              </div>
+            </div>
+            <small class="BusiError hidden">Please Complete the Field</small>
+
+            <div class="row mb-2">
+              <label
+                for="addbusinessContent"
+                class="col-form-label col-form-label-sm"
+                >Business Content</label
+              >
+              <div>
+                <input
+                  type="text"
+                  class="input business-content"
+                  id="addbusinessContent"
+                  placeholder="Business Content"
+                />
+              </div>
+            </div>
+            <small class="ContentError hidden">Please Complete the Field</small>
+
+            <div class="row mb-2">
+              <label
+                for="addworkLocation"
+                class="col-form-label col-form-label-sm"
+                >Work Location</label
+              >
+              <div>
+                <input
+                  type="text"
+                  class="input work-location"
+                  id="addworkLocation"
+                  placeholder="Work Location"
+                />
+              </div>
+            </div>
+            <small class="LocError hidden">Please Complete the Field</small>
+
+            <div class="add-wh-error"></div>
+     
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-wh-cancel btn-secondary">
+            Cancel
+          </button>
+          <button
+            type="button"
+            class="btn btn-success fw-medium"
+            id="btn-addWorkEntry"
+            
+          >
+            Add
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div
+    class="modal fade"
+    id="editWorkHistory"
+    data-bs-backdrop="static"
+    data-bs-keyboard="false"
+    tabindex="-1"
+    aria-labelledby="staticBackdropLabel"
+    aria-hidden="true"
+  >
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="staticBackdropLabel">Edit Work History Entry</h1>
+          <button
+            type="button"
+            class="btn-wh-close"
+            data-bs-dismiss="modal"
+            aria-label="Close"
+          ></button>
+        </div>
+        <div class="modal-wh-body">
+          <div class="d-grid">
+            <div class="row mb-2">
+              <label
+                for="edit-companyName"
+                class="col-form-label col-form-label-sm"
+                >Company Name</label
+              >
+              <div>
+                <input
+                  type="text"
+                  class="input company-name"
+                  id="edit-companyName"
+                  placeholder="Company Name"
+                />
+              </div>
+            </div>
+            <small class="compNameError hidden">Please Complete the Field</small>
+
+            <div class="MYDates mb-2 d-flex flex-row">
+              <div class="col-sm-6">
+                <label
+                  for="edit-StartMonthYear"
+                  class="col-form-label col-form-label-sm"
+                  >Start Month and Year</label
+                >
+                <input
+                  type="month"
+                  class="input add-start-year"
+                  id="edit-StartMonthYear"
+                  min="1900-01"
+                  max="2025-12"
+                />
+              </div>
+              <div class="col-sm-6">
+                <label
+                  for="edit-EndMonthYear"
+                  class="col-form-label col-form-label-sm"
+                  >End Month and Year</label
+                >
+                <input
+                  type="month"
+                  class="input add-start-year"
+                  id="edit-EndMonthYear"
+                  min="1900-01"
+                  max="2025-12"
+                />
+              </div>
+            </div>
+            <small class="dateError hidden">Please Complete the Field</small>
+
+            <div class="row mb-2">
+              <label
+                for="edit-companyBusiness"
+                class="col-form-label col-form-label-sm"
+                >Company Business</label
+              >
+              <div>
+                <input
+                  type="text"
+                  class="input company-business"
+                  id="edit-companyBusiness"
+                  placeholder="Company Business"
+                />
+              </div>
+            </div>
+            <small class="BusiError hidden">Please Complete the Field</small>
+
+            <div class="row mb-2">
+              <label
+                for="edit-businessContent"
+                class="col-form-label col-form-label-sm"
+                >Business Content</label
+              >
+              <div>
+                <input
+                  type="text"
+                  class="input business-content"
+                  id="edit-businessContent"
+                  placeholder="Business Content"
+                />
+              </div>
+            </div>
+            <small class="ContentError hidden">Please Complete the Field</small>
+
+            <div class="row mb-2">
+              <label
+                for="edit-workLocation"
+                class="col-form-label col-form-label-sm"
+                >Work Location</label
+              >
+              <div>
+                <input
+                  type="text"
+                  class="input work-location"
+                  id="edit-workLocation"
+                  placeholder="Work Location"
+                />
+              </div>
+            </div>
+            <small class="LocError hidden">Please Complete the Field</small>
+
+            <div class="edit-wh-error"></div>
+     
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-wh-cancel btn-secondary">
+            Cancel
+          </button>
+          <button
+            type="button"
+            class="btn btn-success fw-medium"
+            id="btn-updateWorkEntry"
+            e-wh-id="0"
+          >
+            Save
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div
+    class="modal fade"
+    id="deleteWorkHistory"
+    data-bs-backdrop="static"
+    data-bs-keyboard="false"
+    tabindex="-1"
+    aria-labelledby="staticBackdropLabel"
+    aria-hidden="true"
+  >
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="staticBackdropLabel">
+            Delete Work History Entry
+          </h1>
+          <button
+            type="button"
+            class="btn-wh-close"
+            data-bs-dismiss="modal"
+            aria-label="Close"
+          ></button>
+        </div>
+        <div class="modal-body">
+          <p class="mb-2">
+            Are you sure you want to delete
+            <span class="fw-semibold" id="selectedEmp"></span>'s Work History Entry
+            <span class="fw-semibold"
+              >no. <span id="storeWorkId" del-work-id="0"></span
+            ></span>
+            ?
+          </p>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-wh-cancel btn-secondary">
+            Cancel
+          </button>
+          <button
+            type="button"
+            class="btn btn-danger fw-medium"
+            id="btn-deleteWorkHistory"
+          >
+            Delete
           </button>
         </div>
       </div>
@@ -284,9 +609,12 @@
             </div>
         <div class="main w-100 d-flex h-[calc(100%-30px)]">
         
-          <div class="left pl-0 pr-6 lg:pr-6 py-6 pt-0" id="left">
+          <div class="left pl-0 pr-6 lg:pr-6 pt-0" id="left">
             <label for="check" class="lbl-viewForm">View Dispatch Form</label>
             <input type="checkbox" class="chkbx-viewForm" id="check">
+            
+              <!-- <label for="check" class="lbl-viewForm">▼</label>
+              <input type="checkbox" class="chkbx-viewForm" id="check"> -->
             <div class="viewForm">
 
               <div class="form pl-3">
@@ -314,7 +642,7 @@
                 </div>
 
                 <div class="calendars mb-1 ml-[-10px] d-flex flex-row">
-                  <div class="col-sm-6">
+                  <div class="dateJ col-sm-6">
                     <label for="" class="col-form-label pl-0"
                     >Date to Japan:</label
                   >
@@ -325,7 +653,7 @@
                     />
                   </div>
                   <!-- <div class="col-sm-1"></div> -->
-                  <div class="col-sm-6">
+                  <div class="dateP col-sm-6">
                     <label for="" class="col-form-label pl-0"
                     >Date to Philippines:</label
                   >
@@ -396,24 +724,28 @@
 
                 </div>
               </div>
-              <div class="sticky-buttons align-middle pr-5 pt-3 mb-2">
-                <div class="count-total-days">
-                  <label for="" class="col-form-label pl-0 pr-5">Total days:</label>
-                    <h5
-                      class="d-flex float-right align-items-center h-100"
-                      id="daysCount"
-                    > 0 Day</h5>
-                </div>
-                <div class="submit-btns">
-                  <button class="btn btn-clear" id="btnClear">Clear</button>
-                  <button class="btn btn-dispatch" id="btnApply">
-                    Send Dispatch Request
-                  </button>
-                </div>
+              
+            </div>
+              <!-- <label for="check" class="lbl-closeForm">▼</label>
+              <input type="checkbox" class="chkbx-viewForm" id="check"> -->
+            <div class="sticky-buttons align-middle pr-5 pt-3 mb-2">
+              <div class="count-total-days mb-4">
+                <label for="" class="countlabel col-form-label pl-0 pr-5">Total days:</label>
+                  <h5
+                    class="d-flex float-right align-items-center font-bold text-3xl h-100"
+                    id="daysCount"
+                  > 0 Day</h5>
+              </div>
+              <div class="submit-btns">
+                <button class="btn btn-clear" id="btnClear">Clear</button>
+                <button class="btn btn-dispatch" id="btnApply">
+                  Send Dispatch Request
+                </button>
               </div>
             </div>
+            
           </div>
-        
+          
           
           <div class="right h-full relative" id="appendHere">
             <div class="d-flex withContent d-none flex-column gap-3 h-full">
@@ -737,11 +1069,11 @@
                 <div class="work-hist h-full pb-6 xl:pb-0">
                   <div class="top flex justify-content-between">
                     <div class="title pb-3">Work History</div>
-                    <div>
-                      <button class="btn btn-success bg-[var(--darkest)]" id="btnExport">
+                    <!-- <div>
+                      <button class="btn btn-success bg-[var(--darkest)]" id="btnExportss">
                         Export table
                       </button>
-                    </div>
+                    </div> -->
                   </div>
                   <div class="table-cont overflow-auto min-h-[300px]">
                     <table class="table" id="workhistTable">
@@ -881,6 +1213,9 @@
                       <tbody id="wList">
                         <tr>
                           <td colspan="10" class="text-center">No data found</td>
+                        </tr>
+                        <tr>
+                          <td colspan="10" class="add-work">Add New  Item</td>
                         </tr>
                         <!-- <tr>
                             <td>1</td>
