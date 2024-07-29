@@ -227,6 +227,8 @@ let monthNames2 = [
 // };
 let reqList = [];
 let cardData = [];
+
+let sortDateAsc = false;
 //#endregion
 checkAccess()
   .then((emp) => {
@@ -351,6 +353,10 @@ $(document).on("click", "#logoutBtn", function () {
     .catch((error) => {
       alert(`${error}`);
     });
+});
+$(document).on("click", "#sortDate", function () {
+  sortDateAsc = !sortDateAsc;
+  searchFilter(reqList);
 });
 //#endregion
 
@@ -581,6 +587,12 @@ function searchFilter(req_list) {
     const statusMatch = filter !== undefined ? emp.status == filter : true;
 
     return searchMatch && groupMatch && statusMatch && dateMatch;
+  });
+
+  results.sort((a, b) => {
+    return sortDateAsc
+      ? new Date(a.req_date) - new Date(b.req_date)
+      : new Date(b.req_date) - new Date(a.req_date);
   });
 
   fillTable(results);
