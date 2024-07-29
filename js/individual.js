@@ -286,8 +286,9 @@ function getGroups() {
   });
 }
 function fillGroups(grps) {
+  const groupIDS = grps.map((obj) => obj.id);
   var grpSelect = $("#grpSel");
-  grpSelect.html("<option value='0'>Select Group</option>");
+  grpSelect.html(`<option value=${groupIDS.toString()}>Select Group</option>`);
   $.each(grps, function (index, item) {
     var option = $("<option>")
       .attr("value", item.id)
@@ -297,7 +298,7 @@ function fillGroups(grps) {
   });
 }
 function getEmployees() {
-  const grpID = $("#grpSel").find("option:selected").attr("grp-id");
+  const grpID = $("#grpSel").val();
   dispatch_days = 0;
   return new Promise((resolve, reject) => {
     $.ajax({

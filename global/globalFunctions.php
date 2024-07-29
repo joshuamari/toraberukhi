@@ -31,29 +31,24 @@ function allGroupAccess($empnum)
     return $access;
 }
 
-function getMembers($empnum, $groups)
+function getMembers($empnum)
 {
     global $connnew;
     $members = array();
     $yearMonth = date("Y-m-01");
-    if ($groups != 0) {
-        $myGroups = explode(",", $groups);
-    } else {
-        $myGroups = getGroups($empnum);
-        $myGroups = array_column($myGroups, "id");
-    }
+    $myGroups = getGroups($empnum);
     foreach ($myGroups as $grp) {
-        $memsQ = "SELECT CONCAT(`surname`, ', ', `firstname`) as `name`, `id` FROM `employee_list` WHERE `group_id` = :grp AND (`resignation_date` IS NULL OR 
-        `resignation_date` = '0000-00-00' OR `resignation_date` > :yearMonth) 
+        $memsQ = "SELECT `id` FROM `employee_list` WHERE `group_id` = :grp AND (`resignation_date` IS NULL OR `resignation_date` = '0000-00-00' OR `resignation_date` > :yearMonth) 
         AND `nickname` <> ''";
         $memsStmt = $connnew->prepare($memsQ);
-        $memsStmt->execute([":grp" => $grp, ":yearMonth" => $yearMonth]);
+        $memsStmt->execute([":grp" => $grp['id'], ":yearMonth" => $yearMonth]);
         if ($memsStmt->rowCount() > 0) {
             $memArr = $memsStmt->fetchAll();
-            $members = array_merge($members, $memArr);
+            $arrValues = array_column($memArr, "id");
+            $members = array_merge($members, $arrValues);
         }
     }
-    usort($members, "arraySort");
+
     return $members;
 }
 
@@ -137,6 +132,101 @@ function getID()
         $empID = hex2bin($empID);
         $empID = base64_decode(urldecode($empID));
     }
-    return $empID;
+    return (int)$empID;
+}
+function getName($id)
+{
+    global $connnew;
+    global $connpcs;
+    $name = '';
+    $newQ = "SELECT CONCAT(`surname`,', ',`firstname`) FROM `employee_list` WHERE `id`=:id";
+    $newStmt = $connnew->prepare($newQ);
+    $newStmt->execute([":id" => $id]);
+    if ($newStmt->rowCount() > 0) {
+        $name = $newStmt->fetchColumn();
+    } else {
+        $pcsQ = "SELECT CONCAT(`surname`,', ',`firstname`) FROM `khi_details` WHERE `number`=:id";
+        $pcsStmt = $connpcs->prepare($pcsQ);
+        $pcsStmt->execute([":id" => $id]);
+        if ($pcsStmt->rowCount() > 0) {
+            $name = $pcsStmt->fetchColumn();
+        }
+    }
+
+    return ucwords(strtolower($name));
+}
+function getPresID()
+{
+    global $connnew;
+    $idp = 0;
+    $idQ = "SELECT `id` FROM `employee_list` WHERE `designation`=29 AND `resignation_date` < CURRENT_DATE()";
+    $idStmt = $connnew->query($idQ);
+    if ($idStmt->rowCount() > 0) {
+        $idp = $idStmt->fetchColumn();
+    }
+    return (int)$idp;
+}
+function getPresEmail()
+{
+    global $connnew;
+    $emailp = '';
+    $emailQ = "SELECT `email` FROM `employee_list` WHERE `designation`=29 AND `resignation_date` < CURRENT_DATE()";
+    $emailStmt = $connnew->query($emailQ);
+    if ($emailStmt->rowCount() > 0) {
+        $emailp = $emailStmt->fetchColumn();
+    }
+    return $emailp;
+}
+function getAdminEmails()
+{
+    global $connnew;
+    $adminEmail = array();
+    $exclude = [29, 40, 43, 44, 45, 49, 51, 53];
+    $adminGroupID = 2;
+    $excludeStmt = "AND `designation` NOT IN (" . implode(",", $exclude) . ")";
+    $emailQ = "SELECT `email` FROM `employee_list` WHERE `group_id`=:group_id $excludeStmt";
+    $emailStmt = $connnew->prepare($emailQ);
+    $emailStmt->execute([":group_id" => $adminGroupID]);
+    if ($emailStmt->rowCount() > 0) {
+        $emailArr = $emailStmt->fetchAll();
+        foreach ($emailArr as $emails) {
+            $adminEmail[] = $emails['email'];
+        }
+    }
+    return $adminEmail;
+}
+function groupByID($id)
+{
+    global $connnew;
+    $grpID = 0;
+    $grpQ = "SELECT `group_id` FROM `employee_list` WHERE `id`=:id";
+    $grpStmt = $connnew->prepare($grpQ);
+    $grpStmt->execute([":id" => $id]);
+    if ($grpStmt->rowCount() > 0) {
+        $grpID = $grpStmt->fetchColumn();
+    }
+    return $grpID;
+}
+function getKHIPICEmail($group_id, $exclude = 0)
+{
+    global $connpcs;
+    $khiEmail = array();
+    $khiQ = "SELECT `email` FROM `khi_details` WHERE `group_id`=:group_id AND `number` != :exclude";
+    $khiStmt = $connpcs->prepare($khiQ);
+    $khiStmt->execute([":group_id" => $group_id, ":exclude" => $exclude]);
+    if ($khiStmt->rowCount() > 0) {
+        $khiArr = $khiStmt->fetchAll();
+        foreach ($khiArr as $emails) {
+            $khiEmail[] = $emails['email'];
+        }
+    }
+    return $khiEmail;
+}
+function countDays($start, $end)
+{
+    $date1 = date_create($start);
+    $date2 = date_create($end);
+    $diff = date_diff($date1, $date2);
+    return  (int)$diff->format("%a") + 1;
 }
 #endregion

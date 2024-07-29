@@ -109,6 +109,10 @@
 
 
         </div>
+        <div id="modifyFooter" class="">
+          <label for="" class="text-[var(--gray-text)]" id="modiLabel">Modified:</label>
+            <p class="text-[var(--gray-text)]" id="modalModiDate">2024-06-06</p>
+        </div>
       </div>
       
     </div>
@@ -131,46 +135,39 @@
       <nav class="flex flex-col justify-content-between h-[calc(100%-63px)]">
         <section>
           <ul class="list-unstyled d-grid gap-2">
-            <a href="../">
-              <li>
-                <div class="d-flex align-items-center gap-2">
-                  <i class="bx bxs-dashboard"></i>
-                  <p>Dashboard</p>
-                </div>
-              </li>
-            </a>
-            <a href="./">
-              <li class="active">
-                <div class="d-flex align-items-center gap-2">
-                  <i class="bx bx-task text-[18px]"></i>
-                  <p>Request List</p>
-                </div>
-              </li>
-            </a>
-            <a href="../checkAvailability/">
-              <li>
-                <div class="d-flex align-items-center gap-2">
-                  <i class="bx bxs-briefcase"></i>
-                  <p>Dispatch Request</p>
-                </div>
-              </li>
-            </a>
-            <a href="../empList/">
-              <li>
-                <div class="d-flex align-items-center gap-2">
-                  <i class="bx bxs-group"></i>
-                  <p>Employee List</p>
-                </div>
-              </li>
-            </a>
-            <a href="../report/">
-              <li>
-                <div class="d-flex align-items-center gap-2">
-                  <i class="bx bxs-report"></i>
-                  <p>Report</p>
-                </div>
-              </li>
-            </a>
+            <a href="../"
+            ><li>
+              <div class="d-flex align-items-center gap-2">
+                <i class="bx bxs-briefcase"></i>
+                <p>Dispatch Request by KHI</p>
+              </div>
+            </li></a
+          >
+          <a href="./">
+            <li class="active">
+              <div class="d-flex align-items-center gap-2">
+                <i class="bx bx-task text-[18px]"></i>
+                <p>Request List</p>
+              </div>
+            </li>
+          </a>
+          <a href="../dashboard/"
+            ><li>
+              <div class="d-flex align-items-center gap-2">
+                <i class="bx bxs-dashboard"></i>
+                <p>Dashboard</p>
+              </div>
+            </li></a
+          >
+          <a href="../report/"
+            ><li>
+              <div class="d-flex align-items-center gap-2">
+                <i class="bx bxs-report"></i>
+                <p>Report</p>
+              </div>
+            </li></a>
+
+
           </ul>
         </section>
         <section class="grid gap-2">
@@ -190,22 +187,22 @@
               </div>
             </div>
           </li>
-          <!-- <a href="../admin/"
-              ><li>
-                <div class="d-flex align-items-center gap-2">
-                  <i class="bx bxs-lock-open"></i>
-                  <p>Admin</p>
-                </div>
-              </li></a
-            > -->
-          <a href="#" id="portalBtn">
-            <li>
-              <div class="d-flex align-items-center gap-2">
-                <i class='bx bx-home-alt'></i>
-                <p>KDT Portal</p>
-              </div>
-            </li>
-          </a>
+          <a href="../admin/"
+          ><li>
+            <div class="d-flex align-items-center gap-2">
+              <i class="bx bxs-buildings"></i>
+              <p>Organization</p>
+            </div>
+          </li></a
+        >
+        <a href="#"
+          ><li id="logoutBtn">
+            <div class="d-flex align-items-center gap-2">
+              <i class="bx bx-log-out"></i>
+              <p>Logout</p>
+            </div>
+          </li></a
+        >
         </section>
       </nav>
     </div>
@@ -312,7 +309,7 @@
                 <div class="filters  w-100 flex  gap-2 ">
                   <div class="flex gap-2 w-full justify-content-end">
                     <div class="relative lg:w-auto w-full">
-                      <input type="search" class="input search " placeholder="Search here . . .">
+                      <input type="search" class="input search " placeholder="Search here . . ." id="searchbar">
                       <i class='bx bx-search absolute top-[8px] text-[18px] left-[8px] text-[var(--gray-text)]'></i>
                     </div>
                     <div class="relative">
