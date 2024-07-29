@@ -358,9 +358,154 @@ $(document).on("click", "#sortDate", function () {
   sortDateAsc = !sortDateAsc;
   searchFilter(reqList);
 });
+$(document).on("click", "#attachment", function () {
+  fillAttachment(samplePrintData);
+  $("#openModal .btn-close").click();
+  $("#attachmentModal").modal("show");
+});
+$(document).on("click", "#attachment2", function () {
+  fillAttachment2(samplePrintData);
+  $("#openModal .btn-close").click();
+  $("#attachmentModal2").modal("show");
+});
+$(document).on("click", "#btnBack", function () {
+  $("#attachmentModal .btn-close").click();
+  $("#openModal").modal("show");
+});
+$(document).on("click", "#btnBack2", function () {
+  $("#attachmentModal2 .btn-close").click();
+  $("#openModal").modal("show");
+});
 //#endregion
 
 //#region FUNCTIONS
+function fillAttachment(data) {
+  $(".siteDispatch").empty();
+  $("#printJap, #printPh, #printThird").text("");
+  var date = data.date_request;
+  var khi = data.dispatch_request.requester_name;
+  var khibu = data.dispatch_request.request_by_dept;
+  var name = data.dispatch_request.emp_name;
+  var from = data.dispatch_request.start;
+  var to = data.dispatch_request.end;
+  var country = data.dispatch_request.location_id;
+  var loc = data.dispatch_request.specific_loc;
+  var invitation = data.dispatch_request.invitation_id;
+  var workOrder = data.dispatch_request.work_order;
+  var project = data.dispatch_request.project_name;
+  var siteDispatch = data.dispatch_request.site_dispatch;
+  var salary = data.dispatch_request.allowance;
+
+  if (country === 1) {
+    insertIconCountry(1);
+    $("#printJap").text(loc);
+  }
+  if (country === 2) {
+    insertIconCountry(2);
+    $("#printPh").text(loc);
+  }
+  if (country === 3) {
+    insertIconCountry(3);
+    $("#printThird").text(loc);
+  }
+  if (invitation === 1) {
+    insertIconInvitation(1);
+  }
+  if (invitation === 2) {
+    insertIconInvitation(2);
+  }
+  if (invitation === 3) {
+    insertIconInvitation(3);
+  }
+  if (siteDispatch === 1) {
+    $(".siteDispatch").html(`<i class="bx bx-x down"></i>`);
+  }
+  if (siteDispatch === 0) {
+    $(".siteDispatch").empty();
+  }
+  $("#printKHI").text(formatName(khi));
+  $("#printBU").text(khibu);
+  $("#printName").text(formatName(name));
+  $("#printFrom").text(from);
+  $("#printTo").text(to);
+  $("#printWO").text(workOrder);
+  $("#printProject").text(project);
+  $("#printSalary").text(salary);
+  $("#printDate").text(date);
+}
+function fillAttachment2(data) {
+  var dates = data.dispatch_request.date_request;
+  var name = data.dispatch_request.emp_name;
+
+  const [day, monthName, year] = dates.split(" ");
+  const month = monthNames2.indexOf(monthName);
+  var str = "";
+  $("#workHistoryTable tbody").empty();
+  if (data.work_history.length != 0) {
+    $.each(data.work_history, function (index, item) {
+      str = `
+      <tr>
+        <td>${item.start_year}</td>
+        <td>${item.start_month}</td>
+        <td>${item.end_year}</td>
+        <td>${item.end_month}</td>
+        <td>${item.company_name}</td>
+        <td>${item.company_business}</td>
+        <td>${item.business_content}</td>
+        <td>${item.location}</td>
+      </tr>
+    `;
+      $("#workHistoryTable tbody").append(str);
+    });
+  } else {
+    str = `
+    <tr>
+      <td colspan="9" class="text-center">
+        No data found.
+      </td>
+    </tr>
+    `;
+
+    $("#workHistoryTable tbody").append(str);
+  }
+
+  $("#whYear").text(year);
+  $("#whMonth").text(month + 1);
+  $("#whDay").text(day);
+  $("#whName").text(name);
+}
+function insertIconCountry(id) {
+  $(".countries").empty();
+
+  const iconElement = $("<i>").addClass("bx bx-x down");
+
+  const countriesContainers = $(".countries");
+  if (id === 1) {
+    countriesContainers.eq(0).append(iconElement);
+  }
+  if (id === 2) {
+    countriesContainers.eq(1).append(iconElement);
+  }
+  if (id === 3) {
+    countriesContainers.eq(2).append(iconElement);
+  }
+}
+function insertIconInvitation(id) {
+  $(".inv").empty();
+
+  const iconElement = $("<i>").addClass("bx bx-x down");
+
+  const countriesContainers = $(".inv");
+  if (id === 1) {
+    countriesContainers.eq(0).append(iconElement);
+  }
+  if (id === 2) {
+    countriesContainers.eq(1).append(iconElement);
+  }
+  if (id === 3) {
+    countriesContainers.eq(2).append(iconElement);
+  }
+}
 function getRequests() {
   return new Promise((resolve, reject) => {
     $.ajax({
@@ -425,6 +570,7 @@ function fillCards() {
   );
   $("#cardTotal").text(total);
 }
+
 function fillOpenModal(trID) {
   const req = reqList.find((req) => req.req_id == trID);
   const name = req.emp_name;
@@ -441,6 +587,10 @@ function fillOpenModal(trID) {
   const duration = req.duration;
   const reqGrp = req.requester_group;
   const modi = req.modified;
+  const empnum = req.empnum;
+  const [last, given] = name.split(",");
+  const surname = last.toUpperCase();
+  const first = given.replace(/\s+/g, "");
   formatStatus(status);
   formatVisaPassport(visaValidity, passValidity);
   $("#modalEmpName").text(name);
@@ -453,6 +603,9 @@ function fillOpenModal(trID) {
   $("#modalCountry").text(country);
   $("#modalReqGrp").text(reqGrp);
   $("#modalModiDate").text(modi);
+  $("#attachment").text(`${empnum}_${surname}${first}_DispatchRequest`);
+  $("#attachment2").text(`${empnum}_${surname}${first}_WorkHistory`);
+
   if (duration > 1) {
     $("#modalDuration").html(
       `<span class="text-[16px] font-semibold" >${duration}</span>
