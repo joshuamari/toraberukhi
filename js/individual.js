@@ -5,6 +5,7 @@ var dispatch_days = 0;
 var to_add = 0;
 const full = 183;
 var dHistory = [];
+var wHistory = [];
 //#endregion
 checkAccess()
   .then((emp) => {
@@ -58,6 +59,16 @@ $(document).on("click", ".btn-close", function () {
 });
 $(document).on("click", ".btn-cancel", function () {
   $(this).closest(".modal").find(".btn-close").click();
+});
+$(document).on("click", ".btn-wh-close", function () {
+  $(this).closest(".modal").find("input").attr("disabled", true);
+  $("#btn-updateWorkEntry").attr("e-wh-id", 0);
+  $("small").removeClass("block");
+  $("small").addClass("hidden");
+  removeOutline();
+});
+$(document).on("click", ".btn-wh-cancel", function () {
+  $(this).closest(".modal").find(".btn-wh-close").click();
 });
 $(document).on("change", ".ddates", function () {
   var startD = $("#startDate").val();
@@ -113,16 +124,16 @@ $(document).on("change", "#empSel", function () {
     $(".withContent").removeClass("d-none");
   }
 });
-$(document).on("change", "#dToggle", function () {
-  getDispatchHistory()
-    .then((dlst) => {
-      dHistory = dlst;
-      fillDispatchHistory(dHistory);
-    })
-    .catch((error) => {
-      alert(`${error}`);
-    });
-});
+// $(document).on("change", "#dToggle", function () {
+//   getDispatchHistory()
+//     .then((dlst) => {
+//       dHistory = dlst;
+//       fillDispatchHistory(dHistory);
+//     })
+//     .catch((error) => {
+//       alert(`${error}`);
+//     });
+// });
 $(document).on("click", "#btnApply", function () {
   insertDispatch();
 });
@@ -162,6 +173,34 @@ $(document).on("click", "#btn-deleteEntry", function () {
     }
   });
 });
+$(document).on("click", ".btn-delete-work", function () {
+  var num = $(this).closest("tr").find("td:first-of-type").html();
+
+  var WHtrID = $(this).closest("tr").attr("wh-id");
+  $("#storeWorkId").html(num);
+  $("#storeWorkId").attr("del-work-id", WHtrID);
+});
+$(document).on("click", "#btn-deleteWorkHistory", function () {
+  deleteWork().then((res) => {
+    if (res.isSuccess) {
+      showToast("success", res.error);
+      getWorkHistory()
+        .then((wlst) => {
+          wHistory = wlst;
+          fillWorkHistory(wHistory);
+          $("#btn-deleteWorkHistory")
+            .closest(".modal")
+            .find(".btn-wh-close")
+            .click();
+        })
+        .catch((error) => {
+          showToast("error", error);
+        });
+    } else {
+      showToast("error", res.error);
+    }
+  });
+});
 $(document).on("click", "#updateEmp", function () {
   const empID = $("#empSel").find("option:selected").attr("emp-id");
   if (!empID) {
@@ -192,6 +231,27 @@ $(document).on("click", "#btn-saveEntry", function () {
     }
   });
 });
+$(document).on("click", "#btn-updateWorkEntry", function () {
+  saveEditWorkHistEntry().then((res) => {
+    if (res.isSuccess) {
+      showToast("success", res.error);
+      getWorkHistory()
+        .then((wlst) => {
+          wHistory = wlst;
+          fillWorkHistory(wHistory);
+          $("#btn-updateWorkEntry")
+            .closest(".modal")
+            .find(".btn-wh-close")
+            .click();
+        })
+        .catch((error) => {
+          showToast("error", error);
+        });
+    } else {
+      showToast("error", res.error);
+    }
+  });
+});
 $(document).on("change", ".edit-date", function () {
   computeTotalDays();
 });
@@ -208,6 +268,28 @@ $(document).on("click", ".btn-edit", function () {
   $("#editEntry").modal("show");
   $("#btn-saveEntry").attr("e-id", trID);
 });
+$(document).on("click", ".add-work", function () {
+  $(
+    "#addcompanyName, #addStartMonthYear, #addEndMonthYear, #addcompanyBusiness, #addbusinessContent, #addworkLocation"
+  ).prop("disabled", false);
+  const empID = $("#empSel").find("option:selected").attr("emp-id");
+  $("#addNewWork").modal("show");
+});
+$(document).on("click", "#btn-addWorkEntry", function () {
+  const test = addWorkHistory();
+  if (test) {
+    $("#btn-addWorkEntry").closest(".modal").find(".btn-wh-close").click();
+  }
+});
+$(document).on("click", ".btn-edit-work", function () {
+  var WHtrID = parseInt($(this).closest("tr").attr("wh-id"));
+  getEditWorkHistDetails(WHtrID);
+  $(
+    "#edit-companyName, #edit-StartMonthYear, #edit-EndMonthYear, #edit-companyBusiness, #edit-businessContent, #edit-workLocation"
+  ).prop("disabled", false);
+  $("#editWorkHistory").modal("show");
+  $("#btn-updateWorkEntry").attr("e-wh-id", WHtrID);
+});
 $(document).on("click", "#btnExport", function () {
   exportTable();
 });
@@ -220,6 +302,52 @@ $(document).on(
   function () {
     $(this).removeClass("bg-red-100  border-red-400");
     $(".errTxt").remove();
+  }
+);
+$(document).on(
+  "click",
+  "#addcompanyName, #addStartMonthYear, #addEndMonthYear, #addcompanyBusiness, #addbusinessContent, #addworkLocation",
+  function () {
+    $(this).removeClass("bg-red-100  border-red-400");
+    if ($(this).hasClass("company-name")) {
+      $(".compNameError").removeClass("block");
+      $(".compNameError").addClass("hidden");
+    } else if ($(this).hasClass("company-business")) {
+      $(".BusiError").removeClass("block");
+      $(".BusiError").addClass("hidden");
+    } else if ($(this).hasClass("business-content")) {
+      $(".ContentError").removeClass("block");
+      $(".ContentError").addClass("hidden");
+    } else if ($(this).hasClass("work-location")) {
+      $(".LocError").removeClass("block");
+      $(".LocError").addClass("hidden");
+    } else {
+      $(".dateError").removeClass("block");
+      $(".dateError").addClass("hidden");
+    }
+  }
+);
+$(document).on(
+  "click",
+  "#edit-companyName, #edit-StartMonthYear, #edit-EndMonthYear, #edit-companyBusiness, #edit-businessContent, #edit-workLocation",
+  function () {
+    $(this).removeClass("bg-red-100  border-red-400");
+    if ($(this).hasClass("company-name")) {
+      $(".compNameError").removeClass("block");
+      $(".compNameError").addClass("hidden");
+    } else if ($(this).hasClass("company-business")) {
+      $(".BusiError").removeClass("block");
+      $(".BusiError").addClass("hidden");
+    } else if ($(this).hasClass("business-content")) {
+      $(".ContentError").removeClass("block");
+      $(".ContentError").addClass("hidden");
+    } else if ($(this).hasClass("work-location")) {
+      $(".LocError").removeClass("block");
+      $(".LocError").addClass("hidden");
+    } else {
+      $(".dateError").removeClass("block");
+      $(".dateError").addClass("hidden");
+    }
   }
 );
 $(document).on("change", "#startDate", function () {
@@ -237,13 +365,11 @@ $(document).on("click", "#logoutBtn", function () {
       alert(`${error}`);
     });
 });
-// $(document).on("click", "#viewAll", function () {
-//   $("#left").toggleClass("changeSize");
-//   $(".right").toggleClass("changeSize");
-//   $(".sticky-buttons").toggleClass("appear");
-//   $("body").addClass("overflow-hidden");
-//   $(this).text($(this).text() == "-" ? "+" : "-");
-// });
+$(document).on("keydown", "#allowance", function (e) {
+  if (e.which === 38 || e.which === 40 || e.which === 189) {
+    e.preventDefault();
+  }
+});
 
 $(".lbl-viewForm").click(function () {
   $(this).text(
@@ -251,15 +377,17 @@ $(".lbl-viewForm").click(function () {
       ? "View Dispatch Form"
       : "Hide Dispatch Form"
   );
+  // $(this).html($(this).html() == `▼` ? `▲` : `▼`);
 
-  // $(".sticky-buttons").fadeToggle(1000);
+  // $(".sample").addClass("hidden");
+
   $("#left").toggleClass("changeSize");
   $(".sticky-buttons").toggleClass("appear");
+  $(".viewForm").toggleClass("bgChange");
 
   const checking = $("#check").is(":checked");
-  console.log(checking);
-  console.log("ok");
 });
+
 //#endregion
 
 //#region FUNCTIONS
@@ -506,7 +634,6 @@ function getWorkHistory() {
       },
       dataType: "json",
       success: function (response) {
-        console.log("work: ", response.result);
         const wList = response.result;
         resolve(wList);
       },
@@ -527,12 +654,16 @@ function fillWorkHistory(wList) {
   tableBody.empty();
   if (wList.length === 0) {
     var noDataRow = $(
-      "<tr><td colspan='7' class='text-center'>No data found</td></tr>"
+      "<tr><td colspan='10' class='text-center'>No data found</td></tr>"
     );
     tableBody.append(noDataRow);
+    var addDataRow = $(
+      "<tr> <td colspan='10' class='add-work text-center'> + Add New Item</td></tr>"
+    );
+    tableBody.append(addDataRow);
   } else {
     $.each(wList, function (index, item) {
-      var row = $(`<tr d-id=${item.id}>`);
+      var row = $(`<tr wh-id=${item.id}>`);
       row.append(`<td data-exclude='true'>${index + 1}</td>`);
       row.append(
         `<td  data-f-name="Arial" data-f-sz="9"  data-a-h="center" data-a-v="middle" 	data-b-a-s="thin" data-b-a-c="000000">${item.start_year}</td>`
@@ -558,41 +689,21 @@ function fillWorkHistory(wList) {
       row.append(
         `<td  data-f-name="Arial" data-f-sz="9"  data-a-h="center" data-a-v="middle" 	data-b-a-s="thin" data-b-a-c="000000">${item.work_loc}</td>`
       );
-      /*
-      if (item.duration > 183) {
-        row.append(
-          `<td class="redText" data-f-name="Arial" data-f-sz="9"  data-a-h="center" data-a-v="middle" 	data-b-a-s="thin" data-b-a-c="000000" data-f-color="FFFF0000">${item.duration}</td>`
-        );
-      } else {
-        row.append(
-          `<td  data-f-name="Arial" data-f-sz="9"  data-a-h="center" data-a-v="middle" 	data-b-a-s="thin" data-b-a-c="000000">${item.duration}</td>`
-        );
-      }
-
-      if (item.pastOne > 183) {
-        row.append(
-          `<td class="redText" data-f-name="Arial" data-f-sz="9"  data-a-h="center" data-a-v="middle" 	data-b-a-s="thin" data-b-a-c="000000" data-f-color="FFFF0000">${item.pastOne}</td>`
-        );
-      } else {
-        row.append(
-          `<td  data-f-name="Arial" data-f-sz="9"  data-a-h="center" data-a-v="middle" 	data-b-a-s="thin" data-b-a-c="000000" >${item.pastOne}</td>`
-        );
-      }*/
 
       row.append(`<td data-exclude='true'>
         <div class="d-flex gap-2">
         <button
-          class="btn-edit"
-          title="Edit Entry"
+          class="btn-edit-work"
+          title="Edit Work Entry"
           
         >
         <i class='bx bxs-edit fs-5' ></i>
         </button>
         <button
-          class="btn-delete"
-          title="Delete Entry"
+          class="btn-delete-work"
+          title="Delete Work Entry"
           data-bs-toggle="modal"
-          data-bs-target="#deleteEntry"
+          data-bs-target="#deleteWorkHistory"
         >
           <i class="bx bx-trash fs-5"></i>
         </button>
@@ -600,6 +711,10 @@ function fillWorkHistory(wList) {
 
       tableBody.append(row);
     });
+    var addDataRow = $(
+      "<tr> <td colspan='10' class='add-work text-center'> + Add New Item</td></tr>"
+    );
+    tableBody.append(addDataRow);
   }
 }
 function getDispatchHistory() {
@@ -618,7 +733,6 @@ function getDispatchHistory() {
       },
       dataType: "json",
       success: function (response) {
-        console.log("dispatch: ", response);
         const dList = response;
         resolve(dList);
       },
@@ -778,6 +892,20 @@ function colorBar(dd) {
       .removeClass("bg-warning bg-danger");
   }
 }
+function removeOutline() {
+  $("#edit-companyName").removeClass("bg-red-100  border-red-400");
+  $("#edit-StartMonthYear").removeClass("bg-red-100  border-red-400");
+  $("#edit-EndMonthYear").removeClass("bg-red-100  border-red-400");
+  $("#edit-companyBusiness").removeClass("bg-red-100  border-red-400");
+  $("#edit-businessContent").removeClass("bg-red-100  border-red-400");
+  $("#edit-workLocation").removeClass("bg-red-100  border-red-400");
+  $("#addcompanyName").removeClass("bg-red-100  border-red-400");
+  $("#addStartMonthYear").removeClass("bg-red-100  border-red-400");
+  $("#addEndMonthYear").removeClass("bg-red-100  border-red-400");
+  $("#addcompanyBusiness").removeClass("bg-red-100  border-red-400");
+  $("#addbusinessContent").removeClass("bg-red-100  border-red-400");
+  $("#addworkLocation").removeClass("bg-red-100  border-red-400");
+}
 
 function insertDispatch() {
   const reqDept = $("#reqDeptInput").val();
@@ -908,7 +1036,7 @@ function insertDispatch() {
             $("#inviteSel").val(0);
             $("#workOrder").val("");
             $("#projName").val("");
-            $("#allowance").val("");
+            $("#allowance").val("0");
             to_add = 0;
             countTotal();
             showToast("success", "Successfully added a dispatch entry.");
@@ -938,11 +1066,20 @@ function clearInput() {
   $(".errTxt").remove();
   $("#grpSel, #empSel, #locSel, #inviteSel").val(0);
   $(
-    "#reqDeptInput, #reqNameInput, #startDate, #endDate, #specLocInput, #workOrder, #projName, #allowance"
+    "#reqDeptInput, #reqNameInput, #startDate, #endDate, #specLocInput, #workOrder, #projName"
   ).val("");
+  $("#allowance").val("0");
   to_add = 0;
   $("#daysCount").text("0 Day");
   $("#empSel").change();
+}
+function clearAddWorkInputs() {
+  $(
+    "#addcompanyName, #addStartMonthYear, #addEndMonthYear, #addcompanyBusiness, #addbusinessContent, #addworkLocation"
+  ).removeClass("bg-red-100  border-red-400");
+  $(
+    "#addcompanyName, #addStartMonthYear, #addEndMonthYear, #addcompanyBusiness, #addbusinessContent, #addworkLocation"
+  ).val("");
 }
 
 function getLocations() {
@@ -1041,6 +1178,143 @@ function deleteDispatch() {
         }
       },
     });
+  });
+}
+function deleteWork() {
+  const delWorkID = $("#storeWorkId").attr("del-work-id");
+  return new Promise((resolve, reject) => {
+    $.ajax({
+      type: "POST",
+      url: "php/delete_work_history.php",
+      dataType: "json",
+      data: {
+        work_histID: delWorkID,
+      },
+      success: function (response) {
+        const res = response;
+        resolve(res);
+      },
+      error: function (xhr, status, error) {
+        if (xhr.status === 404) {
+          reject("Not Found Error: The requested resource was not found.");
+        } else if (xhr.status === 500) {
+          reject("Internal Server Error: There was a server error.");
+        } else {
+          reject(
+            "An unspecified error occurred while deleting dispatch history."
+          );
+        }
+      },
+    });
+  });
+}
+function addWorkHistory() {
+  const empID = $("#empSel").find("option:selected").attr("emp-id");
+  const comp_name = $("#addcompanyName").val();
+  const startMonthYear = $("#addStartMonthYear").val();
+  const endMonthYear = $("#addEndMonthYear").val();
+  const comp_business = $("#addcompanyBusiness").val();
+  const business_cont = $("#addbusinessContent").val();
+  const work_loc = $("#addworkLocation").val();
+  let errcount = 0;
+
+  if (!comp_name) {
+    $("#addcompanyName").addClass("bg-red-100  border-red-400");
+    $(".compNameError").removeClass("hidden");
+    $(".compNameError").addClass("block flex items-center gap-1 text-red-600");
+    errcount++;
+  }
+  if (!startMonthYear) {
+    $("#addStartMonthYear").addClass("bg-red-100  border-red-400");
+    $(".dateError").removeClass("hidden");
+    $(".dateError").addClass("block flex items-center gap-1 text-red-600");
+    errcount++;
+  }
+  if (!endMonthYear) {
+    $("#addEndMonthYear").addClass("bg-red-100  border-red-400");
+    $(".dateError").removeClass("hidden");
+    $(".dateError").addClass("block flex items-center gap-1 text-red-600");
+    errcount++;
+  }
+  if (!comp_business) {
+    $("#addcompanyBusiness").addClass("bg-red-100  border-red-400");
+    $(".BusiError").removeClass("hidden");
+    $(".BusiError").addClass("block flex items-center gap-1 text-red-600");
+    errcount++;
+  }
+  if (!business_cont) {
+    $("#addbusinessContent").addClass("bg-red-100  border-red-400");
+    $(".ContentError").removeClass("hidden");
+    $(".ContentError").addClass("block flex items-center gap-1 text-red-600");
+    errcount++;
+  }
+  if (!work_loc) {
+    $("#addworkLocation").addClass("bg-red-100  border-red-400");
+    $(".LocError").removeClass("hidden");
+    $(".LocError").addClass("block flex items-center gap-1 text-red-600");
+    errcount++;
+  }
+  if (endMonthYear < startMonthYear) {
+    $("#addEndMonthYear").val("");
+    $("#addStartMonthYear").val("");
+    $("#addEndMonthYear").addClass("bg-red-100  border-red-400");
+    $("#addStartMonthYear").addClass("bg-red-100  border-red-400");
+    $(".dateError").removeClass("hidden");
+    $(".dateError").addClass("block flex items-center gap-1 text-red-600");
+    $(".dateError").text(
+      "Invalid Date. End date must not be earlier than Start date."
+    );
+    return false;
+  }
+  if (errcount > 0) {
+    console.log("complete required fields");
+    return false;
+  }
+
+  $.ajax({
+    type: "POST",
+    url: "php/insert_work_history.php",
+    data: {
+      empID: empID,
+      comp_name: comp_name,
+      date_monthYearStart: startMonthYear,
+      date_monthYearEnd: endMonthYear,
+      comp_business: comp_business,
+      business_cont: business_cont,
+      work_loc: work_loc,
+    },
+    dataType: "json",
+    success: function (response) {
+      const isSuccess = response.isSuccess;
+      if (!isSuccess) {
+        toggleLoadingAnimation(false);
+        showToast("error", `${response.error}`);
+      } else {
+        getWorkHistory()
+          .then((wlst) => {
+            wHistory = wlst;
+            fillWorkHistory(wHistory);
+            clearAddWorkInputs();
+            $("#btn-addWorkEntry")
+              .closest(".modal")
+              .find(".btn-wh-close")
+              .click();
+          })
+          .catch((error) => {
+            showToast("error", error);
+          });
+        showToast("success", "Successfully Added Work History");
+      }
+    },
+    error: function (xhr, status, error) {
+      if (xhr.status === 404) {
+        reject("Not Found Error: The requested resource was not found.");
+      } else if (xhr.status === 500) {
+        reject("Internal Server Error: There was a server error.");
+      } else {
+        reject("An unspecified error occurred while updating dispatch data.");
+      }
+    },
   });
 }
 
@@ -1145,6 +1419,101 @@ function saveEditEntry() {
     });
   });
 }
+function saveEditWorkHistEntry() {
+  var startMonthYear = $("#edit-StartMonthYear").val();
+  var endMonthYear = $("#edit-EndMonthYear").val();
+  var compName = $("#edit-companyName").val();
+  var compBusiness = $("#edit-companyBusiness").val();
+  var businesscont = $("#edit-businessContent").val();
+  var workloc = $("#edit-workLocation").val();
+  // const empID = $("#empSel").find("option:selected").attr("emp-id");
+  const editID = $("#btn-updateWorkEntry").attr("e-wh-id");
+  let errcount = 0;
+
+  if (!compName) {
+    $("#edit-companyName").addClass("bg-red-100  border-red-400");
+    $(".compNameError").removeClass("hidden");
+    $(".compNameError").addClass("block flex items-center gap-1 text-red-600");
+    errcount++;
+  }
+  if (!startMonthYear) {
+    $("#edit-StartMonthYear").addClass("bg-red-100  border-red-400");
+    $(".dateError").removeClass("hidden");
+    $(".dateError").addClass("block flex items-center gap-1 text-red-600");
+    errcount++;
+  }
+  if (!endMonthYear) {
+    $("#edit-EndMonthYear").addClass("bg-red-100  border-red-400");
+    $(".dateError").removeClass("hidden");
+    $(".dateError").addClass("block flex items-center gap-1 text-red-600");
+    errcount++;
+  }
+  if (!compBusiness) {
+    $("#edit-companyBusiness").addClass("bg-red-100  border-red-400");
+    $(".BusiError").removeClass("hidden");
+    $(".BusiError").addClass("block flex items-center gap-1 text-red-600");
+    errcount++;
+  }
+  if (!businesscont) {
+    $("#edit-businessContent").addClass("bg-red-100  border-red-400");
+    $(".ContentError").removeClass("hidden");
+    $(".ContentError").addClass("block flex items-center gap-1 text-red-600");
+    errcount++;
+  }
+  if (!workloc) {
+    $("#edit-workLocation").addClass("bg-red-100  border-red-400");
+    $(".LocError").removeClass("hidden");
+    $(".LocError").addClass("block flex items-center gap-1 text-red-600");
+    errcount++;
+  }
+  if (endMonthYear < startMonthYear) {
+    $("#addEndMonthYear").val("");
+    $("#addStartMonthYear").val("");
+    $("#addEndMonthYear").addClass("bg-red-100  border-red-400");
+    $("#addStartMonthYear").addClass("bg-red-100  border-red-400");
+    $(".dateError").removeClass("hidden");
+    $(".dateError").addClass("block flex items-center gap-1 text-red-600");
+    $(".dateError").text(
+      "Invalid Date. End date must not be earlier than Start date."
+    );
+    return false;
+  }
+  if (errcount > 0) {
+    console.log("complete required fields");
+    return false;
+  }
+
+  return new Promise((resolve, reject) => {
+    $.ajax({
+      type: "POST",
+      url: "php/update_work_history.php",
+      data: {
+        date_monthYearStart: startMonthYear,
+        date_monthYearEnd: endMonthYear,
+        comp_name: compName,
+        comp_business: compBusiness,
+        business_cont: businesscont,
+        work_loc: workloc,
+        work_histID: editID,
+      },
+      dataType: "json",
+      success: function (response) {
+        const res = response;
+        resolve(res);
+      },
+      error: function (xhr, status, error) {
+        if (xhr.status === 404) {
+          reject("Not Found Error: The requested resource was not found.");
+        } else if (xhr.status === 500) {
+          reject("Internal Server Error: There was a server error.");
+        } else {
+          reject("An unspecified error occurred while updating dispatch data.");
+        }
+      },
+    });
+  });
+}
+
 function computeTotalDays() {
   var from = new Date($("#editentryDateJ").val());
   var to = new Date($("#editentryDateP").val());
@@ -1186,6 +1555,39 @@ function getEditDetails(editID) {
   $("#editentryDateP").attr("min", formattedDateJap);
   $("#editentryLocation option:contains(" + loc + ")").prop("selected", true);
   $(" #editentryDays").html(total);
+}
+function getEditWorkHistDetails(editworkID) {
+  const editItem = wHistory.find((item) => parseInt(item.id) === editworkID);
+  var st_year = editItem["start_year"];
+  var st_month = editItem["start_month"];
+  var end_year = editItem["end_year"];
+  var end_month = editItem["end_month"];
+  var comp_name = editItem["comp_name"];
+  var comp_business = editItem["comp_business"];
+  var business_cont = editItem["business_cont"];
+  var work_loc = editItem["work_loc"];
+  let newStMonth = "";
+  let newEndMonth = "";
+
+  if (st_month < 10) {
+    newStMonth = "0" + st_month;
+  } else {
+    newStMonth = st_month;
+  }
+  if (end_month < 10) {
+    newEndMonth = "0" + end_month;
+  } else {
+    newEndMonth = end_month;
+  }
+  const stMonthYear = st_year.concat("-", newStMonth);
+  const endMonthYear = end_year.concat("-", newEndMonth);
+
+  $("#edit-StartMonthYear").val(stMonthYear);
+  $("#edit-EndMonthYear").val(endMonthYear);
+  $("#edit-companyName").val(comp_name);
+  $("#edit-companyBusiness").val(comp_business);
+  $("#edit-businessContent").val(business_cont);
+  $("#edit-workLocation").val(work_loc);
 }
 function getYearly() {
   const empID = $("#empSel").find("option:selected").attr("emp-id");
