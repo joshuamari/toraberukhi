@@ -123,16 +123,6 @@ $(document).on("change", "#empSel", function () {
     $(".withContent").removeClass("d-none");
   }
 });
-// $(document).on("change", "#dToggle", function () {
-//   getDispatchHistory()
-//     .then((dlst) => {
-//       dHistory = dlst;
-//       fillDispatchHistory(dHistory);
-//     })
-//     .catch((error) => {
-//       alert(`${error}`);
-//     });
-// });
 $(document).on("click", "#btnApply", function () {
   insertDispatch();
 });
@@ -231,25 +221,29 @@ $(document).on("click", "#btn-saveEntry", function () {
   });
 });
 $(document).on("click", "#btn-updateWorkEntry", function () {
-  saveEditWorkHistEntry().then((res) => {
-    if (res.isSuccess) {
-      showToast("success", res.error);
-      getWorkHistory()
-        .then((wlst) => {
-          wHistory = wlst;
-          fillWorkHistory(wHistory);
-          $("#btn-updateWorkEntry")
-            .closest(".modal")
-            .find(".btn-wh-close")
-            .click();
-        })
-        .catch((error) => {
-          showToast("error", error);
-        });
-    } else {
-      showToast("error", res.error);
-    }
-  });
+  saveEditWorkHistEntry()
+    .then((res) => {
+      if (res.isSuccess) {
+        showToast("success", res.error);
+        getWorkHistory()
+          .then((wlst) => {
+            wHistory = wlst;
+            fillWorkHistory(wHistory);
+            $("#btn-updateWorkEntry")
+              .closest(".modal")
+              .find(".btn-wh-close")
+              .click();
+          })
+          .catch((error) => {
+            showToast("error", error);
+          });
+      } else {
+        showToast("error", res.error);
+      }
+    })
+    .catch((error) => {
+      showToast("error", error);
+    });
 });
 $(document).on("change", ".edit-date", function () {
   computeTotalDays();
@@ -275,10 +269,30 @@ $(document).on("click", ".add-work", function () {
   $("#addNewWork").modal("show");
 });
 $(document).on("click", "#btn-addWorkEntry", function () {
-  const test = addWorkHistory();
-  if (test) {
-    $("#btn-addWorkEntry").closest(".modal").find(".btn-wh-close").click();
-  }
+  addWorkHistory()
+    .then((res) => {
+      if (!res.isSuccess) {
+        showToast("error", `${res.error}`);
+      } else {
+        getWorkHistory()
+          .then((wlst) => {
+            wHistory = wlst;
+            fillWorkHistory(wHistory);
+            clearAddWorkInputs();
+            $("#btn-addWorkEntry")
+              .closest(".modal")
+              .find(".btn-wh-close")
+              .click();
+          })
+          .catch((error) => {
+            showToast("error", error);
+          });
+        showToast("success", "Successfully Added Work History");
+      }
+    })
+    .catch((error) => {
+      showToast("error", error);
+    });
 });
 $(document).on("click", ".btn-edit-work", function () {
   var WHtrID = parseInt($(this).closest("tr").attr("wh-id"));
@@ -1253,67 +1267,49 @@ function addWorkHistory() {
     $(".LocError").addClass("block flex items-center gap-1 text-red-600");
     errcount++;
   }
-  if (endMonthYear < startMonthYear) {
-    $("#addEndMonthYear").val("");
-    $("#addStartMonthYear").val("");
-    $("#addEndMonthYear").addClass("bg-red-100  border-red-400");
-    $("#addStartMonthYear").addClass("bg-red-100  border-red-400");
-    $(".dateError").removeClass("hidden");
-    $(".dateError").addClass("block flex items-center gap-1 text-red-600");
-    $(".dateError").text(
-      "Invalid Date. End date must not be earlier than Start date."
-    );
-    return false;
-  }
-  if (errcount > 0) {
-    console.log("complete required fields");
-    return false;
-  }
-
-  $.ajax({
-    type: "POST",
-    url: "php/insert_work_history.php",
-    data: {
-      empID: empID,
-      comp_name: comp_name,
-      date_monthYearStart: startMonthYear,
-      date_monthYearEnd: endMonthYear,
-      comp_business: comp_business,
-      business_cont: business_cont,
-      work_loc: work_loc,
-    },
-    dataType: "json",
-    success: function (response) {
-      const isSuccess = response.isSuccess;
-      if (!isSuccess) {
-        toggleLoadingAnimation(false);
-        showToast("error", `${response.error}`);
-      } else {
-        getWorkHistory()
-          .then((wlst) => {
-            wHistory = wlst;
-            fillWorkHistory(wHistory);
-            clearAddWorkInputs();
-            $("#btn-addWorkEntry")
-              .closest(".modal")
-              .find(".btn-wh-close")
-              .click();
-          })
-          .catch((error) => {
-            showToast("error", error);
-          });
-        showToast("success", "Successfully Added Work History");
-      }
-    },
-    error: function (xhr, status, error) {
-      if (xhr.status === 404) {
-        reject("Not Found Error: The requested resource was not found.");
-      } else if (xhr.status === 500) {
-        reject("Internal Server Error: There was a server error.");
-      } else {
-        reject("An unspecified error occurred while updating dispatch data.");
-      }
-    },
+  return new Promise((resolve, reject) => {
+    if (endMonthYear < startMonthYear) {
+      $("#addEndMonthYear").val("");
+      $("#addStartMonthYear").val("");
+      $("#addEndMonthYear").addClass("bg-red-100  border-red-400");
+      $("#addStartMonthYear").addClass("bg-red-100  border-red-400");
+      $(".dateError").removeClass("hidden");
+      $(".dateError").addClass("block flex items-center gap-1 text-red-600");
+      $(".dateError").text(
+        "Invalid Date. End date must not be earlier than Start date."
+      );
+      reject("Invalid Date. End date must not be earlier than Start date.");
+    }
+    if (errcount > 0) {
+      reject("Complete all fields.");
+    }
+    $.ajax({
+      type: "POST",
+      url: "php/insert_work_history.php",
+      data: {
+        empID: empID,
+        comp_name: comp_name,
+        date_monthYearStart: startMonthYear,
+        date_monthYearEnd: endMonthYear,
+        comp_business: comp_business,
+        business_cont: business_cont,
+        work_loc: work_loc,
+      },
+      dataType: "json",
+      success: function (response) {
+        const res = response;
+        resolve(res);
+      },
+      error: function (xhr, status, error) {
+        if (xhr.status === 404) {
+          reject("Not Found Error: The requested resource was not found.");
+        } else if (xhr.status === 500) {
+          reject("Internal Server Error: There was a server error.");
+        } else {
+          reject("An unspecified error occurred while inserting work history.");
+        }
+      },
+    });
   });
 }
 
@@ -1465,24 +1461,23 @@ function saveEditWorkHistEntry() {
     $(".LocError").addClass("block flex items-center gap-1 text-red-600");
     errcount++;
   }
-  if (endMonthYear < startMonthYear) {
-    $("#addEndMonthYear").val("");
-    $("#addStartMonthYear").val("");
-    $("#addEndMonthYear").addClass("bg-red-100  border-red-400");
-    $("#addStartMonthYear").addClass("bg-red-100  border-red-400");
-    $(".dateError").removeClass("hidden");
-    $(".dateError").addClass("block flex items-center gap-1 text-red-600");
-    $(".dateError").text(
-      "Invalid Date. End date must not be earlier than Start date."
-    );
-    return false;
-  }
-  if (errcount > 0) {
-    console.log("complete required fields");
-    return false;
-  }
 
   return new Promise((resolve, reject) => {
+    if (endMonthYear < startMonthYear) {
+      $("#addEndMonthYear").val("");
+      $("#addStartMonthYear").val("");
+      $("#addEndMonthYear").addClass("bg-red-100  border-red-400");
+      $("#addStartMonthYear").addClass("bg-red-100  border-red-400");
+      $(".dateError").removeClass("hidden");
+      $(".dateError").addClass("block flex items-center gap-1 text-red-600");
+      $(".dateError").text(
+        "Invalid Date. End date must not be earlier than Start date."
+      );
+      reject("Invalid Date. End date must not be earlier than Start date.");
+    }
+    if (errcount > 0) {
+      reject("Complete all fields");
+    }
     $.ajax({
       type: "POST",
       url: "php/update_work_history.php",
