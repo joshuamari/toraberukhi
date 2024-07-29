@@ -65,7 +65,7 @@
         </div>
 
         <div class="modal-footer">
-          <button type="button" class="btn btn-cancel btn-secondary">
+          <button type="button" class="btn btn-cancel bg-[var(--dark)] hover:bg-[var(--dark-200)] text-[var(--white)] hover:text-[var(--white)] ">
             Cancel
           </button>
           <button
@@ -159,16 +159,16 @@
         </div>
 
         <div class="modal-footer">
-          <button type="button" class="btn btn-cancel btn-secondary">
+          <button type="button" class="btn btn-cancel bg-[var(--dark)] hover:bg-[var(--dark-200)] text-[var(--white)] hover:text-[var(--white)] ">
             Cancel
           </button>
           <button
             type="button"
-            class="btn btn-success fw-medium"
+            class="btn bg-[var(--secondary)] hover:bg-[var(--tertiary)] text-[var(--dark)] font-semibold"
             id="btn-saveEntry"
             e-id="0"
           >
-            Save
+            Save Changes
           </button>
         </div>
       </div>
@@ -305,16 +305,16 @@
         </div>
 
         <div class="modal-footer">
-          <button type="button" class="btn btn-wh-cancel btn-secondary">
+          <button type="button" class="btn btn-wh-cancel bg-[var(--dark)] hover:bg-[var(--dark-200)] text-[var(--white)] hover:text-[var(--white)] ">
             Cancel
           </button>
           <button
             type="button"
-            class="btn btn-success fw-medium"
+            class="btn bg-[var(--secondary)] hover:bg-[var(--tertiary)] text-[var(--dark)] font-semibold"
             id="btn-addWorkEntry"
             
           >
-            Add
+            Add Work History
           </button>
         </div>
       </div>
@@ -449,16 +449,16 @@
         </div>
 
         <div class="modal-footer">
-          <button type="button" class="btn btn-wh-cancel btn-secondary">
+          <button type="button" class="btn btn-wh-cancel bg-[var(--dark)] hover:bg-[var(--dark-200)] text-[var(--white)] hover:text-[var(--white)] ">
             Cancel
           </button>
           <button
             type="button"
-            class="btn btn-success fw-medium"
+            class="btn bg-[var(--secondary)] hover:bg-[var(--tertiary)] text-[var(--dark)] font-semibold"
             id="btn-updateWorkEntry"
             e-wh-id="0"
           >
-            Save
+            Save Changes
           </button>
         </div>
       </div>
@@ -499,7 +499,7 @@
         </div>
 
         <div class="modal-footer">
-          <button type="button" class="btn btn-wh-cancel btn-secondary">
+          <button type="button" class="btn btn-wh-cancel bg-[var(--dark)] hover:bg-[var(--dark-200)] text-[var(--white)] hover:text-[var(--white)] ">
             Cancel
           </button>
           <button
@@ -744,9 +744,9 @@
                     id="daysCount"
                   > 0 Day</h5>
               </div>
-              <div class="submit-btns">
-                <button class="btn btn-clear" id="btnClear">Clear</button>
-                <button class="btn btn-dispatch" id="btnApply">
+              <div class="submit-btns flex gap-2">
+                <button class="btn bg-[var(--dark)] hover:bg-[var(--dark-200)] text-[var(--white)] hover:text-[var(--white)] " id="btnClear">Clear</button>
+                <button class="btn btn-dispatch hover:bg-[var(--tertiary)] font-semibold" id="btnApply">
                   Send Dispatch Request
                 </button>
               </div>
@@ -971,7 +971,7 @@
                     </div>
                   </div>
                 </div>
-                <div class="dispatch-hist h-full pb-6 xl:pb-0">
+                <div class="dispatch-hist p-3 bg-white rounded-lg h-full shadow-sm xl:pb-0">
                   <div class="top flex justify-content-between">
                     <div class="title pb-3">Dispatch History to Japan</div>
                     <div>
@@ -984,7 +984,7 @@
                     <table class="table" id="histTable">
                       <thead class="sticky top-0 bg-gray-200">
                         <tr>
-                          <th data-exclude="true">No.</th>
+                          <th data-exclude="true" >No.</th>
                           <th
                             data-f-name="Arial"
                             data-f-sz="9"
@@ -1074,7 +1074,7 @@
                     </table>
                   </div>
                 </div>
-                <div class="work-hist h-full pb-6 xl:pb-0">
+                <div class="work-hist h-full p-3 bg-white rounded-lg shadow-sm xl:pb-0">
                   <div class="top flex justify-content-between">
                     <div class="title pb-3">Work History</div>
                     <!-- <div>
@@ -1219,9 +1219,7 @@
                         </tr>
                       </thead>
                       <tbody id="wList">
-                        <tr>
-                          <td colspan="10" class="text-center">No data found</td>
-                        </tr>
+                        
                         <tr>
                           <td colspan="10" class="add-work">Add New  Item</td>
                         </tr>

@@ -666,12 +666,12 @@ function fillWorkHistory(wList) {
   var tableBody = $("#wList");
   tableBody.empty();
   if (wList.length === 0) {
-    var noDataRow = $(
-      "<tr><td colspan='10' class='text-center'>No data found</td></tr>"
-    );
-    tableBody.append(noDataRow);
+    // var noDataRow = $(
+    //   "<tr><td colspan='10' class='text-center'>No data found</td></tr>"
+    // );
+    // tableBody.append(noDataRow);
     var addDataRow = $(
-      "<tr> <td colspan='10' class='add-work text-center'> + Add New Item</td></tr>"
+      "<tr> <td colspan='10' class='add-work text-center text-[var(--gray-text)] '> + Add New Item</td></tr>"
     );
     tableBody.append(addDataRow);
   } else {
@@ -729,7 +729,7 @@ function fillWorkHistory(wList) {
       tableBody.append(row);
     });
     var addDataRow = $(
-      "<tr> <td colspan='10' class='add-work text-center'> + Add New Item</td></tr>"
+      "<tr> <td colspan='10' class='add-work text-center text-[var(--gray-text)] bg-[var(--white)]'> + Add New Item</td></tr>"
     );
     tableBody.append(addDataRow);
   }

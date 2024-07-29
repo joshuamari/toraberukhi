@@ -228,10 +228,30 @@ input:checked + .toggle:after {
 }
 
 .dispatch-hist table thead th {
-  text-transform: uppercase;
-  font-size: 12px !important;
-  text-wrap: nowrap;
+  background-color: var(--tableheader);
+    font-size: 12px !important;
+    text-transform: uppercase;
+    white-space: nowrap;
+    vertical-align: middle;
+    color: var(--text-color);
+    padding: 0.75rem;
+    border-top: 1px solid #ebebeb;
+    border-bottom: 1px solid #ebebeb;
 }
+
+.dispatch-hist table thead tr th:first-of-type{
+  border-top-left-radius: 8px;
+    border-bottom-left-radius: 8px;
+    border-left: 1px solid #ebebeb;
+
+}
+.dispatch-hist table thead  th:last-of-type{
+  border-top-right-radius: 8px;
+  border-bottom-right-radius: 8px;
+  border-right: 1px solid #ebebeb;
+
+}
+
 .dispatch-hist table tbody td,
 .work-hist table tbody td {
   font-size: 14px;
@@ -245,17 +265,23 @@ input:checked + .toggle:after {
   text-align: center;
   vertical-align: middle;
 }
-.work-hist table thead th {
-  outline: 2px solid white;
-}
+
 .work-hist table thead th {
   text-transform: uppercase;
   font-size: 12px !important;
-  outline: thin solid var(--gray-100);
+border: 1px solid var(--gray);
   word-wrap: break-word;
+  background-color: var(--tableheader);
+}
+.work-hist table td{
+  border: 1px solid var(--gray);
+  background-color: #fff;
 }
 .work-hist table .add-work {
   cursor: pointer;
+  border: 0;
+  /* border-bottom: 1px solid var(--gray); */
+  background-color: var(--white-100);
 }
 .work-hist table .add-work:hover {
   background-color: #e6e6e6;
