@@ -627,7 +627,7 @@ function fillOpenModal(trID) {
   const duration = req.duration;
   const reqGrp = req.requester_group;
   const modi = req.modified;
-  const empnum = req.empnum;
+  const empnum = req.emp_number;
   const [last, given] = name.split(",");
   const surname = last.toUpperCase();
   const first = given.replace(/\s+/g, "");

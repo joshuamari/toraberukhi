@@ -430,6 +430,11 @@ $(".lbl-viewForm").click(function () {
 //#endregion
 
 //#region FUNCTIONS
+function formatName(name) {
+  const [last, given] = name.split(",");
+  const surname = last.toUpperCase();
+  return given + " " + surname;
+}
 function fillAttachment() {
   const reqDept = $("#reqDeptInput").val();
   const reqName = $("#reqNameInput").val();
@@ -447,7 +452,7 @@ function fillAttachment() {
 
   $("#printBU").text(reqDept);
   $("#printKHI").text(reqName);
-  $("#printName").text(emp);
+  $("#printName").text(formatName(emp));
   $("#printFrom").text(formatDate(startD));
   $("#printTo").text(formatDate(endD));
   if (locID == 1) {
