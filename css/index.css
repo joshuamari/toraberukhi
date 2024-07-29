@@ -363,6 +363,83 @@ border: 1px solid var(--gray);
   width: 75px;
 }
 
+
+#attachmentModal p{
+  font-size: 14px;
+  font-family: "Arial", sans-serif;
+ line-height: normal;
+
+  
+}
+#attachmentModal td, #attachmentModal th{
+  margin: 0 !important;
+  padding: 0 10px;
+  background-color: #fff;
+  font-family:"Arial", sans-serif;
+  border: 0.5px solid #000;
+  border-radius: 0;
+  text-transform: none;
+  font-size: 14px;
+  border-left: 0;
+  line-height: normal;
+  vertical-align: middle;
+ 
+}
+#attachmentModal th{
+  height: 20px;
+  
+
+}
+
+#attachmentModal td{
+  border-top: 0;
+  cursor: default;
+  
+}
+#attachmentModal th.sm{
+  max-width: 45px;
+  min-width: 45px;
+  width: 45px;
+}
+#attachmentModal td.sm{
+  text-align: center;
+ 
+}
+#attachmentModal td.sm i{
+   vertical-align: middle;
+}
+#attachmentModal tr:nth-of-type(4n+1) td:first-child,
+#attachmentModal th:first-of-type{
+  border-left: 0.5px solid #000;
+}
+
+#toPrint2 th{
+  background-color: var(--main);
+  border: 0.5px solid #000;
+  border-radius: 0;
+  text-align: center;
+  white-space: normal;
+  text-transform: none;
+  border-left: 0;
+  font-family: "Arial", sans-serif;
+}
+#toPrint2 td{
+  text-transform: none;
+  cursor: auto;
+  text-align: center;
+  white-space: normal;
+  font-family: "Arial", sans-serif;
+ 
+  border: 0.5px solid #000; border-left: 0;
+}
+#toPrint2 tr th:first-of-type ,
+#toPrint2 td:first-of-type{
+  border-left: 1px solid #000;
+}
+#toPrint2 tr:nth-of-type(2) th{
+  border-top: 0;
+}
+
 @media screen and (min-width: 0px) and (max-width: 1340px) {
   .pageTitle h1 {
     font-size: 18px;
