@@ -733,7 +733,7 @@ function fillTable(sampleData) {
           ? ` <span class=" status pending ">
                         Pending
                       </span>`
-          : item.status === 1
+          : item.status == 1
           ? `  <span class=" status accepted ">
                         Accepted
                       </span>`
@@ -788,7 +788,7 @@ function searchFilter(req_list) {
       emp.emp_name.toLowerCase().includes(keyword) ||
       emp.requester_name.toLowerCase().includes(keyword);
 
-    const groupMatch = grps.includes(emp.group_id);
+    const groupMatch = grps.includes(parseInt(emp.group_id));
 
     const dateMatch = dateFilter ? emp.req_date.startsWith(dateFilter) : true;
 
