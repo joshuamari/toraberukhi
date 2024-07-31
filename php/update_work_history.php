@@ -9,7 +9,7 @@ date_default_timezone_set('Asia/Manila');
 
 #region Initialize Variable
 $msg = array();
-$work_histID =  $empNumber = 0; 
+$work_histID =  $empNumber = 0;
 $date_monthYearStart = $date_yearEnd = $comp_name = $comp_business = $busi_content = $work_loc = NULL;
 #end region
 
@@ -25,11 +25,10 @@ if (!empty($_POST['date_monthYearStart'])) {
 	$msg['error'][] = "Start Month and Year";
 }
 
+$date_End = NULL;
 if (!empty($_POST['date_monthYearEnd'])) {
 	$date_monthYearEnd = $_POST['date_monthYearEnd'];
-} else {
-	$msg["isSuccess"] = false;
-	$msg['error'][] = "End Month and Year";
+	$date_End = date($date_monthYearEnd . "-01");
 }
 
 if (!empty($_POST['comp_name'])) {
@@ -67,24 +66,21 @@ if (!empty($msg)) {
 		foreach ($msg['error'] as $result) {
 			if ($result === end($msg['error'])) {
 				$errorString .= "and '$result' Missing";
-			}
-			else {
+			} else {
 				$errorString .= "'$result', ";
 			}
 		}
 		$msg['error'] = $errorString;
+	} else {
+		$msg['error'] = implode("", $msg['error']);
+		$msg['error'] .= " Missing";
 	}
-  else {
-    $msg['error'] = implode("", $msg['error']);
-    $msg['error'] .= " Missing";
-  }
 	die(json_encode($msg));
 }
 #end region
 
 #setting up dates
 $date_Start = date($date_monthYearStart . "-01");
-$date_End = date($date_monthYearEnd . "-01");
 #end region
 
 #region Entries Query
@@ -98,18 +94,19 @@ try {
                                     WHERE `work_hist_id` = :wh_id";
 
 	$updateStmt = $connpcs->prepare($updateQ);
-	$updateStmt->execute([":date_Start" => $date_Start, ":date_End" => $date_End, ":comp_name" => $comp_name,
-											     ":comp_business" => $comp_business, ":busi_content" => $busi_content, ":work_loc" => $work_loc, ":wh_id" => $work_histID]);
-	if($updateStmt->rowCount() > 0) {
-    $msg["isSuccess"] = true;
-    $msg["error"] = "Update successful";
-  }
-  else {
-    $msg["isSuccess"] = false;
-    $msg["error"] = "No changes has been made";
-  }
+	$updateStmt->execute([
+		":date_Start" => $date_Start, ":date_End" => $date_End, ":comp_name" => $comp_name,
+		":comp_business" => $comp_business, ":busi_content" => $busi_content, ":work_loc" => $work_loc, ":wh_id" => $work_histID
+	]);
+	if ($updateStmt->rowCount() > 0) {
+		$msg["isSuccess"] = true;
+		$msg["error"] = "Update successful";
+	} else {
+		$msg["isSuccess"] = false;
+		$msg["error"] = "No changes has been made";
+	}
 } catch (Exception $e) {
-  echo "Connection failed: " . $e->getMessage();
+	echo "Connection failed: " . $e->getMessage();
 }
 #end region
 

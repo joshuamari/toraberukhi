@@ -65,7 +65,7 @@
         </div>
 
         <div class="modal-footer">
-          <button type="button" class="btn btn-cancel btn-secondary">
+          <button type="button" class="btn btn-cancel bg-[var(--dark)] hover:bg-[var(--dark-200)] text-[var(--white)] hover:text-[var(--white)] ">
             Cancel
           </button>
           <button
@@ -116,20 +116,6 @@
                 </select>
               </div>
             </div>
-            <!-- <div class="row mb-2">
-              <label
-                for="editentryInvite"
-                class="col-sm-4 col-form-label col-form-label-sm"
-                >Invitation Type</label
-              >
-              <div class="col-sm-8">
-                <select class="select" id="editentryInvite">
-                  <option value="1">Multiple</option>
-                  <option value="2">Single</option>
-                  <option value="3">Not Required</option>
-                </select>
-              </div>
-            </div> -->
             <div class="row mb-2">
               <label
                 for="editentryDateJ"
@@ -173,21 +159,791 @@
         </div>
 
         <div class="modal-footer">
-          <button type="button" class="btn btn-cancel btn-secondary">
+          <button type="button" class="btn btn-cancel bg-[var(--dark)] hover:bg-[var(--dark-200)] text-[var(--white)] hover:text-[var(--white)] ">
             Cancel
           </button>
           <button
             type="button"
-            class="btn btn-success fw-medium"
+            class="btn bg-[var(--secondary)] hover:bg-[var(--tertiary)] text-[var(--dark)] font-semibold"
             id="btn-saveEntry"
             e-id="0"
           >
-            Save
+            Save Changes
           </button>
         </div>
       </div>
     </div>
   </div>
+  <!-- Work History Modal -->
+  <div
+    class="modal fade"
+    id="addNewWork"
+    data-bs-backdrop="static"
+    data-bs-keyboard="false"
+    tabindex="-1"
+    aria-labelledby="staticBackdropLabel"
+    aria-hidden="true"
+  >
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="staticBackdropLabel">Add Work History Entry</h1>
+          <button
+            type="button"
+            class="btn-wh-close"
+            data-bs-dismiss="modal"
+            aria-label="Close"
+          ></button>
+        </div>
+        <div class="modal-body">
+          <div class="d-grid">
+            
+            <div class="row mb-2">
+              <label
+                for="addcompanyName"
+                class="col-form-label col-form-label-sm"
+                >Company Name</label
+              >
+              <div>
+                <input
+                  type="text"
+                  class="input company-name"
+                  id="addcompanyName"
+                  placeholder="Company Name"
+                />
+              </div>
+            </div>
+            <small class="compNameError hidden">Please Complete the Field</small>
+
+            <div class="MYDates mb-2 d-flex flex-row">
+              <div class="col-sm-6">
+                <label
+                  for="addStartMonthYear"
+                  class="col-form-label col-form-label-sm"
+                  >Start Month and Year</label
+                >
+                <input
+                  type="month"
+                  class="input add-start-year"
+                  id="addStartMonthYear"
+                  min="1900-01"
+                  max="2025-12"
+                />
+              </div>
+
+              <div class="col-sm-6">
+                <label
+                  for="addEndMonthYear"
+                  class="col-form-label col-form-label-sm"
+                  >End Month and Year</label
+                >
+                <input
+                  type="month"
+                  class="input add-start-year"
+                  id="addEndMonthYear"
+                  min="1900-01"
+                  max="2025-12"
+                />
+              </div>
+            </div>
+            <small class="dateError hidden">Please Complete the Fields</small>
+
+            <div class="row mb-2">
+              <label
+                for="addcompanyBusiness"
+                class="col-form-label col-form-label-sm"
+                >Company Business</label
+              >
+              <div>
+                <input
+                  type="text"
+                  class="input company-business"
+                  id="addcompanyBusiness"
+                  placeholder="Company Business"
+                />
+              </div>
+            </div>
+            <small class="BusiError hidden">Please Complete the Field</small>
+
+            <div class="row mb-2">
+              <label
+                for="addbusinessContent"
+                class="col-form-label col-form-label-sm"
+                >Business Content</label
+              >
+              <div>
+                <input
+                  type="text"
+                  class="input business-content"
+                  id="addbusinessContent"
+                  placeholder="Business Content"
+                />
+              </div>
+            </div>
+            <small class="ContentError hidden">Please Complete the Field</small>
+
+            <div class="row mb-2">
+              <label
+                for="addworkLocation"
+                class="col-form-label col-form-label-sm"
+                >Work Location</label
+              >
+              <div>
+                <input
+                  type="text"
+                  class="input work-location"
+                  id="addworkLocation"
+                  placeholder="Work Location"
+                />
+              </div>
+            </div>
+            <small class="LocError hidden">Please Complete the Field</small>
+
+            <div class="add-wh-error"></div>
+     
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-wh-cancel bg-[var(--dark)] hover:bg-[var(--dark-200)] text-[var(--white)] hover:text-[var(--white)] ">
+            Cancel
+          </button>
+          <button
+            type="button"
+            class="btn bg-[var(--secondary)] hover:bg-[var(--tertiary)] text-[var(--dark)] font-semibold"
+            id="btn-addWorkEntry"
+            
+          >
+            Add Work History
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div
+    class="modal fade"
+    id="editWorkHistory"
+    data-bs-backdrop="static"
+    data-bs-keyboard="false"
+    tabindex="-1"
+    aria-labelledby="staticBackdropLabel"
+    aria-hidden="true"
+  >
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="staticBackdropLabel">Edit Work History Entry</h1>
+          <button
+            type="button"
+            class="btn-wh-close"
+            data-bs-dismiss="modal"
+            aria-label="Close"
+          ></button>
+        </div>
+        <div class="modal-wh-body px-3">
+          <div class="d-grid">
+            <div class="row mb-2">
+              <label
+                for="edit-companyName"
+                class="col-form-label col-form-label-sm"
+                >Company Name</label
+              >
+              <div>
+                <input
+                  type="text"
+                  class="input company-name"
+                  id="edit-companyName"
+                  placeholder="Company Name"
+                />
+              </div>
+            </div>
+            <small class="compNameError hidden">Please Complete the Field</small>
+
+            <div class="MYDates mb-2 d-flex flex-row">
+              <div class="col-sm-6">
+                <label
+                  for="edit-StartMonthYear"
+                  class="col-form-label col-form-label-sm"
+                  >Start Month and Year</label
+                >
+                <input
+                  type="month"
+                  class="input add-start-year"
+                  id="edit-StartMonthYear"
+                  min="1900-01"
+                  max="2025-12"
+                />
+              </div>
+              <div class="col-sm-6">
+                <label
+                  for="edit-EndMonthYear"
+                  class="col-form-label col-form-label-sm"
+                  >End Month and Year</label
+                >
+                <input
+                  type="month"
+                  class="input add-start-year"
+                  id="edit-EndMonthYear"
+                  min="1900-01"
+                  max="2025-12"
+                />
+              </div>
+            </div>
+            <small class="dateError hidden">Please Complete the Field</small>
+
+            <div class="row mb-2">
+              <label
+                for="edit-companyBusiness"
+                class="col-form-label col-form-label-sm"
+                >Company Business</label
+              >
+              <div>
+                <input
+                  type="text"
+                  class="input company-business"
+                  id="edit-companyBusiness"
+                  placeholder="Company Business"
+                />
+              </div>
+            </div>
+            <small class="BusiError hidden">Please Complete the Field</small>
+
+            <div class="row mb-2">
+              <label
+                for="edit-businessContent"
+                class="col-form-label col-form-label-sm"
+                >Business Content</label
+              >
+              <div>
+                <input
+                  type="text"
+                  class="input business-content"
+                  id="edit-businessContent"
+                  placeholder="Business Content"
+                />
+              </div>
+            </div>
+            <small class="ContentError hidden">Please Complete the Field</small>
+
+            <div class="row mb-2">
+              <label
+                for="edit-workLocation"
+                class="col-form-label col-form-label-sm"
+                >Work Location</label
+              >
+              <div>
+                <input
+                  type="text"
+                  class="input work-location"
+                  id="edit-workLocation"
+                  placeholder="Work Location"
+                />
+              </div>
+            </div>
+            <small class="LocError hidden">Please Complete the Field</small>
+
+            <div class="edit-wh-error"></div>
+     
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-wh-cancel bg-[var(--dark)] hover:bg-[var(--dark-200)] text-[var(--white)] hover:text-[var(--white)] ">
+            Cancel
+          </button>
+          <button
+            type="button"
+            class="btn bg-[var(--secondary)] hover:bg-[var(--tertiary)] text-[var(--dark)] font-semibold"
+            id="btn-updateWorkEntry"
+            e-wh-id="0"
+          >
+            Save Changes
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div
+    class="modal fade"
+    id="deleteWorkHistory"
+    data-bs-backdrop="static"
+    data-bs-keyboard="false"
+    tabindex="-1"
+    aria-labelledby="staticBackdropLabel"
+    aria-hidden="true"
+  >
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="staticBackdropLabel">
+            Delete Work History Entry
+          </h1>
+          <button
+            type="button"
+            class="btn-wh-close"
+            data-bs-dismiss="modal"
+            aria-label="Close"
+          ></button>
+        </div>
+        <div class="modal-body">
+          <p class="mb-2">
+            Are you sure you want to delete
+            <span class="fw-semibold" id="selectedEmp"></span>'s Work History Entry
+            <span class="fw-semibold"
+              >no. <span id="storeWorkId" del-work-id="0"></span
+            ></span>
+            ?
+          </p>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-wh-cancel bg-[var(--dark)] hover:bg-[var(--dark-200)] text-[var(--white)] hover:text-[var(--white)] ">
+            Cancel
+          </button>
+          <button
+            type="button"
+            class="btn btn-danger fw-medium"
+            id="btn-deleteWorkHistory"
+          >
+            Delete
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+
+  <div class="modal fade" id="attachmentModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+  aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-xl">
+    <div class="modal-content">
+      <div class="  modal-header border-0 ">
+        <h1 class="modal-title text-[18px]" id="titleModal">Review Request for Dispatch File</h1>
+        <button type="button" class="btn-close text-[14px]  m-1 w-0 h-0  w-auto h-auto" data-bs-dismiss="modal"
+          aria-label="Close"></button>
+      </div>
+      <div class="modal-body  flex items-center justify-content-center bg-[var(--gray)]">
+        <div class="w-[210mm] h-[297mm] min-w-[210mm] min-h-[297mm] bg-[#fff] py-[7mm] ps-[15mm] pe-[7mm] my-[-37mm]" id="toPrint" style="transform: scale(0.75);">
+          <div class="top flex gap-[28px] mb-2">
+            <img src="./images/kawasakilOGO.png" alt="kawasakilOGO" class="w-[250px] h-auto">
+            <div class="flex flex-col justify-content-between items-start">
+              <div class="flex flex-col">
+                <small class="font-['Arial'] text-[10px]"><span class="font-semibold text-[10px]">KOBE</span>: 1-1, Higashikawasaki 3-Chome, Chuo-ku, KOBE 650-8670 Japan</small>
+                <div class="flex gap-3">
+                  <small class="font-['Arial'] text-[10px]">Phone: 81-(0)78-682-5202</small> <small class="font-['Arial'] text-[10px]">Facsimile:81-(0)78-682-5574</small>
+                </div> 
+              </div>
+              <p class="font-semibold font-['Arial']">Kawasaki Heavy Industries, Ltd.</p>
+            </div>
+          </div>
+          <div class="h-[5px] w-full bg-[var(--text-color)] mb-1 mt-2 " ></div>
+          <div class="h-[1px] w-full bg-[var(--text-color)] " ></div>
+          <div class="flex items-end  ">
+            <p id="printDate" class="w-100 text-end font-['Arial']"></p>
+          </div>
+          <div>
+            <h1 class="text-[20px] text-center w-full font-semibold font-['Arial']">Request for Dispatch of Engineer</h1>
+          </div>
+          <div class="flex mt-5 items-center gap-2">
+            <div class="w-full">
+              <div class="flex gap-2">
+                <p class="font-semibold whitespace-nowrap font-['Arial']">To :</p>
+                <div class="flex flex-col">
+                    <p class="font-semibold font-['Arial']">KHI Design & Technical Services, Inc.(KDT)</p>
+                    <p class="font-semibold font-['Arial']">Unit 1503-P, 15th Flr. Five E-com Center</p>
+                    <p class="font-semibold font-['Arial']">Pacific Drive, Mall of Asia Complex, Pasay City 1300</p>
+                    <p class=" font-['Arial']">Trunk Line:(+632)802-5406 / (+632)802 5407</p>
+                </div>
+              </div>
+              <div class="flex gap-2 mt-3">
+                <p class="font-semibold whitespace-nowrap font-['Arial']">Attention :</p>
+                <div class="flex flex-col ">
+                    <p class="font-semibold font-['Arial']">MR. Yukihiro Takenaka (President)</p>
+                    <p class="font-semibold font-['Arial']">(c/o Ms. Evangeline G. Panado)</p>
+      
+                </div>
+              </div>
+            </div>
+            <div class="w-[40%]">
+              <div class="  flex flex-col p-2" style="border: 1px solid var(--text-color);">
+                <div class="flex gap-2">
+                  <p  class=" font-['Arial'] min-w-[28px]">From:</p>
+                  <div class="flex flex-col">
+                    <p class="font-['Arial'] border-b-[1px] whitespace-nowrap">Kawasaki Heavy Industries, Ltd.</p>
+                    <p class="font-['Arial'] border-b-[1px] whitespace-nowrap font-semibold" id="printBU">Environmental Plant Dept.</p>
+                    <p class="font-['Arial'] border-b-[1px] whitespace-nowrap font-semibold" id="printKHI">Jun TOSHIHIRO</p>
+                  </div>
+                </div>
+                <div class="flex gap-2">
+                  <p for="from" class=" font-['Arial'] min-w-[28px]">TEL:</p>
+                  
+                    <p class="font-['Arial'] w-[calc(100%-28px)] border-b-[1px] whitespace-nowrap">+81-(0)78-682-5084</p>
+                </div>
+                <div class="flex gap-2">
+                  <p for="from" class=" font-['Arial'] min-w-[28px]">FAX:</p>
+                    <p class="font-['Arial'] w-[calc(100%-28px)]  border-b-[1px] whitespace-nowrap">+81-(0)78-682-5433</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="mt-[2rem]">
+ 
+             <p class="font-['Arial']">Dear Sir,</p>
+             <p class="font-['Arial']">This is to request you to dispatch your Engineer, with following terms & conditions;</p>
+           
+           <div class="grid mt-2"  style=" grid-template-columns: 180px 1fr;">
+             <div class=" flex gap-1 p-1 " style="border: 1px solid var(--text-color);"><p class="font-['Arial']">1.</p><p class="font-['Arial']">Required name to be Dispatched</p> </div>
+             <div class="p-1 bg-[var(--white)]" style="border: 1px solid var(--text-color); border-left: 0px;"><p class="font-['Arial'] font-semibold" id="printName"> Blessel Desoloc</p></div>
+             <div class=" flex gap-1 p-1 border-[1px] border-[var(--dark)] border-t-0" ><p class="font-['Arial']">2.</p><p class="font-['Arial']">Required Period</p> </div>
+             <div class="flex" style="border: 1px solid var(--text-color); border-left: 0px; border-top: 0px;">
+               <p class="font-['Arial'] p-1 min-w-[50px]">From</p>
+               <p class="font-['Arial'] border-x-[1px] border-[var(--dark)] flex p-1 min-w-[200px] font-semibold bg-[var(--white)]" id="printFrom"></p>
+               <p class="font-['Arial'] p-1 min-w-[50px]">To</p>
+               <p class="font-['Arial'] border-l-[1px] border-[var(--dark)] flex p-1  min-w-[200px] font-semibold bg-[var(--white)]" id="printTo"></p>
+             </div>
+             <div class=" flex gap-1 p-1 border-[1px] border-[var(--dark)] border-t-0" ><p class="font-['Arial']">3.</p><p class="font-['Arial']">Place of Service</p> </div>
+             <div class="flex flex-col w-full" >
+               <span class="p-1 border-l-0 border-t-0 border-[1px] border-[var(--dark)] grid w-full min-h-[20px]  m-0" style="grid-template-columns: 120px 1fr;">
+                <div class="flex gap-2 items-center">
+                  <span class="w-[12px] h-[12px] up border-[1px] border-[var(--dark)] flex justify-content-center items-center countries">
+                   
+                  </span>
+          
+                    <p class="font-['Arial'] whitespace-nowrap"> Japan</p>
+                  
+                </div>
+                 <span class="inline-flex"> <p class="w-full bg-[var(--white)] font-['Arial'] font-semibold" id="printJap"></p></span>
+                
+               </span>
+               <span class="p-1 border-l-0 border-t-0 border-[1px] border-[var(--dark)] grid w-full" style="grid-template-columns: 120px 1fr;">
+                 <div class="flex gap-2 items-center ">
+                   <span class="w-[12px] h-[12px] up border-[1px] border-[var(--dark)] flex justify-content-center items-center countries"></span>
+                   <p class="font-['Arial']">Philippines</p>
+                 </div>
+                 <span class="inline-flex"> <p class="w-full bg-[var(--white)] font-['Arial'] font-semibold" id="printPh"></p></span>
+                
+               </span>
+               <span class="font-['Arial'] p-1 border-l-0 border-t-0 border-[1px] border-[var(--dark)] grid w-full" style="grid-template-columns: 120px 1fr;">
+                 <div class="flex gap-2 items-center">
+                   <span class="w-[12px] h-[12px] up border-[1px] border-[var(--dark)] flex justify-content-center items-center countries"></span>
+                   <p class="font-['Arial'] whitespace-nowrap">Third Countries</p>
+                 </div>
+                 <span class="inline-flex"> <p class="w-full bg-[var(--white)] font-['Arial'] font-semibold" id="printThird"></p></span>
+                
+               </span>
+              
+             </div>
+             <div class=" flex gap-1 p-1 border-[1px] border-[var(--dark)] border-t-0" ><p class="font-['Arial']">4.</p><p class="font-['Arial']">Invitation</p> </div>
+             
+             <div class=" p-1 border-[1px] border-l-0 border-[var(--dark)] border-t-0">
+               <div class="flex gap-2 items-center">
+                 <span class="up w-[12px] h-[12px] border-[1px] border-[var(--dark)] flex justify-content-center items-center inv"></span>
+                 <p class="font-['Arial']">Invitation letter for multiple business travel visa has already been sent via courier.</p>
+               </div>
+               <div class="flex gap-2 items-center">
+                 <span class="up w-[12px] h-[12px] border-[1px] border-[var(--dark)] flex justify-content-center items-center inv"></span>
+                 <p class="font-['Arial']">Invitation letter for single business travel visa has already been sent via courier.</p>
+               </div>
+               <div class="flex gap-2 items-center">
+                 <span class="up w-[12px] h-[12px] border-[1px] border-[var(--dark)] flex justify-content-center items-center inv">
+       
+                 </span>
+                 <p class="font-['Arial']">Invitation letter is not required.</p>
+               </div>
+             </div>
+        
+             <div class=" flex gap-1 p-1 border-[1px] border-[var(--dark)] border-t-0" >
+               <p class="font-['Arial']">5.</p>
+               <p class="font-['Arial']">Work Order and Project</p>
+             </div>
+             
+             <div class="border-r-[1px] border-b-[1px] border-[var(--dark)]">
+               <span class="font-['Arial'] p-1 grid w-full" style="grid-template-columns: 50px 1fr;">
+         
+                  
+                   <p class="font-['Arial']">W/O</p>
+               
+                 <span class="inline-flex h-[18px]"> <p class="w-full bg-[var(--white)] font-['Arial'] font-semibold" id="printWO"></p></span>
+                
+               </span>
+               <span class="font-['Arial'] p-1  grid w-full" style="grid-template-columns: 50px 1fr;">
+            
+        
+                   <p class="font-['Arial']" >Project</p>
+             
+                 <span class="inline-flex h-[18px]"> <p class="w-full bg-[var(--white)] font-['Arial'] font-semibold"id="printProject">
+                  
+                 </p></span>
+                
+               </span>
+               <div class="flex gap-2 px-1  items-center">
+                 <span class=" w-[12px] h-[12px] border-[1px] border-[var(--dark)] flex justify-content-center items-center up siteDispatch" ></span>
+                 <p class="font-['Arial']">Site Dispatch Training application</p>
+               </div>
+               <small class=" font-['Arial'] p-1 flex leading-[1.25]">
+                 *Remark: In case of site dispatch training (W/O:6104298) applied, actual Air ticket fee (KDT paid) shall be reimbursed by KHI as post-settlement.
+        
+               </small>
+        
+        
+             </div>
+           </div>
+          </div>
+          <div class="pt-3">
+             <p class=" font-['Arial'] ">Division of Responsibilities for each "Place of Service"</p>
+          </div>
+          
+           
+          
+
+           <table class="w-full pt-2">
+                 <thead>
+                   <tr>
+                     <th>Place of Service</th>
+                     <th>Scope</th>
+                     <th class="sm">KHI</th>
+                     <th class="sm">KDT</th>
+                     <th>Remarks</th>
+                   </tr>
+                 </thead>
+                 <tbody>
+                   <tr>
+                     <td rowspan="4">Japan</td>
+                     <td>Absence Fee</td>
+                     <td class="sm"></td>
+                     <td class="sm"><i class='bx bx-x'></i></td>
+                     <td>Included in the Annual Service Fee</td>
+                   </tr>
+                   <tr>
+                     <td>Daily Allowance with Meals</td>
+                     <td class="sm"><i class='bx bx-x'></i></td>
+                     <td class="sm"></td>
+                     <td>
+                      <div class="flex"><p class="font-['Arial']">JP¥</p>
+                      <p class="font-['Arial']  font-bold" id="printSalary"></p>
+                      <p class="font-['Arial']">(*)/Calendar Day</p>
+                      </div>
+                     <small class="font-['Arial'] text-[11px] leading-2 flex ">(*)AM/Mg class according to KDT Rule</small>
+                    </td>
+                   </tr>
+                   <tr>
+                     <td>Air Ticket</td>
+                     <td class="sm"></td>
+                     <td class="sm"><i class='bx bx-x'></i></td>
+                     <td>Included in the Annual Service Fee</td>
+                   </tr>
+                   <tr>
+                     <td>Accommodation</td>
+                     <td class="sm"><i class='bx bx-x'></i></td>
+                     <td class="sm"></td>
+                     <td>To be provided by KHI</td>
+                   </tr>
+                   <tr>
+                     <td rowspan="4">Philippines</td>
+                     <td>Absence Fee</td>
+                     <td class="sm"></td>
+                     <td class="sm"><i class='bx bx-x'></i></td>
+                     <td>Included in the Annual Service Fee</td>
+                   </tr>
+                   <tr>
+                     <td>Daily Allowance with Meals</td>
+                     <td class="sm"><i class='bx bx-x'></i></td>
+                     <td class="sm"></td>
+                     <td>According to KDT Internal Rule</td>
+                   </tr>
+                   <tr>
+                     <td>Air Ticket</td>
+                     <td class="sm"></td>
+                     <td class="sm"><i class='bx bx-x'></i></td>
+                     <td></td>
+                   </tr>
+                   <tr>
+                     <td>Accommodation</td>
+                     <td class="sm"><i class='bx bx-x'></i></td>
+                     <td class="sm"></td>
+                     <td>To be provided by KHI</td>
+                   </tr>
+                   <tr>
+                     <td rowspan="4">Other third Countries</td>
+                     <td>Absence Fee</td>
+                     <td class="sm"></td>
+                     <td class="sm"><i class='bx bx-x'></i></td>
+                     <td></td>
+                   </tr>
+                   <tr>
+                     <td>Daily Allowance with Meals</td>
+                     <td class="sm"><i class='bx bx-x'></i></td>
+                     <td class="sm"></td>
+                     <td>
+                      <div class="flex"><p class="font-['Arial']">US$</p>
+                      <p class="font-['Arial'] " id="printSalary">40</p>
+                      <p class="font-['Arial']">(*)/Calendar Day</p>
+                      </div>
+                     <small class="font-['Arial'] text-[11px] leading-2 flex ">(*)AM/Mg class according to KDT Rule</small>
+                    </td>
+                   </tr>
+                   <tr>
+                     <td>Air Ticket</td>
+                     <td class="sm"></td>
+                     <td class="sm"><i class='bx bx-x'></i></td>
+                     <td></td>
+                   </tr>
+                   <tr>
+                     <td>Accommodation</td>
+                     <td class="sm"><i class='bx bx-x'></i></td>
+                     <td class="sm"></td>
+                     <td>To be provided by KHI</td>
+                   </tr>
+                 </tbody>
+           </table>
+        
+     
+         
+          <div class="bottom-text mt-[0.5rem]">
+            <p class="font-['Arial']">Copy:</p>
+            <div class="flex justify-content-between">
+              <p class="font-['Arial']">General Affairs and Personal Gr.: Mr. T. Kurosumi</p>
+              <p class="font-['Arial']">(81-78-682-5202/Ext. 7-20-81101)</p>
+            </div>
+            <div class="flex justify-content-between">
+              <p class="font-['Arial']">Control Dep't Corporate Planning Gr.: Mr. H. Kanari</p>
+              <p class="font-['Arial']">(81-78-682-5072/Ext. 7-30-33217)</p>
+            </div>
+            
+          </div>
+
+
+        </div>
+      </div>
+      <div class="modal-footer">
+       
+          
+          <button class="bg-[var(--secondary)] hover:bg-[var(--tertiary)] font-semibold rounded-md px-3 py-1  text-[var(--dark)]" id="btnSend">Send Dispatch Request</button>
+        
+      </div>
+    </div>
+    </div>
+</div>
+
+<!-- <div class="modal fade" id="attachmentModal2" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+  aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-xl">
+    <div class="modal-content">
+      <div class="  modal-header border-0 ">
+        <h1 class="modal-title text-[18px]" id="titleModal">Review Work History</h1>
+        <button type="button" class="btn-close text-[14px]  m-1 w-0 h-0  w-auto h-auto" data-bs-dismiss="modal"
+          aria-label="Close"></button>
+      </div>
+      <div class="modal-body  flex items-center justify-content-center bg-[var(--gray)]">
+        <div class="w-[210mm] h-[297mm] min-w-[210mm] min-h-[297mm] bg-[#fff] p-[14mm]  my-[-37mm]" id="toPrint2" style="transform: scale(0.75);">
+          <div class="top flex  justify-content-end w-100 mb-4">
+            <span class="">（別紙）</span>
+          </div> 
+          <div class="top flex  justify-content-end w-100 mb-2 gap-2">
+            <span id="whYear">2024</span>
+            年
+            <span id="whMonth">7</span>
+            月
+            <span id="whDay">29</span>
+            日
+          </div>
+          <div class="mb-4">大阪入国管理局　様</div>
+          <div class="top flex  justify-content-end w-100 mb-2 tracking-[1rem]">
+            川崎重工業株式会社</div>
+          <div class="text-[14px] top flex  justify-content-end w-100 mb-5">
+            エネルギーソリューション＆マリンカンパニー
+          </div>
+          <div class="indent-6 leading-[2rem] mb-3">
+            申請人の職務経歴および弊社内での職務内容について下記の通り補足させていただきます。つきましては、申請人の在留資格認定証明書の交付にご配慮賜りますよう、お願い致します。
+          </div>
+          <div class="flex gap-2 mb-4">
+            <span>1.</span>
+            <div class="flex flex-col">
+              <span>申請人</span>
+              <span class="font-semibold font-['Arial']" id="whName">Pangilinan, Seanne Kyle Beltran</span>
+            </div>
+          </div>
+          <div class="flex gap-2 mb-4">
+            <span>2.</span>
+            <div class="flex flex-col">
+              <span>申請内容</span>
+              <span class="" >企業内転勤にかかわる在留資格認定証明書の交付</span>
+            </div>
+          </div>
+          <div class="flex gap-2 mb-4 w-full">
+            <span>3.</span>
+            <div class="flex flex-col">
+              <span>職務経歴詳細</span>
+              <span class="" >申請人はフィリピンにおいて、主に技術設計業務等に従事してきました。</span>
+              <span>申請人の職務経歴の詳細は下表の通りです。</span>
+       
+               <table class="table mt-2" id="workHistoryTable">
+                 <thead>
+                   <tr>
+                     <th colspan="2">Start</th>
+                     <th colspan="2">End</th>
+                     <th rowspan="2">Company's name</th>
+                     <th rowspan="2">Company's business</th>
+                     <th rowspan="2">Business content</th>
+                     <th rowspan="2">Work location</th>
+                   </tr>
+                   <tr>
+                     <th>Year</th>
+                     <th>Month</th>
+                     <th>Year</th>
+                     <th>Month</th>
+                   </tr>
+                 </thead>
+                 <tbody>
+                  <tr>
+                    <td>2007</td>
+                    <td>3</td>
+                    <td></td>
+                    <td></td>
+                    <td>KHI Design & Technical Service Inc.</td>
+                    <td>プラントエンジニアリング</td>
+                    <td>土建設計業務</td>
+                    <td>マニラ</td>
+                  </tr>
+                 </tbody>
+               </table>
+           
+            </div>
+          </div>
+          <div class="flex gap-2 mb-4">
+            <span>4.</span>
+            <div class="flex flex-col">
+              <span>業務内容（予定</span>
+              <span class="" >水素実証設備の設計業務</span>
+            </div>
+          </div>
+          <div class="flex gap-2 mb-4">
+            <span>5.</span>
+            <div class="flex flex-col">
+              <span>本件担当</span>
+              <span class="" >川崎重工業　エネルギーソリューション＆マリンカンパニー</span>
+              <span class="" >企画本部　人事総務部　人事総務一課</span>
+              <span class="" >佐々木　萌香（ササキ　モカ）</span>
+              <span>℡　078-682-5202</span>
+            </div>
+          </div>
+          <div class="top flex  justify-content-end w-100 mb-4">
+            <span class="">以　上</span>
+          </div> 
+
+          
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="bg-[var(--dark)] hover:bg-[var(--dark-200)] text-[var(--white)] font-medium transition rounded-md px-3 py-1" id="btnBack">Back</button>
+        <button class="bg-[var(--secondary)] hover:bg-[var(--tertiary)] font-semibold rounded-md px-3 py-1  text-[var(--dark)]" id="btnSend">Send Dispatch Request</button>
+      </div>
+    </div>
+    </div>
+</div> -->
   <!-- #endregion modal-->
 
   <body>
@@ -218,6 +974,14 @@
                 </div>
               </li></a
             >
+            <a href="./requestList/">
+              <li>
+                <div class="d-flex align-items-center gap-2">
+                  <i class="bx bx-task text-[18px]"></i>
+                  <p>Request List</p>
+                </div>
+              </li>
+            </a>
               <a href="./dashboard"
                 ><li >
                   <div class="d-flex align-items-center gap-2">
@@ -284,9 +1048,12 @@
             </div>
         <div class="main w-100 d-flex h-[calc(100%-30px)]">
         
-          <div class="left pl-0 pr-6 lg:pr-6 py-6 pt-0" id="left">
+          <div class="left pl-0 pr-6 lg:pr-6 pt-0" id="left">
             <label for="check" class="lbl-viewForm">View Dispatch Form</label>
             <input type="checkbox" class="chkbx-viewForm" id="check">
+            
+              <!-- <label for="check" class="lbl-viewForm">▼</label>
+              <input type="checkbox" class="chkbx-viewForm" id="check"> -->
             <div class="viewForm">
 
               <div class="form pl-3">
@@ -314,7 +1081,7 @@
                 </div>
 
                 <div class="calendars mb-1 ml-[-10px] d-flex flex-row">
-                  <div class="col-sm-6">
+                  <div class="dateJ col-sm-6">
                     <label for="" class="col-form-label pl-0"
                     >Date to Japan:</label
                   >
@@ -325,7 +1092,7 @@
                     />
                   </div>
                   <!-- <div class="col-sm-1"></div> -->
-                  <div class="col-sm-6">
+                  <div class="dateP col-sm-6">
                     <label for="" class="col-form-label pl-0"
                     >Date to Philippines:</label
                   >
@@ -396,24 +1163,28 @@
 
                 </div>
               </div>
-              <div class="sticky-buttons align-middle pr-5 pt-3 mb-2">
-                <div class="count-total-days">
-                  <label for="" class="col-form-label pl-0 pr-5">Total days:</label>
-                    <h5
-                      class="d-flex float-right align-items-center h-100"
-                      id="daysCount"
-                    > 0 Day</h5>
-                </div>
-                <div class="submit-btns">
-                  <button class="btn btn-clear" id="btnClear">Clear</button>
-                  <button class="btn btn-dispatch" id="btnApply">
-                    Send Dispatch Request
-                  </button>
-                </div>
+              
+            </div>
+              <!-- <label for="check" class="lbl-closeForm">▼</label>
+              <input type="checkbox" class="chkbx-viewForm" id="check"> -->
+            <div class="sticky-buttons align-middle pr-5 pt-3 mb-2">
+              <div class="count-total-days mb-4">
+                <label for="" class="countlabel col-form-label pl-0 pr-5">Total days:</label>
+                  <h5
+                    class="d-flex float-right align-items-center font-bold text-3xl h-100"
+                    id="daysCount"
+                  > 0 Day</h5>
+              </div>
+              <div class="submit-btns flex gap-2">
+                <button class="btn bg-[var(--dark)] hover:bg-[var(--dark-200)] text-[var(--white)] hover:text-[var(--white)] " id="btnClear">Clear</button>
+                <button class="btn btn-dispatch hover:bg-[var(--tertiary)] font-semibold" id="btnApply">
+                  Send Dispatch Request
+                </button>
               </div>
             </div>
+            
           </div>
-        
+          
           
           <div class="right h-full relative" id="appendHere">
             <div class="d-flex withContent d-none flex-column gap-3 h-full">
@@ -631,7 +1402,7 @@
                     </div>
                   </div>
                 </div>
-                <div class="dispatch-hist h-full pb-6 xl:pb-0">
+                <div class="dispatch-hist p-3 bg-white rounded-lg h-full shadow-sm xl:pb-0">
                   <div class="top flex justify-content-between">
                     <div class="title pb-3">Dispatch History to Japan</div>
                     <div>
@@ -644,7 +1415,7 @@
                     <table class="table" id="histTable">
                       <thead class="sticky top-0 bg-gray-200">
                         <tr>
-                          <th data-exclude="true">No.</th>
+                          <th data-exclude="true" >No.</th>
                           <th
                             data-f-name="Arial"
                             data-f-sz="9"
@@ -734,14 +1505,14 @@
                     </table>
                   </div>
                 </div>
-                <div class="work-hist h-full pb-6 xl:pb-0">
+                <div class="work-hist h-full p-3 bg-white rounded-lg shadow-sm xl:pb-0">
                   <div class="top flex justify-content-between">
                     <div class="title pb-3">Work History</div>
-                    <div>
-                      <button class="btn btn-success bg-[var(--darkest)]" id="btnExport">
+                    <!-- <div>
+                      <button class="btn btn-success bg-[var(--darkest)]" id="btnExportss">
                         Export table
                       </button>
-                    </div>
+                    </div> -->
                   </div>
                   <div class="table-cont overflow-auto min-h-[300px]">
                     <table class="table" id="workhistTable">
@@ -879,8 +1650,9 @@
                         </tr>
                       </thead>
                       <tbody id="wList">
+                        
                         <tr>
-                          <td colspan="10" class="text-center">No data found</td>
+                          <td colspan="10" class="add-work">Add New  Item</td>
                         </tr>
                         <!-- <tr>
                             <td>1</td>

@@ -1,6 +1,7 @@
 <?php
 #region DB Connect
 require_once '../dbconn/dbconnectpcs.php';
+require_once '../dbconn/dbconnectnew.php';
 require_once '../global/globalFunctions.php';
 #endregion
 
@@ -25,42 +26,42 @@ if (!empty($_SESSION["IDKHI"])) {
 
 $empNumber = NULL;
 if (!empty($_POST['empID'])) {
-    $empNumber = $_POST['empID'];
+  $empNumber = $_POST['empID'];
 } else {
-    $msg["isSuccess"] = false;
-    $msg['error'][] = "Employee Number";
+  $msg["isSuccess"] = false;
+  $msg['error'][] = "Employee Number";
 }
 
 $locID = 0;
 if (!empty($_POST['locID'])) {
-    $locID = $_POST['locID'];
+  $locID = $_POST['locID'];
 } else {
-    $msg["isSuccess"] = false;
-    $msg['error'][] = "Location";
+  $msg["isSuccess"] = false;
+  $msg['error'][] = "Location";
 }
 
 $spec_loc = '';
 if (!empty($_POST['spec_loc'])) {
-    $spec_loc = $_POST['spec_loc'];
+  $spec_loc = $_POST['spec_loc'];
 } else {
-    $msg["isSuccess"] = false;
-    $msg['error'][] = "Specific Location";
+  $msg["isSuccess"] = false;
+  $msg['error'][] = "Specific Location";
 }
 
 $dateFrom = date("Y-m-d");
 if (!empty($_POST['dateFrom'])) {
-    $dateFrom = $_POST['dateFrom'];
+  $dateFrom = $_POST['dateFrom'];
 } else {
-    $msg["isSuccess"] = false;
-    $msg['error'][] = "Date From";
+  $msg["isSuccess"] = false;
+  $msg['error'][] = "Date From";
 }
 
 $dateTo = date("Y-m-d");
 if (!empty($_POST['dateTo'])) {
-    $dateTo = $_POST['dateTo'];
+  $dateTo = $_POST['dateTo'];
 } else {
-    $msg["isSuccess"] = false;
-    $msg['error'][] = "Date To";
+  $msg["isSuccess"] = false;
+  $msg['error'][] = "Date To";
 }
 
 $inviID = 0;
@@ -117,23 +118,21 @@ if (!empty($_POST['request_name'])) {
 
 #for separtion of error
 if (!empty($msg)) {
-	if (count($msg['error']) > 1) {
-		$errorString = '';
-		foreach ($msg['error'] as $result) {
-			if ($result === end($msg['error'])) {
-				$errorString .= "and '$result' Missing";
-			}
-			else {
-				$errorString .= "'$result', ";
-			}
-		}
-		$msg['error'] = $errorString;
-	}
-  else {
+  if (count($msg['error']) > 1) {
+    $errorString = '';
+    foreach ($msg['error'] as $result) {
+      if ($result === end($msg['error'])) {
+        $errorString .= "and '$result' Missing";
+      } else {
+        $errorString .= "'$result', ";
+      }
+    }
+    $msg['error'] = $errorString;
+  } else {
     $msg['error'] = implode("", $msg['error']);
     $msg['error'] .= " Missing";
   }
-	die(json_encode($msg));
+  die(json_encode($msg));
 }
 #endregion
 
@@ -155,9 +154,9 @@ $checkConflictStmt = $connpcs->prepare($checkConflict);
 $checkConflictStmt->execute([":empNumber" => "$empNumber", ":dateFrom" => "$dateFrom", ":dateTo" => "$dateTo"]);
 $checkCount = $checkConflictStmt->fetchColumn();
 if ($checkCount > 0) {
-    $msg["isSuccess"] = false;
-    $msg['error'] = "Dispatch request conflict";
-    die(json_encode($msg));
+  $msg["isSuccess"] = false;
+  $msg['error'] = "Dispatch request conflict";
+  die(json_encode($msg));
 }
 #endregion
 
@@ -190,31 +189,36 @@ try {
                       :request_dept,
                       :request_name)";
   $insertStmt = $connpcs->prepare($insertQ);
-  $insertStmt->execute([":userID" => $userID,
-                        ":empNumber" => $empNumber, 
-                        ":locID" => $locID,
-                        ":spec_loc" => $spec_loc,
-                        ":dateFrom" => $dateFrom, 
-                        ":dateTo" => $dateTo, 
-                        ":inviID" => $inviID,
-                        ":workOrder" => $workOrder,
-                        ":project_name" => $project_name,
-                        ":site_dispatch" => $site_dispatch,
-                        ":allowance" => $allowance,
-                        ":request_dept" => $request_dept,
-                        ":request_name" => $request_name]);
+  $insertStmt->execute([
+    ":userID" => $userID,
+    ":empNumber" => $empNumber,
+    ":locID" => $locID,
+    ":spec_loc" => $spec_loc,
+    ":dateFrom" => $dateFrom,
+    ":dateTo" => $dateTo,
+    ":inviID" => $inviID,
+    ":workOrder" => $workOrder,
+    ":project_name" => $project_name,
+    ":site_dispatch" => $site_dispatch,
+    ":allowance" => $allowance,
+    ":request_dept" => $request_dept,
+    ":request_name" => $request_name
+  ]);
 
   if ($insertStmt->rowCount() > 0) {
-    $msg["isSuccess"] = true;
-    $msg["error"] = "Adding Work History successfully";
-  }
-  else {
+    $id = $connpcs->lastInsertId();
+    $details = getRequestDetails($id);
+    if (emailRequest($details)) {
+      $msg["isSuccess"] = true;
+      $msg["error"] = "Adding Work History successfully";
+    }
+  } else {
     $msg["isSuccess"] = false;
     $msg["error"] = "Adding Work History unsuccessful";
   }
 } catch (Exception $e) {
-    $msg["isSuccess"] = false;
-    $msg['error'] =  "Connection failed: " . $e->getMessage();
+  $msg["isSuccess"] = false;
+  $msg['error'] =  "Connection failed: " . $e->getMessage();
 }
 
 echo json_encode($msg);

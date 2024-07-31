@@ -11,16 +11,13 @@ date_default_timezone_set('Asia/Manila');
 #endregion
 
 #region Initialize Variable
-$userID = 0;
+$userID = getID();
 $empDetails = array();
 $result = array();
 #endregion
 
 #region get data values
-if (!empty($_SESSION["IDKHI"])) {
-    $userID = $_SESSION["IDKHI"];
-    $userID = hex2bin($userID);
-    $userID = base64_decode(urldecode($userID));
+if (!empty($userID)) {
 } else {
     $result["isSuccess"] = false;
     $result["message"] = "Not logged in";

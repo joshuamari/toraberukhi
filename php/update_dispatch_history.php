@@ -45,7 +45,7 @@ try {
         $updateStmt = $connpcs->prepare($updateQ);
         if ($updateStmt->execute([":dispatchLoc" => "$dispatchLoc", ":dateFrom" => "$dateFrom", ":dateTo" => "$dateTo", ":dispatchID" => "$dispatchID"])) {
             $msg["isSuccess"] = true;
-            $msg["error"] = "Update successfull";
+            $msg["error"] = "Update successful";
         } else {
             $msg["isSuccess"] = false;
             $msg["error"] = "Error updating";

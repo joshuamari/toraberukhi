@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>Passport Control System</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="UTF-8" />
+
+  <script src="js/html2canvas.js"></script>
+  <script src="js/jquery.js"></script>
+  <script src="js/jquery.inview.min.js"></script>
+  <!-- <script src="js/jquery.table2excel.js"></script> -->
+  <script>
+    var busterCall = ["js/individual.js", "css/index.css"];
+    $.post(
+      "php/get_version.php",
+      {
+        busterCall: busterCall,
+        titleName: "トラベる - KDT",
+      },
+      function (data) {
+        $("head").html(data);
+      }
+    );
+  </script>
+</head>
+
+<!-- #region modal -->
+<div class="modal fade" id="openModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+  aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered ">
+    <div class="modal-content">
+      <div class="  modal-header border-0 ">
+        <h1 class="modal-title text-[18px]" id="titleModal"> </h1>
+        <button type="button" class="btn-close text-[14px]  m-1 w-0 h-0  w-auto h-auto" data-bs-dismiss="modal"
+          aria-label="Close"></button>
+      </div>
+      <div class="modal-body  flex flex-col">
+        <div class="flex gap-3 items-start">
+          <div class="rounded-lg border-1  flex items-center">
+            <i class='bx bxs-user text-[16px] text-[var(--gray-text)] p-1 '></i>
+          </div>
+          <div class="w-100">
+            <p class="text-[var(--gray-text)] text-[12px] uppercase">Employee Information</p>
+            <div>
+              <div>
+                <p class="font-semibold " id="modalEmpName"></p>
+              </div>
+              <div>
+                <p class=" " id="modalGroup"></p>
+              </div>
+              <div class="flex gap-2 " id="modalPassport">
+
+              </div>
+              <div class="flex gap-2 " id="modalVisa">
+
+              </div>
+
+            </div>
+          </div>
+        </div>
+        <div class="flex gap-3 items-start mt-4">
+          <div class="rounded-lg border-1  flex items-center">
+            <i class='bx bx-calendar text-[16px] text-[var(--gray-text)] p-1 '></i>
+          </div>
+          <div class="">
+            <p class="text-[var(--gray-text)] text-[12px] uppercase">Duration</p>
+            <div>
+              <div class="flex items-center gap-2 ">
+                <p id="modalDateFrom"></p>
+                <span class="block w-[20px] h-[2px] bg-[var(--tertiary)]     ounded-lg"></span>
+                <p id="modalDateTo"></p>
+              </div>
+              <div class="flex gap-1 items-center" id="modalDuration">
+                <span class="text-[16px] font-semibold" ></span>
+                <p>days in total</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="flex gap-3 items-start mt-4">
+          <div class="rounded-lg border-1  flex items-center">
+            <i class='bx bxs-map text-[16px] text-[var(--gray-text)] p-1 '></i>
+          </div>
+          <div class="">
+            <p class="text-[var(--gray-text)] text-[12px] uppercase">Location</p>
+            <div>
+              <div class="flex items-center gap-2 ">
+                <p class="font-semibold" id="modalLoc"></p>,
+                <p id="modalCountry"></p>
+              </div>
+
+            </div>
+          </div>
+        </div>
+        <div class="flex gap-3 items-start mt-4">
+          <div class="rounded-lg border-1  flex items-center">
+            <i class='bx bxs-pin text-[16px] text-[var(--gray-text)] p-1 '></i>
+          </div>
+          <div class="attachments" >
+            <p class="text-[var(--gray-text)] text-[12px] uppercase">Attachments</p>
+           <p class=" underline decoration-2 decoration-[var(--secondary)] text-[var(--dark)] hover:text-[var(--tertiary)] transition" id="attachment" role="button"></p>
+           <p class=" underline decoration-2 decoration-[var(--secondary)] text-[var(--dark)] hover:text-[var(--tertiary)] transition" id="attachment2" role="button"></p>
+          </div>
+        </div>
+        <div class="mt-4 p-3 rounded-md border-[1px] bg-[var(--white)]">
+          <div class="flex justify-content-between mb-2">
+            <label for="" class="text-[var(--gray-text)]">Requester's Name:</label>
+            <p class="text-[var(--gray-text)]" id="modalReqName"></p>
+          </div>
+          <div class="flex justify-content-between mb-2">
+            <label for="" class="text-[var(--gray-text)]">Requester's Group:</label>
+            <p class="text-[var(--gray-text)]" id="modalReqGrp"></p>
+          </div>
+          <div class="flex justify-content-between ">
+            <label for="" class="text-[var(--gray-text)]">Date Requested:</label>
+            <p class="text-[var(--gray-text)]" id="modalReqDate"></p>
+          </div>
+
+
+        </div>
+        <div id="modifyFooter" class="flex gap-1 mt-2 justify-content-end">
+          <label for="" class="text-[12px] text-[var(--gray-text)] capitalize" id="modiLabel">Modified:</label>
+          <p class="text-[var(--gray-text)] text-[12px]">on</p>
+            <p class="text-[var(--gray-text)] text-[12px]" id="modalModiDate"></p>
+        </div>
+      </div>
+      
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="attachmentModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+  aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-xl">
+    <div class="modal-content">
+      <div class="  modal-header border-0 ">
+        <h1 class="modal-title text-[18px]" id="titleModal">Request for Dispatch of Engineer</h1>
+        <button type="button" class="btn-close text-[14px]  m-1 w-0 h-0  w-auto h-auto" data-bs-dismiss="modal"
+          aria-label="Close"></button>
+      </div>
+      <div class="modal-body  flex items-center justify-content-center bg-[var(--gray)]">
+        <div class="w-[210mm] h-[297mm] min-w-[210mm] min-h-[297mm] bg-[#fff] py-[7mm] ps-[15mm] pe-[7mm] my-[-37mm]" id="toPrint" style="transform: scale(0.75);">
+          <div class="top flex gap-[28px] mb-2">
+            <img src="../images/kawasakilOGO.png" alt="kawasakilOGO" class="w-[250px] h-auto">
+            <div class="flex flex-col justify-content-between items-start">
+              <div class="flex flex-col">
+                <small class="font-['Arial'] text-[10px]"><span class="font-semibold text-[10px]">KOBE</span>: 1-1, Higashikawasaki 3-Chome, Chuo-ku, KOBE 650-8670 Japan</small>
+                <div class="flex gap-3">
+                  <small class="font-['Arial'] text-[10px]">Phone: 81-(0)78-682-5202</small> <small class="font-['Arial'] text-[10px]">Facsimile:81-(0)78-682-5574</small>
+                </div> 
+              </div>
+              <p class="font-semibold font-['Arial']">Kawasaki Heavy Industries, Ltd.</p>
+            </div>
+          </div>
+          <div class="h-[5px] w-full bg-[var(--text-color)] mb-1 mt-2 " ></div>
+          <div class="h-[1px] w-full bg-[var(--text-color)] " ></div>
+          <div class="flex items-end  ">
+            <p id="printDate" class="w-100 text-end font-['Arial']"></p>
+          </div>
+          <div>
+            <h1 class="text-[20px] text-center w-full font-semibold font-['Arial']">Request for Dispatch of Engineer</h1>
+          </div>
+          <div class="flex mt-5 items-center gap-2">
+            <div class="w-full">
+              <div class="flex gap-2">
+                <p class="font-semibold whitespace-nowrap font-['Arial']">To :</p>
+                <div class="flex flex-col">
+                    <p class="font-semibold font-['Arial']">KHI Design & Technical Services, Inc.(KDT)</p>
+                    <p class="font-semibold font-['Arial']">Unit 1503-P, 15th Flr. Five E-com Center</p>
+                    <p class="font-semibold font-['Arial']">Pacific Drive, Mall of Asia Complex, Pasay City 1300</p>
+                    <p class=" font-['Arial']">Trunk Line:(+632)802-5406 / (+632)802 5407</p>
+                </div>
+              </div>
+              <div class="flex gap-2 mt-3">
+                <p class="font-semibold whitespace-nowrap font-['Arial']">Attention :</p>
+                <div class="flex flex-col ">
+                    <p class="font-semibold font-['Arial']">MR. Yukihiro Takenaka (President)</p>
+                    <p class="font-semibold font-['Arial']">(c/o Ms. Evangeline G. Panado)</p>
+      
+                </div>
+              </div>
+            </div>
+            <div class="w-[40%]">
+              <div class="  flex flex-col p-2" style="border: 1px solid var(--text-color);">
+                <div class="flex gap-2">
+                  <p  class=" font-['Arial'] min-w-[28px]">From:</p>
+                  <div class="flex flex-col">
+                    <p class="font-['Arial'] border-b-[1px] whitespace-nowrap">Kawasaki Heavy Industries, Ltd.</p>
+                    <p class="font-['Arial'] border-b-[1px] whitespace-nowrap font-semibold" id="printBU">Environmental Plant Dept.</p>
+                    <p class="font-['Arial'] border-b-[1px] whitespace-nowrap font-semibold" id="printKHI">Jun TOSHIHIRO</p>
+                  </div>
+                </div>
+                <div class="flex gap-2">
+                  <p for="from" class=" font-['Arial'] min-w-[28px]">TEL:</p>
+                  
+                    <p class="font-['Arial'] w-[calc(100%-28px)] border-b-[1px] whitespace-nowrap">+81-(0)78-682-5084</p>
+                </div>
+                <div class="flex gap-2">
+                  <p for="from" class=" font-['Arial'] min-w-[28px]">FAX:</p>
+                    <p class="font-['Arial'] w-[calc(100%-28px)]  border-b-[1px] whitespace-nowrap">+81-(0)78-682-5433</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="mt-[2rem]">
+ 
+             <p class="font-['Arial']">Dear Sir,</p>
+             <p class="font-['Arial']">This is to request you to dispatch your Engineer, with following terms & conditions;</p>
+           
+           <div class="grid mt-2"  style=" grid-template-columns: 180px 1fr;">
+             <div class=" flex gap-1 p-1 " style="border: 1px solid var(--text-color);"><p class="font-['Arial']">1.</p><p class="font-['Arial']">Required name to be Dispatched</p> </div>
+             <div class="p-1 bg-[var(--white)]" style="border: 1px solid var(--text-color); border-left: 0px;"><p class="font-['Arial'] font-semibold" id="printName"> Blessel Desoloc</p></div>
+             <div class=" flex gap-1 p-1 border-[1px] border-[var(--dark)] border-t-0" ><p class="font-['Arial']">2.</p><p class="font-['Arial']">Required Period</p> </div>
+             <div class="flex" style="border: 1px solid var(--text-color); border-left: 0px; border-top: 0px;">
+               <p class="font-['Arial'] p-1 min-w-[50px]">From</p>
+               <p class="font-['Arial'] border-x-[1px] border-[var(--dark)] flex p-1 min-w-[200px] font-semibold bg-[var(--white)]" id="printFrom"></p>
+               <p class="font-['Arial'] p-1 min-w-[50px]">To</p>
+               <p class="font-['Arial'] border-l-[1px] border-[var(--dark)] flex p-1  min-w-[200px] font-semibold bg-[var(--white)]" id="printTo"></p>
+             </div>
+             <div class=" flex gap-1 p-1 border-[1px] border-[var(--dark)] border-t-0" ><p class="font-['Arial']">3.</p><p class="font-['Arial']">Place of Service</p> </div>
+             <div class="flex flex-col w-full" >
+               <span class="p-1 border-l-0 border-t-0 border-[1px] border-[var(--dark)] grid w-full min-h-[20px]  m-0" style="grid-template-columns: 120px 1fr;">
+                <div class="flex gap-2 items-center">
+                  <span class="w-[12px] h-[12px] up border-[1px] border-[var(--dark)] flex justify-content-center items-center countries">
+                   
+                  </span>
+          
+                    <p class="font-['Arial'] whitespace-nowrap"> Japan</p>
+                  
+                </div>
+                 <span class="inline-flex"> <p class="w-full bg-[var(--white)] font-['Arial'] font-semibold" id="printJap"></p></span>
+                
+               </span>
+               <span class="p-1 border-l-0 border-t-0 border-[1px] border-[var(--dark)] grid w-full" style="grid-template-columns: 120px 1fr;">
+                 <div class="flex gap-2 items-center ">
+                   <span class="w-[12px] h-[12px] up border-[1px] border-[var(--dark)] flex justify-content-center items-center countries"></span>
+                   <p class="font-['Arial']">Philippines</p>
+                 </div>
+                 <span class="inline-flex"> <p class="w-full bg-[var(--white)] font-['Arial'] font-semibold" id="printPh"></p></span>
+                
+               </span>
+               <span class="font-['Arial'] p-1 border-l-0 border-t-0 border-[1px] border-[var(--dark)] grid w-full" style="grid-template-columns: 120px 1fr;">
+                 <div class="flex gap-2 items-center">
+                   <span class="w-[12px] h-[12px] up border-[1px] border-[var(--dark)] flex justify-content-center items-center countries"></span>
+                   <p class="font-['Arial'] whitespace-nowrap">Third Countries</p>
+                 </div>
+                 <span class="inline-flex"> <p class="w-full bg-[var(--white)] font-['Arial'] font-semibold" id="printThird"></p></span>
+                
+               </span>
+              
+             </div>
+             <div class=" flex gap-1 p-1 border-[1px] border-[var(--dark)] border-t-0" ><p class="font-['Arial']">4.</p><p class="font-['Arial']">Invitation</p> </div>
+             
+             <div class=" p-1 border-[1px] border-l-0 border-[var(--dark)] border-t-0">
+               <div class="flex gap-2 items-center">
+                 <span class="up w-[12px] h-[12px] border-[1px] border-[var(--dark)] flex justify-content-center items-center inv"></span>
+                 <p class="font-['Arial']">Invitation letter for multiple business travel visa has already been sent via courier.</p>
+               </div>
+               <div class="flex gap-2 items-center">
+                 <span class="up w-[12px] h-[12px] border-[1px] border-[var(--dark)] flex justify-content-center items-center inv"></span>
+                 <p class="font-['Arial']">Invitation letter for single business travel visa has already been sent via courier.</p>
+               </div>
+               <div class="flex gap-2 items-center">
+                 <span class="up w-[12px] h-[12px] border-[1px] border-[var(--dark)] flex justify-content-center items-center inv">
+       
+                 </span>
+                 <p class="font-['Arial']">Invitation letter is not required.</p>
+               </div>
+             </div>
+        
+             <div class=" flex gap-1 p-1 border-[1px] border-[var(--dark)] border-t-0" >
+               <p class="font-['Arial']">5.</p>
+               <p class="font-['Arial']">Work Order and Project</p>
+             </div>
+             
+             <div class="border-r-[1px] border-b-[1px] border-[var(--dark)]">
+               <span class="font-['Arial'] p-1 grid w-full" style="grid-template-columns: 50px 1fr;">
+         
+                  
+                   <p class="font-['Arial']">W/O</p>
+               
+                 <span class="inline-flex h-[18px]"> <p class="w-full bg-[var(--white)] font-['Arial'] font-semibold" id="printWO"></p></span>
+                
+               </span>
+               <span class="font-['Arial'] p-1  grid w-full" style="grid-template-columns: 50px 1fr;">
+            
+        
+                   <p class="font-['Arial']" >Project</p>
+             
+                 <span class="inline-flex h-[18px]"> <p class="w-full bg-[var(--white)] font-['Arial'] font-semibold"id="printProject">
+                  
+                 </p></span>
+                
+               </span>
+               <div class="flex gap-2 px-1  items-center">
+                 <span class=" w-[12px] h-[12px] border-[1px] border-[var(--dark)] flex justify-content-center items-center up siteDispatch" ></span>
+                 <p class="font-['Arial']">Site Dispatch Training application</p>
+               </div>
+               <small class=" font-['Arial'] p-1 flex leading-[1.25]">
+                 *Remark: In case of site dispatch training (W/O:6104298) applied, actual Air ticket fee (KDT paid) shall be reimbursed by KHI as post-settlement.
+        
+               </small>
+        
+        
+             </div>
+           </div>
+          </div>
+          <div class="pt-3">
+             <p class=" font-['Arial'] ">Division of Responsibilities for each "Place of Service"</p>
+          </div>
+          
+           
+          
+
+           <table class="w-full pt-2">
+                 <thead>
+                   <tr>
+                     <th>Place of Service</th>
+                     <th>Scope</th>
+                     <th class="sm">KHI</th>
+                     <th class="sm">KDT</th>
+                     <th>Remarks</th>
+                   </tr>
+                 </thead>
+                 <tbody>
+                   <tr>
+                     <td rowspan="4">Japan</td>
+                     <td>Absence Fee</td>
+                     <td class="sm"></td>
+                     <td class="sm"><i class='bx bx-x'></i></td>
+                     <td>Included in the Annual Service Fee</td>
+                   </tr>
+                   <tr>
+                     <td>Daily Allowance with Meals</td>
+                     <td class="sm"><i class='bx bx-x'></i></td>
+                     <td class="sm"></td>
+                     <td>
+                      <div class="flex"><p class="font-['Arial']">JP¥</p>
+                      <p class="font-['Arial']  font-bold" id="printSalary"></p>
+                      <p class="font-['Arial']">(*)/Calendar Day</p>
+                      </div>
+                     <small class="font-['Arial'] text-[11px] leading-2 flex ">(*)AM/Mg class according to KDT Rule</small>
+                    </td>
+                   </tr>
+                   <tr>
+                     <td>Air Ticket</td>
+                     <td class="sm"></td>
+                     <td class="sm"><i class='bx bx-x'></i></td>
+                     <td>Included in the Annual Service Fee</td>
+                   </tr>
+                   <tr>
+                     <td>Accommodation</td>
+                     <td class="sm"><i class='bx bx-x'></i></td>
+                     <td class="sm"></td>
+                     <td>To be provided by KHI</td>
+                   </tr>
+                   <tr>
+                     <td rowspan="4">Philippines</td>
+                     <td>Absence Fee</td>
+                     <td class="sm"></td>
+                     <td class="sm"><i class='bx bx-x'></i></td>
+                     <td>Included in the Annual Service Fee</td>
+                   </tr>
+                   <tr>
+                     <td>Daily Allowance with Meals</td>
+                     <td class="sm"><i class='bx bx-x'></i></td>
+                     <td class="sm"></td>
+                     <td>According to KDT Internal Rule</td>
+                   </tr>
+                   <tr>
+                     <td>Air Ticket</td>
+                     <td class="sm"></td>
+                     <td class="sm"><i class='bx bx-x'></i></td>
+                     <td></td>
+                   </tr>
+                   <tr>
+                     <td>Accommodation</td>
+                     <td class="sm"><i class='bx bx-x'></i></td>
+                     <td class="sm"></td>
+                     <td>To be provided by KHI</td>
+                   </tr>
+                   <tr>
+                     <td rowspan="4">Other third Countries</td>
+                     <td>Absence Fee</td>
+                     <td class="sm"></td>
+                     <td class="sm"><i class='bx bx-x'></i></td>
+                     <td></td>
+                   </tr>
+                   <tr>
+                     <td>Daily Allowance with Meals</td>
+                     <td class="sm"><i class='bx bx-x'></i></td>
+                     <td class="sm"></td>
+                     <td>
+                      <div class="flex"><p class="font-['Arial']">US$</p>
+                      <p class="font-['Arial'] " id="printSalary">40</p>
+                      <p class="font-['Arial']">(*)/Calendar Day</p>
+                      </div>
+                     <small class="font-['Arial'] text-[11px] leading-2 flex ">(*)AM/Mg class according to KDT Rule</small>
+                    </td>
+                   </tr>
+                   <tr>
+                     <td>Air Ticket</td>
+                     <td class="sm"></td>
+                     <td class="sm"><i class='bx bx-x'></i></td>
+                     <td></td>
+                   </tr>
+                   <tr>
+                     <td>Accommodation</td>
+                     <td class="sm"><i class='bx bx-x'></i></td>
+                     <td class="sm"></td>
+                     <td>To be provided by KHI</td>
+                   </tr>
+                 </tbody>
+           </table>
+        
+     
+         
+          <div class="bottom-text mt-[0.5rem]">
+            <p class="font-['Arial']">Copy:</p>
+            <div class="flex justify-content-between">
+              <p class="font-['Arial']">General Affairs and Personal Gr.: Mr. T. Kurosumi</p>
+              <p class="font-['Arial']">(81-78-682-5202/Ext. 7-20-81101)</p>
+            </div>
+            <div class="flex justify-content-between">
+              <p class="font-['Arial']">Control Dep't Corporate Planning Gr.: Mr. H. Kanari</p>
+              <p class="font-['Arial']">(81-78-682-5072/Ext. 7-30-33217)</p>
+            </div>
+            
+          </div>
+
+
+        </div>
+      </div>
+      <div class="modal-footer">
+       
+          <button class="bg-[var(--dark)] hover:bg-[var(--dark-200)] text-[var(--white)] font-medium transition rounded-md px-3 py-1" id="btnBack">Back</button>
+          <!-- <button class="bg-[var(--secondary)] hover:bg-[var(--tertiary)] font-semibold rounded-md px-3 py-1  text-[var(--dark)]" id="btnPrint">Print document</button> -->
+        
+      </div>
+    </div>
+    </div>
+</div>
+
+<div class="modal fade" id="attachmentModal2" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+  aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-xl">
+    <div class="modal-content">
+      <div class="  modal-header border-0 ">
+        <h1 class="modal-title text-[18px]" id="titleModal">Work History</h1>
+        <button type="button" class="btn-close text-[14px]  m-1 w-0 h-0  w-auto h-auto" data-bs-dismiss="modal"
+          aria-label="Close"></button>
+      </div>
+      <div class="modal-body  flex items-center justify-content-center bg-[var(--gray)]">
+        <div class="w-[210mm] h-[297mm] min-w-[210mm] min-h-[297mm] bg-[#fff] p-[14mm]  my-[-37mm]" id="toPrint2" style="transform: scale(0.75);">
+          <div class="top flex  justify-content-end w-100 mb-4">
+            <span class="">（別紙）</span>
+          </div> 
+          <div class="top flex  justify-content-end w-100 mb-2 gap-2">
+            <span id="whYear">2024</span>
+            年
+            <span id="whMonth">7</span>
+            月
+            <span id="whDay">29</span>
+            日
+          </div>
+          <div class="mb-4">大阪入国管理局　様</div>
+          <div class="top flex  justify-content-end w-100 mb-2 tracking-[1rem]">
+            川崎重工業株式会社</div>
+          <div class="text-[14px] top flex  justify-content-end w-100 mb-5">
+            エネルギーソリューション＆マリンカンパニー
+          </div>
+          <div class="indent-6 leading-[2rem] mb-3">
+            申請人の職務経歴および弊社内での職務内容について下記の通り補足させていただきます。つきましては、申請人の在留資格認定証明書の交付にご配慮賜りますよう、お願い致します。
+          </div>
+          <div class="flex gap-2 mb-4">
+            <span>1.</span>
+            <div class="flex flex-col">
+              <span>申請人</span>
+              <span class="font-semibold font-['Arial']" id="whName">Pangilinan, Seanne Kyle Beltran</span>
+            </div>
+          </div>
+          <div class="flex gap-2 mb-4">
+            <span>2.</span>
+            <div class="flex flex-col">
+              <span>申請内容</span>
+              <span class="" >企業内転勤にかかわる在留資格認定証明書の交付</span>
+            </div>
+          </div>
+          <div class="flex gap-2 mb-4 w-full">
+            <span>3.</span>
+            <div class="flex flex-col w-full">
+              <span>職務経歴詳細</span>
+              <span class="" >申請人はフィリピンにおいて、主に技術設計業務等に従事してきました。</span>
+              <span>申請人の職務経歴の詳細は下表の通りです。</span>
+       
+               <table class="table mt-2" id="workHistoryTable">
+                 <thead>
+                   <tr>
+                     <th colspan="2">Start</th>
+                     <th colspan="2">End</th>
+                     <th rowspan="2">Company's name</th>
+                     <th rowspan="2">Company's business</th>
+                     <th rowspan="2">Business content</th>
+                     <th rowspan="2">Work location</th>
+                   </tr>
+                   <tr>
+                     <th>Year</th>
+                     <th>Month</th>
+                     <th>Year</th>
+                     <th>Month</th>
+                   </tr>
+                 </thead>
+                 <tbody>
+                  <tr>
+                    <td>2007</td>
+                    <td>3</td>
+                    <td></td>
+                    <td></td>
+                    <td>KHI Design & Technical Service Inc.</td>
+                    <td>プラントエンジニアリング</td>
+                    <td>土建設計業務</td>
+                    <td>マニラ</td>
+                  </tr>
+                 </tbody>
+               </table>
+           
+            </div>
+          </div>
+          <div class="flex gap-2 mb-4">
+            <span>4.</span>
+            <div class="flex flex-col">
+              <span>業務内容（予定</span>
+              <span class="" >水素実証設備の設計業務</span>
+            </div>
+          </div>
+          <div class="flex gap-2 mb-4">
+            <span>5.</span>
+            <div class="flex flex-col">
+              <span>本件担当</span>
+              <span class="" >川崎重工業　エネルギーソリューション＆マリンカンパニー</span>
+              <span class="" >企画本部　人事総務部　人事総務一課</span>
+              <span class="" >佐々木　萌香（ササキ　モカ）</span>
+              <span>℡　078-682-5202</span>
+            </div>
+          </div>
+          <div class="top flex  justify-content-end w-100 mb-4">
+            <span class="">以　上</span>
+          </div> 
+
+          
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="bg-[var(--dark)] hover:bg-[var(--dark-200)] text-[var(--white)] font-medium transition rounded-md px-3 py-1" id="btnBack2">Back</button>
+        <!-- <button class="bg-[var(--secondary)] hover:bg-[var(--tertiary)] font-semibold rounded-md px-3 py-1  text-[var(--dark)]" id="btnPrint2">Print document</button> -->
+      </div>
+    </div>
+    </div>
+</div>
+
+<!-- #region end-->
+
+<body>
+  <div class="position-relative flex h-screen">
+    <div class="navigation">
+      <div class="title p-3 d-flex justify-content-between align-items-center">
+        <div class="w-full h-[36px] px-[.75rem]">
+          <img src="../images/pcs logo bold.png" alt="logo" class="h-full" />
+        </div>
+        <div id="closeNav" class="justify-content-center align-items-center m-0">
+          <i class="bx bx-x fs-3"></i>
+        </div>
+      </div>
+      <nav class="flex flex-col justify-content-between h-[calc(100%-63px)]">
+        <section>
+          <ul class="list-unstyled d-grid gap-2">
+            <a href="../"
+            ><li>
+              <div class="d-flex align-items-center gap-2">
+                <i class="bx bxs-briefcase"></i>
+                <p>Dispatch Request by KHI</p>
+              </div>
+            </li></a
+          >
+          <a href="./">
+            <li class="active">
+              <div class="d-flex align-items-center gap-2">
+                <i class="bx bx-task text-[18px]"></i>
+                <p>Request List</p>
+              </div>
+            </li>
+          </a>
+          <a href="../dashboard/"
+            ><li>
+              <div class="d-flex align-items-center gap-2">
+                <i class="bx bxs-dashboard"></i>
+                <p>Dashboard</p>
+              </div>
+            </li></a
+          >
+          <a href="../report/"
+            ><li>
+              <div class="d-flex align-items-center gap-2">
+                <i class="bx bxs-report"></i>
+                <p>Report</p>
+              </div>
+            </li></a>
+
+
+          </ul>
+        </section>
+        <section class="grid gap-2">
+          <li class="bg-[var(--main)] hover:bg-green-100">
+            <div class="flex gap-2 items-center">
+              <div
+                class="bg-[var(--secondary)] rounded-full h-[45px] w-[45px] min-w-[45px] flex justify-content-center items-center"
+                id="empInitials">
+                BK
+              </div>
+
+              <div class="w-full">
+                <div class="" id="empLabel">Boglin Kit</div>
+                <div class="text-uppercase text-[10px] text-gray-400" id="grpLabel">
+                  Systems group
+                </div>
+              </div>
+            </div>
+          </li>
+          <a href="../admin/"
+          ><li>
+            <div class="d-flex align-items-center gap-2">
+              <i class="bx bxs-buildings"></i>
+              <p>Organization</p>
+            </div>
+          </li></a
+        >
+        <a href="#"
+          ><li id="logoutBtn">
+            <div class="d-flex align-items-center gap-2">
+              <i class="bx bx-log-out"></i>
+              <p>Logout</p>
+            </div>
+          </li></a
+        >
+        </section>
+      </nav>
+    </div>
+    <div class="content h-screen">
+      <div class="flex flex-col  overflow-auto p-[14px] md:p-8 h-full w-full">
+        <div class="pageTitle w-100 gap-3 d-flex">
+          <div id="menu">
+            <i class="bx bx-menu-alt-left fs-3"></i>
+          </div>
+          <h1 class="fw-semibold m-0">Requests from KHI</h1>
+        </div>
+
+        <div class=" w-100 h-[calc(100%-35px)] lg:h-[calc(100%-30px)] pt-3 flex flex-col  gap-3 relative">
+          <div class="lg:flex  gap-2 lg:gap-4 w-100 grid grid-cols-2">
+            <span class="card active">
+              <div class="flex gap-2 items-center">
+                <span class="icon"> <i class='bx bxs-error-circle text-[16px] font-medium '></i></span>
+
+                <h6 class="">Pending Requests</h6>
+
+              </div>
+              <div class="pt-6 flex gap-3 items-center justify-content-between w-100">
+                <h2 class="text-[var(--white)] text-[32px] font-semibold" id="cardPending"></h2>
+
+
+              </div>
+            </span>
+            <span class="card ">
+              <div class="flex gap-2 items-center">
+                <span class="icon"> <i class='bx bx-check text-[16px] font-medium '></i></span>
+
+                <h6 class=" m-0 font-semibold">Total Accepted Requests</h6>
+
+              </div>
+              <div class="pt-6 flex gap-3 items-center justify-content-between w-100">
+                <h2 class=" text-[32px] font-bold" id="cardAccepted"></h2>
+                <span class="bg-[var(--secondary)] px-2 py-0 rounded-lg " id="cardTodayAccepted"></span>
+              </div>
+            </span>
+            <span class="card">
+              <div class="flex gap-2 items-center">
+                <span class="w-[25px] h-[25px] flex items-center justify-content-center rounded-md bg-[var(--dark)] ">
+                  <i class='bx bx-x text-[16px] font-medium text-[var(--white)]'></i></span>
+
+                <h6 class=" m-0 font-semibold">Total Cancelled Requests</h6>
+
+              </div>
+              <div class="pt-6 flex gap-3 items-center justify-content-between w-100">
+                <h2 class=" text-[32px] font-bold" id="cardCancelled"></h2>
+
+              </div>
+            </span>
+            <span class="card">
+              <div class="flex gap-2 items-center">
+                <span class="w-[25px] h-[25px] flex items-center justify-content-center rounded-md bg-[var(--dark)] ">
+                  <i class='bx bxs-file text-[16px] font-medium text-[var(--white)]'></i></span>
+
+                <h6 class=" m-0 font-semibold">Total Requests</h6>
+
+              </div>
+              <div class="pt-6 flex gap-3 items-center justify-content-between w-100">
+                <h2 class=" text-[32px] font-bold" id="cardTotal"></h2>
+                <span class="bg-[var(--secondary)] px-2 py-0 rounded-lg " id="cardTodayTotal"></span>
+
+              </div>
+            </span>
+
+
+
+          </div>
+          <div class="w-100 h-[calc(100%-275px)] lg:h-[calc(100%-130px)] bg-white rounded-lg border">
+
+            <div class="flex lg:flex-row flex-col justify-content-between p-3 gap-2 lg:gap-0 border-b-[1px]">
+              <div class="flex gap-3 w-100">
+                <div
+                  class="tabs w-full lg:w-auto flex gap-2  items-center relative overflow-hidden bg-[var(--white)] border grid grid-cols-4 px-[3px] rounded-lg transition"
+                  role="tablist" aria-label="tabs">
+                  <div class="indicator absolute top-0 my-[0.25rem] bottom-0  left-0 rounded-md  bg-[var(--secondary)]">
+                  </div>
+                  <button role="tab" aria-selected="true" aria-controls="panel-1" id="tab-1" tabindex="0"
+                    class="relative block  p-2 tab rounded-full flex gap-1 items-center justify-content-center">
+                    <span class="text-[12px] text-[var(--gray-text)]">All</span>
+
+                  </button>
+                  <button role="tab" aria-selected="false" aria-controls="panel-2" id="tab-2" tabindex="-1"
+                    class="relative block  p-2 tab rounded-full flex gap-1 items-center justify-content-center">
+                    <span class="text-[12px] text-[var(--gray-text)]">Pending</span>
+                    <small
+                      class="rounded-full w-[14px] h-[14px] bg-[var(--dark)] text-white text-[8px] flex items-center justify-content-center font-semibold" id="pendingTab">10</small>
+                  </button>
+                  <button role="tab" aria-selected="false" aria-controls="panel-3" id="tab-3" tabindex="-2"
+                    class="relative block p-2 tab rounded-full flex gap-1 items-center justify-content-center">
+                    <span class="text-[12px] text-[var(--gray-text)]">Accepted</span>
+                  </button>
+                  <button role="tab" aria-selected="false" aria-controls="panel-4" id="tab-4" tabindex="-3"
+                    class="relative block p-2 tab rounded-full flex gap-1 items-center justify-content-center">
+                    <span class="text-[12px] text-[var(--gray-text)]">Cancelled</span>
+                  </button>
+
+                </div>
+              </div>
+              <div class="  flex gap-2 items-center w-100">
+
+                <div class="filters  w-100 flex  gap-2 ">
+                  <div class="flex gap-2 w-full justify-content-end">
+                    <div class="relative lg:w-auto w-full">
+                      <input type="search" class="input search " placeholder="Search here . . ." id="searchbar">
+                      <i class='bx bx-search absolute top-[8px] text-[18px] left-[8px] text-[var(--gray-text)]'></i>
+                    </div>
+                    <div class="relative">
+
+                      <input type="month" id="monthSel" class="opacity-0  h-full w-full absolute cursor-pointer">
+
+
+                      <div
+                        class="mobtn rounded-md border flex gap-1 pl-2 pr-1 py-2 items-center justify-content-center hover:bg-[var(--white)] monthCont"
+                        role="button">
+                        <i class='bx bx-calendar'></i>
+                        <span class="" id="monthLabel">Requested Month</span>
+                        <i class='bx bx-chevron-down text-[18px] ml-3'></i>
+                      </div>
+                    </div>
+                    <div class="relative">
+                      <select name="grp select" id="grpSel" class="opacity-0  h-full w-full absolute cursor-pointer">
+
+                      </select>
+                      <div
+                        class="grpbtn rounded-md border transition flex gap-1 pl-2 pr-1   py-2 items-center justify-content-center hover:b [var  (--white)] grpCont"
+                        role="button">
+                        <i class='bx bx-group'></i>
+                        <span id="lblGrp">All Groups</span>
+                        <i class='bx bx-chevron-down text-[18px] ml-3'></i>
+
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+
+              </div>
+            </div>
+
+            <div class=" relative h-[calc(100%-104px)] lg:h-[calc(100%-93px)]  p-3 pt-0 mt-3 overflow-auto">
+              <table class="">
+                <thead>
+                  <tr>
+                    <th>Employee</th>
+                    <th><div class="flex gap-2 items-center text-[12px] text-[var(--text-color)]">Date requested<i id="sortDate" class='bx bx-sort cursor-pointer'></i></div></th>
+                    <th>Start date</th>
+                    <th>End date</th>
+                    <th>Requested by</th>
+                    <th>Status</th>
+                    <th>Passport</th>
+                    <th>Visa</th>
+                    <th></th>
+                  </tr>
+
+                </thead>
+                <tbody id="tableBody">
+
+                </tbody>
+              </table>
+
+
+            </div>
+
+          </div>
+
+
+        </div>
+      </div>
+    </div>
+
+</body>
+
+
+</html>

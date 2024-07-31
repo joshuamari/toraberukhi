@@ -7,7 +7,7 @@
 * {
   margin: 0;
   padding: 0;
-  font-family: "Poppins", sans-serif !important;
+  font-family: "Poppins", sans-serif ;
   font-size: 14px;
   box-sizing: border-box;
   color: #333;
@@ -49,15 +49,28 @@ p {
   --main: #dcfce7;
   --secondary: #4ade80;
   --tertiary: #22c55e;
-  --darkest: #15803d;
+  --darkest: rgb(14, 156, 66);
+  --darkest-100: rgb(8, 141, 57);
+  --secondary-100: rgba(74, 222, 128, 0.4);
   --bg: #f6fcf1;
   --orange: #ec8f5e;
   --gray: #dedede;
   --gray-100: #f2f2f2;
-  --red-color: #df2e38;
-  --yellow-color: rgb(254, 201, 88);
+  --red-color: rgba(223, 46, 56,1);
+  --red-100:rgba(240, 105, 112, 0.4);
+  --red-200: rgb(240, 105, 112);
+  --yellow-color: rgba(254, 201, 88, 1);
+  --yellow-100: rgba(254, 201, 88, 0.4);
+  --yellow-200:rgb(190, 134, 11);
   --text-color: #555;
-  --tableheader: #e5e7eb;
+  --gray-text: rgba(85, 85, 85, 0.7);
+  --gray-text2: rgba(85, 85, 85, 0.9);
+  --tableheader: #f4f4f4;
+  --tablehover: rgba(231, 232, 233, 0.5);
+  --dark: #212121;
+  --dark-200: rgba(33, 33, 33, 0.9);
+  --white:#f3f2f2;
+  --white-100:rgba(243, 242, 242, 0.85);
 }
 
 button {
@@ -108,7 +121,9 @@ nav li.active {
   border-radius: 0.5rem;
   border: 1px solid #dee2e6;
 }
-
+.input.search {
+  padding: 0.375rem 0.75rem 0.375rem 2.15rem;
+}
 .input:focus,
 .select:focus {
   border: 1px solid var(--darkest);
@@ -157,7 +172,7 @@ nav li.active {
   flex-direction: column;
   overflow: hidden;
   padding: 12px;
-  z-index: 10;
+  z-index: 10000;
   gap: 16px;
   pointer-events: none;
 }
@@ -218,10 +233,9 @@ nav li.active {
 .toasty.warn::after {
   background-color: #ffaa33;
 }
-
 .redText {
   color: var(--red-color);
-  font-weight: 700;
+  font-weight: 700 !important;
 }
 
 @keyframes anim {
