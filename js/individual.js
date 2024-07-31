@@ -414,6 +414,9 @@ $(document).on("keydown", "#allowance", function (e) {
 //   $("#attachmentModal").modal("show");
 // });
 $(document).on("click", "#btnSend", function () {
+  $("#btnSend").prop("disabled", true);
+  console.log("disabling send email btn");
+  // $('#btnSend').addClass("bg-[var(--secondary)] hover:bg-[var(--tertiary)] font-semibold rounded-md px-3 py-1  text-[var(--dark)]")
   insertDispatch();
 });
 
@@ -1228,14 +1231,18 @@ function insertDispatch() {
             $("#workOrder").val("");
             $("#projName").val("");
             $("#allowance").val("0");
+            $("#siteDispatch").prop("checked", false);
             to_add = 0;
             countTotal();
             $("#attachmentModal .btn-close").click();
             showToast("success", "Successfully added a dispatch entry.");
+            $("#btnSend").prop("disabled", false);
+            console.log("enabling send email btn");
             toggleLoadingAnimation(false);
           })
           .catch((error) => {
             $("#attachmentModal .btn-close").click();
+            $("#btnSend").prop("disabled", false);
             toggleLoadingAnimation(false);
             alert(`${error}`);
           });
@@ -1263,6 +1270,7 @@ function clearInput() {
     "#reqDeptInput, #reqNameInput, #startDate, #endDate, #specLocInput, #workOrder, #projName"
   ).val("");
   $("#allowance").val("0");
+  $("#siteDispatch").prop("checked", false);
   to_add = 0;
   $("#daysCount").text("0 Day");
   $("#empSel").change();

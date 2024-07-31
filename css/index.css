@@ -173,6 +173,23 @@ input:checked + .toggle:after {
 .btn-delete:hover {
   color: var(--red-color) !important;
 }
+.btn-send {
+  background-color: var(--secondary) !important;
+  font-weight: 600;
+  color: var(--dark);
+  padding: 4px 12px;
+  border-radius: 6px;
+  transition: background-color 0.25s ease-in-out;
+  border: none;
+}
+.btn-send:hover {
+  background-color: var(--tertiary) !important;
+}
+.btn-send:disabled {
+  /* background-color: var(--tablehover);
+  color: var(--white); */
+  opacity: 0.5;
+}
 .btn-dispatch,
 .btn-wh-edit,
 .btn-wh-add,

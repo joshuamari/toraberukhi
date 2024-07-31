@@ -733,7 +733,7 @@ function fillTable(sampleData) {
           ? ` <span class=" status pending ">
                         Pending
                       </span>`
-          : item.status === 1
+          : item.status == 1
           ? `  <span class=" status accepted ">
                         Accepted
                       </span>`
