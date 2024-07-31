@@ -296,6 +296,8 @@ function emailRequest($details)
     } else {
         return FALSE;
     }
+
+    // return true;
     //baguhin yung $CCarray pag prod na.
 }
 function countDays($start, $end)

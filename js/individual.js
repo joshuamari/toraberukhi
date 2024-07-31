@@ -393,7 +393,14 @@ $(document).on("click", "#logoutBtn", function () {
     });
 });
 $(document).on("keydown", "#allowance", function (e) {
-  if (e.which === 38 || e.which === 40 || e.which === 189) {
+  if (
+    e.which === 38 ||
+    e.which === 40 ||
+    e.which === 187 ||
+    e.which === 189 ||
+    e.which === 109 ||
+    e.which === 107
+  ) {
     e.preventDefault();
   }
 });
@@ -416,9 +423,6 @@ $(".lbl-viewForm").click(function () {
       ? "View Dispatch Form"
       : "Hide Dispatch Form"
   );
-  // $(this).html($(this).html() == `▼` ? `▲` : `▼`);
-
-  // $(".sample").addClass("hidden");
 
   $("#left").toggleClass("changeSize");
   $(".sticky-buttons").toggleClass("appear");
@@ -589,6 +593,7 @@ function fillGroups(grps) {
   const groupIDS = grps.map((obj) => obj.id);
   var grpSelect = $("#grpSel");
   grpSelect.html(`<option value=${groupIDS.toString()}>Select Group</option>`);
+  // grpSelect.html(`<option value='0' hidden>Select Group</option>`);
   $.each(grps, function (index, item) {
     var option = $("<option>")
       .attr("value", item.id)
@@ -905,6 +910,7 @@ function getDispatchHistory() {
       },
       dataType: "json",
       success: function (response) {
+        // console.log("getDHistory: ", response);
         const dList = response;
         resolve(dList);
       },
@@ -998,7 +1004,9 @@ function getDispatchDays() {
       data: {
         empID: empID,
       },
+      dataType: "json",
       success: function (response) {
+        // console.log(response);
         const dDays = response;
         resolve(dDays);
       },
@@ -1065,18 +1073,9 @@ function colorBar(dd) {
   }
 }
 function removeOutline() {
-  $("#edit-companyName").removeClass("bg-red-100  border-red-400");
-  $("#edit-StartMonthYear").removeClass("bg-red-100  border-red-400");
-  $("#edit-EndMonthYear").removeClass("bg-red-100  border-red-400");
-  $("#edit-companyBusiness").removeClass("bg-red-100  border-red-400");
-  $("#edit-businessContent").removeClass("bg-red-100  border-red-400");
-  $("#edit-workLocation").removeClass("bg-red-100  border-red-400");
-  $("#addcompanyName").removeClass("bg-red-100  border-red-400");
-  $("#addStartMonthYear").removeClass("bg-red-100  border-red-400");
-  $("#addEndMonthYear").removeClass("bg-red-100  border-red-400");
-  $("#addcompanyBusiness").removeClass("bg-red-100  border-red-400");
-  $("#addbusinessContent").removeClass("bg-red-100  border-red-400");
-  $("#addworkLocation").removeClass("bg-red-100  border-red-400");
+  $(
+    "#edit-companyName, #edit-StartMonthYear, #edit-EndMonthYear, #edit-companyBusiness, #edit-businessContent, #edit-workLocation, #addcompanyName, #addStartMonthYear, #addEndMonthYear, #addcompanyBusiness, #addbusinessContent, #addworkLocation"
+  ).removeClass("bg-red-100  border-red-400");
 }
 function checkDispatch() {
   const reqDept = $("#reqDeptInput").val();
@@ -1203,6 +1202,7 @@ function insertDispatch() {
     },
     dataType: "json",
     success: function (response) {
+      console.log(response);
       const isSuccess = response.isSuccess;
       if (!isSuccess) {
         $("#attachmentModal .btn-close").click();
@@ -1247,7 +1247,8 @@ function insertDispatch() {
       } else if (xhr.status === 500) {
         alert("Internal Server Error: There was a server error.");
       } else {
-        alert("An unspecified error occurred while adding dispatch data.");
+        console.log(error);
+        alert(error);
       }
     },
   });
@@ -1419,6 +1420,12 @@ function addWorkHistory() {
   }
   if (!startMonthYear) {
     $("#addStartMonthYear").addClass("bg-red-100  border-red-400");
+    $(".dateError").removeClass("hidden");
+    $(".dateError").addClass("block flex items-center gap-1 text-red-600");
+    errcount++;
+  }
+  if (!endMonthYear) {
+    $("#addEndMonthYear").addClass("bg-red-100  border-red-400");
     $(".dateError").removeClass("hidden");
     $(".dateError").addClass("block flex items-center gap-1 text-red-600");
     errcount++;
@@ -1611,6 +1618,12 @@ function saveEditWorkHistEntry() {
     $(".dateError").addClass("block flex items-center gap-1 text-red-600");
     errcount++;
   }
+  if (!endMonthYear) {
+    $("#edit-EndMonthYear").addClass("bg-red-100  border-red-400");
+    $(".dateError").removeClass("hidden");
+    $(".dateError").addClass("block flex items-center gap-1 text-red-600");
+    errcount++;
+  }
   if (!compBusiness) {
     $("#edit-companyBusiness").addClass("bg-red-100  border-red-400");
     $(".BusiError").removeClass("hidden");
@@ -1764,6 +1777,7 @@ function getYearly() {
       },
       dataType: "json",
       success: function (response) {
+        // console.log(response);
         const yrly = response;
         resolve(yrly);
       },

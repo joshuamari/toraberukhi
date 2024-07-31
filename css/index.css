@@ -143,33 +143,75 @@ input:checked + .toggle {
 }
 
 input:checked + .toggle:after {
-  content: "\2714";
+  content: "";
   text-align: center;
   font-size: 10px;
-  left: calc(100% - 5px);
+  left: calc(100% - 3px);
   transform: translateX(-100%);
 }
 
 .toggle:active:after {
   width: 25px;
 }
-
-.btn-dispatch {
+/* San ginamit? */
+.btn-updateEmp {
   background-color: var(--secondary) !important;
-  font-weight: 500;
-  transition: background-color 0.25s ease-in-out;
 }
-.btn-dispatch:hover {
+.btn-updateEmp:hover {
   background-color: var(--tertiary) !important;
 }
-.btn-clear {
-  border: 1px solid var(--text-color) !important;
-  font-weight: 500;
+
+/* Buttons CSS */
+.btn-edit,
+.btn-delete {
+  border: none;
+  background-color: transparent;
 }
-.btn-clear:hover {
-  background-color: #a7a7a7 !important;
-  border-color: #a7a7a7 !important;
+.btn-edit:hover {
+  color: var(--yellow-color) !important;
 }
+.btn-delete:hover {
+  color: var(--red-color) !important;
+}
+.btn-dispatch,
+.btn-wh-edit,
+.btn-wh-add,
+.btn-editEntry,
+.btn-success {
+  background-color: var(--secondary) !important;
+  font-weight: 600;
+  color: var(--dark);
+  transition: background-color 0.25s ease-in-out;
+  border: none;
+}
+.btn-dispatch:hover,
+.btn-wh-edit:hover,
+.btn-wh-add:hover,
+.btn-editEntry:hover,
+.btn-success:hover {
+  background-color: var(--tertiary) !important;
+  font-weight: 600;
+  color: var(--dark);
+}
+.btn-clear,
+.btn-cancel,
+.btn-wh-cancel {
+  background-color: var(--dark);
+  color: var(--white);
+  font-weight: 600;
+}
+.btn-clear:hover,
+.btn-cancel:hover,
+.btn-wh-cancel:hover {
+  background-color: var(--dark-200);
+  color: var(--white);
+  font-weight: 600;
+}
+/* .btn-success {
+  background-color: var(--secondary);
+  background-color: var(--darkest);
+} */
+/* END OF BUTTON CSS */
 
 .main .right {
   width: calc(100% - 400px);
@@ -227,6 +269,7 @@ input:checked + .toggle:after {
   color: var(--red-color);
 }
 
+/* TABLES CSS */
 .dispatch-hist table thead th {
   background-color: var(--tableheader);
   font-size: 12px !important;
@@ -235,72 +278,98 @@ input:checked + .toggle:after {
   vertical-align: middle;
   color: var(--text-color);
   padding: 0.75rem;
-  border-top: 1px solid #ebebeb;
-  border-bottom: 1px solid #ebebeb;
+  /* border-top: 1px solid #000;
+  border-bottom: 1px solid #000;
+  border-left: 1px solid #000;
+  border-right: 1px solid #000; */
+
+  border: 1px solid #000;
 }
 
-.dispatch-hist table thead tr th:first-of-type {
+/* .dispatch-hist table thead tr th:first-of-type {
   border-top-left-radius: 8px;
   border-bottom-left-radius: 8px;
-  border-left: 1px solid #ebebeb;
+  border-left: 1px solid #000;
 }
 .dispatch-hist table thead th:last-of-type {
   border-top-right-radius: 8px;
   border-bottom-right-radius: 8px;
-  border-right: 1px solid #ebebeb;
-}
-
-.dispatch-hist table tbody td,
-.work-hist table tbody td {
+  border-right: 1px solid #000;
+} */
+.dispatch-hist table tbody td {
   font-size: 14px;
   vertical-align: middle;
 }
-.dispatch-hist table tbody tr:hover,
-.work-hist table tbody tr:hover {
-  background-color: #e6e6e6;
-}
-.work-hist table thead th {
-  text-align: center;
-  vertical-align: middle;
+.dispatch-hist table tbody tr:hover {
+  background-color: #fff;
 }
 
-.work-hist table thead th {
-  text-transform: uppercase;
-  font-size: 12px !important;
+.work-hist {
+  background: #fff;
+  padding: 16px;
+  border-radius: 8px;
   border: 1px solid var(--gray);
-  word-wrap: break-word;
-  background-color: var(--tableheader);
 }
-.work-hist table td {
-  border: 1px solid var(--gray);
+.work-hist .title {
+  font-size: 14px;
+
+  text-transform: uppercase;
+}
+.work-hist table {
+  border-collapse: separate !important;
+  border-spacing: 0;
+  width: 100%;
+}
+.work-hist table thead tr th,
+.work-hist table tbody tr td {
+  vertical-align: middle;
+  white-space: nowrap;
+}
+.work-hist table thead tr th {
+  background-color: var(--tableheader);
+  font-size: 12px !important;
+  text-transform: uppercase;
+  white-space: nowrap;
+  vertical-align: middle;
+  color: var(--text-color);
+  padding: 0.75rem;
+
+  border: 1px solid #000;
+  border-left: 0;
+}
+
+.work-hist table thead tr th:first-of-type {
+  border-left: 1px solid #000;
+}
+.work-hist table thead tr:nth-of-type(2) th:first-of-type {
+  border-left: 0;
+}
+.work-hist table thead tr:nth-of-type(2) th {
+  border-top: 0;
+}
+.work-hist table tbody tr td:last-of-type {
+  justify-content: end;
+  width: 25px;
+}
+.work-hist table tbody tr td {
   background-color: #fff;
-  text-align: center;
+  padding: 0.75rem;
+  font-weight: 400;
+  /* color: var(--dark); */
+  border-bottom: 1px solid var(--gray);
+}
+.work-hist tbody tr:hover td {
+  background-color: var(--tablehover);
+}
+.work-hist .header {
+  padding-bottom: 14px;
 }
 .work-hist table .add-work {
   cursor: pointer;
-  border: 0;
-  /* border-bottom: 1px solid var(--gray); */
-  background-color: var(--white-100);
+  /* color: var(--text-color); */
 }
-.work-hist table .add-work:hover {
-  background-color: #e6e6e6;
-  color: var(--text-color);
-}
-.work-hist table .add-work:active {
-  background-color: #999999;
-  color: var(--bg);
-}
-.btn-edit,
-.btn-delete {
-  border: none;
-  background-color: transparent;
-}
-.btn-edit:hover {
-  color: var(--yellow-color) !important;
-}
-.btn-delete:hover {
-  color: var(--red-color) !important;
-}
+/* END OF TABLES CSS */
+
 .totalThisYear {
   border-radius: 8px;
   background-color: #fff;
@@ -316,8 +385,9 @@ input:checked + .toggle:after {
 }
 .dispatch-hist .top .title,
 .work-hist .top .title {
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 500;
+  text-transform: uppercase;
 }
 .prog-cont small {
   color: var(--red-color);
@@ -334,12 +404,7 @@ input:checked + .toggle:after {
   font-size: 30px;
   font-weight: 700;
 }
-.btn-updateEmp {
-  background-color: var(--secondary) !important;
-}
-.btn-updateEmp:hover {
-  background-color: var(--tertiary) !important;
-}
+
 .empDetails div:first-of-type {
   display: flex;
   flex-direction: column;
@@ -498,42 +563,6 @@ input:checked + .toggle:after {
     padding: 3px 8px;
   }
 
-  /* Button(?) as Button ▼ */
-  /* .lbl-viewForm {
-    display: flex;
-    justify-content: center;
-    background-color: var(--text-color);
-    border-radius: 50px;
-    color: white;
-    font-size: 20px;
-    width: 30px;
-    height: 30px;
-    visibility: visible;
-    cursor: pointer;
-    z-index: 100;
-
-    position: sticky;
-    left: 45%;
-    top: 85%;
-  }
-  .lbl-closeForm {
-    display: flex;
-    justify-content: center;
-    background-color: var(--text-color);
-    border-radius: 50px;
-    color: white;
-    font-size: 20px;
-    width: 30px;
-    height: 30px;
-    visibility: hidden;
-    cursor: pointer;
-    z-index: 100;
-
-    position: sticky;
-    left: 45%;
-    bottom: -20%;
-  } */
-
   .chkbx-viewForm {
     display: none;
   }
@@ -576,17 +605,17 @@ input:checked + .toggle:after {
     width: 100%;
   }
 }
-@media screen and (min-width: 0px) and (max-width: 450px) {
-  /* .input[type="date"] {
+/* @media screen and (min-width: 0px) and (max-width: 450px) {
+  .input[type="date"] {
     width: 5%;
-  } */
-  /* .calendars {
+  }
+  .calendars {
     flex-wrap: wrap;
-  } */
-}
+  }
+} */
 @media (max-width: 842px) {
   .left {
-    width: 100% !important;
+    width: 95% !important;
     height: 30%;
   }
   .sticky-buttons .btn {

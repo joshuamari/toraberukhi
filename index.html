@@ -65,7 +65,7 @@
         </div>
 
         <div class="modal-footer">
-          <button type="button" class="btn btn-cancel bg-[var(--dark)] hover:bg-[var(--dark-200)] text-[var(--white)] hover:text-[var(--white)] ">
+          <button type="button" class="btn btn-cancel">
             Cancel
           </button>
           <button
@@ -159,12 +159,12 @@
         </div>
 
         <div class="modal-footer">
-          <button type="button" class="btn btn-cancel bg-[var(--dark)] hover:bg-[var(--dark-200)] text-[var(--white)] hover:text-[var(--white)] ">
+          <button type="button" class="btn btn-cancel">
             Cancel
           </button>
           <button
             type="button"
-            class="btn bg-[var(--secondary)] hover:bg-[var(--tertiary)] text-[var(--dark)] font-semibold"
+            class="btn btn-editEntry"
             id="btn-saveEntry"
             e-id="0"
           >
@@ -305,12 +305,12 @@
         </div>
 
         <div class="modal-footer">
-          <button type="button" class="btn btn-wh-cancel bg-[var(--dark)] hover:bg-[var(--dark-200)] text-[var(--white)] hover:text-[var(--white)] ">
+          <button type="button" class="btn btn-wh-cancel">
             Cancel
           </button>
           <button
             type="button"
-            class="btn bg-[var(--secondary)] hover:bg-[var(--tertiary)] text-[var(--dark)] font-semibold"
+            class="btn btn-wh-add"
             id="btn-addWorkEntry"
             
           >
@@ -449,12 +449,12 @@
         </div>
 
         <div class="modal-footer">
-          <button type="button" class="btn btn-wh-cancel bg-[var(--dark)] hover:bg-[var(--dark-200)] text-[var(--white)] hover:text-[var(--white)] ">
+          <button type="button" class="btn btn-wh-cancel">
             Cancel
           </button>
           <button
             type="button"
-            class="btn bg-[var(--secondary)] hover:bg-[var(--tertiary)] text-[var(--dark)] font-semibold"
+            class="btn btn-wh-edit"
             id="btn-updateWorkEntry"
             e-wh-id="0"
           >
@@ -499,7 +499,7 @@
         </div>
 
         <div class="modal-footer">
-          <button type="button" class="btn btn-wh-cancel bg-[var(--dark)] hover:bg-[var(--dark-200)] text-[var(--white)] hover:text-[var(--white)] ">
+          <button type="button" class="btn btn-wh-cancel">
             Cancel
           </button>
           <button
@@ -1051,9 +1051,6 @@
           <div class="left pl-0 pr-6 lg:pr-6 pt-0" id="left">
             <label for="check" class="lbl-viewForm">View Dispatch Form</label>
             <input type="checkbox" class="chkbx-viewForm" id="check">
-            
-              <!-- <label for="check" class="lbl-viewForm">▼</label>
-              <input type="checkbox" class="chkbx-viewForm" id="check"> -->
             <div class="viewForm">
 
               <div class="form pl-3">
@@ -1165,8 +1162,6 @@
               </div>
               
             </div>
-              <!-- <label for="check" class="lbl-closeForm">▼</label>
-              <input type="checkbox" class="chkbx-viewForm" id="check"> -->
             <div class="sticky-buttons align-middle pr-5 pt-3 mb-2">
               <div class="count-total-days mb-4">
                 <label for="" class="countlabel col-form-label pl-0 pr-5">Total days:</label>
@@ -1176,8 +1171,8 @@
                   > 0 Day</h5>
               </div>
               <div class="submit-btns flex gap-2">
-                <button class="btn bg-[var(--dark)] hover:bg-[var(--dark-200)] text-[var(--white)] hover:text-[var(--white)] " id="btnClear">Clear</button>
-                <button class="btn btn-dispatch hover:bg-[var(--tertiary)] font-semibold" id="btnApply">
+                <button class="btn btn-clear" id="btnClear">Clear</button>
+                <button class="btn btn-dispatch" id="btnApply">
                   Send Dispatch Request
                 </button>
               </div>
@@ -1406,7 +1401,7 @@
                   <div class="top flex justify-content-between">
                     <div class="title pb-3">Dispatch History to Japan</div>
                     <div>
-                      <button class="btn btn-success bg-[var(--darkest)]" id="btnExport">
+                      <button class="btn btn-success" id="btnExport">
                         Export table
                       </button>
                     </div>
