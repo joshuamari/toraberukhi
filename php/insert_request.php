@@ -77,7 +77,7 @@ if (!empty($_POST['workOrder'])) {
   $workOrder = $_POST['workOrder'];
 } else {
   $msg["isSuccess"] = false;
-  $msg['error'][] = "Word Order";
+  $msg['error'][] = "Work Order";
 }
 
 $project_name = '';

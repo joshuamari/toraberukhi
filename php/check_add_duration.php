@@ -45,17 +45,21 @@ if ($dFrom <= $dTo) {
     $trueDiff = $trueStart->diff($trueEnd)->days;
     $difference = $startYear->diff($endYear)->days;
 
-    if ($difference == 0) {
-        $toPrint["toAdd"] = $difference;
-    } else {
-        $toPrint["toAdd"] = $difference + 1;
-    }
 
-    if ($trueDiff == 0) {
-        $toPrint["difference"] = $trueDiff;
-    } else {
-        $toPrint["difference"] = $trueDiff + 1;
-    }
+    $toPrint["toAdd"] = $difference + 1;
+    $toPrint["difference"] = $trueDiff + 1;
+
+    // if ($difference == 0) {
+    //     $toPrint["toAdd"] = $difference;
+    // } else {
+    //     $toPrint["toAdd"] = $difference + 1;
+    // }
+
+    // if ($trueDiff == 0) {
+    //     $toPrint["difference"] = $trueDiff;
+    // } else {
+    //     $toPrint["difference"] = $trueDiff + 1;
+    // }
 } else {
     $toPrint["toAdd"] = 0;
     $toPrint["difference"] = 0;

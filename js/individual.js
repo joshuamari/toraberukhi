@@ -144,6 +144,7 @@ $(document).on("click", "#btnApply", function () {
 $(document).on("click", ".btn-clear", function () {
   dispatch_days = 0;
   clearInput();
+  clearGroup();
 
   $(".emptyState").removeClass("d-none");
   $(".withContent").addClass("d-none");
@@ -394,7 +395,14 @@ $(document).on("click", "#logoutBtn", function () {
     });
 });
 $(document).on("keydown", "#allowance", function (e) {
-  if (e.which === 38 || e.which === 40 || e.which === 189) {
+  if (
+    e.which === 38 ||
+    e.which === 40 ||
+    e.which === 187 ||
+    e.which === 189 ||
+    e.which === 109 ||
+    e.which === 107
+  ) {
     e.preventDefault();
   }
 });
@@ -408,6 +416,9 @@ $(document).on("keydown", "#allowance", function (e) {
 //   $("#attachmentModal").modal("show");
 // });
 $(document).on("click", "#btnSend", function () {
+  $("#btnSend").prop("disabled", true);
+  console.log("disabling send email btn");
+  // $('#btnSend').addClass("bg-[var(--secondary)] hover:bg-[var(--tertiary)] font-semibold rounded-md px-3 py-1  text-[var(--dark)]")
   insertDispatch();
 });
 
@@ -417,9 +428,6 @@ $(".lbl-viewForm").click(function () {
       ? "View Dispatch Form"
       : "Hide Dispatch Form"
   );
-  // $(this).html($(this).html() == `▼` ? `▲` : `▼`);
-
-  // $(".sample").addClass("hidden");
 
   $("#left").toggleClass("changeSize");
   $(".sticky-buttons").toggleClass("appear");
@@ -590,6 +598,7 @@ function fillGroups(grps) {
   const groupIDS = grps.map((obj) => obj.id);
   var grpSelect = $("#grpSel");
   grpSelect.html(`<option value=${groupIDS.toString()}>Select Group</option>`);
+  // grpSelect.html(`<option value='0' hidden>Select Group</option>`);
   $.each(grps, function (index, item) {
     var option = $("<option>")
       .attr("value", item.id)
@@ -664,7 +673,7 @@ function countDays(strt, end) {
 }
 function displayDays(cdays) {
   if (cdays.difference === 1) {
-    $("#daysCount").text(" 1 day.");
+    $("#daysCount").text(" 1 day");
   } else {
     $("#daysCount").text(`${cdays.difference} days`);
   }
@@ -906,6 +915,7 @@ function getDispatchHistory() {
       },
       dataType: "json",
       success: function (response) {
+        // console.log("getDHistory: ", response);
         const dList = response;
         resolve(dList);
       },
@@ -999,7 +1009,9 @@ function getDispatchDays() {
       data: {
         empID: empID,
       },
+      dataType: "json",
       success: function (response) {
+        // console.log(response);
         const dDays = response;
         resolve(dDays);
       },
@@ -1066,18 +1078,9 @@ function colorBar(dd) {
   }
 }
 function removeOutline() {
-  $("#edit-companyName").removeClass("bg-red-100  border-red-400");
-  $("#edit-StartMonthYear").removeClass("bg-red-100  border-red-400");
-  $("#edit-EndMonthYear").removeClass("bg-red-100  border-red-400");
-  $("#edit-companyBusiness").removeClass("bg-red-100  border-red-400");
-  $("#edit-businessContent").removeClass("bg-red-100  border-red-400");
-  $("#edit-workLocation").removeClass("bg-red-100  border-red-400");
-  $("#addcompanyName").removeClass("bg-red-100  border-red-400");
-  $("#addStartMonthYear").removeClass("bg-red-100  border-red-400");
-  $("#addEndMonthYear").removeClass("bg-red-100  border-red-400");
-  $("#addcompanyBusiness").removeClass("bg-red-100  border-red-400");
-  $("#addbusinessContent").removeClass("bg-red-100  border-red-400");
-  $("#addworkLocation").removeClass("bg-red-100  border-red-400");
+  $(
+    "#edit-companyName, #edit-StartMonthYear, #edit-EndMonthYear, #edit-companyBusiness, #edit-businessContent, #edit-workLocation, #addcompanyName, #addStartMonthYear, #addEndMonthYear, #addcompanyBusiness, #addbusinessContent, #addworkLocation"
+  ).removeClass("bg-red-100  border-red-400");
 }
 function checkDispatch() {
   const reqDept = $("#reqDeptInput").val();
@@ -1204,6 +1207,7 @@ function insertDispatch() {
     },
     dataType: "json",
     success: function (response) {
+      console.log(response);
       const isSuccess = response.isSuccess;
       if (!isSuccess) {
         $("#attachmentModal .btn-close").click();
@@ -1216,27 +1220,32 @@ function insertDispatch() {
             fillDispatchHistory(dHistory);
             dispatch_days = dd;
             fillYearly(yrl);
-            $("#reqDeptInput").val("");
-            $("#reqNameInput").val("");
-            $("#grpSel").val(0);
-            $("#empSel").val(0);
-            $("#startDate").val("");
-            $("#endDate").val("");
-            $("#daysCount").text("0 Day");
-            $("#locSel").val(0);
-            $("#specLocInput").val("");
-            $("#inviteSel").val(0);
-            $("#workOrder").val("");
-            $("#projName").val("");
-            $("#allowance").val("0");
-            to_add = 0;
-            countTotal();
+            // $("#reqDeptInput").val("");
+            // $("#reqNameInput").val("");
+            // $("#grpSel").val(0);
+            // $("#empSel").val(0);
+            // $("#startDate").val("");
+            // $("#endDate").val("");
+            // $("#daysCount").text("0 Day");
+            // $("#locSel").val(0);
+            // $("#specLocInput").val("");
+            // $("#inviteSel").val(0);
+            // $("#workOrder").val("");
+            // $("#projName").val("");
+            // $("#allowance").val("0");
+            // $("#siteDispatch").prop("checked", false);
+            // to_add = 0;
+            clearInput();
+            // countTotal();
             $("#attachmentModal .btn-close").click();
             showToast("success", "Successfully added a dispatch entry.");
+            $("#btnSend").prop("disabled", false);
+            console.log("enabling send email btn");
             toggleLoadingAnimation(false);
           })
           .catch((error) => {
             $("#attachmentModal .btn-close").click();
+            $("#btnSend").prop("disabled", false);
             toggleLoadingAnimation(false);
             alert(`${error}`);
           });
@@ -1248,7 +1257,8 @@ function insertDispatch() {
       } else if (xhr.status === 500) {
         alert("Internal Server Error: There was a server error.");
       } else {
-        alert("An unspecified error occurred while adding dispatch data.");
+        console.log(error);
+        alert(error);
       }
     },
   });
@@ -1258,14 +1268,18 @@ function clearInput() {
     "#reqDeptInput, #reqNameInput, #grpSel, #empSel, #startDate, #endDate, #locSel, #specLocInput, #inviteSel, #workOrder, #projName, #allowance"
   ).removeClass("bg-red-100  border-red-400");
   $(".errTxt").remove();
-  $("#grpSel, #empSel, #locSel, #inviteSel").val(0);
+  $("#locSel, #inviteSel").val(0);
   $(
     "#reqDeptInput, #reqNameInput, #startDate, #endDate, #specLocInput, #workOrder, #projName"
   ).val("");
   $("#allowance").val("0");
+  $("#siteDispatch").prop("checked", false);
   to_add = 0;
   $("#daysCount").text("0 Day");
-  $("#empSel").change();
+}
+function clearGroup() {
+  $("#grpSel").val($("#grpSel option:first").val());
+  $("#grpSel").change();
 }
 function clearAddWorkInputs() {
   $(
@@ -1420,6 +1434,12 @@ function addWorkHistory() {
   }
   if (!startMonthYear) {
     $("#addStartMonthYear").addClass("bg-red-100  border-red-400");
+    $(".dateError").removeClass("hidden");
+    $(".dateError").addClass("block flex items-center gap-1 text-red-600");
+    errcount++;
+  }
+  if (!endMonthYear) {
+    $("#addEndMonthYear").addClass("bg-red-100  border-red-400");
     $(".dateError").removeClass("hidden");
     $(".dateError").addClass("block flex items-center gap-1 text-red-600");
     errcount++;
@@ -1612,6 +1632,12 @@ function saveEditWorkHistEntry() {
     $(".dateError").addClass("block flex items-center gap-1 text-red-600");
     errcount++;
   }
+  if (!endMonthYear) {
+    $("#edit-EndMonthYear").addClass("bg-red-100  border-red-400");
+    $(".dateError").removeClass("hidden");
+    $(".dateError").addClass("block flex items-center gap-1 text-red-600");
+    errcount++;
+  }
   if (!compBusiness) {
     $("#edit-companyBusiness").addClass("bg-red-100  border-red-400");
     $(".BusiError").removeClass("hidden");
@@ -1765,6 +1791,7 @@ function getYearly() {
       },
       dataType: "json",
       success: function (response) {
+        // console.log(response);
         const yrly = response;
         resolve(yrly);
       },

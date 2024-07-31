@@ -48,6 +48,9 @@ try {
         $details['end'] = date("d M Y", strtotime($details['dispatch_to']));
         $details['date_request'] = date("d M Y", strtotime($details['date_requested']));
         $details['location'] = getLocationName($details['location_id']);
+        $details['location_id'] = (int)$details['location_id'];
+        $details['invitation_id'] = (int)$details['invitation_id'];
+        $details['site_dispatch'] = (int)$details['site_dispatch'];
         // $details['work_history'] = getWorkHistory($details['emp_number']);
         $result['isSuccess'] = TRUE;
         $result['message'] = 'Successfully fetched data';
