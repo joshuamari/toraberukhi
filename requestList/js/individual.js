@@ -242,7 +242,6 @@ checkAccess()
             groupList = grps;
             fillGroups(groupList);
             reqList = reqs["data"];
-            console.log(reqList);
             cardData = counts;
             fillCards();
             $(".tab")[0].click();

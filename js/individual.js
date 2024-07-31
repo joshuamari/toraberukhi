@@ -143,6 +143,7 @@ $(document).on("click", "#btnApply", function () {
 $(document).on("click", ".btn-clear", function () {
   dispatch_days = 0;
   clearInput();
+  clearGroup();
 
   $(".emptyState").removeClass("d-none");
   $(".withContent").addClass("d-none");
@@ -671,7 +672,7 @@ function countDays(strt, end) {
 }
 function displayDays(cdays) {
   if (cdays.difference === 1) {
-    $("#daysCount").text(" 1 day.");
+    $("#daysCount").text(" 1 day");
   } else {
     $("#daysCount").text(`${cdays.difference} days`);
   }
@@ -1218,22 +1219,23 @@ function insertDispatch() {
             fillDispatchHistory(dHistory);
             dispatch_days = dd;
             fillYearly(yrl);
-            $("#reqDeptInput").val("");
-            $("#reqNameInput").val("");
-            $("#grpSel").val(0);
-            $("#empSel").val(0);
-            $("#startDate").val("");
-            $("#endDate").val("");
-            $("#daysCount").text("0 Day");
-            $("#locSel").val(0);
-            $("#specLocInput").val("");
-            $("#inviteSel").val(0);
-            $("#workOrder").val("");
-            $("#projName").val("");
-            $("#allowance").val("0");
-            $("#siteDispatch").prop("checked", false);
-            to_add = 0;
-            countTotal();
+            // $("#reqDeptInput").val("");
+            // $("#reqNameInput").val("");
+            // $("#grpSel").val(0);
+            // $("#empSel").val(0);
+            // $("#startDate").val("");
+            // $("#endDate").val("");
+            // $("#daysCount").text("0 Day");
+            // $("#locSel").val(0);
+            // $("#specLocInput").val("");
+            // $("#inviteSel").val(0);
+            // $("#workOrder").val("");
+            // $("#projName").val("");
+            // $("#allowance").val("0");
+            // $("#siteDispatch").prop("checked", false);
+            // to_add = 0;
+            clearInput();
+            // countTotal();
             $("#attachmentModal .btn-close").click();
             showToast("success", "Successfully added a dispatch entry.");
             $("#btnSend").prop("disabled", false);
@@ -1265,7 +1267,7 @@ function clearInput() {
     "#reqDeptInput, #reqNameInput, #grpSel, #empSel, #startDate, #endDate, #locSel, #specLocInput, #inviteSel, #workOrder, #projName, #allowance"
   ).removeClass("bg-red-100  border-red-400");
   $(".errTxt").remove();
-  $("#grpSel, #empSel, #locSel, #inviteSel").val(0);
+  $("#locSel, #inviteSel").val(0);
   $(
     "#reqDeptInput, #reqNameInput, #startDate, #endDate, #specLocInput, #workOrder, #projName"
   ).val("");
@@ -1273,7 +1275,10 @@ function clearInput() {
   $("#siteDispatch").prop("checked", false);
   to_add = 0;
   $("#daysCount").text("0 Day");
-  $("#empSel").change();
+}
+function clearGroup() {
+  $("#grpSel").val($("#grpSel option:first").val());
+  $("#grpSel").change();
 }
 function clearAddWorkInputs() {
   $(
