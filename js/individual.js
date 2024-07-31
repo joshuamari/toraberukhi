@@ -78,6 +78,7 @@ $(document).on("click", ".btn-wh-close", function () {
   $("#btn-updateWorkEntry").attr("e-wh-id", 0);
   $("small").removeClass("block");
   $("small").addClass("hidden");
+  clearAddWorkInputs();
   removeOutline();
 });
 $(document).on("click", ".btn-wh-cancel", function () {
@@ -400,7 +401,9 @@ $(document).on("keydown", "#allowance", function (e) {
     e.which === 187 ||
     e.which === 189 ||
     e.which === 109 ||
-    e.which === 107
+    e.which === 107 ||
+    e.key === "e" ||
+    e.key === "E"
   ) {
     e.preventDefault();
   }
@@ -1437,12 +1440,6 @@ function addWorkHistory() {
     $(".dateError").addClass("block flex items-center gap-1 text-red-600");
     errcount++;
   }
-  if (!endMonthYear) {
-    $("#addEndMonthYear").addClass("bg-red-100  border-red-400");
-    $(".dateError").removeClass("hidden");
-    $(".dateError").addClass("block flex items-center gap-1 text-red-600");
-    errcount++;
-  }
   if (!comp_business) {
     $("#addcompanyBusiness").addClass("bg-red-100  border-red-400");
     $(".BusiError").removeClass("hidden");
@@ -1461,6 +1458,7 @@ function addWorkHistory() {
     $(".LocError").addClass("block flex items-center gap-1 text-red-600");
     errcount++;
   }
+  $(".dateError").text("Please Complete the Fields");
   return new Promise((resolve, reject) => {
     if (endMonthYear && endMonthYear < startMonthYear) {
       $("#addEndMonthYear").val("");
@@ -1473,9 +1471,11 @@ function addWorkHistory() {
         "Invalid Date. End date must not be earlier than Start date."
       );
       reject("Invalid Date. End date must not be earlier than Start date.");
+      return;
     }
     if (errcount > 0) {
       reject("Complete all fields.");
+      return;
     }
     $.ajax({
       type: "POST",
@@ -1631,12 +1631,6 @@ function saveEditWorkHistEntry() {
     $(".dateError").addClass("block flex items-center gap-1 text-red-600");
     errcount++;
   }
-  if (!endMonthYear) {
-    $("#edit-EndMonthYear").addClass("bg-red-100  border-red-400");
-    $(".dateError").removeClass("hidden");
-    $(".dateError").addClass("block flex items-center gap-1 text-red-600");
-    errcount++;
-  }
   if (!compBusiness) {
     $("#edit-companyBusiness").addClass("bg-red-100  border-red-400");
     $(".BusiError").removeClass("hidden");
@@ -1655,22 +1649,24 @@ function saveEditWorkHistEntry() {
     $(".LocError").addClass("block flex items-center gap-1 text-red-600");
     errcount++;
   }
-
+  $(".dateError").text("Please Complete the Fields");
   return new Promise((resolve, reject) => {
     if (endMonthYear && endMonthYear < startMonthYear) {
-      $("#addEndMonthYear").val("");
-      $("#addStartMonthYear").val("");
-      $("#addEndMonthYear").addClass("bg-red-100  border-red-400");
-      $("#addStartMonthYear").addClass("bg-red-100  border-red-400");
+      $("#edit-EndMonthYear").val("");
+      $("#edit-StartMonthYear").val("");
+      $("#edit-EndMonthYear").addClass("bg-red-100  border-red-400");
+      $("#edit-StartMonthYear").addClass("bg-red-100  border-red-400");
       $(".dateError").removeClass("hidden");
       $(".dateError").addClass("block flex items-center gap-1 text-red-600");
       $(".dateError").text(
         "Invalid Date. End date must not be earlier than Start date."
       );
       reject("Invalid Date. End date must not be earlier than Start date.");
+      return;
     }
     if (errcount > 0) {
       reject("Complete all fields");
+      return;
     }
     $.ajax({
       type: "POST",
