@@ -605,15 +605,25 @@ function fillCards() {
 
   var total = cardData.data.total;
 
-  $("#cardPending, #pendingTab").text(pending);
+  if (pending != 0) {
+    $("#tab-2").append(`
+         <small
+                      class="rounded-full w-[14px] h-[14px] bg-[var(--dark)] text-white text-[8px] flex items-center justify-content-center font-semibold" >${pending}</small>
+      `);
+  }
+  $("#cardPending").text(pending);
   $("#cardAccepted").text(accepted);
-  $("#cardTodayAccepted").html(
-    `<small class="font-semibold" >+${todayAccept} today</small>`
-  );
+  if (todayAccept != 0) {
+    $("#cardTodayAccepted").html(
+      `<small class="font-semibold" >+${todayAccept} today</small>`
+    );
+  }
   $("#cardCancelled").text(cancelled);
-  $("#cardTodayTotal").html(
-    `<small class="font-semibold" >+${todayTotal} today</small>`
-  );
+  if (todayTotal != 0) {
+    $("#cardTodayTotal").html(
+      `<small class="font-semibold" >+${todayTotal} today</small>`
+    );
+  }
   $("#cardTotal").text(total);
 }
 
