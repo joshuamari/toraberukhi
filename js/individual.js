@@ -138,6 +138,7 @@ $(document).on("change", "#empSel", function () {
   }
 });
 $(document).on("click", "#btnApply", function () {
+  toggleLoadingAnimation(true);
   checkDispatch();
 });
 $(document).on("click", ".btn-clear", function () {
@@ -1145,7 +1146,7 @@ function checkDispatch() {
   }
   if (ctr > 0) {
     $(".error-msg").html(`
-    <div class="errTxt mb-3 flex items-center gap-1">
+    <div class="errTxt  flex items-center gap-1">
     <i class='bx bx-info-circle text-red-600'></i>
     <p class="text-red-600">Please complete all fields.</p>
     </div>`);
@@ -1828,22 +1829,22 @@ function arrangeName(nme) {
 function toggleLoadingAnimation(show) {
   if (show) {
     $("#appendHere").append(`
-          <div class="top-0 backdrop-blur-sm bg-gray/30 h-full flex justify-center items-center flex-col pb-5 absolute w-full" id="loadingAnimation">
-              <div class="relative">
-                  <div class="grayscale-[70%] w-[400px]">
-                      <img src="images/Frame 1.gif" alt="loader" class="w-full" />
-                  </div>
-                  <div class="absolute bottom-0 flex-col w-full text-center flex justify-center items-center gap-2">
-                      <div class="title fw-semibold fs-5">
-                          Loading data . . .
-                      </div>
-                      <div class="text">
-                          Please wait while we fetch the employee details.
-                      </div>
-                  </div>
-              </div>
-          </div>
-      `);
+        <div class="bottom-0 xl:top-0 right-0 xl:right-[20px] backdrop-blur-sm bg-gray/30 h-[calc(100%-280px)] xl:h-full  justify-center items-center flex-col pb-5 absolute w-full lg:w-full xl:w-[calc(100%-460px)]   flex" id="loadingAnimation">
+            <div class="relative">
+                <div class="grayscale-[70%] w-[400px]">
+                    <img src="images/Frame 1.gif" alt="loader" class="w-full" />
+                </div>
+                <div class="absolute bottom-0 flex-col w-full text-center flex justify-center items-center gap-2">
+                    <div class="title fw-semibold fs-5">
+                        Loading data . . .
+                    </div>
+                    <div class="text">
+                        Please wait while we fetch the employee details.
+                    </div>
+                </div>
+            </div>
+        </div>
+    `);
   } else {
     $("#loadingAnimation").remove();
   }
