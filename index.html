@@ -1038,7 +1038,7 @@
         </nav>
       </div>
       <div class="content h-screen">
-        <div class="main flex  h-full">
+        <div class="main flex relative  h-full">
           <div class="flex flex-col p-[14px] md:p-8 h-full w-full">
             <div class="pageTitle w-100 gap-3 d-flex">
               <div id="menu">
@@ -1046,14 +1046,14 @@
               </div>
               <h1 class="fw-semibold m-0">Dispatch Request by KHI</h1>
             </div>
-        <div class="main w-100 d-flex h-[calc(100%-30px)]">
+        <div class="main w-100 d-flex h-[calc(100%-30px)]"id="appendHere">
         
           <div class="left pl-0 pr-6 lg:pr-6 pt-0" id="left">
             <label for="check" class="lbl-viewForm">View Dispatch Form</label>
             <input type="checkbox" class="chkbx-viewForm" id="check">
             <div class="viewForm">
 
-              <div class="form pl-3">
+              <div class="form ">
 
                 <div class="mb-1 row">
                   <label for="" class="col-form-label pl-0">Group:</label>
@@ -1135,9 +1135,9 @@
                     <input type="text" name="" class="input" id="projName" placeholder="Project Name">
                 </div>
 
-                <div class="mb-1 row">
-                  <label for="" class="col-sm-9 col-form-label pl-0">Site Dispatch Training Application</label>
-                  <div class="col-sm-3 d-flex justify-center pt-2">
+                <div class="mb-1 flex gap-2 items-center pt-1 flex-row-reverse" style="justify-content: start;">
+                  <label for="" class="">Site Dispatch Training Application</label>
+                  <div class=" d-flex justify-center ">
                       <!-- <input type="checkbox" name="" class="d-flex float-right align-items-center h-100 mr-5" id="siteDispatch"> -->
                         <input id="siteDispatch" type="checkbox"/><label for="siteDispatch" class="toggle"></label>
                   </div>
@@ -1181,7 +1181,7 @@
           </div>
           
           
-          <div class="right h-full relative" id="appendHere">
+          <div class="right h-full relative" >
             <div class="d-flex withContent d-none flex-column gap-3 h-full">
               <div
                 class="empDetails gap-3 flex justify-content-between align-items-center"
