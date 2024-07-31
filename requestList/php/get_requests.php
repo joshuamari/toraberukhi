@@ -45,7 +45,7 @@ try {
             $output = array();
             $passValidity = false;
             $visaValidity = false;
-            $output["req_id"] = $req['request_id'];
+            $output["req_id"] = (int)$req['request_id'];
             $empnum = $req['emp_number'];
             $output["emp_name"] = getName($empnum);
             $output["emp_number"] = $req['emp_number'];
