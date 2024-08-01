@@ -78,6 +78,7 @@ $(document).on("click", ".btn-wh-close", function () {
   $("#btn-updateWorkEntry").attr("e-wh-id", 0);
   $("small").removeClass("block");
   $("small").addClass("hidden");
+  clearAddWorkInputs();
   removeOutline();
 });
 $(document).on("click", ".btn-wh-cancel", function () {
@@ -400,7 +401,9 @@ $(document).on("keydown", "#allowance", function (e) {
     e.which === 187 ||
     e.which === 189 ||
     e.which === 109 ||
-    e.which === 107
+    e.which === 107 ||
+    e.key === "e" ||
+    e.key === "E"
   ) {
     e.preventDefault();
   }
@@ -418,7 +421,36 @@ $(document).on("click", "#btnSend", function () {
   $("#btnSend").prop("disabled", true);
   console.log("disabling send email btn");
   // $('#btnSend').addClass("bg-[var(--secondary)] hover:bg-[var(--tertiary)] font-semibold rounded-md px-3 py-1  text-[var(--dark)]")
-  insertDispatch();
+  insertDispatch()
+    .then((res) => {
+      const isSuccess = res.isSuccess;
+      if (!isSuccess) {
+        showToast("error", `${res.error}`);
+      } else {
+        Promise.all([getDispatchHistory(), getDispatchDays(), getYearly()])
+          .then(([dlst, dd, yrl]) => {
+            dHistory = dlst;
+            fillDispatchHistory(dHistory);
+            dispatch_days = dd;
+            fillYearly(yrl);
+            clearInput();
+            showToast("success", "Successfully added a dispatch entry.");
+            console.log("enabling send email btn");
+          })
+          .catch((error) => {
+            alert(`${error}`);
+          });
+      }
+      $("#attachmentModal .btn-close").click();
+      $("#btnSend").prop("disabled", false);
+      toggleLoadingAnimation(false);
+    })
+    .catch((error) => {
+      $("#attachmentModal .btn-close").click();
+      $("#btnSend").prop("disabled", false);
+      toggleLoadingAnimation(false);
+      alert(`${error}`);
+    });
 });
 $(document).on("click", ".lbl-viewForm", function () {
   $("#left").toggleClass("changeSize");
@@ -1207,18 +1239,16 @@ function insertDispatch() {
   const allowance = $("#allowance").val();
   const siteDispatch = $("#siteDispatch").is(":checked");
 
-  $("#buttonHere").html(`
-     <button class="btn-send disabled:bg-[var(--secondary-100)] inline-flex items-center" disabled>
-            <svg class="animate-spin  mr-3 h-5 w-5 " xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-      </svg>
-      Sending Request . . .
-     </button>
-    `);
-
   toggleLoadingAnimation(true);
-
+  $("#buttonHere").html(`
+    <button class="btn-send disabled:bg-[var(--secondary-100)] inline-flex items-center" disabled>
+           <svg class="animate-spin  mr-3 h-5 w-5 " xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+     </svg>
+     Sending Request . . .
+    </button>
+   `);
   $.ajax({
     type: "POST",
     url: "php/insert_request.php",
@@ -1254,9 +1284,6 @@ function insertDispatch() {
             fillDispatchHistory(dHistory);
             dispatch_days = dd;
             fillYearly(yrl);
-            $("#buttonHere").html(`
-              <button class="btn-send" id="btnSend">Send Dispatch Request</button>
-             `);
             // $("#reqDeptInput").val("");
             // $("#reqNameInput").val("");
             // $("#grpSel").val(0);
@@ -1279,14 +1306,17 @@ function insertDispatch() {
             $("#btnSend").prop("disabled", false);
             console.log("enabling send email btn");
             toggleLoadingAnimation(false);
+            $("#buttonHere").html(`
+              <button class="btn-send" id="btnSend">Send Dispatch Request</button>
+             `);
           })
           .catch((error) => {
             $("#attachmentModal .btn-close").click();
             $("#btnSend").prop("disabled", false);
+            toggleLoadingAnimation(false);
             $("#buttonHere").html(`
               <button class="btn-send" id="btnSend">Send Dispatch Request</button>
              `);
-            toggleLoadingAnimation(false);
             alert(`${error}`);
           });
       }
@@ -1478,12 +1508,6 @@ function addWorkHistory() {
     $(".dateError").addClass("block flex items-center gap-1 text-red-600");
     errcount++;
   }
-  if (!endMonthYear) {
-    $("#addEndMonthYear").addClass("bg-red-100  border-red-400");
-    $(".dateError").removeClass("hidden");
-    $(".dateError").addClass("block flex items-center gap-1 text-red-600");
-    errcount++;
-  }
   if (!comp_business) {
     $("#addcompanyBusiness").addClass("bg-red-100  border-red-400");
     $(".BusiError").removeClass("hidden");
@@ -1502,6 +1526,7 @@ function addWorkHistory() {
     $(".LocError").addClass("block flex items-center gap-1 text-red-600");
     errcount++;
   }
+  $(".dateError").text("Please Complete the Fields");
   return new Promise((resolve, reject) => {
     if (endMonthYear && endMonthYear < startMonthYear) {
       $("#addEndMonthYear").val("");
@@ -1514,9 +1539,11 @@ function addWorkHistory() {
         "Invalid Date. End date must not be earlier than Start date."
       );
       reject("Invalid Date. End date must not be earlier than Start date.");
+      return;
     }
     if (errcount > 0) {
       reject("Complete all fields.");
+      return;
     }
     $.ajax({
       type: "POST",
@@ -1672,12 +1699,6 @@ function saveEditWorkHistEntry() {
     $(".dateError").addClass("block flex items-center gap-1 text-red-600");
     errcount++;
   }
-  if (!endMonthYear) {
-    $("#edit-EndMonthYear").addClass("bg-red-100  border-red-400");
-    $(".dateError").removeClass("hidden");
-    $(".dateError").addClass("block flex items-center gap-1 text-red-600");
-    errcount++;
-  }
   if (!compBusiness) {
     $("#edit-companyBusiness").addClass("bg-red-100  border-red-400");
     $(".BusiError").removeClass("hidden");
@@ -1696,22 +1717,24 @@ function saveEditWorkHistEntry() {
     $(".LocError").addClass("block flex items-center gap-1 text-red-600");
     errcount++;
   }
-
+  $(".dateError").text("Please Complete the Fields");
   return new Promise((resolve, reject) => {
     if (endMonthYear && endMonthYear < startMonthYear) {
-      $("#addEndMonthYear").val("");
-      $("#addStartMonthYear").val("");
-      $("#addEndMonthYear").addClass("bg-red-100  border-red-400");
-      $("#addStartMonthYear").addClass("bg-red-100  border-red-400");
+      $("#edit-EndMonthYear").val("");
+      $("#edit-StartMonthYear").val("");
+      $("#edit-EndMonthYear").addClass("bg-red-100  border-red-400");
+      $("#edit-StartMonthYear").addClass("bg-red-100  border-red-400");
       $(".dateError").removeClass("hidden");
       $(".dateError").addClass("block flex items-center gap-1 text-red-600");
       $(".dateError").text(
         "Invalid Date. End date must not be earlier than Start date."
       );
       reject("Invalid Date. End date must not be earlier than Start date.");
+      return;
     }
     if (errcount > 0) {
       reject("Complete all fields");
+      return;
     }
     $.ajax({
       type: "POST",

@@ -9,7 +9,7 @@ session_start();
 
 #region set timezone
 date_default_timezone_set('Asia/Manila');
-$groups = array();
+$groups = 0;
 #endregion
 
 #region Initialize Variable

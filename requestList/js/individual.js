@@ -637,7 +637,7 @@ function fillOpenModal(trID) {
   const endDate = req.to;
   const reqName = req.requester_name;
   const reqDate = req.req_date;
-  const status = req.status;
+  const status = parseInt(req.status);
   const location = req.specific_loc;
   const country = req.location;
   const duration = req.duration;
@@ -681,7 +681,7 @@ function fillOpenModal(trID) {
        <p>day in total</p>`
     );
   }
-  if (status === null) {
+  if (status === null || isNaN(status)) {
     $("#modifyFooter").addClass("d-none");
   } else {
     $("#modifyFooter").removeClass("d-none");
@@ -696,11 +696,15 @@ function formatDate(date) {
 }
 function formatStatus(status) {
   let statusString =
-    status === null ? "pending" : status === 1 ? "accepted" : "cancelled";
+    isNaN(status) || status === null
+      ? "pending"
+      : status === 1
+      ? "accepted"
+      : "cancelled";
   $("#titleModal").html(
     `  Dispatch Request<span class="status lg ${statusString} ms-3">${statusString}</span>`
   );
-  if (status !== null) {
+  if (!isNaN(status) || status === null) {
     $("#modiLabel").text(`${statusString}`);
   }
 }
