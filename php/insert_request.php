@@ -77,7 +77,7 @@ if (!empty($_POST['workOrder'])) {
   $workOrder = $_POST['workOrder'];
 } else {
   $msg["isSuccess"] = false;
-  $msg['error'][] = "Work Order";
+  $msg['error'][] = "Word Order";
 }
 
 $project_name = '';
@@ -149,7 +149,7 @@ if (checkOverlap($empNumber, $newRange)) {
 #endregion
 
 # for conflicting schedule in request list
-$checkConflict = "SELECT COUNT(*) FROM `request_list` WHERE `emp_number` = :empNumber AND ((`dispatch_from` BETWEEN :dateFrom AND :dateTo OR `dispatch_to` BETWEEN :dateFrom AND :dateTo) OR (:dateFrom BETWEEN `dispatch_from` AND `dispatch_to` OR :dateTo BETWEEN `dispatch_from` AND `dispatch_to`))";
+$checkConflict = "SELECT COUNT(*) FROM `request_list` WHERE `emp_number` = :empNumber AND (((`dispatch_from` BETWEEN :dateFrom AND :dateTo OR `dispatch_to` BETWEEN :dateFrom AND :dateTo) OR (:dateFrom BETWEEN `dispatch_from` AND `dispatch_to` OR :dateTo BETWEEN `dispatch_from` AND `dispatch_to`)) AND `request_status` IS NULL)";
 $checkConflictStmt = $connpcs->prepare($checkConflict);
 $checkConflictStmt->execute([":empNumber" => "$empNumber", ":dateFrom" => "$dateFrom", ":dateTo" => "$dateTo"]);
 $checkCount = $checkConflictStmt->fetchColumn();
