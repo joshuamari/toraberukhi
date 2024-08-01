@@ -55,7 +55,7 @@
         <div class="modal-body">
           <p class="mb-2">
             Are you sure you want to delete
-            <span class="fw-semibold" id="selectedEmp"></span>'s Japan Dispatch
+            <span class="fw-semibold selectedEmp" id=""></span>'s Japan Dispatch
             entry
             <span class="fw-semibold"
               >no. <span id="storeId" del-id="0"></span
@@ -490,7 +490,7 @@
         <div class="modal-body">
           <p class="mb-2">
             Are you sure you want to delete
-            <span class="fw-semibold" id="selectedEmp"></span>'s Work History Entry
+            <span class="fw-semibold selectedEmp" id=""></span>'s Work History Entry
             <span class="fw-semibold"
               >no. <span id="storeWorkId" del-work-id="0"></span
             ></span>
@@ -518,15 +518,16 @@
 
   <div class="modal fade" id="attachmentModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
   aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered modal-xl">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
     <div class="modal-content">
       <div class="  modal-header border-0 ">
         <h1 class="modal-title text-[18px]" id="titleModal">Review Request for Dispatch File</h1>
-        <button type="button" class="btn-close text-[14px]  m-1 w-0 h-0  w-auto h-auto" data-bs-dismiss="modal"
-          aria-label="Close"></button>
+        <!-- <button type="button" class="btn-close text-[14px]  m-1 w-0 h-0  w-auto h-auto" data-bs-dismiss="modal"
+          aria-label="Close"></button> -->
       </div>
-      <div class="modal-body  flex items-center justify-content-center bg-[var(--gray)]">
-        <div class="w-[210mm] h-[297mm] min-w-[210mm] min-h-[297mm] bg-[#fff] py-[7mm] ps-[15mm] pe-[7mm] my-[-37mm]" id="toPrint" style="transform: scale(0.75);">
+      <div class="modal-body flex-col flex items-center justify-content-center bg-[var(--gray)]">
+        
+        <div class="w-[210mm] h-[297mm] min-w-[210mm] min-h-[297mm] bg-[#fff] py-[7mm] ps-[15mm] pe-[7mm] my-[-50mm] gap-2" id="toPrint" style="transform: scale(0.65);">
           <div class="top flex gap-[28px] mb-2">
             <img src="./images/kawasakilOGO.png" alt="kawasakilOGO" class="w-[250px] h-auto">
             <div class="flex flex-col justify-content-between items-start">
@@ -817,11 +818,17 @@
 
 
         </div>
+        <div class="flex h-full px-3">
+          <p class="" style="font-family: 'Poppins',sans-serif;">This file is generated based on your input.Please review if everything is correct, click the "Submit Request" button to finalize your request. If changes are needed, click "Back" button and edit your information before submitting.</p>
+        </div>
       </div>
       <div class="modal-footer" id="buttonHere">
        
-          
-          <button class="btn-send" id="btnSend">Send Dispatch Request</button>
+        <button type="button" data-bs-dismiss="modal"
+        aria-label="Close" class="btn bg-[var(--dark)] hover:bg-[var(--dark-200)] text-[var(--white)]" id="btnBack">
+          Back
+        </button>
+          <button class="btn-send btn" id="btnSend">Submit Request</button>
        
         
       </div>
@@ -1051,7 +1058,7 @@
         <div class="main w-100 d-flex pb-[14px] lg:pb-8 pt-0 h-[calc(100%-57px)]"id="appendHere">
         
           <div class="left px-[14px] lg:px-8 pt-0 " id="left">
-            <small class="text-[var(--gray-text)] text-[12px]">To send a dispatch request to KDT, please fill up the form below.</small>
+            <small class=" text-[12px]">To send a dispatch request to KDT, please fill up the form below.</small>
             <div class="viewForm mt-2">
 
               <div class="form ">
@@ -1406,13 +1413,15 @@
                 </div>
                 <div class="dispatch-hist p-3 bg-white rounded-lg h-full shadow-sm xl:pb-0">
                   <div class="top flex justify-content-between">
-                    <div class="title pb-3">Dispatch History to Japan</div>
+                    <h5 class="title text-[var(--dark)]">Dispatch History to Japan</h5>
+                    
                     <div>
                       <button class="btn btn-success" id="btnExport">
                         Export table
                       </button>
                     </div>
                   </div>
+                  <p class=" normal-case text-[12px]  pb-3">View records of your members dispatches to Japan.</p>
                   <div class="table-cont overflow-auto min-h-[200px]">
                     <table class="table" id="histTable">
                       <thead class="sticky top-0 bg-gray-200">
@@ -1509,7 +1518,10 @@
                 </div>
                 <div class="work-hist h-full p-3 bg-white rounded-lg shadow-sm xl:pb-0">
                   <div class="top flex justify-content-between">
-                    <div class="title pb-3">Work History</div>
+                    <div class="flex flex-col gap-1 pb-3">
+                      <h5 class=" title text-[var(--dark)]">Work History</h5>
+                    <p class="normal-case text-[12px] ">Manage your members Work details and history.</p> </div>
+
                     <!-- <div>
                       <button class="btn btn-success bg-[var(--darkest)]" id="btnExportss">
                         Export table
