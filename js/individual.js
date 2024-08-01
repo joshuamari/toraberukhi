@@ -101,6 +101,8 @@ $(document).on("change", ".ddates", function () {
     });
 });
 $(document).on("change", "#empSel", function () {
+  var emp = $("#empSel option:selected").text();
+  $(".selectedEmp").text(emp);
   toggleLoadingAnimation(true);
   Promise.all([
     getPassport(),
@@ -152,11 +154,10 @@ $(document).on("click", ".btn-clear", function () {
 
 $(document).on("click", ".btn-delete", function () {
   var num = $(this).closest("tr").find("td:first-of-type").html();
-  var emp = $("#empDetails__name").text();
+
   var trID = $(this).closest("tr").attr("d-id");
   $("#storeId").html(num);
   $("#storeId").attr("del-id", trID);
-  $(".selectedEmp").text(emp);
 });
 $(document).on("click", "#btn-deleteEntry", function () {
   deleteDispatch().then((res) => {
