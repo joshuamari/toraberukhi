@@ -461,12 +461,13 @@ $(document).on("click", ".lbl-viewForm", function () {
       `Hide Dispatch Form <i class='bx bx-chevrons-up text-[20px] animate-bounce text-[var(--gray-text)] align-middle ps-2' ></i>`
     );
     $("#left").after(`
-      <div class="absolute w-full h-full bg-black opacity-[0.2] z-10" ></div>
+      <div class="absolute w-full h-full bg-black opacity-[0.2] z-10 " id="overlay" ></div>
       `);
   } else {
     $(this).html(
       `View Dispatch Form <i class='bx bx-chevrons-down text-[20px] animate-bounce  text-[var(--gray-text)] align-middle ps-2'></i>`
     );
+    $("#overlay").remove();
     $(".viewForm").animate(
       {
         scrollTop: 0,
