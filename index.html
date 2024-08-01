@@ -818,10 +818,11 @@
 
         </div>
       </div>
-      <div class="modal-footer">
+      <div class="modal-footer" id="buttonHere">
        
           
           <button class="btn-send" id="btnSend">Send Dispatch Request</button>
+       
         
       </div>
     </div>
@@ -1039,19 +1040,19 @@
       </div>
       <div class="content h-screen">
         <div class="main flex relative  h-full">
-          <div class="flex flex-col p-[14px] md:p-8 h-full w-full">
-            <div class="pageTitle w-100 gap-3 d-flex">
+          <div class="flex flex-col  h-full w-full">
+            <div class="pageTitle p-[14px] lg:p-8
+             pb-0 w-100 gap-3 d-flex">
               <div id="menu">
                 <i class="bx bx-menu-alt-left fs-3"></i>
               </div>
               <h1 class="fw-semibold m-0">Dispatch Request by KHI</h1>
             </div>
-        <div class="main w-100 d-flex h-[calc(100%-30px)]"id="appendHere">
+        <div class="main w-100 d-flex pb-[14px] lg:pb-8 pt-0 h-[calc(100%-57px)]"id="appendHere">
         
-          <div class="left pl-0 pr-6 lg:pr-6 pt-0" id="left">
-            <label for="check" class="lbl-viewForm">View Dispatch Form</label>
-            <input type="checkbox" class="chkbx-viewForm" id="check">
-            <div class="viewForm">
+          <div class="left px-[14px] lg:px-8 pt-0 " id="left">
+            <small class="text-[var(--gray-text)] text-[12px]">To send a dispatch request to KDT, please fill up the form below.</small>
+            <div class="viewForm mt-2">
 
               <div class="form ">
 
@@ -1177,11 +1178,17 @@
                 </button>
               </div>
             </div>
+
+            <div class="relative flex w-full z-100 justify-content-center lbl-viewFormCont ">
+              <label for="check" class="absolute w-full bg-white z-100 top-0  text-center inline-block 2xl:hidden lbl-viewForm  justify-content-center transition bg-[var(--dark)] text-[var(--gray-text)] hover:text-[var(--secondary)]">View Dispatch Form<i class='bx bx-chevrons-down text-[20px] animate-bounce text-[var(--gray-text)] align-middle ps-2'></i></label>
+              <input type="checkbox" class="chkbx-viewForm" id="check">
+              
+            </div>
             
           </div>
           
           
-          <div class="right h-full relative" >
+          <div class="right px-[14px] lg:px-8 pb-[14px] h-full relative" >
             <div class="d-flex withContent d-none flex-column gap-3 h-full">
               <div
                 class="empDetails gap-3 flex justify-content-between align-items-center"
@@ -1647,7 +1654,7 @@
                       <tbody id="wList">
                         
                         <tr>
-                          <td colspan="10" class="add-work">Add New  Item</td>
+                          <td colspan="10" class="add-work bg-[var(--white)]">Add New  Item</td>
                         </tr>
                         <!-- <tr>
                             <td>1</td>

@@ -1,5 +1,5 @@
-.main .left {
 
+.main .left {
   height: 100%;
   font-size: 14px !important;
 }
@@ -89,7 +89,7 @@
   /* max-height: 79vh; */
   overflow-y: scroll;
   background-color: #fff;
-  border-radius: 15px;
+  border-radius: 8px;
   padding: 0 10px 10px 10px;
   border: 1px solid #c7c7c7;
   width: 100%;
@@ -101,6 +101,9 @@
 }
 .lbl-viewForm {
   visibility: hidden;
+  border-bottom-left-radius: 13px;
+  border-bottom-right-radius: 13px;
+  box-shadow: 0 2px 2px 0 rgb(0 0 0 / 0.05);
 }
 
 input[type="checkbox"] {
@@ -236,10 +239,7 @@ input:checked + .toggle:after {
   border-left: 2px solid #c7c7c7;
   border-top: 0;
 }
-.main .right .empDetails,
-.main .right .empmoreDetails {
-  padding: 0 30px;
-}
+
 .table-cont {
   height: calc(100% - 44px);
 }
@@ -370,7 +370,7 @@ input:checked + .toggle:after {
   width: 25px;
 }
 .work-hist table tbody tr td {
-  background-color: #fff;
+  background-color: var(--white);
   padding: 0.75rem;
   font-weight: 400;
   /* color: var(--dark); */
@@ -535,6 +535,9 @@ input:checked + .toggle:after {
   .pageTitle h1 {
     font-size: 18px;
   }
+  .pageTitle{
+    background-color: #fff;
+  }
   input[type="number"],
   input[type="date"] {
     width: 100%;
@@ -544,17 +547,18 @@ input:checked + .toggle:after {
     overflow: hidden;
     z-index: 100;
     transition: max-height 1s;
+    overflow: visible;
   }
   #left.changeSize {
-    transition: max-height 1s;
-    background: var(--gray-100);
-    overflow: scroll;
-    height: 100%;
+    transition: height 1s ease-in-out;
+    /* background: var(--gray-100); */
+    /* overflow: scroll; */
+    height: calc(100% - 150px);
     /* padding-right: 1rem; */
     z-index: 100;
   }
   .right {
-    margin-top: 200px;
+    margin-top: 230px;
   }
   .sticky-buttons {
     display: none;
@@ -596,16 +600,28 @@ input:checked + .toggle:after {
     padding: 3px 8px;
   }
   .main .left{
-    width: calc(100% - 32px);
-    height: 180px;
+    width: calc(100% - 0px);
+    height: 200px;
+    background-color: #fff;
+    box-shadow: 0 1px 7px 0 rgb(0 0 0 / 0.05);
+  }
+  .main .right{
+    height: calc(100% - 180px);
+  }
+  .viewForm{
+    height: auto;
+  }
+  .sticky-buttons {
+    background-color: #fff;
   }
 
 
   .chkbx-viewForm {
     display: none;
   }
-  .viewForm {
-    /* max-height: 40%; */
+ 
+  .left .viewForm {
+    height: 150px;
     opacity: 1;
     overflow: hidden;
     visibility: visible;
@@ -613,19 +629,20 @@ input:checked + .toggle:after {
     background-color: transparent;
     border: none;
   }
-  .chkbx-viewForm:checked + .viewForm {
-    max-height: 120vh;
+  .left.changeSize  .viewForm {
+    height: calc(100% - 180px);
     opacity: 1;
     visibility: visible;
+    overflow: auto;
   }
   /* Text as Button ▼ */
   .lbl-viewForm {
-    position: sticky;
-    top: 0;
+
+   
     visibility: visible;
     display: flex;
     justify-content: center;
-    width: 95%;
+
     padding: 10px;
     color: var(--text-color);
     background: var(--gray-100);
@@ -652,8 +669,8 @@ input:checked + .toggle:after {
   }
   .main .right {
     border-left: 0;
-    border-top: 2px solid #c7c7c7;
-    padding: 30px 0;
+    /* border-top: 2px solid #c7c7c7; */
+    /* padding: 30px 0; */
   }
   .main .right .empDetails,
   .main .right .empmoreDetails {
@@ -671,12 +688,15 @@ input:checked + .toggle:after {
 .main .right{
   width: calc(100% - 400px);
 }
+.viewForm{
+  height: calc(100% - 180px);
+}
 }
 @media (max-width: 842px) {
-  .left {
+  /* .left {
     width: 95% !important;
     height: 30%;
-  }
+  } */
   .sticky-buttons .btn {
     font-size: 12px;
   }
@@ -693,9 +713,9 @@ input:checked + .toggle:after {
   .cards .card {
     width: 100%;
   }
-  .main {
+  /* .main {
     height: 100% !important;
-  }
+  } */
   .emptyState i {
     font-size: 80px !important;
   }
