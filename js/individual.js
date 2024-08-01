@@ -139,7 +139,6 @@ $(document).on("change", "#empSel", function () {
   }
 });
 $(document).on("click", "#btnApply", function () {
-  toggleLoadingAnimation(true);
   checkDispatch();
 });
 $(document).on("click", ".btn-clear", function () {
@@ -422,7 +421,36 @@ $(document).on("click", "#btnSend", function () {
   $("#btnSend").prop("disabled", true);
   console.log("disabling send email btn");
   // $('#btnSend').addClass("bg-[var(--secondary)] hover:bg-[var(--tertiary)] font-semibold rounded-md px-3 py-1  text-[var(--dark)]")
-  insertDispatch();
+  insertDispatch()
+    .then((res) => {
+      const isSuccess = res.isSuccess;
+      if (!isSuccess) {
+        showToast("error", `${res.error}`);
+      } else {
+        Promise.all([getDispatchHistory(), getDispatchDays(), getYearly()])
+          .then(([dlst, dd, yrl]) => {
+            dHistory = dlst;
+            fillDispatchHistory(dHistory);
+            dispatch_days = dd;
+            fillYearly(yrl);
+            clearInput();
+            showToast("success", "Successfully added a dispatch entry.");
+            console.log("enabling send email btn");
+          })
+          .catch((error) => {
+            alert(`${error}`);
+          });
+      }
+      $("#attachmentModal .btn-close").click();
+      $("#btnSend").prop("disabled", false);
+      toggleLoadingAnimation(false);
+    })
+    .catch((error) => {
+      $("#attachmentModal .btn-close").click();
+      $("#btnSend").prop("disabled", false);
+      toggleLoadingAnimation(false);
+      alert(`${error}`);
+    });
 });
 
 $(".lbl-viewForm").click(function () {
@@ -1189,81 +1217,39 @@ function insertDispatch() {
   const allowance = $("#allowance").val();
   const siteDispatch = $("#siteDispatch").is(":checked");
 
-  toggleLoadingAnimation(true);
-
-  $.ajax({
-    type: "POST",
-    url: "php/insert_request.php",
-    data: {
-      request_dept: reqDept,
-      request_name: reqName,
-      empID: empID,
-      dateFrom: startD,
-      dateTo: endD,
-      locID: locID,
-      spec_loc: specLoc,
-      inviID: inviteID,
-      workOrder: workOrder,
-      project_name: projName,
-      allowance: allowance,
-      site_dispatch: siteDispatch,
-    },
-    dataType: "json",
-    success: function (response) {
-      console.log(response);
-      const isSuccess = response.isSuccess;
-      if (!isSuccess) {
-        $("#attachmentModal .btn-close").click();
-        toggleLoadingAnimation(false);
-        showToast("error", `${response.error}`);
-      } else {
-        Promise.all([getDispatchHistory(), getDispatchDays(), getYearly()])
-          .then(([dlst, dd, yrl]) => {
-            dHistory = dlst;
-            fillDispatchHistory(dHistory);
-            dispatch_days = dd;
-            fillYearly(yrl);
-            // $("#reqDeptInput").val("");
-            // $("#reqNameInput").val("");
-            // $("#grpSel").val(0);
-            // $("#empSel").val(0);
-            // $("#startDate").val("");
-            // $("#endDate").val("");
-            // $("#daysCount").text("0 Day");
-            // $("#locSel").val(0);
-            // $("#specLocInput").val("");
-            // $("#inviteSel").val(0);
-            // $("#workOrder").val("");
-            // $("#projName").val("");
-            // $("#allowance").val("0");
-            // $("#siteDispatch").prop("checked", false);
-            // to_add = 0;
-            clearInput();
-            // countTotal();
-            $("#attachmentModal .btn-close").click();
-            showToast("success", "Successfully added a dispatch entry.");
-            $("#btnSend").prop("disabled", false);
-            console.log("enabling send email btn");
-            toggleLoadingAnimation(false);
-          })
-          .catch((error) => {
-            $("#attachmentModal .btn-close").click();
-            $("#btnSend").prop("disabled", false);
-            toggleLoadingAnimation(false);
-            alert(`${error}`);
-          });
-      }
-    },
-    error: function (xhr, status, error) {
-      if (xhr.status === 404) {
-        alert("Not Found Error: The requested resource was not found.");
-      } else if (xhr.status === 500) {
-        alert("Internal Server Error: There was a server error.");
-      } else {
-        console.log(error);
-        alert(error);
-      }
-    },
+  return new Promise((resolve, reject) => {
+    $.ajax({
+      type: "POST",
+      url: "php/insert_request.php",
+      data: {
+        request_dept: reqDept,
+        request_name: reqName,
+        empID: empID,
+        dateFrom: startD,
+        dateTo: endD,
+        locID: locID,
+        spec_loc: specLoc,
+        inviID: inviteID,
+        workOrder: workOrder,
+        project_name: projName,
+        allowance: allowance,
+        site_dispatch: siteDispatch,
+      },
+      dataType: "json",
+      success: function (response) {
+        const res = response;
+        resolve(response);
+      },
+      error: function (xhr, status, error) {
+        if (xhr.status === 404) {
+          resolve("Not Found Error: The requested resource was not found.");
+        } else if (xhr.status === 500) {
+          resolve("Internal Server Error: There was a server error.");
+        } else {
+          resolve(error);
+        }
+      },
+    });
   });
 }
 function clearInput() {
