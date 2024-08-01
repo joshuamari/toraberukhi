@@ -574,6 +574,7 @@ input:checked + .toggle:after {
     padding-bottom: 10px;
     padding-right: 5px;
   }
+
   .submit-btns {
     display: flex;
     justify-content: end;
@@ -690,6 +691,9 @@ input:checked + .toggle:after {
 }
 .viewForm{
   height: calc(100% - 180px);
+}
+#overlay{
+  display: none;
 }
 }
 @media (max-width: 842px) {
