@@ -101,6 +101,8 @@ $(document).on("change", ".ddates", function () {
     });
 });
 $(document).on("change", "#empSel", function () {
+  var emp = $("#empSel option:selected").text();
+  $(".selectedEmp").text(emp);
   toggleLoadingAnimation(true);
   Promise.all([
     getPassport(),
@@ -303,7 +305,7 @@ $(document).on("click", "#btn-addWorkEntry", function () {
           .catch((error) => {
             showToast("error", error);
           });
-        showToast("success", "Successfully Added Work History");
+        showToast("success", "Successfully Added a Work History");
       }
     })
     .catch((error) => {
@@ -434,19 +436,22 @@ $(document).on("click", "#btnSend", function () {
             dispatch_days = dd;
             fillYearly(yrl);
             clearInput();
-            showToast("success", "Successfully added a dispatch entry.");
+            showToast(
+              "success",
+              "Successfully sent a dispatch request to KDT."
+            );
             console.log("enabling send email btn");
           })
           .catch((error) => {
             alert(`${error}`);
           });
       }
-      $("#attachmentModal .btn-close").click();
+      $("#attachmentModal").modal("hide");
       $("#btnSend").prop("disabled", false);
       toggleLoadingAnimation(false);
     })
     .catch((error) => {
-      $("#attachmentModal .btn-close").click();
+      $("#attachmentModal").modal("hide");
       $("#btnSend").prop("disabled", false);
       toggleLoadingAnimation(false);
       alert(`${error}`);
@@ -1272,10 +1277,13 @@ function insertDispatch() {
       console.log(response);
       const isSuccess = response.isSuccess;
       if (!isSuccess) {
-        $("#attachmentModal .btn-close").click();
+        $("#attachmentModal").modal("hide");
         toggleLoadingAnimation(false);
-        $("#buttonHere").html(`
-          <button class="btn-send" id="btnSend">Send Dispatch Request</button>
+        $("#buttonHere").html(` <button type="button" data-bs-dismiss="modal"
+        aria-label="Close" class="btn bg-[var(--dark)] hover:bg-[var(--dark-200)] text-[var(--white)]" id="btnBack">
+          Back
+        </button>
+          <button class="btn-send btn" id="btnSend">Submit Request</button>
          `);
         showToast("error", `${response.error}`);
       } else {
@@ -1302,21 +1310,32 @@ function insertDispatch() {
             // to_add = 0;
             clearInput();
             // countTotal();
-            $("#attachmentModal .btn-close").click();
-            showToast("success", "Successfully added a dispatch entry.");
+            $("#attachmentModal").modal("hide");
+            showToast(
+              "success",
+              "Successfully sent a dispatch request to KDT."
+            );
             $("#btnSend").prop("disabled", false);
             console.log("enabling send email btn");
             toggleLoadingAnimation(false);
             $("#buttonHere").html(`
-              <button class="btn-send" id="btnSend">Send Dispatch Request</button>
+               <button type="button" data-bs-dismiss="modal"
+        aria-label="Close" class="btn bg-[var(--dark)] hover:bg-[var(--dark-200)] text-[var(--white)]" id="btnBack">
+          Back
+        </button>
+              <button class="btn-send btn" id="btnSend">Submit Request</button>
              `);
           })
           .catch((error) => {
-            $("#attachmentModal .btn-close").click();
+            $("#attachmentModal").modal("hide");
             $("#btnSend").prop("disabled", false);
             toggleLoadingAnimation(false);
             $("#buttonHere").html(`
-              <button class="btn-send" id="btnSend">Send Dispatch Request</button>
+               <button type="button" data-bs-dismiss="modal"
+        aria-label="Close" class="btn bg-[var(--dark)] hover:bg-[var(--dark-200)] text-[var(--white)]" id="btnBack">
+          Back
+        </button>
+               <button class="btn-send btn" id="btnSend">Submit Request</button>
              `);
             alert(`${error}`);
           });
