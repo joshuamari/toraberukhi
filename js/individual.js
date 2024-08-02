@@ -517,6 +517,7 @@ function fillAttachment() {
   const projName = $("#projName").val();
   const allowance = $("#allowance").val();
   const siteDispatch = $("#siteDispatch").is(":checked");
+  $("#printJap, #printPh, #printThird").empty();
 
   $("#printBU").text(reqDept);
   $("#printKHI").text(reqName);
