@@ -93,6 +93,9 @@
   border: 1px solid #c7c7c7;
   width: 100%;
 }
+/* .form {
+  max-height: 80vh;
+} */
 .form .row,
 .form .calendars {
   padding-left: 10px;
@@ -156,15 +159,14 @@ input:checked + .toggle:after {
 .toggle:active:after {
   width: 25px;
 }
-/* San ginamit? */
+
+/* Buttons CSS */
 .btn-updateEmp {
   background-color: var(--secondary) !important;
 }
 .btn-updateEmp:hover {
   background-color: var(--tertiary) !important;
 }
-
-/* Buttons CSS */
 .btn-edit,
 .btn-delete {
   border: none;

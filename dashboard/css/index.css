@@ -15,7 +15,8 @@
 .ctaCard .contain .left h1 {
   font-size: 48px;
 }
-th,td{
+th,
+td {
   white-space: nowrap;
 }
 .btn-checkAvail {
@@ -50,7 +51,6 @@ th,td{
   border-bottom-right-radius: 8px;
 }
 
-
 .table-container table thead tr th {
   background-color: var(--tableheader);
   padding: 1.25rem 0.75rem;
@@ -59,7 +59,7 @@ th,td{
   font-weight: 600;
   white-space: nowrap;
 }
-.table-container table td{
+.table-container table td {
   white-space: nowrap;
 }
 table tbody tr:hover {
@@ -124,6 +124,14 @@ table tbody tr:hover {
   left: -250px;
   pointer-events: none;
 }
+
+.crrntYear {
+  font-size: 20px;
+  font-weight: 600;
+  text-align: center;
+  line-height: 2.5rem;
+}
+
 @media (max-width: 886px) {
   .main .left {
     width: 100%;
