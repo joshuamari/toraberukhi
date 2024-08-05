@@ -75,7 +75,7 @@
   align-items: end;
   gap: 2px;
   background-color: var(--gray-100);
-  height: 120px;
+  height: 115px;
   margin-top: 5px;
   width: 100%;
 }
@@ -86,13 +86,16 @@
   padding: 0px;
 }
 .viewForm {
-  max-height: 79vh;
+  max-height: 80vh;
   overflow-y: scroll;
   background-color: #fff;
   border-radius: 15px;
   padding: 10px;
   border: 1px solid #c7c7c7;
 }
+/* .form {
+  max-height: 80vh;
+} */
 .form .row,
 .form .calendars {
   padding-left: 10px;
@@ -153,15 +156,14 @@ input:checked + .toggle:after {
 .toggle:active:after {
   width: 25px;
 }
-/* San ginamit? */
+
+/* Buttons CSS */
 .btn-updateEmp {
   background-color: var(--secondary) !important;
 }
 .btn-updateEmp:hover {
   background-color: var(--tertiary) !important;
 }
-
-/* Buttons CSS */
 .btn-edit,
 .btn-delete {
   border: none;
