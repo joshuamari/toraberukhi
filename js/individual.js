@@ -430,7 +430,20 @@ $(document).on("click", "#btnSend", function () {
       const isSuccess = res.isSuccess;
       if (!isSuccess) {
         showToast("error", `${res.error}`);
+        $("#buttonHere").html(` <button type="button" data-bs-dismiss="modal"
+          aria-label="Close" class="btn bg-[var(--dark)] hover:bg-[var(--dark-200)] text-[var(--white)]" id="btnBack">
+            Back
+          </button>
+            <button class="btn-send btn" id="btnSend">Submit Request</button>
+           `);
       } else {
+        $("#buttonHere").html(`
+          <button type="button" data-bs-dismiss="modal"
+   aria-label="Close" class="btn bg-[var(--dark)] hover:bg-[var(--dark-200)] text-[var(--white)]" id="btnBack">
+     Back
+   </button>
+         <button class="btn-send btn" id="btnSend">Submit Request</button>
+        `);
         Promise.all([getDispatchHistory(), getDispatchDays(), getYearly()])
           .then(([dlst, dd, yrl]) => {
             dHistory = dlst;
@@ -1262,98 +1275,39 @@ function insertDispatch() {
      Sending Request . . .
     </button>
    `);
-  $.ajax({
-    type: "POST",
-    url: "php/insert_request.php",
-    data: {
-      request_dept: reqDept,
-      // request_name: reqName,
-      empID: empID,
-      dateFrom: startD,
-      dateTo: endD,
-      locID: locID,
-      spec_loc: specLoc,
-      inviID: inviteID,
-      workOrder: workOrder,
-      project_name: projName,
-      allowance: allowance,
-      site_dispatch: siteDispatch,
-    },
-    dataType: "json",
-    success: function (response) {
-      console.log(response);
-      const isSuccess = response.isSuccess;
-      if (!isSuccess) {
-        $("#attachmentModal").modal("hide");
-        toggleLoadingAnimation(false);
-        $("#buttonHere").html(` <button type="button" data-bs-dismiss="modal"
-        aria-label="Close" class="btn bg-[var(--dark)] hover:bg-[var(--dark-200)] text-[var(--white)]" id="btnBack">
-          Back
-        </button>
-          <button class="btn-send btn" id="btnSend">Submit Request</button>
-         `);
-        showToast("error", `${response.error}`);
-      } else {
-        Promise.all([getDispatchHistory(), getDispatchDays(), getYearly()])
-          .then(([dlst, dd, yrl]) => {
-            dHistory = dlst;
-            fillDispatchHistory(dHistory);
-            dispatch_days = dd;
-            fillYearly(yrl);
-            $("#reqDeptInput").val("");
-            $("#reqNameInput").val("");
-            $("#grpSel").val(0);
-            $("#empSel").val(0);
-            $("#startDate").val("");
-            $("#endDate").val("");
-            $("#daysCount").text("0 Day");
-            $("#locSel").val(0);
-            $("#specLocInput").val("");
-            $("#inviteSel").val(0);
-            $("#workOrder").val("");
-            $("#projName").val("");
-            $("#allowance").val("0");
-            $("#siteDispatch").prop("checked", false);
-            to_add = 0;
-            countTotal();
-            $("#attachmentModal .btn-close").click();
-            showToast("success", "Successfully added a dispatch entry.");
-            $("#btnSend").prop("disabled", false);
-            console.log("enabling send email btn");
-            toggleLoadingAnimation(false);
-            $("#buttonHere").html(`
-               <button type="button" data-bs-dismiss="modal"
-        aria-label="Close" class="btn bg-[var(--dark)] hover:bg-[var(--dark-200)] text-[var(--white)]" id="btnBack">
-          Back
-        </button>
-              <button class="btn-send btn" id="btnSend">Submit Request</button>
-             `);
-          })
-          .catch((error) => {
-            $("#attachmentModal").modal("hide");
-            $("#btnSend").prop("disabled", false);
-            toggleLoadingAnimation(false);
-            $("#buttonHere").html(`
-               <button type="button" data-bs-dismiss="modal"
-        aria-label="Close" class="btn bg-[var(--dark)] hover:bg-[var(--dark-200)] text-[var(--white)]" id="btnBack">
-          Back
-        </button>
-               <button class="btn-send btn" id="btnSend">Submit Request</button>
-             `);
-            alert(`${error}`);
-          });
-      }
-    },
-    error: function (xhr, status, error) {
-      if (xhr.status === 404) {
-        alert("Not Found Error: The requested resource was not found.");
-      } else if (xhr.status === 500) {
-        alert("Internal Server Error: There was a server error.");
-      } else {
-        console.log(error);
-        alert(error);
-      }
-    },
+  return new Promise((resolve, reject) => {
+    $.ajax({
+      type: "POST",
+      url: "php/insert_request.php",
+      data: {
+        request_dept: reqDept,
+        // request_name: reqName,
+        empID: empID,
+        dateFrom: startD,
+        dateTo: endD,
+        locID: locID,
+        spec_loc: specLoc,
+        inviID: inviteID,
+        workOrder: workOrder,
+        project_name: projName,
+        allowance: allowance,
+        site_dispatch: siteDispatch,
+      },
+      dataType: "json",
+      success: function (response) {
+        const res = response;
+        resolve(res);
+      },
+      error: function (xhr, status, error) {
+        if (xhr.status === 404) {
+          reject("Not Found Error: The requested resource was not found.");
+        } else if (xhr.status === 500) {
+          reject("Internal Server Error: There was a server error.");
+        } else {
+          reject(error);
+        }
+      },
+    });
   });
 }
 function clearInput() {
