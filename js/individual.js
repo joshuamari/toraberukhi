@@ -504,8 +504,9 @@ function formatName(name) {
   return given + " " + surname;
 }
 function fillAttachment() {
+  console.log(empDetails)
   const reqDept = $("#reqDeptInput").val();
-  const reqName = $("#reqNameInput").val();
+  // const reqName = $("#reqNameInput").val();
   const grp = $("#grpSel").find("option:selected").text();
   const emp = $("#empSel").find("option:selected").text();
   const startD = $("#startDate").val();
@@ -520,7 +521,7 @@ function fillAttachment() {
   $("#printJap, #printPh, #printThird").empty();
 
   $("#printBU").text(reqDept);
-  $("#printKHI").text(reqName);
+  $("#printKHI").text(formatName(`${empDetails.surname}, ${empDetails.firstname}`));
   $("#printName").text(formatName(emp));
   $("#printFrom").text(formatDate(startD));
   $("#printTo").text(formatDate(endD));
@@ -1144,7 +1145,6 @@ function removeOutline() {
 }
 function checkDispatch() {
   const reqDept = $("#reqDeptInput").val();
-  const reqName = $("#reqNameInput").val();
   const grp = $("#grpSel").find("option:selected").attr("grp-id");
   const empID = $("#empSel").find("option:selected").attr("emp-id");
   const startD = $("#startDate").val();
@@ -1161,10 +1161,6 @@ function checkDispatch() {
   toggleLoadingAnimation(true);
   if (!reqDept) {
     $("#reqDeptInput").addClass("bg-red-100  border-red-400");
-    ctr++;
-  }
-  if (!reqName) {
-    $("#reqNameInput").addClass("bg-red-100  border-red-400");
     ctr++;
   }
   if (!grp) {
@@ -1233,7 +1229,6 @@ function checkDispatch() {
 }
 function insertDispatch() {
   const reqDept = $("#reqDeptInput").val();
-  const reqName = $("#reqNameInput").val();
   const grp = $("#grpSel").find("option:selected").attr("grp-id");
   const empID = $("#empSel").find("option:selected").attr("emp-id");
   const startD = $("#startDate").val();
@@ -1261,7 +1256,6 @@ function insertDispatch() {
     url: "php/insert_request.php",
     data: {
       request_dept: reqDept,
-      request_name: reqName,
       empID: empID,
       dateFrom: startD,
       dateTo: endD,

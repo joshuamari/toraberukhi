@@ -108,14 +108,6 @@ if (!empty($_POST['request_dept'])) {
   $msg['error'][] = "Requesting Department";
 }
 
-$request_name = '';
-if (!empty($_POST['request_name'])) {
-  $request_name = $_POST['request_name'];
-} else {
-  $msg["isSuccess"] = false;
-  $msg['error'][] = "Requester";
-}
-
 #for separtion of error
 if (!empty($msg)) {
   if (count($msg['error']) > 1) {
@@ -173,8 +165,7 @@ try {
                                           `project_name`, 
                                           `site_dispatch`, 
                                           `allowance`, 
-                                          `request_by_dept`, 
-                                          `request_by_name`) 
+                                          `request_by_dept`) 
               VALUES (:userID,
                       :empNumber,
                       :locID,
@@ -186,8 +177,7 @@ try {
                       :project_name,
                       :site_dispatch,
                       :allowance,
-                      :request_dept,
-                      :request_name)";
+                      :request_dept)";
   $insertStmt = $connpcs->prepare($insertQ);
   $insertStmt->execute([
     ":userID" => $userID,
@@ -201,8 +191,7 @@ try {
     ":project_name" => $project_name,
     ":site_dispatch" => $site_dispatch,
     ":allowance" => $allowance,
-    ":request_dept" => $request_dept,
-    ":request_name" => $request_name
+    ":request_dept" => $request_dept
   ]);
 
   if ($insertStmt->rowCount() > 0) {
