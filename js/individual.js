@@ -101,6 +101,8 @@ $(document).on("change", ".ddates", function () {
     });
 });
 $(document).on("change", "#empSel", function () {
+  var emp = $("#empSel option:selected").text();
+  $(".selectedEmp").text(emp);
   toggleLoadingAnimation(true);
   Promise.all([
     getPassport(),
@@ -144,6 +146,7 @@ $(document).on("click", "#btnApply", function () {
 $(document).on("click", ".btn-clear", function () {
   dispatch_days = 0;
   clearInput();
+  clearGroup();
 
   $(".emptyState").removeClass("d-none");
   $(".withContent").addClass("d-none");
@@ -304,7 +307,7 @@ $(document).on("click", "#btn-addWorkEntry", function () {
           .catch((error) => {
             showToast("error", error);
           });
-        showToast("success", "Successfully Added Work History");
+        showToast("success", "Successfully Added a Work History");
       }
     })
     .catch((error) => {
@@ -402,7 +405,9 @@ $(document).on("keydown", "#allowance", function (e) {
     e.which === 187 ||
     e.which === 189 ||
     e.which === 109 ||
-    e.which === 107
+    e.which === 107 ||
+    e.key === "e" ||
+    e.key === "E"
   ) {
     e.preventDefault();
   }
@@ -419,22 +424,78 @@ $(document).on("keydown", "#allowance", function (e) {
 $(document).on("click", "#btnSend", function () {
   $("#btnSend").prop("disabled", true);
   console.log("disabling send email btn");
-  insertDispatch();
+  // $('#btnSend').addClass("bg-[var(--secondary)] hover:bg-[var(--tertiary)] font-semibold rounded-md px-3 py-1  text-[var(--dark)]")
+  insertDispatch()
+    .then((res) => {
+      const isSuccess = res.isSuccess;
+      if (!isSuccess) {
+        showToast("error", `${res.error}`);
+      } else {
+        Promise.all([getDispatchHistory(), getDispatchDays(), getYearly()])
+          .then(([dlst, dd, yrl]) => {
+            dHistory = dlst;
+            fillDispatchHistory(dHistory);
+            dispatch_days = dd;
+            fillYearly(yrl);
+            clearInput();
+            showToast(
+              "success",
+              "Successfully sent a dispatch request to KDT."
+            );
+            console.log("enabling send email btn");
+          })
+          .catch((error) => {
+            alert(`${error}`);
+          });
+      }
+      $("#attachmentModal").modal("hide");
+      $("#btnSend").prop("disabled", false);
+      toggleLoadingAnimation(false);
+    })
+    .catch((error) => {
+      $("#attachmentModal").modal("hide");
+      $("#btnSend").prop("disabled", false);
+      toggleLoadingAnimation(false);
+      alert(`${error}`);
+    });
 });
-
-$(".lbl-viewForm").click(function () {
-  $(this).text(
-    $(this).text() == "Hide Dispatch Form"
-      ? "View Dispatch Form"
-      : "Hide Dispatch Form"
-  );
-
+$(document).on("click", ".lbl-viewForm", function () {
   $("#left").toggleClass("changeSize");
   $(".sticky-buttons").toggleClass("appear");
   $(".viewForm").toggleClass("bgChange");
-
-  const checking = $("#check").is(":checked");
+  if ($("#left").hasClass("changeSize")) {
+    $(this).html(
+      `Hide Dispatch Form <i class='bx bx-chevrons-up text-[20px] animate-bounce text-[var(--gray-text)] align-middle ps-2' ></i>`
+    );
+    $("#left").after(`
+      <div class="absolute w-full h-full bg-black opacity-[0.2] z-10 " id="overlay" ></div>
+      `);
+  } else {
+    $(this).html(
+      `View Dispatch Form <i class='bx bx-chevrons-down text-[20px] animate-bounce  text-[var(--gray-text)] align-middle ps-2'></i>`
+    );
+    $("#overlay").remove();
+    $(".viewForm").animate(
+      {
+        scrollTop: 0,
+      },
+      ""
+    );
+  }
 });
+// $(".lbl-viewForm").click(function () {
+//   $(this).html(
+//     `Hide Dispatch Form <i class='bx bx-chevrons-up text-[20px]' ></i>`
+//       ? `View Dispatch Form <i class='bx bx-chevrons-down text-[20px]'></i>`
+//       : `Hide Dispatch Form <i class='bx bx-chevrons-up text-[20px]' ></i>`
+//   );
+
+//   $("#left").toggleClass("changeSize");
+//   $(".sticky-buttons").toggleClass("appear");
+//   $(".viewForm").toggleClass("bgChange");
+
+//   const checking = $("#check").is(":checked");
+// });
 
 //#endregion
 
@@ -461,6 +522,7 @@ function fillAttachment() {
   const projName = $("#projName").val();
   const allowance = $("#allowance").val();
   const siteDispatch = $("#siteDispatch").is(":checked");
+  $("#printJap, #printPh, #printThird").empty();
 
   $("#printBU").text(reqDept);
   $("#printKHI").text(fullName);
@@ -676,7 +738,7 @@ function countDays(strt, end) {
 }
 function displayDays(cdays) {
   if (cdays.difference === 1) {
-    $("#daysCount").text(" 1 day.");
+    $("#daysCount").text(" 1 day");
   } else {
     $("#daysCount").text(`${cdays.difference} days`);
   }
@@ -839,7 +901,7 @@ function fillWorkHistory(wList) {
   tableBody.empty();
   if (wList.length === 0) {
     var addDataRow = $(
-      "<tr> <td colspan='10' class='add-work text-center text-[var(--gray-text)] '> + Add New Item</td></tr>"
+      "<tr> <td colspan='10' class='add-work text-center text-[var(--gray-text)] bg-[var(--white)]'> + Add New Item</td></tr>"
     );
     tableBody.append(addDataRow);
   } else {
@@ -1152,7 +1214,7 @@ function checkDispatch() {
   }
   if (ctr > 0) {
     $(".error-msg").html(`
-    <div class="errTxt mb-3 flex items-center gap-1">
+    <div class="errTxt  flex items-center gap-1">
     <i class='bx bx-info-circle text-red-600'></i>
     <p class="text-red-600">Please complete all fields.</p>
     </div>`);
@@ -1190,7 +1252,15 @@ function insertDispatch() {
   const siteDispatch = $("#siteDispatch").is(":checked");
 
   toggleLoadingAnimation(true);
-
+  $("#buttonHere").html(`
+    <button class="btn-send disabled:bg-[var(--secondary-100)] inline-flex items-center" disabled>
+           <svg class="animate-spin  mr-3 h-5 w-5 " xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+     </svg>
+     Sending Request . . .
+    </button>
+   `);
   $.ajax({
     type: "POST",
     url: "php/insert_request.php",
@@ -1213,8 +1283,14 @@ function insertDispatch() {
       console.log(response);
       const isSuccess = response.isSuccess;
       if (!isSuccess) {
-        $("#attachmentModal .btn-close").click();
+        $("#attachmentModal").modal("hide");
         toggleLoadingAnimation(false);
+        $("#buttonHere").html(` <button type="button" data-bs-dismiss="modal"
+        aria-label="Close" class="btn bg-[var(--dark)] hover:bg-[var(--dark-200)] text-[var(--white)]" id="btnBack">
+          Back
+        </button>
+          <button class="btn-send btn" id="btnSend">Submit Request</button>
+         `);
         showToast("error", `${response.error}`);
       } else {
         Promise.all([getDispatchHistory(), getDispatchDays(), getYearly()])
@@ -1224,7 +1300,7 @@ function insertDispatch() {
             dispatch_days = dd;
             fillYearly(yrl);
             $("#reqDeptInput").val("");
-            // $("#reqNameInput").val("");
+            $("#reqNameInput").val("");
             $("#grpSel").val(0);
             $("#empSel").val(0);
             $("#startDate").val("");
@@ -1244,11 +1320,25 @@ function insertDispatch() {
             $("#btnSend").prop("disabled", false);
             console.log("enabling send email btn");
             toggleLoadingAnimation(false);
+            $("#buttonHere").html(`
+               <button type="button" data-bs-dismiss="modal"
+        aria-label="Close" class="btn bg-[var(--dark)] hover:bg-[var(--dark-200)] text-[var(--white)]" id="btnBack">
+          Back
+        </button>
+              <button class="btn-send btn" id="btnSend">Submit Request</button>
+             `);
           })
           .catch((error) => {
-            $("#attachmentModal .btn-close").click();
+            $("#attachmentModal").modal("hide");
             $("#btnSend").prop("disabled", false);
             toggleLoadingAnimation(false);
+            $("#buttonHere").html(`
+               <button type="button" data-bs-dismiss="modal"
+        aria-label="Close" class="btn bg-[var(--dark)] hover:bg-[var(--dark-200)] text-[var(--white)]" id="btnBack">
+          Back
+        </button>
+               <button class="btn-send btn" id="btnSend">Submit Request</button>
+             `);
             alert(`${error}`);
           });
       }
@@ -1270,7 +1360,7 @@ function clearInput() {
     "#reqDeptInput, #reqNameInput, #grpSel, #empSel, #startDate, #endDate, #locSel, #specLocInput, #inviteSel, #workOrder, #projName, #allowance"
   ).removeClass("bg-red-100  border-red-400");
   $(".errTxt").remove();
-  $("#grpSel, #empSel, #locSel, #inviteSel").val(0);
+  $("#locSel, #inviteSel").val(0);
   $(
     "#reqDeptInput, #reqNameInput, #startDate, #endDate, #specLocInput, #workOrder, #projName"
   ).val("");
@@ -1278,7 +1368,10 @@ function clearInput() {
   $("#siteDispatch").prop("checked", false);
   to_add = 0;
   $("#daysCount").text("0 Day");
-  $("#empSel").change();
+}
+function clearGroup() {
+  $("#grpSel").val($("#grpSel option:first").val());
+  $("#grpSel").change();
 }
 function clearAddWorkInputs() {
   $(
@@ -1437,12 +1530,6 @@ function addWorkHistory() {
     $(".dateError").addClass("block flex items-center gap-1 text-red-600");
     errcount++;
   }
-  if (!endMonthYear) {
-    $("#addEndMonthYear").addClass("bg-red-100  border-red-400");
-    $(".dateError").removeClass("hidden");
-    $(".dateError").addClass("block flex items-center gap-1 text-red-600");
-    errcount++;
-  }
   if (!comp_business) {
     $("#addcompanyBusiness").addClass("bg-red-100  border-red-400");
     $(".BusiError").removeClass("hidden");
@@ -1461,6 +1548,7 @@ function addWorkHistory() {
     $(".LocError").addClass("block flex items-center gap-1 text-red-600");
     errcount++;
   }
+  $(".dateError").text("Please Complete the Fields");
   return new Promise((resolve, reject) => {
     if (!endMonthYear && endMonthYear < startMonthYear) {
       $("#addEndMonthYear").val("");
@@ -1473,9 +1561,11 @@ function addWorkHistory() {
         "Invalid Date. End date must not be earlier than Start date."
       );
       reject("Invalid Date. End date must not be earlier than Start date.");
+      return;
     }
     if (errcount > 0) {
       reject("Complete all fields.");
+      return;
     }
     $.ajax({
       type: "POST",
@@ -1631,12 +1721,6 @@ function saveEditWorkHistEntry() {
     $(".dateError").addClass("block flex items-center gap-1 text-red-600");
     errcount++;
   }
-  if (!endMonthYear) {
-    $("#edit-EndMonthYear").addClass("bg-red-100  border-red-400");
-    $(".dateError").removeClass("hidden");
-    $(".dateError").addClass("block flex items-center gap-1 text-red-600");
-    errcount++;
-  }
   if (!compBusiness) {
     $("#edit-companyBusiness").addClass("bg-red-100  border-red-400");
     $(".BusiError").removeClass("hidden");
@@ -1655,22 +1739,24 @@ function saveEditWorkHistEntry() {
     $(".LocError").addClass("block flex items-center gap-1 text-red-600");
     errcount++;
   }
-
+  $(".dateError").text("Please Complete the Fields");
   return new Promise((resolve, reject) => {
     if (endMonthYear && endMonthYear < startMonthYear) {
-      $("#addEndMonthYear").val("");
-      $("#addStartMonthYear").val("");
-      $("#addEndMonthYear").addClass("bg-red-100  border-red-400");
-      $("#addStartMonthYear").addClass("bg-red-100  border-red-400");
+      $("#edit-EndMonthYear").val("");
+      $("#edit-StartMonthYear").val("");
+      $("#edit-EndMonthYear").addClass("bg-red-100  border-red-400");
+      $("#edit-StartMonthYear").addClass("bg-red-100  border-red-400");
       $(".dateError").removeClass("hidden");
       $(".dateError").addClass("block flex items-center gap-1 text-red-600");
       $(".dateError").text(
         "Invalid Date. End date must not be earlier than Start date."
       );
       reject("Invalid Date. End date must not be earlier than Start date.");
+      return;
     }
     if (errcount > 0) {
       reject("Complete all fields");
+      return;
     }
     $.ajax({
       type: "POST",
@@ -1855,22 +1941,22 @@ function arrangeName(nme) {
 function toggleLoadingAnimation(show) {
   if (show) {
     $("#appendHere").append(`
-          <div class="top-0 backdrop-blur-sm bg-gray/30 h-full flex justify-center items-center flex-col pb-5 absolute w-full" id="loadingAnimation">
-              <div class="relative">
-                  <div class="grayscale-[70%] w-[400px]">
-                      <img src="images/Frame 1.gif" alt="loader" class="w-full" />
-                  </div>
-                  <div class="absolute bottom-0 flex-col w-full text-center flex justify-center items-center gap-2">
-                      <div class="title fw-semibold fs-5">
-                          Loading data . . .
-                      </div>
-                      <div class="text">
-                          Please wait while we fetch the employee details.
-                      </div>
-                  </div>
-              </div>
-          </div>
-      `);
+        <div class="bottom-0 xl:top-0 right-0 xl:right-[20px] backdrop-blur-sm bg-gray/30 h-[calc(100%-280px)] xl:h-full  justify-center items-center flex-col pb-5 absolute w-full lg:w-full xl:w-[calc(100%-460px)]   flex" id="loadingAnimation">
+            <div class="relative">
+                <div class="grayscale-[70%] w-[400px]">
+                    <img src="images/Frame 1.gif" alt="loader" class="w-full" />
+                </div>
+                <div class="absolute bottom-0 flex-col w-full text-center flex justify-center items-center gap-2">
+                    <div class="title fw-semibold fs-5">
+                        Loading data . . .
+                    </div>
+                    <div class="text">
+                        Please wait while we fetch the employee details.
+                    </div>
+                </div>
+            </div>
+        </div>
+    `);
   } else {
     $("#loadingAnimation").remove();
   }

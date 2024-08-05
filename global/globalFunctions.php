@@ -222,6 +222,21 @@ function getKHIPICEmail($group_id, $exclude = 0)
     }
     return $khiEmail;
 }
+function getKHIAdminEmails()
+{
+    global $connpcs;
+    $khiEmail = array();
+    $khiQ = "SELECT `email` FROM `khi_details` WHERE `group_id`=2 AND `number` != 905007";
+    $khiStmt = $connpcs->prepare($khiQ);
+    $khiStmt->execute();
+    if ($khiStmt->rowCount() > 0) {
+        $khiArr = $khiStmt->fetchAll();
+        foreach ($khiArr as $emails) {
+            $khiEmail[] = $emails['email'];
+        }
+    }
+    return $khiEmail;
+}
 function getRequestDetails($request_id)
 {
     global $connpcs;
@@ -257,13 +272,14 @@ function emailRequest($details)
 {
     $headers = "MIME-Version: 1.0" . "\r\n";
     $headers .= "Content-type:text/html;charset=UTF-8" . "\r\n";
-    $headers .= "From: kdt_toraberur@global.kawasaki.com" . "\r\n";
+    $headers .= "From: kdt_toraberu@global.kawasaki.com" . "\r\n";
     $subject = 'Dispatch Request Notification(TEST ONLY)';
     $CCarray = array('medrano_c-kdt@global.kawasaki.com', 'hernandez-kdt@global.kawasaki.com', 'reyes_d-kdt@global.kawasaki.com', 'cabiso-kdt@global.kawasaki.com', 'coquia-kdt@global.kawasaki.com'); //COMMENT PAG PROD
     $khidetails = getKHIUserDetails($details['requester_id']);
     $admins = getAdminEmails();
     $khipic = getKHIPICEmail($details['emp_group'], $details['requester_id']);
-    // $CCarray = $khipic;//UNCOMMENT PAG PROD
+    $khiAdmins = getKHIAdminEmails();
+    // $CCarray = array_merge($khipic, $khiAdmins);//UNCOMMENT PAG PROD
     $emails = array("coquia-kdt@global.kawasaki.com", "medrano_c-kdt@global.kawasaki.com"); //COMMENT PAG PROD
     // $emails = $admins;//UNCOMMENT PAG PROD
     // $emails[] = getPresEmail();//UNCOMMENT PAG PROD

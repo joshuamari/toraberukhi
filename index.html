@@ -490,7 +490,7 @@
         <div class="modal-wh-body">
           <p class="mb-2">
             Are you sure you want to delete
-            <span class="fw-semibold" id="selectedEmpWH"></span>'s Work History Entry
+            <span class="fw-semibold selectedEmp" id=""></span>'s Work History Entry
             <span class="fw-semibold"
               >no. <span id="storeWorkId" del-work-id="0"></span
             ></span>
@@ -518,15 +518,16 @@
 
   <div class="modal fade" id="attachmentModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
   aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered modal-xl">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
     <div class="modal-content">
       <div class="  modal-header border-0 ">
         <h1 class="modal-title text-[18px]" id="titleModal">Review Request for Dispatch File</h1>
-        <button type="button" class="btn-close text-[14px]  m-1 w-0 h-0  w-auto h-auto" data-bs-dismiss="modal"
-          aria-label="Close"></button>
+        <!-- <button type="button" class="btn-close text-[14px]  m-1 w-0 h-0  w-auto h-auto" data-bs-dismiss="modal"
+          aria-label="Close"></button> -->
       </div>
-      <div class="modal-body  flex items-center justify-content-center bg-[var(--gray)]">
-        <div class="w-[210mm] h-[297mm] min-w-[210mm] min-h-[297mm] bg-[#fff] py-[7mm] ps-[15mm] pe-[7mm] my-[-37mm]" id="toPrint" style="transform: scale(0.75);">
+      <div class="modal-body flex-col flex items-center justify-content-center bg-[var(--gray)]">
+        
+        <div class="w-[210mm] h-[297mm] min-w-[210mm] min-h-[297mm] bg-[#fff] py-[7mm] ps-[15mm] pe-[7mm] my-[-50mm] gap-2" id="toPrint" style="transform: scale(0.65);">
           <div class="top flex gap-[28px] mb-2">
             <img src="./images/kawasakilOGO.png" alt="kawasakilOGO" class="w-[250px] h-auto">
             <div class="flex flex-col justify-content-between items-start">
@@ -817,11 +818,19 @@
 
 
         </div>
+        <div class="flex h-full px-3 flex-col gap-2">
+          <p class="" style="font-family: 'Poppins',sans-serif;">This file is generated based on your input.Please review if everything is correct, click the "Submit Request" button to finalize your request. If changes are needed, click "Back" button and edit your information before submitting.</p>
+          <p class="text-[var(--gray-text)]" style="font-family: 'Poppins',sans-serif;"><i class='bx bxs-info-circle text-[var(--gray-text)] align-middle pr-1'></i>Keep track of your request on "Request List" tab.</p>
+        </div>
       </div>
-      <div class="modal-footer">
+      <div class="modal-footer" id="buttonHere">
        
-          
-          <button class="btn-send" id="btnSend">Send Dispatch Request</button>
+        <button type="button" data-bs-dismiss="modal"
+        aria-label="Close" class="btn bg-[var(--dark)] hover:bg-[var(--dark-200)] text-[var(--white)]" id="btnBack">
+          Back
+        </button>
+          <button class="btn-send btn" id="btnSend">Submit Request</button>
+       
         
       </div>
     </div>
@@ -1038,25 +1047,25 @@
         </nav>
       </div>
       <div class="content h-screen">
-        <div class="main flex  h-full">
-          <div class="flex flex-col p-[14px] md:p-8 h-full w-full">
-            <div class="pageTitle w-100 gap-3 d-flex">
+        <div class="main flex relative  h-full">
+          <div class="flex flex-col  h-full w-full">
+            <div class="pageTitle p-[14px] lg:p-8
+             pb-0 w-100 gap-3 d-flex">
               <div id="menu">
                 <i class="bx bx-menu-alt-left fs-3"></i>
               </div>
               <h1 class="fw-semibold m-0">Dispatch Request by KHI</h1>
             </div>
-        <div class="main w-100 d-flex h-[calc(100%-30px)]">
+        <div class="main w-100 d-flex pb-[14px] lg:pb-8 pt-0 h-[calc(100%-57px)]"id="appendHere">
         
-          <div class="left pl-0 pr-6 lg:pr-6 pt-0" id="left">
-            <label for="check" class="lbl-viewForm">View Dispatch Form</label>
-            <input type="checkbox" class="chkbx-viewForm" id="check">
-            <div class="viewForm">
+          <div class="left px-[14px] lg:px-8 pt-0 " id="left">
+            <small class=" text-[12px]">To send a dispatch request to KDT, please fill up the form below.</small>
+            <div class="viewForm mt-2">
 
-              <div class="form pl-3">
+              <div class="form ">
 
                 <div class="mb-1 row">
-                  <label for="" class="col-form-label pl-0">Group:</label>
+                  <label for="" class="col-form-label pl-0">Employee Group:</label>
                     <select
                       name=""
                       class="select "
@@ -1067,7 +1076,7 @@
                 </div>
 
                 <div class="mb-1 row">
-                  <label for="" class="col-form-label pl-0">Dispatch Name:</label>
+                  <label for="" class="col-form-label pl-0">Employee Name:</label>
                     <select
                       name=""
                       class="select "
@@ -1135,9 +1144,9 @@
                     <input type="text" name="" class="input" id="projName" placeholder="Project Name">
                 </div>
 
-                <div class="mb-1 row">
-                  <label for="" class="col-sm-9 col-form-label pl-0">Site Dispatch Training Application</label>
-                  <div class="col-sm-3 d-flex justify-center pt-2">
+                <div class="mb-1 flex gap-2 items-center pt-1 flex-row-reverse" style="justify-content: start;">
+                  <label for="" class="">Site Dispatch Training Application</label>
+                  <div class=" d-flex justify-center ">
                       <!-- <input type="checkbox" name="" class="d-flex float-right align-items-center h-100 mr-5" id="siteDispatch"> -->
                         <input id="siteDispatch" type="checkbox"/><label for="siteDispatch" class="toggle"></label>
                   </div>
@@ -1145,7 +1154,7 @@
 
                 <div class="mb-1 row">
                   <label for="" class="col-form-label pl-0">Allowance:</label>
-                    <input type="number" name="" class="input" id="allowance" placeholder="Allowance">
+                    <input type="number" name="" class="input" id="allowance" placeholder="Allowance" min="0">
                 </div>
                 
                 <div class="mb-1 row">
@@ -1177,11 +1186,17 @@
                 </button>
               </div>
             </div>
+
+            <div class="relative flex w-full z-100 justify-content-center lbl-viewFormCont ">
+              <label for="check" class="absolute w-full bg-white z-100 top-0  text-center inline-block 2xl:hidden lbl-viewForm  justify-content-center transition bg-[var(--dark)] text-[var(--gray-text)] hover:text-[var(--secondary)] text-[12px]">View Dispatch Form<i class='bx bx-chevrons-down text-[20px] animate-bounce text-[var(--gray-text)] align-middle ps-2'></i></label>
+              <input type="checkbox" class="chkbx-viewForm" id="check">
+              
+            </div>
             
           </div>
           
           
-          <div class="right h-full relative" id="appendHere">
+          <div class="right px-[14px] lg:px-8 pb-[14px] h-full relative" >
             <div class="d-flex withContent d-none flex-column gap-3 h-full">
               <div
                 class="empDetails gap-3 flex justify-content-between align-items-center"
@@ -1399,13 +1414,15 @@
                 </div>
                 <div class="dispatch-hist p-3 bg-white rounded-lg h-full shadow-sm xl:pb-0">
                   <div class="top flex justify-content-between">
-                    <div class="title pb-3">Dispatch History to Japan</div>
+                    <h5 class="title text-[var(--dark)]">Dispatch History to Japan</h5>
+                    
                     <div>
                       <button class="btn btn-success" id="btnExport">
                         Export table
                       </button>
                     </div>
                   </div>
+                  <p class=" normal-case text-[12px]  pb-3">View records of your members dispatches to Japan.</p>
                   <div class="table-cont overflow-auto min-h-[200px]">
                     <table class="table" id="histTable">
                       <thead class="sticky top-0 bg-gray-200">
@@ -1500,16 +1517,20 @@
                     </table>
                   </div>
                 </div>
-                <div class="work-hist h-full p-3 bg-white rounded-lg shadow-sm xl:pb-0">
+                <div class="work-hist  h-full pb-[50px] bg-white rounded-lg shadow-sm xl:pb-0">
                   <div class="top flex justify-content-between">
-                    <div class="title pb-3">Work History</div>
+                    <div class="flex flex-col gap-1 pb-3">
+                      <h5 class=" title text-[var(--dark)]">Work History</h5>
+                    <p class="normal-case text-[12px] ">Manage your members Work details and history.</p> </div>
+
                     <!-- <div>
                       <button class="btn btn-success bg-[var(--darkest)]" id="btnExportss">
                         Export table
                       </button>
                     </div> -->
                   </div>
-                  <div class="table-cont overflow-auto min-h-[300px]">
+                  <div class="h-[300px]
+                   table-cont overflow-auto ">
                     <table class="table" id="workhistTable">
                       <thead class="sticky top-0 bg-gray-200">
                         <tr>
@@ -1647,7 +1668,7 @@
                       <tbody id="wList">
                         
                         <tr>
-                          <td colspan="10" class="add-work">Add New  Item</td>
+                          <td colspan="10" class="add-work bg-[var(--white)]">Add New  Item</td>
                         </tr>
                         <!-- <tr>
                             <td>1</td>

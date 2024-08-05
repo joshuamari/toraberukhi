@@ -1,5 +1,4 @@
 .main .left {
-  width: 400px;
   height: 100%;
   font-size: 14px !important;
 }
@@ -75,7 +74,7 @@
   align-items: end;
   gap: 2px;
   background-color: var(--gray-100);
-  height: 115px;
+  /* height: 120px; */
   margin-top: 5px;
   width: 100%;
 }
@@ -86,12 +85,13 @@
   padding: 0px;
 }
 .viewForm {
-  max-height: 80vh;
+  /* max-height: 79vh; */
   overflow-y: scroll;
   background-color: #fff;
-  border-radius: 15px;
-  padding: 10px;
+  border-radius: 8px;
+  padding: 0 10px 10px 10px;
   border: 1px solid #c7c7c7;
+  width: 100%;
 }
 /* .form {
   max-height: 80vh;
@@ -103,6 +103,9 @@
 }
 .lbl-viewForm {
   visibility: hidden;
+  border-bottom-left-radius: 13px;
+  border-bottom-right-radius: 13px;
+  box-shadow: 0 2px 2px 0 rgb(0 0 0 / 0.05);
 }
 
 input[type="checkbox"] {
@@ -233,14 +236,11 @@ input:checked + .toggle:after {
 /* END OF BUTTON CSS */
 
 .main .right {
-  width: calc(100% - 400px);
+  /* width: calc(100% - 400px); */
   border-left: 2px solid #c7c7c7;
   border-top: 0;
 }
-.main .right .empDetails,
-.main .right .empmoreDetails {
-  padding: 0 30px;
-}
+
 .table-cont {
   height: calc(100% - 44px);
 }
@@ -320,7 +320,7 @@ input:checked + .toggle:after {
   vertical-align: middle;
 }
 .dispatch-hist table tbody tr:hover {
-  background-color: #fff;
+  background-color: var(--tablehover);
 }
 
 .work-hist {
@@ -329,11 +329,11 @@ input:checked + .toggle:after {
   border-radius: 8px;
   border: 1px solid var(--gray);
 }
-.work-hist .title {
+/* .work-hist .title {
   font-size: 14px;
 
   text-transform: uppercase;
-}
+} */
 .work-hist table {
   border-collapse: separate !important;
   border-spacing: 0;
@@ -404,9 +404,8 @@ input:checked + .toggle:after {
 }
 .dispatch-hist .top .title,
 .work-hist .top .title {
-  font-size: 18px;
-  font-weight: 500;
-  text-transform: uppercase;
+  font-size: 20px;
+  font-weight: 600;
 }
 .prog-cont small {
   color: var(--red-color);
@@ -444,6 +443,11 @@ input:checked + .toggle:after {
   font-weight: 700;
   font-size: 28px;
   width: 75px;
+}
+
+.card-title {
+  font-weight: 600;
+  font-size: 18px;
 }
 
 #attachmentModal p {
@@ -516,10 +520,27 @@ input:checked + .toggle:after {
 #toPrint2 tr:nth-of-type(2) th {
   border-top: 0;
 }
+@media screen and (min-width: 1280px) and (max-width: 1340px) {
+  #loadingAnimation {
+    right: 0;
+    width: 100%;
+    height: calc(100% - 280px);
+    bottom: 0;
+    top: auto;
+  }
+}
+@media screen and (min-width: 888px) and (max-width: 1024px) {
+  .left {
+    width: calc(100% - 300px);
+  }
+}
 
 @media screen and (min-width: 0px) and (max-width: 1340px) {
   .pageTitle h1 {
     font-size: 18px;
+  }
+  .pageTitle {
+    background-color: #fff;
   }
   input[type="number"],
   input[type="date"] {
@@ -530,17 +551,18 @@ input:checked + .toggle:after {
     overflow: hidden;
     z-index: 100;
     transition: max-height 1s;
+    overflow: visible;
   }
   #left.changeSize {
-    transition: max-height 1s;
-    background: var(--gray-100);
-    overflow: scroll;
-    height: 95vh;
-    padding-right: 1rem;
+    transition: height 1s ease-in-out;
+    /* background: var(--gray-100); */
+    /* overflow: scroll; */
+    height: calc(100% - 150px);
+    /* padding-right: 1rem; */
     z-index: 100;
   }
   .right {
-    margin-top: 200px;
+    margin-top: 230px;
   }
   .sticky-buttons {
     display: none;
@@ -556,6 +578,7 @@ input:checked + .toggle:after {
     padding-bottom: 10px;
     padding-right: 5px;
   }
+
   .submit-btns {
     display: flex;
     justify-content: end;
@@ -581,12 +604,28 @@ input:checked + .toggle:after {
     width: 70px;
     padding: 3px 8px;
   }
+  .main .left {
+    width: calc(100% - 0px);
+    height: 200px;
+    background-color: #fff;
+    box-shadow: 0 1px 7px 0 rgb(0 0 0 / 0.05);
+  }
+  .main .right {
+    height: calc(100% - 180px);
+  }
+  .viewForm {
+    height: auto;
+  }
+  .sticky-buttons {
+    background-color: #fff;
+  }
 
   .chkbx-viewForm {
     display: none;
   }
-  .viewForm {
-    /* max-height: 40%; */
+
+  .left .viewForm {
+    height: 150px;
     opacity: 1;
     overflow: hidden;
     visibility: visible;
@@ -594,19 +633,18 @@ input:checked + .toggle:after {
     background-color: transparent;
     border: none;
   }
-  .chkbx-viewForm:checked + .viewForm {
-    max-height: 120vh;
+  .left.changeSize .viewForm {
+    height: calc(100% - 180px);
     opacity: 1;
     visibility: visible;
+    overflow: auto;
   }
   /* Text as Button ▼ */
   .lbl-viewForm {
-    position: sticky;
-    top: 0;
     visibility: visible;
     display: flex;
     justify-content: center;
-    width: 95%;
+
     padding: 10px;
     color: var(--text-color);
     background: var(--gray-100);
@@ -623,20 +661,47 @@ input:checked + .toggle:after {
   .modal-wh-body .input {
     width: 100%;
   }
-}
-/* @media screen and (min-width: 0px) and (max-width: 450px) {
+
+  .main {
+    flex-direction: column;
+  }
+
+  .main .right {
+    width: 100%;
+  }
+  .main .right {
+    border-left: 0;
+    /* border-top: 2px solid #c7c7c7; */
+    /* padding: 30px 0; */
+  }
+  .main .right .empDetails,
+  .main .right .empmoreDetails {
+    padding: 0;
+  }
+
   .input[type="date"] {
-    width: 5%;
+    width: 100%;
   }
-  .calendars {
-    flex-wrap: wrap;
+}
+@media screen and (min-width: 1341px) {
+  .main .left {
+    width: 400px;
   }
-} */
+  .main .right {
+    width: calc(100% - 400px);
+  }
+  .viewForm {
+    height: calc(100% - 180px);
+  }
+  #overlay {
+    display: none;
+  }
+}
 @media (max-width: 842px) {
-  .left {
+  /* .left {
     width: 95% !important;
     height: 30%;
-  }
+  } */
   .sticky-buttons .btn {
     font-size: 12px;
   }
@@ -653,9 +718,9 @@ input:checked + .toggle:after {
   .cards .card {
     width: 100%;
   }
-  .main {
+  /* .main {
     height: 100% !important;
-  }
+  } */
   .emptyState i {
     font-size: 80px !important;
   }
@@ -676,38 +741,14 @@ input:checked + .toggle:after {
     grid-template-columns: 1fr !important;
   }
 }
-@media (max-width: 1340px) {
-  .main {
-    flex-direction: column;
-  }
-  .main .left,
-  .main .right {
-    width: 100%;
-  }
-  .main .right {
-    border-left: 0;
-    border-top: 2px solid #c7c7c7;
-    padding: 30px 0;
-  }
-  .main .right .empDetails,
-  .main .right .empmoreDetails {
-    padding: 0;
-  }
-  .main .left {
-    height: calc(100% - 680px);
-    width: calc(100% - 300px);
-  }
-  .input[type="date"] {
-    width: 100%;
-  }
-}
+
 @media (max-width: 1490px) {
   .emptyState i {
     font-size: 200px;
   }
-  .viewForm {
-    max-height: 74vh;
-  }
+  /* .viewForm {
+    max-height: calc(100% - 120px);
+  } */
 }
 @media (max-width: 1587px) {
   .cards {

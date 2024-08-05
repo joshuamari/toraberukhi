@@ -36,7 +36,7 @@ if (count($groupMembers) > 0) {
 #region main query
 try {
     $requestQ = "SELECT `rl`.request_id,`rl`.emp_number,`rl`.requester_id,`gll`.name as requester_group,`rl`.dispatch_from,`rl`.dispatch_to,`rl`.date_requested,`ll`.location_name,`rl`.specific_loc,`el`.group_id,`gl`.name,`pd`.passport_expiry,`vd`.visa_expiry,`rl`.request_status,`rl`.date_modified FROM `pcosdb`.request_list rl JOIN `kdtphdb_new`.employee_list el ON `rl`.emp_number=`el`.id LEFT JOIN `passport_details` 
-    AS pd ON `pd`.emp_number=`el`.id LEFT JOIN `kdtphdb_new`.group_list gl ON `el`.group_id=`gl`.id LEFT JOIN `pcosdb`.khi_details kd ON `kd`.number=`rl`.requester_id LEFT JOIN `kdtphdb_new`.group_list gll ON `kd`.group_id=`gll`.id  LEFT JOIN `pcosdb`.location_list ll ON `rl`.location_id=`ll`.location_id LEFT JOIN `visa_details` AS vd ON `vd`.emp_number=`el`.id WHERE `rl`.emp_number != 0 $membersStatement ORDER BY `rl`.date_requested DESC LIMIT 10";
+    AS pd ON `pd`.emp_number=`el`.id LEFT JOIN `kdtphdb_new`.group_list gl ON `el`.group_id=`gl`.id LEFT JOIN `pcosdb`.khi_details kd ON `kd`.number=`rl`.requester_id LEFT JOIN `kdtphdb_new`.group_list gll ON `kd`.group_id=`gll`.id  LEFT JOIN `pcosdb`.location_list ll ON `rl`.location_id=`ll`.location_id LEFT JOIN `visa_details` AS vd ON `vd`.emp_number=`el`.id WHERE `rl`.emp_number != 0 $membersStatement ORDER BY `rl`.date_requested DESC";
     $requestStmt = $connpcs->prepare($requestQ);
     $requestStmt->execute();
     if ($requestStmt->rowCount() > 0) {

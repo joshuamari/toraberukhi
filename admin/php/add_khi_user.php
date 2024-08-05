@@ -20,57 +20,54 @@ $msg = array();
 if (!empty($_POST["empID"])) {
     $empID = $_POST["empID"];
 } else {
-  $msg['isSuccess'] = 0;
-  $msg['message'][] = 'Employee ID';
+    $msg['isSuccess'] = 0;
+    $msg['message'][] = 'Employee ID';
 }
 if (!empty($_POST["fname"])) {
     $fname = $_POST["fname"];
 } else {
-  $msg['isSuccess'] = 0;
-  $msg['message'][] = 'First Name';
+    $msg['isSuccess'] = 0;
+    $msg['message'][] = 'First Name';
 }
 if (!empty($_POST["lname"])) {
     $lname = $_POST["lname"];
 } else {
-  $msg['isSuccess'] = 0;
-  $msg['message'][] = 'Last Name';
+    $msg['isSuccess'] = 0;
+    $msg['message'][] = 'Last Name';
 }
 if (!empty($_POST["grpID"])) {
     $grpID = $_POST["grpID"];
 } else {
-  $msg['isSuccess'] = 0;
-  $msg['message'][] = 'Group';
+    $msg['isSuccess'] = 0;
+    $msg['message'][] = 'Group';
 }
 if (!empty($_POST["empacc"])) {
     $empacc = $_POST["empacc"];
-} else {
-  $msg['isSuccess'] = 0;
-  $msg['message'][] = 'Access Type';
 }
+
 if (!empty($_POST["empemail"])) {
-  $empEMAIL = $_POST["empemail"];
+    $empEMAIL = $_POST["empemail"];
 } else {
-  $msg['isSuccess'] = 0;
-  $msg['message'][] = 'Employee Email';
+    $msg['isSuccess'] = 0;
+    $msg['message'][] = 'Employee Email';
 }
 #for separation of error
 if (!empty($msg)) {
-	if (count($msg['message']) > 1) {
-		$errorString = '';
-		foreach ($msg['message'] as $result) {
-			if ($result === end($msg['message'])) {
-				$errorString .= "and '$result' Missing";
-			}
-			else {
-				$errorString .= "'$result', ";
-			}
-		}
-		$msg['message'] = $errorString;
-	} else {
-    $msg['message'] = implode("", $msg['message']);
-    $msg['message'] .= " Missing";
-  }
-	die(json_encode($msg));
+    if (count($msg['message']) > 1) {
+        $errorString = '';
+        foreach ($msg['message'] as $result) {
+            if ($result === end($msg['message'])) {
+                $errorString .= "and '$result' Missing";
+            } else {
+                $errorString .= "'$result', ";
+            }
+        }
+        $msg['message'] = $errorString;
+    } else {
+        $msg['message'] = implode("", $msg['message']);
+        $msg['message'] .= " Missing";
+    }
+    die(json_encode($msg));
 }
 $connpcs->beginTransaction();
 #endregion
@@ -109,7 +106,7 @@ try {
 
         $insertGroups = "INSERT INTO `khi_user_groups`(`user_id`,`group_id`) VALUE (:empID, :grpID)";
         $insertGroupsStmt = $connpcs->prepare($insertGroups);
-        if($insertGroupsStmt->execute([":empID" => "$empID", ":grpID" => "$grpID"])) {
+        if ($insertGroupsStmt->execute([":empID" => "$empID", ":grpID" => "$grpID"])) {
             $connpcs->commit();
             $message["isSuccess"] = 1;
             $message["message"] = "User successfully added";
