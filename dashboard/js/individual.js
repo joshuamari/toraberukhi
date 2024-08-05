@@ -13,12 +13,14 @@ checkAccess()
           getExpiringPassport(),
           getExpiringVisa(),
           getGraph(),
+          getcurrentYear(),
         ])
-          .then(([dList, epList, evList, dData]) => {
+          .then(([dList, epList, evList, dData, crrntYear]) => {
             fillDispatchList(dList);
             fillPassport(epList);
             fillVisa(evList);
             dispatchGraph(dData);
+            $(".crrntYear").text(`(${crrntYear})`);
           })
           .catch((error) => {
             alert(`${error}`);
@@ -62,6 +64,11 @@ $(document).on("click", "#logoutBtn", function () {
 //#endregion
 
 //#region FUNCTIONS
+function getcurrentYear() {
+  const yearNow = new Date().getFullYear();
+  return yearNow;
+}
+
 function getDispatchlist() {
   const ySel = $("#idYear").val();
   return new Promise((resolve, reject) => {

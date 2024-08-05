@@ -158,6 +158,7 @@ $(document).on("click", ".btn-delete", function () {
   var trID = $(this).closest("tr").attr("d-id");
   $("#storeId").html(num);
   $("#storeId").attr("del-id", trID);
+  $("#selectedEmp").text($("#empSel option:selected").text());
 });
 $(document).on("click", "#btn-deleteEntry", function () {
   deleteDispatch().then((res) => {
@@ -186,6 +187,7 @@ $(document).on("click", ".btn-delete-work", function () {
   var WHtrID = $(this).closest("tr").attr("wh-id");
   $("#storeWorkId").html(num);
   $("#storeWorkId").attr("del-work-id", WHtrID);
+  $("#selectedEmpWH").text($("#empSel option:selected").text());
 });
 $(document).on("click", "#btn-deleteWorkHistory", function () {
   deleteWork().then((res) => {
@@ -505,7 +507,10 @@ function formatName(name) {
 }
 function fillAttachment() {
   const reqDept = $("#reqDeptInput").val();
-  const reqName = $("#reqNameInput").val();
+  // const reqName = $("#reqNameInput").val();
+  const fName = empDetails.firstname;
+  const sName = empDetails.surname;
+  const fullName = capitalizeWords(`${fName} ${sName}`);
   const grp = $("#grpSel").find("option:selected").text();
   const emp = $("#empSel").find("option:selected").text();
   const startD = $("#startDate").val();
@@ -520,7 +525,7 @@ function fillAttachment() {
   $("#printJap, #printPh, #printThird").empty();
 
   $("#printBU").text(reqDept);
-  $("#printKHI").text(reqName);
+  $("#printKHI").text(fullName);
   $("#printName").text(formatName(emp));
   $("#printFrom").text(formatDate(startD));
   $("#printTo").text(formatDate(endD));
@@ -1144,7 +1149,7 @@ function removeOutline() {
 }
 function checkDispatch() {
   const reqDept = $("#reqDeptInput").val();
-  const reqName = $("#reqNameInput").val();
+  // const reqName = $("#reqNameInput").val();
   const grp = $("#grpSel").find("option:selected").attr("grp-id");
   const empID = $("#empSel").find("option:selected").attr("emp-id");
   const startD = $("#startDate").val();
@@ -1163,10 +1168,10 @@ function checkDispatch() {
     $("#reqDeptInput").addClass("bg-red-100  border-red-400");
     ctr++;
   }
-  if (!reqName) {
-    $("#reqNameInput").addClass("bg-red-100  border-red-400");
-    ctr++;
-  }
+  // if (!reqName) {
+  //   $("#reqNameInput").addClass("bg-red-100  border-red-400");
+  //   ctr++;
+  // }
   if (!grp) {
     $("#grpSel").addClass("bg-red-100  border-red-400");
     ctr++;
@@ -1233,7 +1238,7 @@ function checkDispatch() {
 }
 function insertDispatch() {
   const reqDept = $("#reqDeptInput").val();
-  const reqName = $("#reqNameInput").val();
+  // const reqName = $("#reqNameInput").val();
   const grp = $("#grpSel").find("option:selected").attr("grp-id");
   const empID = $("#empSel").find("option:selected").attr("emp-id");
   const startD = $("#startDate").val();
@@ -1261,7 +1266,7 @@ function insertDispatch() {
     url: "php/insert_request.php",
     data: {
       request_dept: reqDept,
-      request_name: reqName,
+      // request_name: reqName,
       empID: empID,
       dateFrom: startD,
       dateTo: endD,
@@ -1294,28 +1299,24 @@ function insertDispatch() {
             fillDispatchHistory(dHistory);
             dispatch_days = dd;
             fillYearly(yrl);
-            // $("#reqDeptInput").val("");
-            // $("#reqNameInput").val("");
-            // $("#grpSel").val(0);
-            // $("#empSel").val(0);
-            // $("#startDate").val("");
-            // $("#endDate").val("");
-            // $("#daysCount").text("0 Day");
-            // $("#locSel").val(0);
-            // $("#specLocInput").val("");
-            // $("#inviteSel").val(0);
-            // $("#workOrder").val("");
-            // $("#projName").val("");
-            // $("#allowance").val("0");
-            // $("#siteDispatch").prop("checked", false);
-            // to_add = 0;
-            clearInput();
-            // countTotal();
-            $("#attachmentModal").modal("hide");
-            showToast(
-              "success",
-              "Successfully sent a dispatch request to KDT."
-            );
+            $("#reqDeptInput").val("");
+            $("#reqNameInput").val("");
+            $("#grpSel").val(0);
+            $("#empSel").val(0);
+            $("#startDate").val("");
+            $("#endDate").val("");
+            $("#daysCount").text("0 Day");
+            $("#locSel").val(0);
+            $("#specLocInput").val("");
+            $("#inviteSel").val(0);
+            $("#workOrder").val("");
+            $("#projName").val("");
+            $("#allowance").val("0");
+            $("#siteDispatch").prop("checked", false);
+            to_add = 0;
+            countTotal();
+            $("#attachmentModal .btn-close").click();
+            showToast("success", "Successfully added a dispatch entry.");
             $("#btnSend").prop("disabled", false);
             console.log("enabling send email btn");
             toggleLoadingAnimation(false);
@@ -1549,7 +1550,7 @@ function addWorkHistory() {
   }
   $(".dateError").text("Please Complete the Fields");
   return new Promise((resolve, reject) => {
-    if (endMonthYear && endMonthYear < startMonthYear) {
+    if (!endMonthYear && endMonthYear < startMonthYear) {
       $("#addEndMonthYear").val("");
       $("#addStartMonthYear").val("");
       $("#addEndMonthYear").addClass("bg-red-100  border-red-400");
