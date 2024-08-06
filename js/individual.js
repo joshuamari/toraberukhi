@@ -23,6 +23,7 @@ let monthNames2 = [
 //#endregion
 checkAccess()
   .then((emp) => {
+    console.log(emp);
     if (emp.isSuccess) {
       empDetails = emp.data;
       $(document).ready(function () {
@@ -972,10 +973,13 @@ function fillWorkHistory(wList) {
 
       tableBody.append(row);
     });
-    var addDataRow = $(
-      "<tr> <td colspan='10' class='add-work text-center text-[var(--gray-text)] bg-[var(--white)]'> + Add New Item</td></tr>"
-    );
-    tableBody.append(addDataRow);
+
+    if (wList.length < 3) {
+      var addDataRow = $(
+        "<tr> <td colspan='10' class='add-work text-center text-[var(--gray-text)] bg-[var(--white)]'> + Add New Item</td></tr>"
+      );
+      tableBody.append(addDataRow);
+    }
   }
 }
 function getDispatchHistory() {
@@ -1472,6 +1476,8 @@ function addWorkHistory() {
   const business_cont = $("#addbusinessContent").val();
   const work_loc = $("#addworkLocation").val();
   let errcount = 0;
+  console.log(startMonthYear);
+  console.log(endMonthYear);
 
   if (!comp_name) {
     $("#addcompanyName").addClass("bg-red-100  border-red-400");
@@ -1505,7 +1511,7 @@ function addWorkHistory() {
   }
   $(".dateError").text("Please Complete the Fields");
   return new Promise((resolve, reject) => {
-    if (!endMonthYear && endMonthYear < startMonthYear) {
+    if (endMonthYear && endMonthYear < startMonthYear) {
       $("#addEndMonthYear").val("");
       $("#addStartMonthYear").val("");
       $("#addEndMonthYear").addClass("bg-red-100  border-red-400");
