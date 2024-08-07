@@ -421,7 +421,6 @@ function formatDate(date) {
   return day + " " + monthName + " " + year;
 }
 function fillAttachment(data) {
-  console.log(data);
   $(".siteDispatch").empty();
   $("#printJap, #printPh, #printThird").text("");
   var date = data.date_request;
@@ -494,6 +493,12 @@ function fillAttachment2(data) {
         item.end_year = "";
       }
       if (item.end_month == null) {
+        item.end_month = "";
+      }
+      if (item.end_year == "-0001") {
+        item.end_year = "";
+      }
+      if (item.end_month == "11") {
         item.end_month = "";
       }
       str = `
