@@ -430,7 +430,20 @@ $(document).on("click", "#btnSend", function () {
       const isSuccess = res.isSuccess;
       if (!isSuccess) {
         showToast("error", `${res.error}`);
+        $("#buttonHere").html(` <button type="button" data-bs-dismiss="modal"
+          aria-label="Close" class="btn bg-[var(--dark)] hover:bg-[var(--dark-200)] text-[var(--white)]" id="btnBack">
+            Back
+          </button>
+            <button class="btn-send btn" id="btnSend">Submit Request</button>
+           `);
       } else {
+        $("#buttonHere").html(`
+          <button type="button" data-bs-dismiss="modal"
+   aria-label="Close" class="btn bg-[var(--dark)] hover:bg-[var(--dark-200)] text-[var(--white)]" id="btnBack">
+     Back
+   </button>
+         <button class="btn-send btn" id="btnSend">Submit Request</button>
+        `);
         Promise.all([getDispatchHistory(), getDispatchDays(), getYearly()])
           .then(([dlst, dd, yrl]) => {
             dHistory = dlst;
@@ -506,6 +519,7 @@ function formatName(name) {
   return given + " " + surname;
 }
 function fillAttachment() {
+  console.log(empDetails);
   const reqDept = $("#reqDeptInput").val();
   // const reqName = $("#reqNameInput").val();
   const fName = empDetails.firstname;
@@ -907,39 +921,44 @@ function fillWorkHistory(wList) {
     tableBody.append(addDataRow);
   } else {
     $.each(wList, function (index, item) {
-      if (count < 3) {
-        var row = $(`<tr wh-id=${item.id}>`);
-        row.append(`<td data-exclude='true'>${index + 1}</td>`);
-        row.append(
-          `<td  data-f-name="Arial" data-f-sz="9"  data-a-h="center" data-a-v="middle" 	data-b-a-s="thin" data-b-a-c="000000">${item.start_year}</td>`
-        );
-        row.append(
-          `<td  data-f-name="Arial" data-f-sz="9"  data-a-h="center" data-a-v="middle" 	data-b-a-s="thin" data-b-a-c="000000">${item.start_month}</td>`
-        );
-        row.append(
-          `<td  data-f-name="Arial" data-f-sz="9"  data-a-h="center" data-a-v="middle" 	data-b-a-s="thin" data-b-a-c="000000">${
-            item.end_year ? item.end_year : ""
-          }</td>`
-        );
-        row.append(
-          `<td  data-f-name="Arial" data-f-sz="9"  data-a-h="center" data-a-v="middle" 	data-b-a-s="thin" data-b-a-c="000000">${
-            item.end_month ? item.end_month : ""
-          }</td>`
-        );
-        row.append(
-          `<td  data-f-name="Arial" data-f-sz="9"  data-a-h="center" data-a-v="middle" 	data-b-a-s="thin" data-b-a-c="000000">${item.comp_name}</td>`
-        );
-        row.append(
-          `<td  data-f-name="Arial" data-f-sz="9"  data-a-h="center" data-a-v="middle" 	data-b-a-s="thin" data-b-a-c="000000">${item.comp_business}</td>`
-        );
-        row.append(
-          `<td  data-f-name="Arial" data-f-sz="9"  data-a-h="center" data-a-v="middle" 	data-b-a-s="thin" data-b-a-c="000000">${item.business_cont}</td>`
-        );
-        row.append(
-          `<td  data-f-name="Arial" data-f-sz="9"  data-a-h="center" data-a-v="middle" 	data-b-a-s="thin" data-b-a-c="000000">${item.work_loc}</td>`
-        );
+      if (item.end_year == 0) {
+        item.end_year = null;
+      }
+      if (item.end_month == 0) {
+        item.end_month = null;
+      }
+      var row = $(`<tr wh-id=${item.id}>`);
+      row.append(`<td data-exclude='true'>${index + 1}</td>`);
+      row.append(
+        `<td  data-f-name="Arial" data-f-sz="9"  data-a-h="center" data-a-v="middle" 	data-b-a-s="thin" data-b-a-c="000000">${item.start_year}</td>`
+      );
+      row.append(
+        `<td  data-f-name="Arial" data-f-sz="9"  data-a-h="center" data-a-v="middle" 	data-b-a-s="thin" data-b-a-c="000000">${item.start_month}</td>`
+      );
+      row.append(
+        `<td  data-f-name="Arial" data-f-sz="9"  data-a-h="center" data-a-v="middle" 	data-b-a-s="thin" data-b-a-c="000000">${
+          item.end_year ? item.end_year : ""
+        }</td>`
+      );
+      row.append(
+        `<td  data-f-name="Arial" data-f-sz="9"  data-a-h="center" data-a-v="middle" 	data-b-a-s="thin" data-b-a-c="000000">${
+          item.end_month ? item.end_month : ""
+        }</td>`
+      );
+      row.append(
+        `<td  data-f-name="Arial" data-f-sz="9"  data-a-h="center" data-a-v="middle" 	data-b-a-s="thin" data-b-a-c="000000">${item.comp_name}</td>`
+      );
+      row.append(
+        `<td  data-f-name="Arial" data-f-sz="9"  data-a-h="center" data-a-v="middle" 	data-b-a-s="thin" data-b-a-c="000000">${item.comp_business}</td>`
+      );
+      row.append(
+        `<td  data-f-name="Arial" data-f-sz="9"  data-a-h="center" data-a-v="middle" 	data-b-a-s="thin" data-b-a-c="000000">${item.business_cont}</td>`
+      );
+      row.append(
+        `<td  data-f-name="Arial" data-f-sz="9"  data-a-h="center" data-a-v="middle" 	data-b-a-s="thin" data-b-a-c="000000">${item.work_loc}</td>`
+      );
 
-        row.append(`<td data-exclude='true'>
+      row.append(`<td data-exclude='true'>
         <div class="d-flex gap-2">
         <button
           class="btn-edit-work"
@@ -958,9 +977,8 @@ function fillWorkHistory(wList) {
         </button>
       </div></td>`);
 
-        tableBody.append(row);
-        count++;
-      }
+      tableBody.append(row);
+      count++;
     });
     if (count < 3) {
       var addDataRow = $(
@@ -1267,98 +1285,39 @@ function insertDispatch() {
      Sending Request . . .
     </button>
    `);
-  $.ajax({
-    type: "POST",
-    url: "php/insert_request.php",
-    data: {
-      request_dept: reqDept,
-      // request_name: reqName,
-      empID: empID,
-      dateFrom: startD,
-      dateTo: endD,
-      locID: locID,
-      spec_loc: specLoc,
-      inviID: inviteID,
-      workOrder: workOrder,
-      project_name: projName,
-      allowance: allowance,
-      site_dispatch: siteDispatch,
-    },
-    dataType: "json",
-    success: function (response) {
-      console.log(response);
-      const isSuccess = response.isSuccess;
-      if (!isSuccess) {
-        $("#attachmentModal").modal("hide");
-        toggleLoadingAnimation(false);
-        $("#buttonHere").html(` <button type="button" data-bs-dismiss="modal"
-        aria-label="Close" class="btn bg-[var(--dark)] hover:bg-[var(--dark-200)] text-[var(--white)]" id="btnBack">
-          Back
-        </button>
-          <button class="btn-send btn" id="btnSend">Submit Request</button>
-         `);
-        showToast("error", `${response.error}`);
-      } else {
-        Promise.all([getDispatchHistory(), getDispatchDays(), getYearly()])
-          .then(([dlst, dd, yrl]) => {
-            dHistory = dlst;
-            fillDispatchHistory(dHistory);
-            dispatch_days = dd;
-            fillYearly(yrl);
-            $("#reqDeptInput").val("");
-            $("#reqNameInput").val("");
-            $("#grpSel").val(0);
-            $("#empSel").val(0);
-            $("#startDate").val("");
-            $("#endDate").val("");
-            $("#daysCount").text("0 Day");
-            $("#locSel").val(0);
-            $("#specLocInput").val("");
-            $("#inviteSel").val(0);
-            $("#workOrder").val("");
-            $("#projName").val("");
-            $("#allowance").val("0");
-            $("#siteDispatch").prop("checked", false);
-            to_add = 0;
-            countTotal();
-            $("#attachmentModal .btn-close").click();
-            showToast("success", "Successfully added a dispatch entry.");
-            $("#btnSend").prop("disabled", false);
-            console.log("enabling send email btn");
-            toggleLoadingAnimation(false);
-            $("#buttonHere").html(`
-               <button type="button" data-bs-dismiss="modal"
-        aria-label="Close" class="btn bg-[var(--dark)] hover:bg-[var(--dark-200)] text-[var(--white)]" id="btnBack">
-          Back
-        </button>
-              <button class="btn-send btn" id="btnSend">Submit Request</button>
-             `);
-          })
-          .catch((error) => {
-            $("#attachmentModal").modal("hide");
-            $("#btnSend").prop("disabled", false);
-            toggleLoadingAnimation(false);
-            $("#buttonHere").html(`
-               <button type="button" data-bs-dismiss="modal"
-        aria-label="Close" class="btn bg-[var(--dark)] hover:bg-[var(--dark-200)] text-[var(--white)]" id="btnBack">
-          Back
-        </button>
-               <button class="btn-send btn" id="btnSend">Submit Request</button>
-             `);
-            alert(`${error}`);
-          });
-      }
-    },
-    error: function (xhr, status, error) {
-      if (xhr.status === 404) {
-        alert("Not Found Error: The requested resource was not found.");
-      } else if (xhr.status === 500) {
-        alert("Internal Server Error: There was a server error.");
-      } else {
-        console.log(error);
-        alert(error);
-      }
-    },
+  return new Promise((resolve, reject) => {
+    $.ajax({
+      type: "POST",
+      url: "php/insert_request.php",
+      data: {
+        request_dept: reqDept,
+        // request_name: reqName,
+        empID: empID,
+        dateFrom: startD,
+        dateTo: endD,
+        locID: locID,
+        spec_loc: specLoc,
+        inviID: inviteID,
+        workOrder: workOrder,
+        project_name: projName,
+        allowance: allowance,
+        site_dispatch: siteDispatch,
+      },
+      dataType: "json",
+      success: function (response) {
+        const res = response;
+        resolve(res);
+      },
+      error: function (xhr, status, error) {
+        if (xhr.status === 404) {
+          reject("Not Found Error: The requested resource was not found.");
+        } else if (xhr.status === 500) {
+          reject("Internal Server Error: There was a server error.");
+        } else {
+          reject(error);
+        }
+      },
+    });
   });
 }
 function clearInput() {
@@ -1523,6 +1482,8 @@ function addWorkHistory() {
   const business_cont = $("#addbusinessContent").val();
   const work_loc = $("#addworkLocation").val();
   let errcount = 0;
+  console.log(startMonthYear);
+  console.log(endMonthYear);
 
   if (!comp_name) {
     $("#addcompanyName").addClass("bg-red-100  border-red-400");
@@ -1556,7 +1517,7 @@ function addWorkHistory() {
   }
   $(".dateError").text("Please Complete the Fields");
   return new Promise((resolve, reject) => {
-    if (!endMonthYear && endMonthYear < startMonthYear) {
+    if (endMonthYear && endMonthYear < startMonthYear) {
       $("#addEndMonthYear").val("");
       $("#addStartMonthYear").val("");
       $("#addEndMonthYear").addClass("bg-red-100  border-red-400");

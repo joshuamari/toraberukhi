@@ -81,6 +81,18 @@ if (!empty($msg)) {
 }
 #endregion
 
+#for check if there is already 3 work history
+$selectQ = "SELECT COUNT(*) FROM `work_history` WHERE `emp_id` = :empID";
+$selectQStmt = $connpcs->prepare($selectQ);
+$selectQStmt->execute([":empID" => $empNumber]);
+$entryCount = $selectQStmt->fetchColumn();
+if($entryCount > 2) {
+	$msg["isSuccess"] = false;
+	$msg['error'] = "Work History Full";
+	die(json_encode($msg));
+}
+#endregion
+
 #setting up dates
 $date_Start = date($date_monthYearStart . "-01");
 #endregion
