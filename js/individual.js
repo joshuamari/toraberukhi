@@ -898,6 +898,7 @@ function getWorkHistory() {
 }
 function fillWorkHistory(wList) {
   var tableBody = $("#wList");
+  let count = 0;
   tableBody.empty();
   if (wList.length === 0) {
     var addDataRow = $(
@@ -906,38 +907,39 @@ function fillWorkHistory(wList) {
     tableBody.append(addDataRow);
   } else {
     $.each(wList, function (index, item) {
-      var row = $(`<tr wh-id=${item.id}>`);
-      row.append(`<td data-exclude='true'>${index + 1}</td>`);
-      row.append(
-        `<td  data-f-name="Arial" data-f-sz="9"  data-a-h="center" data-a-v="middle" 	data-b-a-s="thin" data-b-a-c="000000">${item.start_year}</td>`
-      );
-      row.append(
-        `<td  data-f-name="Arial" data-f-sz="9"  data-a-h="center" data-a-v="middle" 	data-b-a-s="thin" data-b-a-c="000000">${item.start_month}</td>`
-      );
-      row.append(
-        `<td  data-f-name="Arial" data-f-sz="9"  data-a-h="center" data-a-v="middle" 	data-b-a-s="thin" data-b-a-c="000000">${
-          item.end_year ? item.end_year : ""
-        }</td>`
-      );
-      row.append(
-        `<td  data-f-name="Arial" data-f-sz="9"  data-a-h="center" data-a-v="middle" 	data-b-a-s="thin" data-b-a-c="000000">${
-          item.end_month ? item.end_month : ""
-        }</td>`
-      );
-      row.append(
-        `<td  data-f-name="Arial" data-f-sz="9"  data-a-h="center" data-a-v="middle" 	data-b-a-s="thin" data-b-a-c="000000">${item.comp_name}</td>`
-      );
-      row.append(
-        `<td  data-f-name="Arial" data-f-sz="9"  data-a-h="center" data-a-v="middle" 	data-b-a-s="thin" data-b-a-c="000000">${item.comp_business}</td>`
-      );
-      row.append(
-        `<td  data-f-name="Arial" data-f-sz="9"  data-a-h="center" data-a-v="middle" 	data-b-a-s="thin" data-b-a-c="000000">${item.business_cont}</td>`
-      );
-      row.append(
-        `<td  data-f-name="Arial" data-f-sz="9"  data-a-h="center" data-a-v="middle" 	data-b-a-s="thin" data-b-a-c="000000">${item.work_loc}</td>`
-      );
+      if (count < 3) {
+        var row = $(`<tr wh-id=${item.id}>`);
+        row.append(`<td data-exclude='true'>${index + 1}</td>`);
+        row.append(
+          `<td  data-f-name="Arial" data-f-sz="9"  data-a-h="center" data-a-v="middle" 	data-b-a-s="thin" data-b-a-c="000000">${item.start_year}</td>`
+        );
+        row.append(
+          `<td  data-f-name="Arial" data-f-sz="9"  data-a-h="center" data-a-v="middle" 	data-b-a-s="thin" data-b-a-c="000000">${item.start_month}</td>`
+        );
+        row.append(
+          `<td  data-f-name="Arial" data-f-sz="9"  data-a-h="center" data-a-v="middle" 	data-b-a-s="thin" data-b-a-c="000000">${
+            item.end_year ? item.end_year : ""
+          }</td>`
+        );
+        row.append(
+          `<td  data-f-name="Arial" data-f-sz="9"  data-a-h="center" data-a-v="middle" 	data-b-a-s="thin" data-b-a-c="000000">${
+            item.end_month ? item.end_month : ""
+          }</td>`
+        );
+        row.append(
+          `<td  data-f-name="Arial" data-f-sz="9"  data-a-h="center" data-a-v="middle" 	data-b-a-s="thin" data-b-a-c="000000">${item.comp_name}</td>`
+        );
+        row.append(
+          `<td  data-f-name="Arial" data-f-sz="9"  data-a-h="center" data-a-v="middle" 	data-b-a-s="thin" data-b-a-c="000000">${item.comp_business}</td>`
+        );
+        row.append(
+          `<td  data-f-name="Arial" data-f-sz="9"  data-a-h="center" data-a-v="middle" 	data-b-a-s="thin" data-b-a-c="000000">${item.business_cont}</td>`
+        );
+        row.append(
+          `<td  data-f-name="Arial" data-f-sz="9"  data-a-h="center" data-a-v="middle" 	data-b-a-s="thin" data-b-a-c="000000">${item.work_loc}</td>`
+        );
 
-      row.append(`<td data-exclude='true'>
+        row.append(`<td data-exclude='true'>
         <div class="d-flex gap-2">
         <button
           class="btn-edit-work"
@@ -956,12 +958,16 @@ function fillWorkHistory(wList) {
         </button>
       </div></td>`);
 
-      tableBody.append(row);
+        tableBody.append(row);
+        count++;
+      }
     });
-    var addDataRow = $(
-      "<tr> <td colspan='10' class='add-work text-center text-[var(--gray-text)] bg-[var(--white)]'> + Add New Item</td></tr>"
-    );
-    tableBody.append(addDataRow);
+    if (count < 3) {
+      var addDataRow = $(
+        "<tr> <td colspan='10' class='add-work text-center text-[var(--gray-text)] bg-[var(--white)]'> + Add New Item</td></tr>"
+      );
+      tableBody.append(addDataRow);
+    }
   }
 }
 function getDispatchHistory() {

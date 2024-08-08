@@ -10,34 +10,32 @@ table tbody tr td {
 }
 
 table thead tr th {
-
   background-color: var(--tableheader);
   font-size: 12px !important;
   text-transform: uppercase;
   white-space: nowrap;
   vertical-align: middle;
-color: var(--text-color);
-  padding:  0.75rem;
+  color: var(--text-color);
+  padding: 0.75rem;
   border-top: 1px solid #ebebeb;
   border-bottom: 1px solid #ebebeb;
 }
- thead tr th:first-of-type {
+thead tr th:first-of-type {
   border-top-left-radius: 8px;
   border-bottom-left-radius: 8px;
   border-left: 1px solid #ebebeb;
 }
- thead tr th:last-of-type {
+thead tr th:last-of-type {
   border-top-right-radius: 8px;
   border-bottom-right-radius: 8px;
   justify-content: end;
   border-right: 1px solid #ebebeb;
   width: 3%;
 }
-tbody tr td:last-of-type{
- justify-content: end;
+tbody tr td:last-of-type {
+  justify-content: end;
   width: 25px;
 }
-
 
 thead {
   /* box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); */
@@ -48,26 +46,25 @@ thead {
   justify-content: space-between;
 }
 table tbody tr td {
-  background-color: #fff ;
+  background-color: #fff;
   padding: 16px 10px;
   font-weight: 400;
   border-bottom: 1px solid var(--gray);
   cursor: pointer;
 }
 
-tbody tr:hover td{
+tbody tr:hover td {
   background-color: var(--tablehover);
 }
 
-
-.card{
+.card {
   width: 100%;
   padding: 16px;
   border-color: var(--gray);
-  border-radius: 0.75rem ;
+  border-radius: 0.75rem;
 }
-.card .icon{
-  background-color:var(--dark);
+.card .icon {
+  background-color: var(--dark);
   width: 25px;
   height: 25px;
   display: flex;
@@ -75,130 +72,134 @@ tbody tr:hover td{
   justify-content: center;
   border-radius: 0.375rem;
 }
-.card .icon i{
+.card .icon i {
   color: var(--white);
 }
-.card h2{
-   color: var(--dark) ;
+.card h2 {
+  color: var(--dark);
   font-weight: 700;
 }
 .card h6 {
-  color: var(--dark) ;
+  color: var(--dark);
   font-weight: 600;
   margin: 0;
 }
 
-.card.active{
+.card.active {
   background-color: var(--dark);
   color: var(--white) !important;
 }
 
-.card.active .icon{
+.card.active .icon {
   background-color: var(--white);
-
 }
-.card.active .icon i{
+.card.active .icon i {
   color: var(--dark);
 }
-.card.active h6, .card.active h2{
+.card.active h6,
+.card.active h2 {
   color: var(--white);
 }
-.indicator{
+.indicator {
   transition: left 0.4s;
 }
-.filters span{
+.filters span {
   font-size: 12px;
   /* text-transform: uppercase; */
   white-space: nowrap;
 }
-.filters span, .filters i{
+.filters span,
+.filters i {
   color: var(--gray-text);
-  
 }
-.input.search{
+.input.search {
   line-height: 1;
   font-size: 12px;
   padding-top: 7px;
   padding-bottom: 7px;
-
 }
-#grpSel:hover~.grpbtn, #monthSel:hover~.mobtn{
+#grpSel:hover ~ .grpbtn,
+#monthSel:hover ~ .mobtn {
   background-color: var(--white);
 }
-#grpSel.active~.grpCont i:first-of-type,
-#monthSel.active~.mobtn i:first-of-type{
+#grpSel.active ~ .grpCont i:first-of-type,
+#monthSel.active ~ .mobtn i:first-of-type {
   color: #1bc459 !important;
 }
-#grpSel.active~.grpCont #lblGrp, #monthSel.active~.mobtn #monthLabel{
+#grpSel.active ~ .grpCont #lblGrp,
+#monthSel.active ~ .mobtn #monthLabel {
   color: var(--dark);
   font-weight: 600;
 }
 
 ::-webkit-calendar-picker-indicator {
-   background-color: aqua;
-  width: 100%; 
-cursor: pointer;
+  background-color: aqua;
+  width: 100%;
+  cursor: pointer;
   padding: 50px;
-  }
-  ::-webkit-datetime-edit-fields-wrapper{
-    width: 0;
-  }
+}
+::-webkit-datetime-edit-fields-wrapper {
+  width: 0;
+}
 
-.status{
+.status {
   padding: 3px 16px;
   border-radius: 0.375rem;
   font-weight: 600;
   font-size: 10px;
-  text-transform: uppercase;}
-.status.pending{
+  text-transform: uppercase;
+}
+.status.pending {
   background-color: var(--yellow-100);
   /* border: 1px solid var(--yellow-color); */
   color: var(--yellow-200) !important;
 }
-.status.lg{
+.status.lg {
   font-size: 14px;
 }
-.status.accepted{
+.status.accepted {
   background-color: var(--secondary-100);
   /* border: 1px solid var(--darkest); */
   color: var(--darkest-100) !important;
 }
-.status.cancelled{
+.status.cancelled {
   background-color: var(--red-100);
   /* border: 1px solid var(--red-200); */
   color: var(--red-200) !important;
 }
-.openIcon{
+.openIcon {
   display: flex;
   justify-content: end;
-
 }
-.openIcon svg{
+.openIcon svg {
   display: block;
   width: 14px;
   height: 14px;
 }
-.visa a,.visa a i, .passport a, .passport a i{
+.visa a,
+.visa a i,
+.passport a,
+.passport a i {
   color: var(--gray-text) !important;
 }
-.visa:hover a, .visa:hover a i, .passport:hover a,  .passport:hover a i{
+.visa:hover a,
+.visa:hover a i,
+.passport:hover a,
+.passport:hover a i {
   color: var(--gray-text2) !important;
 }
 
-
-
-#attachmentModal p{
+#attachmentModal p {
   font-size: 14px;
   font-family: "Arial", sans-serif;
- line-height: normal;
-
-  
+  line-height: normal;
 }
-#attachmentModal td, #attachmentModal th{
+#attachmentModal td,
+#attachmentModal th {
   margin: 0 !important;
   padding: 0 10px;
   background-color: #fff;
-  font-family:"Arial", sans-serif;
+  font-family: "Arial", sans-serif;
   border: 0.5px solid #000;
   border-radius: 0;
   text-transform: none;
@@ -206,37 +207,32 @@ cursor: pointer;
   border-left: 0;
   line-height: normal;
   vertical-align: middle;
- 
 }
-#attachmentModal th{
+#attachmentModal th {
   height: 20px;
-  
-
 }
 
-#attachmentModal td{
+#attachmentModal td {
   border-top: 0;
   cursor: default;
-  
 }
-#attachmentModal th.sm{
+#attachmentModal th.sm {
   max-width: 45px;
   min-width: 45px;
   width: 45px;
 }
-#attachmentModal td.sm{
+#attachmentModal td.sm {
   text-align: center;
- 
 }
-#attachmentModal td.sm i{
-   vertical-align: middle;
+#attachmentModal td.sm i {
+  vertical-align: middle;
 }
-#attachmentModal tr:nth-of-type(4n+1) td:first-child,
-#attachmentModal th:first-of-type{
+#attachmentModal tr:nth-of-type(4n + 1) td:first-child,
+#attachmentModal th:first-of-type {
   border-left: 0.5px solid #000;
 }
 
-#toPrint2 th{
+#toPrint2 th {
   background-color: var(--main);
   border: 0.5px solid #000;
   border-radius: 0;
@@ -245,24 +241,50 @@ cursor: pointer;
   text-transform: none;
   border-left: 0;
   font-family: "Arial", sans-serif;
+
+  padding: 5px;
+  width: 1px;
+  max-width: 1px;
+  word-wrap: break-word;
 }
-#toPrint2 td{
+#toPrint2 td {
   text-transform: none;
   cursor: auto;
   text-align: center;
   white-space: normal;
   font-family: "Arial", sans-serif;
- 
-  border: 0.5px solid #000; border-left: 0;
+
+  border: 0.5px solid #000;
+  border-left: 0;
+
+  padding: 5px;
+  width: 1px;
+  max-width: 1px;
+  word-wrap: break-word;
+  /* word-break: break-all; */
 }
-#toPrint2 tr th:first-of-type ,
-#toPrint2 td:first-of-type{
+#toPrint2 table thead .main-col {
+  width: 20px;
+  max-width: 20px;
+  white-space: normal;
+  word-wrap: break-word;
+}
+#toPrint2 table thead .ym-col {
+  width: 5px;
+  max-width: 1px;
+  white-space: normal;
+  word-wrap: break-word;
+}
+#toPrint2 table thead .up-col {
+  width: 10px;
+}
+#toPrint2 tr th:first-of-type,
+#toPrint2 td:first-of-type {
   border-left: 1px solid #000;
 }
-#toPrint2 tr:nth-of-type(2) th{
+#toPrint2 tr:nth-of-type(2) th {
   border-top: 0;
 }
-
 
 @media (max-width: 946px) {
   .selection {

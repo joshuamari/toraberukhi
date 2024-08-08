@@ -4,7 +4,7 @@ const dispTableID = ["eList"];
 let empDetails = [];
 let accessTypes = {
   0: "Group Admin",
-  1: "Admin",
+  1: "Admin (Only for KDT)",
 };
 let employees = [];
 let filtered_employees = [];
@@ -131,8 +131,7 @@ $(document).on("click", "#saveBtn", function () {
           employees = emps;
           searchEmployee(employees);
         });
-      }
-      else {
+      } else {
         showToast("error", `${res.message}`);
       }
     })
@@ -248,6 +247,9 @@ function fillEmployees(emps) {
     row.append(`<td>${item.id}</td>`);
     row.append(`<td>${fullName}</td>`);
     row.append(`<td grp-id='${item.group.id}'>${item.group.abbr}</td>`);
+    if (accessTypes[item.type] === "Admin (Only for KDT)") {
+      accessTypes[item.type] = "Admin";
+    }
     row.append(`<td>${accessTypes[item.type]}</td>`);
     const options =
       item.type > empDetails["type"]

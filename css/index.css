@@ -376,7 +376,15 @@ input:checked + .toggle:after {
   font-weight: 400;
   /* color: var(--dark); */
   border-bottom: 1px solid var(--gray);
+  /* width: 50px;
+  height: 100px;
+  word-wrap: break-word; */
 }
+
+.work-hist table thead tr th .work-loc {
+  max-width: 20px;
+}
+
 .work-hist tbody tr:hover td {
   background-color: var(--tablehover);
 }
@@ -387,6 +395,7 @@ input:checked + .toggle:after {
   cursor: pointer;
   /* color: var(--text-color); */
 }
+
 /* END OF TABLES CSS */
 
 .totalThisYear {
