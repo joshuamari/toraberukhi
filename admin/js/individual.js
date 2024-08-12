@@ -89,7 +89,7 @@ $(document).on("click", "#addUserModal .btn-close", function () {
   resetAddModal();
 });
 $(document).on("click", ".close", function () {
-  $(this).closest("modal").find(".btn-close").click();
+  resetAddModal();
 });
 $(document).on("click", ".btn-editUser", function () {
   var empnum = $(this).closest("tr").find("td:eq(0)").text();
@@ -456,14 +456,14 @@ function addUser() {
 
 function resetAddModal() {
   var selectedG = $("#empGroup").children(":first").val();
-  var selectedA = $("#empAccess").children(":first").val();
-  $("#empId, #empFName, #empLName").val("");
+  var selectedA = $("#empAccessAdd").children(":first").val();
+  $("#empId, #empFName, #empLName, #empEmail").val("");
   $("#empGroup").val(selectedG);
-  $("#empAccess").val(selectedA);
-  $("#empAccess , #empGroup, #empLName, #empFName, #empId")
+  $("#empAccessAdd").val(selectedA);
+  $("#empAccessAdd , #empGroup, #empLName, #empFName, #empId")
     .siblings("small")
     .addClass("hidden");
-  $("#empId, #empFName, #empLName, #empGroup, #empAccess").removeClass(
+  $("#empId, #empFName, #empLName, #empGroup, #empAccessAdd").removeClass(
     "border-[var(--red-color)] bg-red-200"
   );
 }
