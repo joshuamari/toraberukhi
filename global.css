@@ -238,6 +238,11 @@ nav li.active {
   font-weight: 700 !important;
 }
 
+.btn-bug:hover i,
+.btn-bug:hover p {
+  color: var(--secondary);
+}
+
 .sentry-error-embed .form-submit .btn {
   background: var(--dark) !important;
   border: 1px solid var(--dark) !important;
