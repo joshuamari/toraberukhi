@@ -16,6 +16,7 @@ $headString = "<title>$titleName</title>
   <script src='js/jquery.js'></script>
   <script src='js/tableToExcel.js'></script>
   <script src='js/bootstrap.min.js'></script>
+  <script src='http://js.sentry-cdn.com/996e6a7f7f64d413dd43124ae5dece7e.min.js' crossorigin='anonymous'></script>
   ";
 $addString = "";
 //ADD TO ULI SA HEADSTRING BAT DI NAGANA

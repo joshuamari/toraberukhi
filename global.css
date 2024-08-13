@@ -7,7 +7,7 @@
 * {
   margin: 0;
   padding: 0;
-  font-family: "Poppins", sans-serif ;
+  font-family: "Poppins", sans-serif;
   font-size: 14px;
   box-sizing: border-box;
   color: #333;
@@ -56,12 +56,12 @@ p {
   --orange: #ec8f5e;
   --gray: #dedede;
   --gray-100: #f2f2f2;
-  --red-color: rgba(223, 46, 56,1);
-  --red-100:rgba(240, 105, 112, 0.4);
+  --red-color: rgba(223, 46, 56, 1);
+  --red-100: rgba(240, 105, 112, 0.4);
   --red-200: rgb(240, 105, 112);
   --yellow-color: rgba(254, 201, 88, 1);
   --yellow-100: rgba(254, 201, 88, 0.4);
-  --yellow-200:rgb(190, 134, 11);
+  --yellow-200: rgb(190, 134, 11);
   --text-color: #555;
   --gray-text: rgba(85, 85, 85, 0.7);
   --gray-text2: rgba(85, 85, 85, 0.9);
@@ -69,8 +69,8 @@ p {
   --tablehover: rgba(231, 232, 233, 0.5);
   --dark: #212121;
   --dark-200: rgba(33, 33, 33, 0.9);
-  --white:#f3f2f2;
-  --white-100:rgba(243, 242, 242, 0.85);
+  --white: #f3f2f2;
+  --white-100: rgba(243, 242, 242, 0.85);
 }
 
 button {
@@ -238,6 +238,26 @@ nav li.active {
   font-weight: 700 !important;
 }
 
+.sentry-error-embed .form-submit .btn {
+  background: var(--dark) !important;
+  border: 1px solid var(--dark) !important;
+  font-weight: 600 !important;
+  font-size: 14px !important;
+}
+.sentry-error-embed .form-submit .btn:hover {
+  background: var(--dark-200) !important;
+}
+.sentry-error-embed .form-field input,
+.sentry-error-embed .form-field textarea {
+  border-radius: 0.5rem !important;
+  border: 1px solid #dee2e6 !important;
+  box-shadow: none !important;
+}
+.sentry-error-embed .form-field input:focus,
+.sentry-error-embed .form-field textarea:focus {
+  box-shadow: 0 0 0.25rem 0.25rem rgba(74, 222, 128, 0.15) !important;
+}
+
 @keyframes anim {
   100% {
     width: 0;
@@ -252,7 +272,7 @@ nav li.active {
 
 @media (max-width: 886px) {
   .pageTitle {
-    padding: 0 ;
+    padding: 0;
     align-items: center;
   }
   .pageTitle h1 {
