@@ -238,6 +238,10 @@ nav li.active {
   font-weight: 700 !important;
 }
 
+.btn-bug:hover i, .btn-bug:hover p{
+  color: var(--secondary);
+}
+
 @keyframes anim {
   100% {
     width: 0;
