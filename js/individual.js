@@ -44,6 +44,7 @@ let monthNames2 = [
   "Nov",
   "Dec",
 ];
+let isSentryModalOpen = false;
 //#endregion
 checkAccess()
   .then((emp) => {
@@ -436,7 +437,12 @@ $(document).on("keydown", "#allowance", function (e) {
     e.preventDefault();
   }
 });
-
+$(document).on("click", ".btn-bug", function () {
+  openReport();
+});
+$(document).on("click", ".sentry-error-embed-wrapper", function () {
+  isSentryModalOpen = false;
+});
 // $(document).on("click", "#btnNext", function () {
 //   $("#attachmentModal").modal("hide");
 //   fillAttachment2();
@@ -537,6 +543,24 @@ $(document).on("click", ".lbl-viewForm", function () {
 //#endregion
 
 //#region FUNCTIONS
+function openReport() {
+  if (!isSentryModalOpen) {
+    const eventId = Sentry.captureException(new Error("Error report"));
+
+    Sentry.showReportDialog({
+      eventId: eventId,
+      title: "We're sorry about that!",
+      subtitle: "Please provide us with some feedback so we can fix the issue.",
+      subtitle2: "We appreciate your help!",
+      labelName: "Name",
+      labelEmail: "Email",
+      labelComments: "What process did you do?",
+      labelSubmit: "Send Feedback",
+      successMessage: "Thank you for your feedback!",
+    });
+  }
+  isSentryModalOpen = true;
+}
 function formatName(name) {
   const [last, given] = name.split(",");
   const surname = last.toUpperCase();
