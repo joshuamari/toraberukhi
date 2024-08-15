@@ -33,6 +33,60 @@
   width: 0px;
   background: transparent;
 }
+.pageTitle {
+  position: relative;
+  display: inline-block;
+}
+.tooltip-modal {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 20px;
+  height: 20px;
+  padding: 0.9rem;
+
+  cursor: pointer;
+}
+.tooltip-modal i {
+  font-size: 24px;
+  /* font-weight: 600; */
+}
+.tooltiptext {
+  visibility: hidden;
+  width: 220px;
+  background-color: var(--gray-text);
+  color: var(--white);
+  text-align: center;
+  border-radius: 6px;
+  padding: 5px 0;
+  position: absolute;
+  z-index: 1;
+  top: 32%;
+  left: 26%;
+  margin-left: -60px;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.tooltiptext::after {
+  content: "";
+  position: absolute;
+  top: 30%;
+  left: -6.5%;
+  margin-left: -5px;
+  border-width: 10px;
+  border-style: solid;
+  border-color: transparent var(--gray-text) transparent transparent;
+}
+/* .tooltip-modal:hover .tooltiptext {
+  visibility: visible;
+  opacity: 1;
+} */
+.tooltiptext.hovered {
+  visibility: visible;
+  opacity: 1;
+}
+
 .input {
   padding: 0.375rem 0.75rem;
   display: block;
@@ -217,14 +271,16 @@ input:checked + .toggle:after {
 }
 .btn-clear,
 .btn-cancel,
-.btn-wh-cancel {
+.btn-wh-cancel,
+.btnBack {
   background-color: var(--dark);
   color: var(--white);
   font-weight: 600;
 }
 .btn-clear:hover,
 .btn-cancel:hover,
-.btn-wh-cancel:hover {
+.btn-wh-cancel:hover,
+.btnBack:hover {
   background-color: var(--dark-200);
   color: var(--white);
   font-weight: 600;
@@ -459,13 +515,33 @@ input:checked + .toggle:after {
   font-size: 18px;
 }
 
-#attachmentModal p {
+/* Places to Input on Red Text (Sample Form) */
+#samplePrintBU,
+#samplePrintKHI,
+#samplePrintName,
+#samplePrintFrom,
+#samplePrintTo,
+#samplePrintLoc,
+#samplePrintJap,
+#samplePrintInv,
+#samplePrintWO,
+#samplePrintProject,
+#samplePrintSiteDisp,
+#samplePrintAllowance {
+  color: red;
+}
+/* END */
+
+#attachmentModal p,
+#sampleAttachmentModal p {
   font-size: 14px;
   font-family: "Arial", sans-serif;
   line-height: normal;
 }
 #attachmentModal td,
-#attachmentModal th {
+#attachmentModal th,
+#sampleAttachmentModal td,
+#sampleAttachmentModal th {
   margin: 0 !important;
   padding: 0 10px;
   background-color: #fff;
@@ -478,27 +554,34 @@ input:checked + .toggle:after {
   line-height: normal;
   vertical-align: middle;
 }
-#attachmentModal th {
+#attachmentModal th,
+#sampleAttachmentModal th {
   height: 20px;
 }
 
-#attachmentModal td {
+#attachmentModal td,
+#sampleAttachmentModal td {
   border-top: 0;
   cursor: default;
 }
-#attachmentModal th.sm {
+#attachmentModal th.sm,
+#sampleAttachmentModal th.sm {
   max-width: 45px;
   min-width: 45px;
   width: 45px;
 }
-#attachmentModal td.sm {
+#attachmentModal td.sm,
+#sampleAttachmentModal td.sm {
   text-align: center;
 }
-#attachmentModal td.sm i {
+#attachmentModal td.sm i,
+#sampleAttachmentModal td.sm i {
   vertical-align: middle;
 }
 #attachmentModal tr:nth-of-type(4n + 1) td:first-child,
-#attachmentModal th:first-of-type {
+#attachmentModal th:first-of-type,
+#sampleAttachmentModal tr:nth-of-type(4n + 1) td:first-child,
+#sampleAttachmentModal th:first-of-type {
   border-left: 0.5px solid #000;
 }
 

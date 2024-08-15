@@ -514,6 +514,329 @@
     </div>
   </div>
 
+  <!-- Modal for Preview of Dispatch Form -->
+  <div class="modal fade" id="sampleAttachmentModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+  aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="  modal-header border-0 ">
+        <h1 class="modal-title text-[18px]" id="titleModal">Sample Dispatch Form</h1>
+        <!-- <button type="button" class="btn-close text-[14px]  m-1 w-0 h-0  w-auto h-auto" data-bs-dismiss="modal"
+          aria-label="Close"></button> -->
+      </div>
+      <div class="modal-body flex-col flex items-center justify-content-center bg-[var(--gray)]">
+        
+        <div class="flex h-full px-3 flex-col gap-1">
+          
+          <p class="text-[var(--gray-text)]" style="font-family: 'Poppins',sans-serif;"><i class='bx bxs-info-circle text-[var(--gray-text)] align-middle pr-1'></i>This is a Preview of the Dispatch Form where your inputs are going to be displayed.</p>
+        </div>
+        <div class="w-[210mm] h-[297mm] min-w-[210mm] min-h-[297mm] bg-[#fff] py-[7mm] ps-[15mm] pe-[7mm] my-[-50mm] gap-2" id="toPrint" style="transform: scale(0.65);">
+          <div class="top flex gap-[28px] mb-2">
+            <img src="./images/kawasakilOGO.png" alt="kawasakilOGO" class="w-[250px] h-auto">
+            <div class="flex flex-col justify-content-between items-start">
+              <div class="flex flex-col">
+                <small class="font-['Arial'] text-[10px]"><span class="font-semibold text-[10px]">KOBE</span>: 1-1, Higashikawasaki 3-Chome, Chuo-ku, KOBE 650-8670 Japan</small>
+                <div class="flex gap-3">
+                  <small class="font-['Arial'] text-[10px]">Phone: 81-(0)78-682-5202</small> <small class="font-['Arial'] text-[10px]">Facsimile:81-(0)78-682-5574</small>
+                </div> 
+              </div>
+              <p class="font-semibold font-['Arial']">Kawasaki Heavy Industries, Ltd.</p>
+            </div>
+          </div>
+          <div class="h-[5px] w-full bg-[var(--text-color)] mb-1 mt-2 " ></div>
+          <div class="h-[1px] w-full bg-[var(--text-color)] " ></div>
+          <div class="flex items-end  ">
+            <p id="printDate" class="w-100 text-end font-['Arial']"></p>
+          </div>
+          <div>
+            <h1 class="text-[20px] text-center w-full font-semibold font-['Arial']">Request for Dispatch of Engineer</h1>
+          </div>
+          <div class="flex mt-5 items-center gap-2">
+            <div class="w-full">
+              <div class="flex gap-2">
+                <p class="font-semibold whitespace-nowrap font-['Arial']">To :</p>
+                <div class="flex flex-col">
+                    <p class="font-semibold font-['Arial']">KHI Design & Technical Services, Inc.(KDT)</p>
+                    <p class="font-semibold font-['Arial']">Unit 1503-P, 15th Flr. Five E-com Center</p>
+                    <p class="font-semibold font-['Arial']">Pacific Drive, Mall of Asia Complex, Pasay City 1300</p>
+                    <p class=" font-['Arial']">Trunk Line:(+632)802-5406 / (+632)802 5407</p>
+                </div>
+              </div>
+              <div class="flex gap-2 mt-3">
+                <p class="font-semibold whitespace-nowrap font-['Arial']">Attention :</p>
+                <div class="flex flex-col ">
+                    <p class="font-semibold font-['Arial']">MR. Yukihiro Takenaka (President)</p>
+                    <p class="font-semibold font-['Arial']">(c/o Ms. Evangeline G. Panado)</p>
+      
+                </div>
+              </div>
+            </div>
+            <div class="w-[40%]">
+              <div class="  flex flex-col p-2" style="border: 1px solid var(--text-color);">
+                <div class="flex gap-2">
+                  <p  class=" font-['Arial'] min-w-[28px]">From:</p>
+                  <div class="flex flex-col">
+                    <p class="font-['Arial'] border-b-[1px] whitespace-nowrap">Kawasaki Heavy Industries, Ltd.</p>
+                    <p class="font-['Arial'] border-b-[1px] whitespace-nowrap font-semibold" id="samplePrintBU">REQUESTER'S DEPARTMENT</p>
+                    <p class="font-['Arial'] border-b-[1px] whitespace-nowrap font-semibold" id="samplePrintKHI">REQUESTER'S NAME</p>
+                  </div>
+                </div>
+                <div class="flex gap-2">
+                  <p for="from" class=" font-['Arial'] min-w-[28px]">TEL:</p>
+                  
+                    <p class="font-['Arial'] w-[calc(100%-28px)] border-b-[1px] whitespace-nowrap">+81-(0)78-682-5084</p>
+                </div>
+                <div class="flex gap-2">
+                  <p for="from" class=" font-['Arial'] min-w-[28px]">FAX:</p>
+                    <p class="font-['Arial'] w-[calc(100%-28px)]  border-b-[1px] whitespace-nowrap">+81-(0)78-682-5433</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="mt-[2rem]">
+ 
+             <p class="font-['Arial']">Dear Sir,</p>
+             <p class="font-['Arial']">This is to request you to dispatch your Engineer, with following terms & conditions;</p>
+           
+           <div class="grid mt-2"  style=" grid-template-columns: 180px 1fr;">
+             <div class=" flex gap-1 p-1 " style="border: 1px solid var(--text-color);"><p class="font-['Arial']">1.</p><p class="font-['Arial']">Required name to be Dispatched</p> </div>
+             <div class="p-1 bg-[var(--white)]" style="border: 1px solid var(--text-color); border-left: 0px;"><p class="font-['Arial'] font-semibold" id="samplePrintName"> EMPLOYEE NAME</p></div>
+             <div class=" flex gap-1 p-1 border-[1px] border-[var(--dark)] border-t-0" ><p class="font-['Arial']">2.</p><p class="font-['Arial']">Required Period</p> </div>
+             <div class="flex" style="border: 1px solid var(--text-color); border-left: 0px; border-top: 0px;">
+               <p class="font-['Arial'] p-1 min-w-[50px]">From</p>
+               <p class="font-['Arial'] border-x-[1px] border-[var(--dark)] flex p-1 min-w-[200px] font-semibold bg-[var(--white)]" id="samplePrintFrom">DATE TO JAPAN</p>
+               <p class="font-['Arial'] p-1 min-w-[50px]">To</p>
+               <p class="font-['Arial'] border-l-[1px] border-[var(--dark)] flex p-1  min-w-[200px] font-semibold bg-[var(--white)]" id="samplePrintTo">DATE TO PHILIPPINES</p>
+             </div>
+             <div class=" flex-col gap-1 p-1 border-[1px] border-[var(--dark)] border-t-0" ><p class="font-['Arial']">3. Place of Service</p>
+              <div><span id="samplePrintLoc">LOCATION (Choose one)</span></div>
+            </div>
+             <div class="flex flex-col w-full" >
+               <span class="p-1 border-l-0 border-t-0 border-[1px] border-[var(--dark)] grid w-full min-h-[20px]  m-0" style="grid-template-columns: 120px 1fr;">
+                <div class="flex gap-2 items-center">
+                  <span class="w-[12px] h-[12px] up border-[1px] border-[var(--dark)] flex justify-content-center items-center countries" id="samplePrintLoc">
+                   x
+                  </span>
+          
+                    <p class="font-['Arial'] whitespace-nowrap"> Japan</p>
+                  
+                </div>
+                 <span class="inline-flex"> <p class="w-full bg-[var(--white)] font-['Arial'] font-semibold" id="samplePrintJap">SPECIFIC LOCATION</p></span>
+                
+               </span>
+               <span class="p-1 border-l-0 border-t-0 border-[1px] border-[var(--dark)] grid w-full" style="grid-template-columns: 120px 1fr;">
+                 <div class="flex gap-2 items-center ">
+                   <span class="w-[12px] h-[12px] up border-[1px] border-[var(--dark)] flex justify-content-center items-center countries"></span>
+                   <p class="font-['Arial']">Philippines</p>
+                 </div>
+                 <span class="inline-flex"> <p class="w-full bg-[var(--white)] font-['Arial'] font-semibold" id="printPh"></p></span>
+                
+               </span>
+               <span class="font-['Arial'] p-1 border-l-0 border-t-0 border-[1px] border-[var(--dark)] grid w-full" style="grid-template-columns: 120px 1fr;">
+                 <div class="flex gap-2 items-center">
+                   <span class="w-[12px] h-[12px] up border-[1px] border-[var(--dark)] flex justify-content-center items-center countries"></span>
+                   <p class="font-['Arial'] whitespace-nowrap">Third Countries</p>
+                 </div>
+                 <span class="inline-flex"> <p class="w-full bg-[var(--white)] font-['Arial'] font-semibold" id="printThird"></p></span>
+                
+               </span>
+              
+             </div>
+             <div class=" flex-col gap-1 p-1 border-[1px] border-[var(--dark)] border-t-0" ><p class="font-['Arial']">4. Invitation</p>
+              <div><span id="samplePrintInv">INVITATION TYPE (Choose one)</span></div></div>
+             
+             <div class=" p-1 border-[1px] border-l-0 border-[var(--dark)] border-t-0">
+               <div class="flex gap-2 items-center">
+                 <span class="up w-[12px] h-[12px] border-[1px] border-[var(--dark)] flex justify-content-center items-center inv"></span>
+                 <p class="font-['Arial']">Invitation letter for multiple business travel visa has already been sent via courier.</p>
+               </div>
+               <div class="flex gap-2 items-center">
+                 <span class="up w-[12px] h-[12px] border-[1px] border-[var(--dark)] flex justify-content-center items-center inv"></span>
+                 <p class="font-['Arial']">Invitation letter for single business travel visa has already been sent via courier.</p>
+               </div>
+               <div class="flex gap-2 items-center">
+                 <span class="up w-[12px] h-[12px] border-[1px] border-[var(--dark)] flex justify-content-center items-center inv" id="samplePrintInv">x
+       
+                 </span>
+                 <p class="font-['Arial']">Invitation letter is not required.</p>
+               </div>
+             </div>
+        
+             <div class=" flex gap-1 p-1 border-[1px] border-[var(--dark)] border-t-0" >
+               <p class="font-['Arial']">5.</p>
+               <p class="font-['Arial']">Work Order and Project</p>
+             </div>
+             
+             <div class="border-r-[1px] border-b-[1px] border-[var(--dark)]">
+               <span class="font-['Arial'] p-1 grid w-full" style="grid-template-columns: 50px 1fr;">
+         
+                  
+                   <p class="font-['Arial']">W/O</p>
+               
+                 <span class="inline-flex h-[18px]"> <p class="w-full bg-[var(--white)] font-['Arial'] font-semibold" id="samplePrintWO">WORK ORDER</p></span>
+                
+               </span>
+               <span class="font-['Arial'] p-1  grid w-full" style="grid-template-columns: 50px 1fr;">
+            
+        
+                   <p class="font-['Arial']" >Project</p>
+             
+                 <span class="inline-flex h-[18px]"> <p class="w-full bg-[var(--white)] font-['Arial'] font-semibold"id="samplePrintProject">PROJECT NAME
+                  
+                 </p></span>
+                
+               </span>
+               <div class="flex gap-2 px-1  items-center">
+                 <span class=" w-[12px] h-[12px] border-[1px] border-[var(--dark)] flex justify-content-center items-center up siteDispatch" id="samplePrintSiteDisp">x</span>
+                 <p class="font-['Arial']">Site Dispatch Training application</p>
+               </div>
+               <small class=" font-['Arial'] p-1 flex leading-[1.25]">
+                 *Remark: In case of site dispatch training (W/O:6104298) applied, actual Air ticket fee (KDT paid) shall be reimbursed by KHI as post-settlement.
+        
+               </small>
+        
+        
+             </div>
+           </div>
+          </div>
+          <div class="pt-3">
+             <p class=" font-['Arial'] ">Division of Responsibilities for each "Place of Service"</p>
+          </div>
+          
+           
+          
+
+           <table class="w-full pt-2">
+                 <thead>
+                   <tr>
+                     <th>Place of Service</th>
+                     <th>Scope</th>
+                     <th class="sm">KHI</th>
+                     <th class="sm">KDT</th>
+                     <th>Remarks</th>
+                   </tr>
+                 </thead>
+                 <tbody>
+                   <tr>
+                     <td rowspan="4">Japan</td>
+                     <td>Absence Fee</td>
+                     <td class="sm"></td>
+                     <td class="sm"><i class='bx bx-x'></i></td>
+                     <td>Included in the Annual Service Fee</td>
+                   </tr>
+                   <tr>
+                     <td>Daily Allowance with Meals</td>
+                     <td class="sm"><i class='bx bx-x'></i></td>
+                     <td class="sm"></td>
+                     <td>
+                      <div class="flex"><p class="font-['Arial']">JP¥</p>
+                      <p class="font-['Arial']  font-bold" id="samplePrintAllowance">ALLOWANCE</p>
+                      <p class="font-['Arial']">(*)/Calendar Day</p>
+                      </div>
+                     <small class="font-['Arial'] text-[11px] leading-2 flex ">(*)AM/Mg class according to KDT Rule</small>
+                    </td>
+                   </tr>
+                   <tr>
+                     <td>Air Ticket</td>
+                     <td class="sm"></td>
+                     <td class="sm"><i class='bx bx-x'></i></td>
+                     <td>Included in the Annual Service Fee</td>
+                   </tr>
+                   <tr>
+                     <td>Accommodation</td>
+                     <td class="sm"><i class='bx bx-x'></i></td>
+                     <td class="sm"></td>
+                     <td>To be provided by KHI</td>
+                   </tr>
+                   <tr>
+                     <td rowspan="4">Philippines</td>
+                     <td>Absence Fee</td>
+                     <td class="sm"></td>
+                     <td class="sm"><i class='bx bx-x'></i></td>
+                     <td>Included in the Annual Service Fee</td>
+                   </tr>
+                   <tr>
+                     <td>Daily Allowance with Meals</td>
+                     <td class="sm"><i class='bx bx-x'></i></td>
+                     <td class="sm"></td>
+                     <td>According to KDT Internal Rule</td>
+                   </tr>
+                   <tr>
+                     <td>Air Ticket</td>
+                     <td class="sm"></td>
+                     <td class="sm"><i class='bx bx-x'></i></td>
+                     <td></td>
+                   </tr>
+                   <tr>
+                     <td>Accommodation</td>
+                     <td class="sm"><i class='bx bx-x'></i></td>
+                     <td class="sm"></td>
+                     <td>To be provided by KHI</td>
+                   </tr>
+                   <tr>
+                     <td rowspan="4">Other third Countries</td>
+                     <td>Absence Fee</td>
+                     <td class="sm"></td>
+                     <td class="sm"><i class='bx bx-x'></i></td>
+                     <td></td>
+                   </tr>
+                   <tr>
+                     <td>Daily Allowance with Meals</td>
+                     <td class="sm"><i class='bx bx-x'></i></td>
+                     <td class="sm"></td>
+                     <td>
+                      <div class="flex"><p class="font-['Arial']">US$</p>
+                      <p class="font-['Arial'] " id="printSalary">40</p>
+                      <p class="font-['Arial']">(*)/Calendar Day</p>
+                      </div>
+                     <small class="font-['Arial'] text-[11px] leading-2 flex ">(*)AM/Mg class according to KDT Rule</small>
+                    </td>
+                   </tr>
+                   <tr>
+                     <td>Air Ticket</td>
+                     <td class="sm"></td>
+                     <td class="sm"><i class='bx bx-x'></i></td>
+                     <td></td>
+                   </tr>
+                   <tr>
+                     <td>Accommodation</td>
+                     <td class="sm"><i class='bx bx-x'></i></td>
+                     <td class="sm"></td>
+                     <td>To be provided by KHI</td>
+                   </tr>
+                 </tbody>
+           </table>
+        
+     
+         
+          <div class="bottom-text mt-[0.5rem]">
+            <p class="font-['Arial']">Copy:</p>
+            <div class="flex justify-content-between">
+              <p class="font-['Arial']">General Affairs and Personal Gr.: Mr. T. Kurosumi</p>
+              <p class="font-['Arial']">(81-78-682-5202/Ext. 7-20-81101)</p>
+            </div>
+            <div class="flex justify-content-between">
+              <p class="font-['Arial']">Control Dep't Corporate Planning Gr.: Mr. H. Kanari</p>
+              <p class="font-['Arial']">(81-78-682-5072/Ext. 7-30-33217)</p>
+            </div>
+            
+          </div>
+
+
+        </div>
+        
+      </div>
+      <div class="modal-footer" id="buttonHere">
+       
+        <button type="button" data-bs-dismiss="modal"
+        aria-label="Close" class="btn bg-[var(--dark)] hover:bg-[var(--dark-200)] text-[var(--white)] hover:text-[var(--white)]" id="btnBack">
+          Back
+        </button>
+
+      </div>
+    </div>
+    </div>
+</div>
 
 
   <div class="modal fade" id="attachmentModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
@@ -1055,6 +1378,7 @@
                 <i class="bx bx-menu-alt-left fs-3"></i>
               </div>
               <h1 class="fw-semibold m-0">Dispatch Request by KHI</h1>
+              <!-- <span class="tooltip-modal" id="tooltip-modal"><i class='bx bxs-info-circle text-[var(--secondary)] align-middle pr-1'></i><span class="tooltiptext">Click to View a Sample Dispatch Form</span></span> -->
             </div>
         <div class="main w-100 d-flex pb-[14px] lg:pb-8 pt-0 h-[calc(100%-57px)]"id="appendHere">
         
@@ -1111,7 +1435,10 @@
                 </div>
                   
                 <div class="mb-1 row">
-                  <label for="" class="col-form-label pl-0">Location:</label>
+                    <label for="" class="col-form-label pl-0 w-[90%]">Location:</label>
+                    <span class="tooltip-modal pb-0 w-[10%]" id="tooltip-modal"><i class='bx bxs-info-circle text-[var(--secondary)] align-middle pr-1'></i>
+                      <!-- <span class="tooltiptext">Click to View a Sample Dispatch Form</span> -->
+                    </span>
                     <select
                       name=""
                       class="select "
@@ -1194,7 +1521,10 @@
             </div>
             
           </div>
-          
+          <!-- <span class="tooltip-modal" id="tooltip-modal"> -->
+          <span class="tooltiptext">Click to View a Sample Dispatch Form</span>
+          <!-- </span> -->
+
           
           <div class="right px-[14px] lg:px-8 pb-[14px] h-full relative" >
             <div class="d-flex withContent d-none flex-column gap-3 h-full">
