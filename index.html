@@ -1279,7 +1279,7 @@
 
                     <div class="mb-1 row">
                       <label for="" class="col-form-label pl-0"
-                        >Location:</label
+                        >Place of Service:</label
                       >
                       <select name="" class="select" id="locSel"></select>
                     </div>
@@ -1298,7 +1298,7 @@
                     </div>
                     <div class="mb-1 row">
                       <label for="" class="col-form-label pl-0"
-                        >Invitation Type:</label
+                        >Invitation:</label
                       >
                       <select name="" class="select" id="inviteSel"></select>
                     </div>
@@ -1345,7 +1345,7 @@
 
                     <div class="mb-1 row">
                       <label for="" class="col-form-label pl-0"
-                        >Allowance:</label
+                        >Daily Allowance with Meals:</label
                       >
                       <input
                         type="number"
@@ -1357,7 +1357,9 @@
                       />
                     </div>
 
-                    <div class="mb-1 row">
+                    <!-- Change the id used in JS depending on the type -->
+                    <!-- Input Type - Req's Dept -->
+                    <!-- <div class="mb-1 row">
                       <label for="" class="col-form-label pl-0"
                         >Requester's Department:</label
                       >
@@ -1368,6 +1370,28 @@
                         id="reqDeptInput"
                         placeholder="Department"
                       />
+                    </div> -->
+                    <!-- Select Type - Req's Dept -->
+                    <div class="mb-1 row">
+                      <label for="" class="col-form-label pl-0"
+                        >Requester's Department:</label
+                      >
+                      <select name="" class="select" id="reqDeptSel"></select>
+                    </div>
+                    <div
+                      class="mb-1 flex gap-2 items-center pt-1 flex-row-reverse"
+                      style="justify-content: start"
+                    >
+                      <label for="" class="whConfirm-lbl"
+                        >Work History Confirmation</label
+                      >
+                      <div class="d-flex justify-center">
+                        <!-- <input type="checkbox" name="" class="d-flex float-right align-items-center h-100 mr-5" id="siteDispatch"> -->
+                        <input id="whConfirm" type="checkbox" /><label
+                          for="whConfirm"
+                          class="toggle"
+                        ></label>
+                      </div>
                     </div>
                     <!-- <div class="mb-1 row">
                   <label for="" class="col-form-label pl-0">Requester's Name:</label>
@@ -1648,119 +1672,6 @@
                       </div>
                     </div>
                     <div
-                      class="dispatch-hist p-3 bg-white rounded-lg h-full shadow-sm xl:pb-0"
-                    >
-                      <div class="top flex justify-content-between">
-                        <h5 class="title text-[var(--dark)]">
-                          Dispatch History to Japan
-                        </h5>
-
-                        <div>
-                          <button class="btn btn-success" id="btnExport">
-                            Export table
-                          </button>
-                        </div>
-                      </div>
-                      <p class="normal-case text-[12px] pb-3">
-                        View records of your members dispatches to Japan.
-                      </p>
-                      <div class="table-cont overflow-auto min-h-[200px]">
-                        <table class="table" id="histTable">
-                          <thead class="sticky top-0 bg-gray-200">
-                            <tr>
-                              <th data-exclude="true">No.</th>
-                              <th
-                                data-f-name="Arial"
-                                data-f-sz="9"
-                                data-f-bold="true"
-                                data-a-h="center"
-                                data-a-v="middle"
-                                data-b-a-s="thin"
-                                data-b-a-c="000000"
-                              >
-                                Location
-                              </th>
-                              <th
-                                data-f-name="Arial"
-                                data-f-sz="9"
-                                data-f-bold="true"
-                                data-a-h="center"
-                                data-a-v="middle"
-                                data-b-a-s="thin"
-                                data-b-a-c="000000"
-                              >
-                                Date to Japan
-                              </th>
-                              <th
-                                data-f-name="Arial"
-                                data-f-sz="9"
-                                data-f-bold="true"
-                                data-a-h="center"
-                                data-a-v="middle"
-                                data-b-a-s="thin"
-                                data-b-a-c="000000"
-                              >
-                                Date to Philippines
-                              </th>
-                              <th
-                                data-f-name="Arial"
-                                data-f-sz="9"
-                                data-f-bold="true"
-                                data-a-h="center"
-                                data-a-v="middle"
-                                data-b-a-s="thin"
-                                data-b-a-c="000000"
-                              >
-                                No. of Days
-                              </th>
-                              <th
-                                data-f-name="Arial"
-                                data-f-sz="9"
-                                data-f-bold="true"
-                                data-a-h="center"
-                                data-a-v="middle"
-                                data-b-a-s="thin"
-                                data-b-a-c="000000"
-                              >
-                                Total Days past 1 year
-                              </th>
-
-                              <th data-exclude="true"></th>
-                            </tr>
-                          </thead>
-                          <tbody id="dList">
-                            <tr>
-                              <td colspan="7" class="text-center">
-                                No data found
-                              </td>
-                            </tr>
-                            <!-- <tr>
-                            <td>1</td>
-                            <td>Kobe</td>
-                            <td>07 AUG 2023</td>
-                            <td>20 NOV 2023</td>
-                            <td>105</td>
-                            <td>105</td>
-                            <td>
-                              <div class="d-flex gap-2">
-                              <button
-                                class="btn-delete"
-                                title="Delete Entry"
-                                data-bs-toggle="modal"
-                                data-bs-target="#deleteEntry"
-                              >
-                                <i class="bx bx-trash fs-5" ></i>
-                              </button>
-                            </div>
-                            </td>
-                            
-                          </td>
-                          </tr> -->
-                          </tbody>
-                        </table>
-                      </div>
-                    </div>
-                    <div
                       class="work-hist h-full pb-[50px] bg-white rounded-lg shadow-sm xl:pb-0"
                     >
                       <div class="top flex justify-content-between">
@@ -1914,6 +1825,119 @@
                                 class="add-work bg-[var(--white)]"
                               >
                                 Add New Item
+                              </td>
+                            </tr>
+                            <!-- <tr>
+                            <td>1</td>
+                            <td>Kobe</td>
+                            <td>07 AUG 2023</td>
+                            <td>20 NOV 2023</td>
+                            <td>105</td>
+                            <td>105</td>
+                            <td>
+                              <div class="d-flex gap-2">
+                              <button
+                                class="btn-delete"
+                                title="Delete Entry"
+                                data-bs-toggle="modal"
+                                data-bs-target="#deleteEntry"
+                              >
+                                <i class="bx bx-trash fs-5" ></i>
+                              </button>
+                            </div>
+                            </td>
+                            
+                          </td>
+                          </tr> -->
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                    <div
+                      class="dispatch-hist p-3 bg-white rounded-lg h-full shadow-sm xl:pb-0"
+                    >
+                      <div class="top flex justify-content-between">
+                        <h5 class="title text-[var(--dark)]">
+                          Dispatch History to Japan
+                        </h5>
+
+                        <div>
+                          <button class="btn btn-success" id="btnExport">
+                            Export table
+                          </button>
+                        </div>
+                      </div>
+                      <p class="normal-case text-[12px] pb-3">
+                        View records of your members dispatches to Japan.
+                      </p>
+                      <div class="table-cont overflow-auto min-h-[200px]">
+                        <table class="table" id="histTable">
+                          <thead class="sticky top-0 bg-gray-200">
+                            <tr>
+                              <th data-exclude="true">No.</th>
+                              <th
+                                data-f-name="Arial"
+                                data-f-sz="9"
+                                data-f-bold="true"
+                                data-a-h="center"
+                                data-a-v="middle"
+                                data-b-a-s="thin"
+                                data-b-a-c="000000"
+                              >
+                                Location
+                              </th>
+                              <th
+                                data-f-name="Arial"
+                                data-f-sz="9"
+                                data-f-bold="true"
+                                data-a-h="center"
+                                data-a-v="middle"
+                                data-b-a-s="thin"
+                                data-b-a-c="000000"
+                              >
+                                Date to Japan
+                              </th>
+                              <th
+                                data-f-name="Arial"
+                                data-f-sz="9"
+                                data-f-bold="true"
+                                data-a-h="center"
+                                data-a-v="middle"
+                                data-b-a-s="thin"
+                                data-b-a-c="000000"
+                              >
+                                Date to Philippines
+                              </th>
+                              <th
+                                data-f-name="Arial"
+                                data-f-sz="9"
+                                data-f-bold="true"
+                                data-a-h="center"
+                                data-a-v="middle"
+                                data-b-a-s="thin"
+                                data-b-a-c="000000"
+                              >
+                                No. of Days
+                              </th>
+                              <th
+                                data-f-name="Arial"
+                                data-f-sz="9"
+                                data-f-bold="true"
+                                data-a-h="center"
+                                data-a-v="middle"
+                                data-b-a-s="thin"
+                                data-b-a-c="000000"
+                              >
+                                Total Days past 1 year
+                              </th>
+
+                              <th data-exclude="true"></th>
+                            </tr>
+                          </thead>
+                          <tbody id="dList">
+                            <tr>
+                              <td colspan="7" class="text-center">
+                                No data found
                               </td>
                             </tr>
                             <!-- <tr>

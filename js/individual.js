@@ -1,5 +1,7 @@
 Sentry.init({
   dsn: "http://996e6a7f7f64d413dd43124ae5dece7e@o4507730788483072.ingest.us.sentry.io/4507767647436800",
+  // integrations: [new BrowserTracing({ tracingOrigins: ["*"] })],
+  // tracesSampleRate: 1.0,
 });
 // try {
 //   // Your code that might throw an error
@@ -56,11 +58,17 @@ checkAccess()
         getGroups()
           .then((grps) => {
             fillGroups(grps);
-            Promise.all([getEmployees(), getLocations(), getInviteTypes()])
+            Promise.all([
+              getEmployees(),
+              getLocations(),
+              getInviteTypes(),
+              // getReqDepts(),
+            ])
               .then(([emps, locs, invs]) => {
                 fillEmployees(emps);
                 fillLocations(locs);
                 fillInvitations(invs);
+                // fillReqDepts(depts);
               })
               .catch((error) => {
                 alert(`${error}`);
@@ -356,12 +364,16 @@ $(document).on("click", ".rmvToast", function () {
 });
 $(document).on(
   "click",
-  "#reqDeptInput, #reqNameInput, #grpSel, #empSel, #startDate, #endDate, #locSel, #specLocInput, #inviteSel, #workOrder, #projName, #allowance",
+  "#reqDeptSel, #reqNameInput, #grpSel, #empSel, #startDate, #endDate, #locSel, #specLocInput, #inviteSel, #workOrder, #projName, #allowance",
   function () {
     $(this).removeClass("bg-red-100  border-red-400");
     $(".errTxt").remove();
   }
 );
+$(document).on("click", "#whConfirm", function () {
+  $(".whConfirm-lbl").removeClass("text-red-600");
+  $(".errTxt").remove();
+});
 $(document).on(
   "click",
   "#addcompanyName, #addStartMonthYear, #addEndMonthYear, #addcompanyBusiness, #addbusinessContent, #addworkLocation",
@@ -539,6 +551,14 @@ $(document).on("click", ".lbl-viewForm", function () {
 
 //   const checking = $("#check").is(":checked");
 // });
+$(document).on("click", "#whConfirm", function () {
+  const workConfirm = $("#whConfirm").is(":checked");
+  if (workConfirm) {
+    console.log("checked");
+  } else {
+    console.log("not checked");
+  }
+});
 
 $(document).on("click", "#tooltip-modal", function () {
   // $(".modal-bg").css("display", "flex");
@@ -590,7 +610,8 @@ function formatName(name) {
 }
 function fillAttachment() {
   console.log(empDetails);
-  const reqDept = $("#reqDeptInput").val();
+  // const reqDept = $("#reqDeptInput").val(); //Input Type Req Dept
+  const reqDept = $("#reqDeptSel").find("option:selected").attr("reqdept-id"); //Select Type Req Dept
   // const reqName = $("#reqNameInput").val();
   const fName = empDetails.firstname;
   const sName = empDetails.surname;
@@ -1242,7 +1263,8 @@ function removeOutline() {
   ).removeClass("bg-red-100  border-red-400");
 }
 function checkDispatch() {
-  const reqDept = $("#reqDeptInput").val();
+  // const reqDept = $("#reqDeptInput").val(); //Input Type Req Dept
+  const reqDept = $("#reqDeptSel").find("option:selected").attr("reqdept-id"); //Select Type Req Dept
   // const reqName = $("#reqNameInput").val();
   const grp = $("#grpSel").find("option:selected").attr("grp-id");
   const empID = $("#empSel").find("option:selected").attr("emp-id");
@@ -1255,11 +1277,29 @@ function checkDispatch() {
   const projName = $("#projName").val();
   const allowance = $("#allowance").val();
   const siteDispatch = $("#siteDispatch").is(":checked");
+  const workConfirm = $("#whConfirm").is(":checked");
+
   let ctr = 0;
 
   toggleLoadingAnimation(true);
+  if (!workConfirm) {
+    console.log("checkbox: ", workConfirm);
+    $(".whConfirm-lbl").addClass("text-red-600");
+    $(".error-msg").html(`
+    <div class="errTxt  flex items-center gap-1">
+    <i class='bx bx-info-circle text-red-600'></i>
+    <p class="text-red-600">Please confirm Work History first.</p>
+    </div>`);
+    console.log("confirm work history");
+    toggleLoadingAnimation(false);
+    return;
+  }
+  // if (!reqDept) {
+  //   $("#reqDeptInput").addClass("bg-red-100  border-red-400");
+  //   ctr++;
+  // }
   if (!reqDept) {
-    $("#reqDeptInput").addClass("bg-red-100  border-red-400");
+    $("#reqDeptSel").addClass("bg-red-100  border-red-400");
     ctr++;
   }
   // if (!reqName) {
@@ -1331,7 +1371,8 @@ function checkDispatch() {
   fillAttachment();
 }
 function insertDispatch() {
-  const reqDept = $("#reqDeptInput").val();
+  // const reqDept = $("#reqDeptInput").val(); //Input Type Req Dept
+  const reqDept = $("#reqDeptSel").find("option:selected").attr("reqdept-id"); //Select Type Req Dept
   // const reqName = $("#reqNameInput").val();
   const grp = $("#grpSel").find("option:selected").attr("grp-id");
   const empID = $("#empSel").find("option:selected").attr("emp-id");
@@ -1344,6 +1385,7 @@ function insertDispatch() {
   const projName = $("#projName").val();
   const allowance = $("#allowance").val();
   const siteDispatch = $("#siteDispatch").is(":checked");
+  const workConfirm = $("#whConfirm").is(":checked");
 
   toggleLoadingAnimation(true);
   $("#buttonHere").html(`
@@ -1355,6 +1397,17 @@ function insertDispatch() {
      Sending Request . . .
     </button>
    `);
+  if (!workConfirm) {
+    $("#whConfirm-lbl").addClass("text-red-600");
+    $(".error-msg").html(`
+    <div class="errTxt  flex items-center gap-1">
+    <i class='bx bx-info-circle text-red-600'></i>
+    <p class="text-red-600">Please confirm Work History first.</p>
+    </div>`);
+    console.log("confirm work history");
+    toggleLoadingAnimation(false);
+    return;
+  }
   return new Promise((resolve, reject) => {
     $.ajax({
       type: "POST",
@@ -1392,15 +1445,16 @@ function insertDispatch() {
 }
 function clearInput() {
   $(
-    "#reqDeptInput, #reqNameInput, #grpSel, #empSel, #startDate, #endDate, #locSel, #specLocInput, #inviteSel, #workOrder, #projName, #allowance"
+    "#reqDeptSel, #reqNameInput, #grpSel, #empSel, #startDate, #endDate, #locSel, #specLocInput, #inviteSel, #workOrder, #projName, #allowance"
   ).removeClass("bg-red-100  border-red-400");
   $(".errTxt").remove();
-  $("#locSel, #inviteSel").val(0);
+  $("#locSel, #inviteSel, #reqDeptSel").val(0);
   $(
-    "#reqDeptInput, #reqNameInput, #startDate, #endDate, #specLocInput, #workOrder, #projName"
+    "#reqNameInput, #startDate, #endDate, #specLocInput, #workOrder, #projName"
   ).val("");
   $("#allowance").val("0");
   $("#siteDispatch").prop("checked", false);
+  $("#whConfirm").prop("checked", false);
   to_add = 0;
   $("#daysCount").text("0 Day");
 }
@@ -1485,6 +1539,41 @@ function fillInvitations(invis) {
       .attr("inv-id", item.id);
     invSelect.append(option);
     $("#editentryInvite").append(option.clone());
+  });
+}
+function getReqDepts() {
+  return new Promise((resolve, reject) => {
+    $.ajax({
+      type: "GET",
+      url: "php/get_request_departments.php",
+      dataType: "json",
+      success: function (response) {
+        const reqdepts = response;
+        resolve(reqdepts);
+      },
+      error: function (xhr, status, error) {
+        if (xhr.status === 404) {
+          reject("Not Found Error: The requested resource was not found.");
+        } else if (xhr.status === 500) {
+          reject("Internal Server Error: There was a server error.");
+        } else {
+          reject("An unspecified error occurred fetching invitation types.");
+        }
+      },
+    });
+  });
+}
+function fillReqDepts(depts) {
+  var reqDeptSel = $("#reqDeptSel");
+  reqDeptSel.html("<option value='0'>Select Request Department</option>");
+  $("#editentryReqDept").empty();
+  $.each(depts, function (index, item) {
+    var option = $("<option>")
+      .attr("value", item.id)
+      .text(item.type)
+      .attr("reqdept-id", item.id);
+    invSelect.append(option);
+    $("#editentryReqDept").append(option.clone());
   });
 }
 function deleteDispatch() {
