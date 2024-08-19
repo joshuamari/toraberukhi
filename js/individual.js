@@ -62,13 +62,13 @@ checkAccess()
               getEmployees(),
               getLocations(),
               getInviteTypes(),
-              // getReqDepts(),
+              getReqDepts(),
             ])
-              .then(([emps, locs, invs]) => {
+              .then(([emps, locs, invs, depts]) => {
                 fillEmployees(emps);
                 fillLocations(locs);
                 fillInvitations(invs);
-                // fillReqDepts(depts);
+                fillReqDepts(depts);
               })
               .catch((error) => {
                 alert(`${error}`);
@@ -577,7 +577,7 @@ function formatName(name) {
 function fillAttachment() {
   console.log(empDetails);
   // const reqDept = $("#reqDeptInput").val(); //Input Type Req Dept
-  const reqDept = $("#reqDeptSel").find("option:selected").attr("reqdept-id"); //Select Type Req Dept
+  const reqDept = $("#reqDeptSel").find("option:selected").attr("reqdept-name"); //Select Type Req Dept
   // const reqName = $("#reqNameInput").val();
   const fName = empDetails.firstname;
   const sName = empDetails.surname;
@@ -1230,7 +1230,7 @@ function removeOutline() {
 }
 function checkDispatch() {
   // const reqDept = $("#reqDeptInput").val(); //Input Type Req Dept
-  const reqDept = $("#reqDeptSel").find("option:selected").attr("reqdept-id"); //Select Type Req Dept
+  const reqDept = $("#reqDeptSel").find("option:selected").attr("reqdept-name"); //Select Type Req Dept
   // const reqName = $("#reqNameInput").val();
   const grp = $("#grpSel").find("option:selected").attr("grp-id");
   const empID = $("#empSel").find("option:selected").attr("emp-id");
@@ -1338,7 +1338,7 @@ function checkDispatch() {
 }
 function insertDispatch() {
   // const reqDept = $("#reqDeptInput").val(); //Input Type Req Dept
-  const reqDept = $("#reqDeptSel").find("option:selected").attr("reqdept-id"); //Select Type Req Dept
+  const reqDept = $("#reqDeptSel").find("option:selected").attr("reqdept-name"); //Select Type Req Dept
   // const reqName = $("#reqNameInput").val();
   const grp = $("#grpSel").find("option:selected").attr("grp-id");
   const empID = $("#empSel").find("option:selected").attr("emp-id");
@@ -1461,7 +1461,7 @@ function getLocations() {
 }
 function fillLocations(locs) {
   var locSelect = $("#locSel");
-  locSelect.html("<option value='0'>Select Location</option>");
+  locSelect.html("<option value='0'>Select Place of Service</option>");
   $("#editentryLocation").empty();
   $.each(locs, function (index, item) {
     var option = $("<option>")
@@ -1496,7 +1496,7 @@ function getInviteTypes() {
 }
 function fillInvitations(invis) {
   var invSelect = $("#inviteSel");
-  invSelect.html("<option value='0'>Select Invitation Type</option>");
+  invSelect.html("<option value='0'>Select Invitation</option>");
   $("#editentryInvite").empty();
   $.each(invis, function (index, item) {
     var option = $("<option>")
@@ -1511,11 +1511,14 @@ function getReqDepts() {
   return new Promise((resolve, reject) => {
     $.ajax({
       type: "GET",
-      url: "php/get_request_departments.php",
+      url: "php/get_req_dep.php",
       dataType: "json",
       success: function (response) {
-        const reqdepts = response;
-        resolve(reqdepts);
+        if(response.isSuccess) {
+          const reqdepts = response.result;
+          resolve(reqdepts);
+        }
+        
       },
       error: function (xhr, status, error) {
         if (xhr.status === 404) {
@@ -1523,7 +1526,7 @@ function getReqDepts() {
         } else if (xhr.status === 500) {
           reject("Internal Server Error: There was a server error.");
         } else {
-          reject("An unspecified error occurred fetching invitation types.");
+          reject("An unspecified error occurred fetching requester's department.");
         }
       },
     });
@@ -1531,14 +1534,15 @@ function getReqDepts() {
 }
 function fillReqDepts(depts) {
   var reqDeptSel = $("#reqDeptSel");
-  reqDeptSel.html("<option value='0'>Select Request Department</option>");
+  reqDeptSel.html("<option value='0'>Select Requester's Department</option>");
   $("#editentryReqDept").empty();
+  
   $.each(depts, function (index, item) {
     var option = $("<option>")
       .attr("value", item.id)
-      .text(item.type)
-      .attr("reqdept-id", item.id);
-    invSelect.append(option);
+      .text(item.dep_name)
+      .attr("reqdept-name", item.dep_name);
+      reqDeptSel.append(option);
     $("#editentryReqDept").append(option.clone());
   });
 }

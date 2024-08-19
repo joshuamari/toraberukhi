@@ -260,7 +260,7 @@ function fillEmployees(emps) {
     </button>
     <ul class="dropdown-menu">
      <li><a class="dropdown-item flex gap-2 items-center btn-editUser" ><i class='bx bx-edit-alt' ></i>Edit</a></li>
-     <li><a class="dropdown-item flex gap-2 items-center btn-removeUser"><i class='bx bx-trash text-[var(--red-color)]' ></i>Remove user</a></li>
+     <li><a class="dropdown-item flex gap-2 items-center btn-removeUser"><i class='bx bx-trash text-[var(--red-color)]' ></i>Delete</a></li>
     
     </ul>
 </div>`;
