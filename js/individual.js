@@ -569,7 +569,7 @@ function formatName(name) {
 }
 function fillAttachment() {
   console.log(empDetails);
-  const reqDept = $("#reqDeptInput").val();
+  const reqDept = $("#reqDepSel").find("option:selected").attr("dep-name");
   // const reqName = $("#reqNameInput").val();
   const fName = empDetails.firstname;
   const sName = empDetails.surname;
@@ -1221,7 +1221,7 @@ function removeOutline() {
   ).removeClass("bg-red-100  border-red-400");
 }
 function checkDispatch() {
-  const reqDept = $("#reqDeptInput").val();
+  const reqDept = $("#reqDepSel").find("option:selected").attr("dep-name");
   // const reqName = $("#reqNameInput").val();
   const grp = $("#grpSel").find("option:selected").attr("grp-id");
   const empID = $("#empSel").find("option:selected").attr("emp-id");
@@ -1310,7 +1310,7 @@ function checkDispatch() {
   fillAttachment();
 }
 function insertDispatch() {
-  const reqDept = $("#reqDeptInput").val();
+  const reqDept = $("#reqDepSel").find("option:selected").attr("dep-name");
   // const reqName = $("#reqNameInput").val();
   const grp = $("#grpSel").find("option:selected").attr("grp-id");
   const empID = $("#empSel").find("option:selected").attr("emp-id");
@@ -1498,7 +1498,7 @@ function fillReqDeps(reqDep) {
     var option = $("<option>")
       .attr("value", item.id)
       .text(item.dep_name)
-      .attr("dep-id", item.id);
+      .attr("dep-name", item.dep_name);
     invSelect.append(option);
     $("#editentryInvite").append(option.clone());
   });
