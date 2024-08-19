@@ -540,6 +540,28 @@ $(document).on("click", ".lbl-viewForm", function () {
 //   const checking = $("#check").is(":checked");
 // });
 
+$(document).on("click", "#tooltip-modal", function () {
+  // $(".modal-bg").css("display", "flex");
+  console.log("open modal");
+  $("#sampleAttachmentModal").modal("show");
+});
+
+// hover on label
+$(".form").on(
+  {
+    mouseenter: function () {
+      // Handle mouseenter...
+      console.log("mouse enter");
+      $(".tooltiptext").toggleClass("hovered");
+    },
+    mouseleave: function () {
+      // Handle mouseleave...
+      console.log("mouse leave");
+      $(".tooltiptext").toggleClass("hovered");
+    },
+  },
+  ".tooltip-modal"
+);
 //#endregion
 
 //#region FUNCTIONS
