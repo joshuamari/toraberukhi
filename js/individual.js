@@ -1248,18 +1248,6 @@ function checkDispatch() {
   let ctr = 0;
 
   toggleLoadingAnimation(true);
-  if (!workConfirm) {
-    console.log("checkbox: ", workConfirm);
-    $(".whConfirm-lbl").addClass("text-red-600");
-    $(".error-msg").html(`
-    <div class="errTxt  flex items-center gap-1">
-    <i class='bx bx-info-circle text-red-600'></i>
-    <p class="text-red-600">Please confirm Work History first.</p>
-    </div>`);
-    console.log("confirm work history");
-    toggleLoadingAnimation(false);
-    return;
-  }
   // if (!reqDept) {
   //   $("#reqDeptInput").addClass("bg-red-100  border-red-400");
   //   ctr++;
@@ -1319,6 +1307,18 @@ function checkDispatch() {
     <p class="text-red-600">Please complete all fields.</p>
     </div>`);
     console.log("complete required fields");
+    toggleLoadingAnimation(false);
+    return;
+  }
+  if (!workConfirm) {
+    console.log("checkbox: ", workConfirm);
+    $(".whConfirm-lbl").addClass("text-red-600");
+    $(".error-msg").html(`
+    <div class="errTxt  flex items-center gap-1">
+    <i class='bx bx-info-circle text-red-600'></i>
+    <p class="text-red-600">Please confirm Work History first.</p>
+    </div>`);
+    console.log("confirm work history");
     toggleLoadingAnimation(false);
     return;
   }
@@ -1514,11 +1514,10 @@ function getReqDepts() {
       url: "php/get_req_dep.php",
       dataType: "json",
       success: function (response) {
-        if(response.isSuccess) {
+        if (response.isSuccess) {
           const reqdepts = response.result;
           resolve(reqdepts);
         }
-        
       },
       error: function (xhr, status, error) {
         if (xhr.status === 404) {
@@ -1526,7 +1525,9 @@ function getReqDepts() {
         } else if (xhr.status === 500) {
           reject("Internal Server Error: There was a server error.");
         } else {
-          reject("An unspecified error occurred fetching requester's department.");
+          reject(
+            "An unspecified error occurred fetching requester's department."
+          );
         }
       },
     });
@@ -1536,13 +1537,13 @@ function fillReqDepts(depts) {
   var reqDeptSel = $("#reqDeptSel");
   reqDeptSel.html("<option value='0'>Select Requester's Department</option>");
   $("#editentryReqDept").empty();
-  
+
   $.each(depts, function (index, item) {
     var option = $("<option>")
       .attr("value", item.id)
       .text(item.dep_name)
       .attr("reqdept-name", item.dep_name);
-      reqDeptSel.append(option);
+    reqDeptSel.append(option);
     $("#editentryReqDept").append(option.clone());
   });
 }
