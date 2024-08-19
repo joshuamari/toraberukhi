@@ -538,19 +538,7 @@ $(document).on("click", ".lbl-viewForm", function () {
     );
   }
 });
-// $(".lbl-viewForm").click(function () {
-//   $(this).html(
-//     `Hide Dispatch Form <i class='bx bx-chevrons-up text-[20px]' ></i>`
-//       ? `View Dispatch Form <i class='bx bx-chevrons-down text-[20px]'></i>`
-//       : `Hide Dispatch Form <i class='bx bx-chevrons-up text-[20px]' ></i>`
-//   );
 
-//   $("#left").toggleClass("changeSize");
-//   $(".sticky-buttons").toggleClass("appear");
-//   $(".viewForm").toggleClass("bgChange");
-
-//   const checking = $("#check").is(":checked");
-// });
 $(document).on("click", "#whConfirm", function () {
   const workConfirm = $("#whConfirm").is(":checked");
   if (workConfirm) {
@@ -560,28 +548,6 @@ $(document).on("click", "#whConfirm", function () {
   }
 });
 
-$(document).on("click", "#tooltip-modal", function () {
-  // $(".modal-bg").css("display", "flex");
-  console.log("open modal");
-  $("#sampleAttachmentModal").modal("show");
-});
-
-// hover on label
-$(".form").on(
-  {
-    mouseenter: function () {
-      // Handle mouseenter...
-      console.log("mouse enter");
-      $(".tooltiptext").toggleClass("hovered");
-    },
-    mouseleave: function () {
-      // Handle mouseleave...
-      console.log("mouse leave");
-      $(".tooltiptext").toggleClass("hovered");
-    },
-  },
-  ".tooltip-modal"
-);
 //#endregion
 
 //#region FUNCTIONS
