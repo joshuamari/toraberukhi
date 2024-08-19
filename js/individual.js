@@ -56,11 +56,12 @@ checkAccess()
         getGroups()
           .then((grps) => {
             fillGroups(grps);
-            Promise.all([getEmployees(), getLocations(), getInviteTypes()])
-              .then(([emps, locs, invs]) => {
+            Promise.all([getEmployees(), getLocations(), getInviteTypes(), getReqDepartment()])
+              .then(([emps, locs, invs, deps]) => {
                 fillEmployees(emps);
                 fillLocations(locs);
                 fillInvitations(invs);
+                fillReqDeps(deps);
               })
               .catch((error) => {
                 alert(`${error}`);
@@ -1419,7 +1420,7 @@ function getLocations() {
 }
 function fillLocations(locs) {
   var locSelect = $("#locSel");
-  locSelect.html("<option value='0'>Select Location</option>");
+  locSelect.html("<option value='0'>Select Place of Service</option>");
   $("#editentryLocation").empty();
   $.each(locs, function (index, item) {
     var option = $("<option>")
@@ -1454,13 +1455,50 @@ function getInviteTypes() {
 }
 function fillInvitations(invis) {
   var invSelect = $("#inviteSel");
-  invSelect.html("<option value='0'>Select Invitation Type</option>");
+  invSelect.html("<option value='0'>Select Invitation</option>");
   $("#editentryInvite").empty();
   $.each(invis, function (index, item) {
     var option = $("<option>")
       .attr("value", item.id)
       .text(item.type)
       .attr("inv-id", item.id);
+    invSelect.append(option);
+    $("#editentryInvite").append(option.clone());
+  });
+}
+function getReqDepartment() {
+  return new Promise((resolve, reject) => {
+    $.ajax({
+      type: "GET",
+      url: "php/get_req_dep.php",
+      dataType: "json",
+      success: function (response) {
+        if(response.isSuccess){
+          const reqDep = response.result;
+          resolve(reqDep);
+        }
+      },
+      error: function (xhr, status, error) {
+        if (xhr.status === 404) {
+          reject("Not Found Error: The requested resource was not found.");
+        } else if (xhr.status === 500) {
+          reject("Internal Server Error: There was a server error.");
+        } else {
+          reject("An unspecified error occurred fetching requester's department.");
+        }
+      },
+    });
+  });
+}
+function fillReqDeps(reqDep) {
+  var invSelect = $("#reqDepSel");
+  $("#reqDepSel").empty();
+  invSelect.html("<option value='0'>Select Requester's Department</option>");
+  $.each(reqDep, function (index, item) {
+    var option = $("<option>")
+      .attr("value", item.id)
+      .text(item.dep_name)
+      .attr("dep-id", item.id);
     invSelect.append(option);
     $("#editentryInvite").append(option.clone());
   });
