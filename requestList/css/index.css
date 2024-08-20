@@ -241,11 +241,6 @@ tbody tr:hover td {
   text-transform: none;
   border-left: 0;
   font-family: "Arial", sans-serif;
-
-  padding: 5px;
-  width: 1px;
-  max-width: 1px;
-  word-wrap: break-word;
 }
 #toPrint2 td {
   text-transform: none;
@@ -253,31 +248,29 @@ tbody tr:hover td {
   text-align: center;
   white-space: normal;
   font-family: "Arial", sans-serif;
-
+  font-size: 12px;
   border: 0.5px solid #000;
   border-left: 0;
+  border-top: 0;
+  padding: 6px;
 
-  padding: 5px;
-  width: 1px;
-  max-width: 1px;
-  word-wrap: break-word;
   /* word-break: break-all; */
 }
-#toPrint2 table thead .main-col {
+/* #toPrint2 table thead .main-col {
   width: 20px;
   max-width: 20px;
   white-space: normal;
   word-wrap: break-word;
-}
-#toPrint2 table thead .ym-col {
+} */
+/* #toPrint2 table thead .ym-col {
   width: 5px;
   max-width: 1px;
   white-space: normal;
   word-wrap: break-word;
-}
-#toPrint2 table thead .up-col {
+} */
+/* #toPrint2 table thead .up-col {
   width: 10px;
-}
+} */
 #toPrint2 tr th:first-of-type,
 #toPrint2 td:first-of-type {
   border-left: 1px solid #000;
