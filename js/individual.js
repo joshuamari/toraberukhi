@@ -362,7 +362,7 @@ $(document).on("click", ".rmvToast", function () {
 });
 $(document).on(
   "click",
-  "#reqDeptSel, #reqNameInput, #grpSel, #empSel, #startDate, #endDate, #locSel, #specLocInput, #inviteSel, #workOrder, #projName, #allowance",
+  "#reqDeptSel, #reqNameInput, #grpSel, #empSel, #startDate, #endDate, #locSel, #specLocInput, #inviteSel, #workOrder, #projName, #allowance, #businessInput",
   function () {
     $(this).removeClass("bg-red-100  border-red-400");
     $(".errTxt").remove();
@@ -592,6 +592,7 @@ function fillAttachment() {
   const locID = $("#locSel").find("option:selected").attr("loc-id");
   const specLoc = $("#specLocInput").val();
   const inviteID = $("#inviteSel").find("option:selected").attr("inv-id");
+  const business = $("#businessInput").val();
   const workOrder = $("#workOrder").val();
   const projName = $("#projName").val();
   const allowance = $("#allowance").val();
@@ -1245,6 +1246,7 @@ function checkDispatch() {
   const workOrder = $("#workOrder").val();
   const projName = $("#projName").val();
   const allowance = $("#allowance").val();
+  const business = $("#businessInput").val();
   const siteDispatch = $("#siteDispatch").is(":checked");
   const workConfirm = $("#whConfirm").is(":checked");
   let ctr = 0;
@@ -1256,6 +1258,11 @@ function checkDispatch() {
   if (!reqDept) {
     $("#reqDeptSel").addClass("bg-red-100  border-red-400");
     if (!firstIncompleteInput) firstIncompleteInput = $("#reqDeptSel");
+    ctr++;
+  }
+  if (!business) {
+    $("#businessInput").addClass("bg-red-100  border-red-400");
+    if (!firstIncompleteInput) firstIncompleteInput = $("#businessInput");
     ctr++;
   }
   if (!grp) {
@@ -1368,6 +1375,7 @@ function insertDispatch() {
   const endD = $("#endDate").val();
   const locID = $("#locSel").find("option:selected").attr("loc-id");
   const specLoc = $("#specLocInput").val();
+  const business = $("#businessInput").val();
   const inviteID = $("#inviteSel").find("option:selected").attr("inv-id");
   const workOrder = $("#workOrder").val();
   const projName = $("#projName").val();
@@ -1433,12 +1441,12 @@ function insertDispatch() {
 }
 function clearInput() {
   $(
-    "#reqDeptSel, #reqNameInput, #grpSel, #empSel, #startDate, #endDate, #locSel, #specLocInput, #inviteSel, #workOrder, #projName, #allowance"
+    "#reqDeptSel, #reqNameInput, #grpSel, #empSel, #startDate, #endDate, #locSel, #specLocInput, #inviteSel, #workOrder, #projName, #allowance, #businessInput"
   ).removeClass("bg-red-100  border-red-400");
   $(".errTxt").remove();
   $("#locSel, #inviteSel, #reqDeptSel").val(0);
   $(
-    "#reqNameInput, #startDate, #endDate, #specLocInput, #workOrder, #projName"
+    "#reqNameInput, #startDate, #endDate, #specLocInput, #workOrder, #projName, #businessInput"
   ).val("");
   $("#allowance").val("0");
   $("#siteDispatch").prop("checked", false);
