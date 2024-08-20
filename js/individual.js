@@ -514,6 +514,7 @@ $(document).on("click", "#btnSend", function () {
 });
 $(document).on("click", ".lbl-viewForm", function () {
   $("#left").toggleClass("changeSize");
+  $(".errTxt").remove();
   $(".sticky-buttons").toggleClass("appear");
   $(".viewForm").toggleClass("bgChange");
   if ($("#left").hasClass("changeSize")) {
@@ -544,6 +545,10 @@ $(document).on("click", "#whConfirm", function () {
   } else {
     console.log("not checked");
   }
+});
+
+$(document).on("click", ".toggle.small", function () {
+  $(this).removeClass("outline outline-offset-2 outline-red-500  ");
 });
 
 //#endregion
@@ -1014,7 +1019,7 @@ function fillWorkHistory(wList) {
       );
 
       row.append(`<td data-exclude='true'>
-        <div class="d-flex gap-2">
+        <div class="d-flex gap-2 justify-end">
         <button
           class="btn-edit-work"
           title="Edit Work Entry"
@@ -1119,7 +1124,7 @@ function fillDispatchHistory(dlist) {
       }
 
       row.append(`<td data-exclude='true'>
-        <div class="d-flex gap-2">
+        <div class="d-flex gap-2 justify-end">
         <button
           class="btn-edit"
           title="Edit Entry"
@@ -1243,50 +1248,64 @@ function checkDispatch() {
   const siteDispatch = $("#siteDispatch").is(":checked");
   const workConfirm = $("#whConfirm").is(":checked");
   let ctr = 0;
+  let firstIncompleteInput = null;
+  const viewForm = $(".viewForm");
 
   toggleLoadingAnimation(true);
+
   if (!reqDept) {
     $("#reqDeptSel").addClass("bg-red-100  border-red-400");
+    if (!firstIncompleteInput) firstIncompleteInput = $("#reqDeptSel");
     ctr++;
   }
   if (!grp) {
     $("#grpSel").addClass("bg-red-100  border-red-400");
+    if (!firstIncompleteInput) firstIncompleteInput = $("#grpSel");
     ctr++;
   }
   if (!empID) {
     $("#empSel").addClass("bg-red-100  border-red-400");
+    if (!firstIncompleteInput) firstIncompleteInput = $("#empSel");
     ctr++;
   }
   if (!startD) {
     $("#startDate").addClass("bg-red-100  border-red-400");
+    if (!firstIncompleteInput) firstIncompleteInput = $("#startDate");
     ctr++;
   }
   if (!endD) {
     $("#endDate").addClass("bg-red-100  border-red-400");
+    if (!firstIncompleteInput) firstIncompleteInput = $("#endDate");
     ctr++;
   }
   if (!locID) {
     $("#locSel").addClass("bg-red-100  border-red-400");
+    if (!firstIncompleteInput) firstIncompleteInput = $("#locSel");
     ctr++;
   }
   if (!specLoc) {
     $("#specLocInput").addClass("bg-red-100  border-red-400");
+    if (!firstIncompleteInput) firstIncompleteInput = $("#specLocInput");
     ctr++;
   }
   if (!inviteID) {
     $("#inviteSel").addClass("bg-red-100  border-red-400");
+    if (!firstIncompleteInput) firstIncompleteInput = $("#inviteSel");
     ctr++;
   }
   if (!workOrder) {
     $("#workOrder").addClass("bg-red-100  border-red-400");
+    if (!firstIncompleteInput) firstIncompleteInput = $("#workOrder");
     ctr++;
   }
   if (!projName) {
     $("#projName").addClass("bg-red-100  border-red-400");
+    if (!firstIncompleteInput) firstIncompleteInput = $("#projName");
     ctr++;
   }
   if (!allowance) {
     $("#allowance").addClass("bg-red-100  border-red-400");
+    if (!firstIncompleteInput) firstIncompleteInput = $("#allowance");
     ctr++;
   }
   if (ctr > 0) {
@@ -1296,18 +1315,32 @@ function checkDispatch() {
     <p class="text-red-600">Please complete all fields.</p>
     </div>`);
     console.log("complete required fields");
+    if (firstIncompleteInput) {
+      const offsetTop =
+        firstIncompleteInput.offset().top -
+        viewForm.offset().top +
+        viewForm.scrollTop();
+      viewForm.animate({ scrollTop: offsetTop }, 500);
+    }
+
     toggleLoadingAnimation(false);
     return;
   }
   if (!workConfirm) {
     console.log("checkbox: ", workConfirm);
     $(".whConfirm-lbl").addClass("text-red-600");
-    $(".error-msg").html(`
-    <div class="errTxt  flex items-center gap-1">
-    <i class='bx bx-info-circle text-red-600'></i>
-    <p class="text-red-600">Please confirm Work History first.</p>
-    </div>`);
+    // $(".error-msg").html(`
+    // <div class="errTxt  flex items-center gap-1">
+    // <i class='bx bx-info-circle text-red-600'></i>
+    // <p class="text-red-600">Please confirm Work History first.</p>
+    // </div>`);
+    showToast(
+      "error",
+      "Please confirm that you have checked the work history table."
+    );
+    $(".toggle.small").addClass("outline outline-offset-2 outline-red-500  ");
     console.log("confirm work history");
+
     toggleLoadingAnimation(false);
     return;
   }
@@ -2091,7 +2124,7 @@ function showToast(type, str) {
 
   setTimeout(() => {
     toast.remove();
-  }, 3000);
+  }, 4000);
 }
 function logOut() {
   return new Promise((resolve, reject) => {

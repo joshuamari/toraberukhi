@@ -143,6 +143,13 @@ input[type="number"]::-webkit-outer-spin-button {
   border-radius: 40px;
   transition: 0.3s;
 }
+.toggle.small {
+transform: scale(0.8);
+}
+
+.toggle.small:after {
+  transform: scale(0.8);
+}
 
 input:checked + .toggle {
   background: #22c55e;
@@ -351,7 +358,7 @@ input:checked + .toggle:after {
   white-space: nowrap;
   vertical-align: middle;
   color: var(--text-color);
-  padding: 0.75rem;
+  padding: 7px;
 
   border: 1px solid #000;
   border-left: 0;
@@ -372,7 +379,7 @@ input:checked + .toggle:after {
 }
 .work-hist table tbody tr td {
   background-color: #fff;
-  padding: 0.75rem;
+  padding: 7px;
   font-weight: 400;
   /* color: var(--dark); */
   border-bottom: 1px solid var(--gray);
@@ -583,7 +590,7 @@ input:checked + .toggle:after {
     margin-bottom: 15px;
     display: flex;
     position: sticky;
-    justify-content: end;
+    /* justify-content: end; */
     padding-bottom: 10px;
     padding-right: 5px;
   }
@@ -700,7 +707,7 @@ input:checked + .toggle:after {
     width: calc(100% - 400px);
   }
   .viewForm {
-    height: calc(100% - 180px);
+    height: calc(100% - 200px);
   }
   #overlay {
     display: none;

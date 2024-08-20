@@ -1243,6 +1243,7 @@
                 >
                 <div class="viewForm mt-2">
                   <div class="form">
+                    <div class="error-msg mt-2"></div>
                     <div class="mb-1 row">
                       <label for="" class="col-form-label pl-0"
                         >Employee Group:</label
@@ -1362,30 +1363,31 @@
                       >
                       <select name="" class="select" id="reqDeptSel"></select>
                     </div>
-                    <div
-                      class="mb-1 flex gap-2 items-center pt-1 flex-row-reverse"
-                      style="justify-content: start"
-                    >
-                      <label for="" class="whConfirm-lbl"
-                        >Work History Confirmation</label
-                      >
-                      <div class="d-flex justify-center">
-                        <!-- <input type="checkbox" name="" class="d-flex float-right align-items-center h-100 mr-5" id="siteDispatch"> -->
-                        <input id="whConfirm" type="checkbox" /><label
-                          for="whConfirm"
-                          class="toggle"
-                        ></label>
-                      </div>
-                    </div>
-                    <!-- <div class="mb-1 row">
-                  <label for="" class="col-form-label pl-0">Requester's Name:</label>
-                    <input type="text" name="" class="input" id="reqNameInput" placeholder="Name">
-                </div> -->
-                    <div class="error-msg mb-1 row"></div>
                   </div>
                 </div>
-                <div class="sticky-buttons align-middle pr-5 pt-3 mb-2">
-                  <div class="count-total-days mb-4">
+                <div class="sticky-buttons align-middle mb-2">
+                  <div
+                    class="mb-1 flex gap-2 items-start flex-row-reverse w-full"
+                    style="justify-content: start"
+                  >
+                    <label
+                      for=""
+                      class="whConfirm-lbl text-[var(--gray-text2)] text-[12px]"
+                      >I hereby confirm that I have carefully checked the
+                      <span
+                        class="font-bold text-[var(--gray-text2)] text-[12px]"
+                        >Work History table</span
+                      >
+                      before submitting this request.
+                    </label>
+                    <div class="d-flex justify-center">
+                      <input id="whConfirm" type="checkbox" /><label
+                        for="whConfirm"
+                        class="toggle small"
+                      ></label>
+                    </div>
+                  </div>
+                  <div class="count-total-days mb-2">
                     <label for="" class="countlabel col-form-label pl-0 pr-5"
                       >Total days:</label
                     >
@@ -1396,6 +1398,7 @@
                       0 Day
                     </h5>
                   </div>
+
                   <div class="submit-btns flex gap-2">
                     <button class="btn btn-clear" id="btnClear">Clear</button>
                     <button class="btn btn-dispatch" id="btnApply">
@@ -1656,7 +1659,7 @@
                       </div>
                     </div>
                     <div
-                      class="work-hist h-full pb-[50px] bg-white rounded-lg shadow-sm xl:pb-0"
+                      class="work-hist h-full pb-[50px] bg-white rounded-lg xl:pb-0"
                     >
                       <div class="top flex justify-content-between">
                         <div class="flex flex-col gap-1 pb-3">
@@ -1667,6 +1670,7 @@
                             Manage your members Work details and history.
                           </p>
                         </div>
+                        <div></div>
 
                         <!-- <div>
                       <button class="btn btn-success bg-[var(--darkest)]" id="btnExportss">
@@ -1674,7 +1678,7 @@
                       </button>
                     </div> -->
                       </div>
-                      <div class="h-[300px] table-cont overflow-auto">
+                      <div class="h-[225px] table-cont overflow-auto">
                         <table class="table" id="workhistTable">
                           <thead class="sticky top-0 bg-gray-200">
                             <tr>
