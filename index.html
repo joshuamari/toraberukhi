@@ -1309,10 +1309,10 @@
               id="appendHere"
             >
               <div class="left px-[14px] lg:px-8 pt-0" id="left">
-                <small class="text-[12px]"
-                  >To send a dispatch request to KDT, please fill up the form
-                  below.</small
-                >
+                <p class="text-pretty" style="font-size: 12px">
+                  To send a dispatch request to KDT, please fill up the form
+                  below.
+                </p>
                 <div class="viewForm mt-2">
                   <div class="form">
                     <div class="error-msg mt-2"></div>
@@ -1458,7 +1458,7 @@
                   >
                     <label
                       for=""
-                      class="whConfirm-lbl text-[var(--gray-text2)] text-[12px]"
+                      class="whConfirm-lbl text-[var(--gray-text2)] text-[12px] text-pretty"
                       >I hereby confirm that I have carefully checked the
                       <span
                         class="font-bold text-[var(--gray-text2)] text-[12px]"
@@ -1524,7 +1524,9 @@
                   </div>
                   <div class="flex flex-col empmoreDetails h-full gap-3">
                     <div class="cards d-grid h-auto">
-                      <div class="card shadow-sm">
+                      <div
+                        class="card rounded-sm border-1 border-[var(--gray)]"
+                      >
                         <div class="card-body">
                           <h5 class="card-title">Latest Passport</h5>
 
@@ -1599,7 +1601,7 @@
                         </div>
                       </div>
 
-                      <div class="card shadow-sm">
+                      <div class="card border-1 border-[var(--gray)]">
                         <div class="card-body">
                           <h5 class="card-title">Latest Japan Visa</h5>
 
@@ -1663,7 +1665,7 @@
                         </div>
                       </div>
 
-                      <div class="card shadow-sm">
+                      <div class="card border-1 border-[var(--gray)]">
                         <div class="card-body">
                           <h5 class="card-title text-capitalize">
                             Total dispatch days per year
@@ -1717,9 +1719,7 @@
                         </div>
                       </div>
                     </div>
-                    <div
-                      class="d-flex totalThisYear flex-column shadow-sm p-3 gap-3"
-                    >
+                    <div class="d-flex totalThisYear flex-column p-3 gap-3">
                       <div class="label">
                         Estimated Total Days of Dispatch this Year
                       </div>
@@ -1930,7 +1930,7 @@
                       </div>
                     </div>
                     <div
-                      class="dispatch-hist p-3 bg-white rounded-lg h-full shadow-sm xl:pb-0"
+                      class="dispatch-hist p-3 bg-white rounded-lg h-full border-1 border-[var(--gray)] xl:pb-0"
                     >
                       <div class="top flex justify-content-between">
                         <h5 class="title text-[var(--dark)]">

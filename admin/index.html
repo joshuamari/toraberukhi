@@ -35,7 +35,7 @@
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content border-0">
         <div class="modal-header border-0">
-          <h1 class="modal-title">Add New User</h1>
+          <h1 class="modal-title text-[18px]">Add New User</h1>
           <button
             type="button"
             class="btn-close"
@@ -43,7 +43,7 @@
             aria-label="Close"
           ></button>
         </div>
-        <div class="modal-body">
+        <div class="modal-body py-0">
           <div class="mb-3">
             <label for="empId" class="form-label">Employee number</label>
             <input
@@ -122,14 +122,14 @@
         <div class="modal-footer border-0">
           <button
             type="button"
-            class="btn btn-secondary close"
+            class="btn bg-[var(--dark)] text-[var(--white-100)] hover:text-[var(--white-100)] hover:bg-[var(--dark-200)] close font-medium border-0"
             data-bs-dismiss="modal"
           >
             Close
           </button>
           <button
             type="button"
-            class="button bg-[var(--secondary)] hover:bg-[var(--tertiary)]"
+            class="button bg-[var(--secondary)] hover:bg-[var(--tertiary)] text-[var(--dark)] font-semibold"
             id="addUser"
           >
             Add user
@@ -150,7 +150,7 @@
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content border-0">
         <div class="modal-header border-0">
-          <h1 class="modal-title">Edit User</h1>
+          <h1 class="modal-title text-[18px]">Edit User</h1>
           <button
             type="button"
             class="btn-close"
@@ -158,7 +158,7 @@
             aria-label="Close"
           ></button>
         </div>
-        <div class="modal-body">
+        <div class="modal-body py-0">
           <div class="mb-3">
             <label for="empIdEdit" class="form-label">Employee number</label>
             <input
@@ -228,7 +228,7 @@
         <div class="modal-footer border-0">
           <button
             type="button"
-            class="button bg-[var(--secondary)] hover:bg-[var(--tertiary)]"
+            class="button bg-[var(--secondary)] hover:bg-[var(--tertiary)] text-[var(--dark)]"
             id="saveBtn"
           >
             Save changes
@@ -261,13 +261,13 @@
             Are you sure you want to remove user
             <span
               id="removeId"
-              class="text-[var(--red-color)] font-semibold text-[16px]"
+              class="text-[var(--dark)] font-semibold text-[16px]"
               >000</span
             >
             -
             <span
               id="removeName"
-              class="text-[var(--red-color)] font-semibold text-[16px]"
+              class="text-[var(--dark)] font-semibold text-[16px]"
               >Juan Delacruz</span
             >?
           </p>
@@ -437,12 +437,12 @@
               </div>
 
               <div class="table-cont overflow-auto overscroll-contain pb-3">
-                <table class="table">
-                  <thead class="sticky-top">
+                <table class="w-full">
+                  <thead class="sticky top-0 z-10">
                     <tr>
                       <th>
                         <div class="d-flex align-items-center gap-2">
-                          <span class="text-[12px] font-bold">Emp ID</span
+                          <span class="text-[12px]">Emp ID</span
                           ><i
                             class="bx bx-sort-alt-2 fs-5 sortEmpNum"
                             role="button"
@@ -451,7 +451,7 @@
                       </th>
                       <th>
                         <div class="d-flex align-items-center gap-2">
-                          <span class="text-[12px] font-bold">Name</span
+                          <span class="text-[12px]">Name</span
                           ><i
                             class="bx bx-sort-a-z fs-5 sortEmpName"
                             role="button"
