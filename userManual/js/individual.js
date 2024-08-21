@@ -1,12 +1,18 @@
+Sentry.init({
+  dsn: "http://996e6a7f7f64d413dd43124ae5dece7e@o4507730788483072.ingest.us.sentry.io/4507767647436800",
+});
 //#region GLOBALS
 const rootFolder = `//${document.location.hostname}`;
-
+let empDetails = [];
+let isSentryModalOpen = false;
 //#endregion
 checkAccess()
   .then((emp) => {
     if (emp.isSuccess) {
       empDetails = emp.data;
-      $(document).ready(function () {});
+      $(document).ready(function () {
+        fillEmployeeDetails();
+      });
     } else {
       alert(emp.message);
       window.location.href = `${rootFolder}/PCSKHI/Login`;
@@ -36,10 +42,33 @@ $(document).on("click", "#logoutBtn", function () {
       alert(`${error}`);
     });
 });
+$(document).on("click", ".btn-bug", function () {
+  openReport();
+});
+$(document).on("click", ".sentry-error-embed-wrapper", function () {
+  isSentryModalOpen = false;
+});
 //#endregion
 
 //#region FUNCTIONS
+function openReport() {
+  if (!isSentryModalOpen) {
+    const eventId = Sentry.captureException(new Error("Error report"));
 
+    Sentry.showReportDialog({
+      eventId: eventId,
+      title: "We're sorry about that!",
+      subtitle: "Please provide us with some feedback so we can fix the issue.",
+      subtitle2: "We appreciate your help!",
+      labelName: "Name",
+      labelEmail: "Email",
+      labelComments: "What process did you do?",
+      labelSubmit: "Send Feedback",
+      successMessage: "Thank you for your feedback!",
+    });
+  }
+  isSentryModalOpen = true;
+}
 function checkAccess() {
   return new Promise((resolve, reject) => {
     $.ajax({
@@ -62,7 +91,30 @@ function checkAccess() {
     });
   });
 }
-
+function fillEmployeeDetails() {
+  const fName = empDetails.firstname;
+  const sName = empDetails.surname;
+  const initials = getInitials(fName, sName);
+  const grpName = empDetails.group;
+  const fullName = capitalizeWords(`${fName} ${sName}`);
+  $("#empLabel").html(`${fullName}`);
+  $("#empInitials").html(`${initials}`);
+  $("#grpLabel").html(`${grpName}`);
+}
+function capitalizeWords(str) {
+  return str
+    .toLowerCase()
+    .split(" ")
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
+}
+function getInitials(firstname, surname) {
+  let initials = "";
+  var firstInitial = firstname.charAt(0);
+  var lastInitial = surname.charAt(0);
+  initials = `${firstInitial}${lastInitial}`;
+  return initials.toUpperCase();
+}
 function toggleLoadingAnimation(show) {
   if (show) {
     $("#appendHere").append(`
