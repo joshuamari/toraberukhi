@@ -878,7 +878,7 @@
                   <td>
                     <div class="flex">
                       <p class="font-['Arial']">JP¥</p>
-                      <p class="font-['Arial'] font-bold" id="printSalary"></p>
+                      <p class="font-['Arial']" id="printSalaryJP"></p>
                       <p class="font-['Arial']">(*)/Calendar Day</p>
                     </div>
                     <small class="font-['Arial'] text-[11px] leading-2 flex"
@@ -937,7 +937,7 @@
                   <td>
                     <div class="flex">
                       <p class="font-['Arial']">US$</p>
-                      <p class="font-['Arial']" id="printSalary">40</p>
+                      <p class="font-['Arial']"  id="printSalaryUS">40</p>
                       <p class="font-['Arial']">(*)/Calendar Day</p>
                     </div>
                     <small class="font-['Arial'] text-[11px] leading-2 flex"
@@ -1132,8 +1132,8 @@
             <div class="flex gap-2 mb-4">
               <span>4.</span>
               <div class="flex flex-col">
-                <span>業務内容（予定</span>
-                <span class="">水素実証設備の設計業務</span>
+                <span>業務内容（予定)</span>
+                <span class="" id="whBusiness">水素実証設備の設計業務</span>
               </div>
             </div>
             <div class="flex gap-2 mb-4">
@@ -1442,14 +1442,15 @@
                       <label for="" class="col-form-label pl-0"
                         >Daily Allowance with Meals:</label
                       >
-                      <input
+                      <!-- <input
                         type="number"
                         name=""
                         class="input"
                         id="allowance"
                         placeholder="Allowance"
                         min="0"
-                      />
+                      /> -->
+                      <span id="allowanceDisplay">0</span>
                     </div>
                     <div class="mb-1 row">
                       <label for="" class="col-form-label pl-0"

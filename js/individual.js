@@ -45,6 +45,7 @@ let monthNames2 = [
   "Dec",
 ];
 let isSentryModalOpen = false;
+let allowance = [];
 //#endregion
 checkAccess()
   .then((emp) => {
@@ -95,6 +96,7 @@ $(document).on("click", "#closeNav", function () {
 $(document).on("change", "#grpSel", function () {
   getEmployees().then((emps) => {
     fillEmployees(emps);
+    displayAllowance();
   });
 });
 $(document).on("click", ".btn-close", function () {
@@ -142,8 +144,9 @@ $(document).on("change", "#empSel", function () {
     getDispatchDays(),
     getYearly(),
     getWorkHistory(),
+    getAllowance(),
   ])
-    .then(([pass, vsa, dlst, dd, yrl, wlst]) => {
+    .then(([pass, vsa, dlst, dd, yrl, wlst, baon]) => {
       fillPassport(pass);
       fillVisa(vsa);
       dispatch_days = dd;
@@ -153,6 +156,8 @@ $(document).on("change", "#empSel", function () {
       fillWorkHistory(wHistory);
       countTotal();
       fillYearly(yrl);
+      allowance = baon;
+      displayAllowance();
       toggleLoadingAnimation(false);
     })
     .catch((error) => {
@@ -170,6 +175,9 @@ $(document).on("change", "#empSel", function () {
     $(".emptyState").addClass("d-none");
     $(".withContent").removeClass("d-none");
   }
+});
+$(document).on("change", "#locSel", function () {
+  displayAllowance();
 });
 $(document).on("click", "#btnApply", function () {
   checkDispatch();
@@ -362,7 +370,7 @@ $(document).on("click", ".rmvToast", function () {
 });
 $(document).on(
   "click",
-  "#reqDeptSel, #reqNameInput, #grpSel, #empSel, #startDate, #endDate, #locSel, #specLocInput, #inviteSel, #workOrder, #projName, #allowance, #businessInput",
+  "#reqDeptSel, #reqNameInput, #empSel, #startDate, #endDate, #locSel, #specLocInput, #inviteSel, #workOrder, #projName, #businessInput",
   function () {
     $(this).removeClass("bg-red-100  border-red-400");
     $(".errTxt").remove();
@@ -433,20 +441,20 @@ $(document).on("click", "#logoutBtn", function () {
       alert(`${error}`);
     });
 });
-$(document).on("keydown", "#allowance", function (e) {
-  if (
-    e.which === 38 ||
-    e.which === 40 ||
-    e.which === 187 ||
-    e.which === 189 ||
-    e.which === 109 ||
-    e.which === 107 ||
-    e.key === "e" ||
-    e.key === "E"
-  ) {
-    e.preventDefault();
-  }
-});
+// $(document).on("keydown", "#allowance", function (e) {
+//   if (
+//     e.which === 38 ||
+//     e.which === 40 ||
+//     e.which === 187 ||
+//     e.which === 189 ||
+//     e.which === 109 ||
+//     e.which === 107 ||
+//     e.key === "e" ||
+//     e.key === "E"
+//   ) {
+//     e.preventDefault();
+//   }
+// });
 $(document).on("click", ".btn-bug", function () {
   openReport();
 });
@@ -455,7 +463,7 @@ $(document).on("click", ".sentry-error-embed-wrapper", function () {
 });
 $(document).on("click", "#btnNext", function () {
   $("#attachmentModal").modal("hide");
-  fillAttachment2();
+  fillAttachment2(wHistory);
 });
 $(document).on("click", "#btnBack", function () {
   $("#attachmentModal2").modal("hide");
@@ -463,7 +471,6 @@ $(document).on("click", "#btnBack", function () {
 });
 $(document).on("click", "#btnSend", function () {
   $("#btnSend").prop("disabled", true);
-  console.log("disabling send email btn");
   // $('#btnSend').addClass("bg-[var(--secondary)] hover:bg-[var(--tertiary)] font-semibold rounded-md px-3 py-1  text-[var(--dark)]")
   insertDispatch()
     .then((res) => {
@@ -495,13 +502,12 @@ $(document).on("click", "#btnSend", function () {
               "success",
               "Successfully sent a dispatch request to KDT."
             );
-            console.log("enabling send email btn");
           })
           .catch((error) => {
             alert(`${error}`);
           });
       }
-      $("#attachmentModal").modal("hide");
+      $("#attachmentModal2").modal("hide");
       $("#btnSend").prop("disabled", false);
       toggleLoadingAnimation(false);
     })
@@ -540,11 +546,6 @@ $(document).on("click", ".lbl-viewForm", function () {
 
 $(document).on("click", "#whConfirm", function () {
   const workConfirm = $("#whConfirm").is(":checked");
-  if (workConfirm) {
-    console.log("checked");
-  } else {
-    console.log("not checked");
-  }
 });
 
 $(document).on("click", ".toggle.small", function () {
@@ -586,13 +587,58 @@ function openReport() {
   }
   isSentryModalOpen = true;
 }
+function getAllowance() {
+  const empID = $("#empSel").find("option:selected").attr("emp-id");
+  return new Promise((resolve, reject) => {
+    $.ajax({
+      type: "GET",
+      url: "php/get_allowance.php",
+      data: {
+        empID: empID,
+      },
+      dataType: "json",
+      success: function (response) {
+        const allowance = response;
+        resolve(allowance);
+      },
+      error: function (xhr, status, error) {
+        if (xhr.status === 404) {
+          reject("Not Found Error: The requested resource was not found.");
+        } else if (xhr.status === 500) {
+          reject("Internal Server Error: There was a server error.");
+        } else {
+          reject(
+            `An unspecified error occurred while fetching allowance: ${error}`
+          );
+        }
+      },
+    });
+  });
+}
+function displayAllowance() {
+  const empVal = parseInt($("#empSel").val());
+  let locVal = parseInt($("#locSel").val());
+  let currency = "¥";
+  let amount = 0;
+
+  if (locVal === 2) {
+    locVal = 1;
+  } else if (locVal === 3) {
+    currency = "$";
+  }
+
+  if (empVal !== 0 && locVal !== 0) {
+    const result = allowance.find((item) => item.location_id == locVal);
+    amount = result ? result.amount : 0;
+  }
+  $("#allowanceDisplay").text(`${currency}${amount}`);
+}
 function formatName(name) {
   const [last, given] = name.split(",");
   const surname = last.toUpperCase();
   return given + " " + surname;
 }
 function fillAttachment() {
-  console.log(empDetails);
   // const reqDept = $("#reqDeptInput").val(); //Input Type Req Dept
   const reqDept = $("#reqDeptSel").find("option:selected").attr("reqdept-name"); //Select Type Req Dept
   // const reqName = $("#reqNameInput").val();
@@ -606,10 +652,10 @@ function fillAttachment() {
   const locID = $("#locSel").find("option:selected").attr("loc-id");
   const specLoc = $("#specLocInput").val();
   const inviteID = $("#inviteSel").find("option:selected").attr("inv-id");
-  const business = $("#businessInput").val();
   const workOrder = $("#workOrder").val();
   const projName = $("#projName").val();
-  const allowance = $("#allowance").val();
+  const allowance_jp = allowance[0]["amount"];
+  const allowance_us = allowance[1]["amount"];
   const siteDispatch = $("#siteDispatch").is(":checked");
   $("#printJap, #printPh, #printThird").empty();
 
@@ -645,7 +691,8 @@ function fillAttachment() {
   if (siteDispatch === false) {
     $(".siteDispatch").empty();
   }
-  $("#printSalary").text(allowance);
+  $("#printSalaryJP").text(allowance_jp);
+  $("#printSalaryUS").text(allowance_us);
   $("#printWO").text(workOrder);
   $("#printProject").text(projName);
 
@@ -672,12 +719,13 @@ function formatDate(date) {
   return day + " " + monthName + " " + year;
 }
 
-function fillAttachment2() {
+function fillAttachment2(wList) {
+  const business = $("#businessInput").val();
   const emp = $("#empSel").find("option:selected").text();
-  var today = new Date();
-  var day = today.getDate();
-  var month = today.getMonth() + 1;
-  var year = today.getFullYear();
+  let today = new Date();
+  let day = today.getDate();
+  let month = today.getMonth() + 1;
+  let year = today.getFullYear();
 
   if (day < 10) {
     day = "0" + day;
@@ -686,10 +734,51 @@ function fillAttachment2() {
     month = "0" + month;
   }
 
+  let str = "";
+  $("#workHistoryTable tbody").empty();
+  if (wList.length != 0) {
+    $.each(wList, function (index, item) {
+      if (item.end_year == null) {
+        item.end_year = "";
+      }
+      if (item.end_month == null) {
+        item.end_month = "";
+      }
+      if (item.end_year == "-0001") {
+        item.end_year = "";
+      }
+      if (item.end_month == "11") {
+        item.end_month = "";
+      }
+      str += `
+      <tr>
+        <td>${item.start_year}</td>
+        <td>${item.start_month}</td>
+        <td>${item.end_year}</td>
+        <td>${item.end_month}</td>
+        <td>${item.comp_name}</td>
+        <td>${item.comp_business}</td>
+        <td>${item.business_cont}</td>
+        <td>${item.work_loc}</td>
+      </tr>
+    `;
+    });
+  } else {
+    str = `
+    <tr>
+      <td colspan="9" class="text-center">
+        No data found.
+      </td>
+    </tr>
+    `;
+  }
+  $("#workHistoryTable tbody").append(str);
+
   $("#whYear").text(year);
   $("#whMonth").text(month);
   $("#whDay").text(day);
   $("#whName").text(emp);
+  $("#whBusiness").text(business);
 
   $("#attachmentModal2").modal("show");
 }
@@ -1079,7 +1168,6 @@ function getDispatchHistory() {
       },
       dataType: "json",
       success: function (response) {
-        // console.log("getDHistory: ", response);
         const dList = response;
         resolve(dList);
       },
@@ -1175,7 +1263,6 @@ function getDispatchDays() {
       },
       dataType: "json",
       success: function (response) {
-        // console.log(response);
         const dDays = response;
         resolve(dDays);
       },
@@ -1202,7 +1289,6 @@ function countTotal() {
     if (dd > 183) {
       $("#rangeCount").addClass("redText");
       countText = `${dd} days`;
-      console.log("lagpas");
     } else {
       $("#rangeCount").removeClass("redText");
       countText = `${dd} days`;
@@ -1250,7 +1336,6 @@ function checkDispatch() {
   // const reqDept = $("#reqDeptInput").val(); //Input Type Req Dept
   const reqDept = $("#reqDeptSel").find("option:selected").attr("reqdept-name"); //Select Type Req Dept
   // const reqName = $("#reqNameInput").val();
-  const grp = $("#grpSel").find("option:selected").attr("grp-id");
   const empID = $("#empSel").find("option:selected").attr("emp-id");
   const startD = $("#startDate").val();
   const endD = $("#endDate").val();
@@ -1259,7 +1344,6 @@ function checkDispatch() {
   const inviteID = $("#inviteSel").find("option:selected").attr("inv-id");
   const workOrder = $("#workOrder").val();
   const projName = $("#projName").val();
-  const allowance = $("#allowance").val();
   const business = $("#businessInput").val();
   const siteDispatch = $("#siteDispatch").is(":checked");
   const workConfirm = $("#whConfirm").is(":checked");
@@ -1277,11 +1361,6 @@ function checkDispatch() {
   if (!business) {
     $("#businessInput").addClass("bg-red-100  border-red-400");
     if (!firstIncompleteInput) firstIncompleteInput = $("#businessInput");
-    ctr++;
-  }
-  if (!grp) {
-    $("#grpSel").addClass("bg-red-100  border-red-400");
-    if (!firstIncompleteInput) firstIncompleteInput = $("#grpSel");
     ctr++;
   }
   if (!empID) {
@@ -1324,18 +1403,12 @@ function checkDispatch() {
     if (!firstIncompleteInput) firstIncompleteInput = $("#projName");
     ctr++;
   }
-  if (!allowance) {
-    $("#allowance").addClass("bg-red-100  border-red-400");
-    if (!firstIncompleteInput) firstIncompleteInput = $("#allowance");
-    ctr++;
-  }
   if (ctr > 0) {
     $(".error-msg").html(`
     <div class="errTxt  flex items-center gap-1">
     <i class='bx bx-info-circle text-red-600'></i>
     <p class="text-red-600">Please complete all fields.</p>
     </div>`);
-    console.log("complete required fields");
     if (firstIncompleteInput) {
       const offsetTop =
         firstIncompleteInput.offset().top -
@@ -1348,7 +1421,6 @@ function checkDispatch() {
     return;
   }
   if (!workConfirm) {
-    console.log("checkbox: ", workConfirm);
     $(".whConfirm-lbl").addClass("text-red-600");
     // $(".error-msg").html(`
     // <div class="errTxt  flex items-center gap-1">
@@ -1360,7 +1432,6 @@ function checkDispatch() {
       "Please confirm that you have checked the work history table."
     );
     $(".toggle.small").addClass("outline outline-offset-2 outline-red-500  ");
-    console.log("confirm work history");
 
     toggleLoadingAnimation(false);
     return;
@@ -1381,9 +1452,8 @@ function checkDispatch() {
 }
 function insertDispatch() {
   // const reqDept = $("#reqDeptInput").val(); //Input Type Req Dept
-  const reqDept = $("#reqDeptSel").find("option:selected").attr("reqdept-name"); //Select Type Req Dept
+  const reqDept = $("#reqDeptSel").val(); //Select Type Req Dept
   // const reqName = $("#reqNameInput").val();
-  const grp = $("#grpSel").find("option:selected").attr("grp-id");
   const empID = $("#empSel").find("option:selected").attr("emp-id");
   const startD = $("#startDate").val();
   const endD = $("#endDate").val();
@@ -1393,7 +1463,6 @@ function insertDispatch() {
   const inviteID = $("#inviteSel").find("option:selected").attr("inv-id");
   const workOrder = $("#workOrder").val();
   const projName = $("#projName").val();
-  const allowance = $("#allowance").val();
   const siteDispatch = $("#siteDispatch").is(":checked");
   const workConfirm = $("#whConfirm").is(":checked");
 
@@ -1414,7 +1483,6 @@ function insertDispatch() {
     <i class='bx bx-info-circle text-red-600'></i>
     <p class="text-red-600">Please confirm Work History first.</p>
     </div>`);
-    console.log("confirm work history");
     toggleLoadingAnimation(false);
     return;
   }
@@ -1433,8 +1501,8 @@ function insertDispatch() {
         inviID: inviteID,
         workOrder: workOrder,
         project_name: projName,
-        allowance: allowance,
         site_dispatch: siteDispatch,
+        business: business,
       },
       dataType: "json",
       success: function (response) {
@@ -1455,18 +1523,18 @@ function insertDispatch() {
 }
 function clearInput() {
   $(
-    "#reqDeptSel, #reqNameInput, #grpSel, #empSel, #startDate, #endDate, #locSel, #specLocInput, #inviteSel, #workOrder, #projName, #allowance, #businessInput"
+    "#reqDeptSel, #reqNameInput, #grpSel, #empSel, #startDate, #endDate, #locSel, #specLocInput, #inviteSel, #workOrder, #projName, #businessInput"
   ).removeClass("bg-red-100  border-red-400");
   $(".errTxt").remove();
   $("#locSel, #inviteSel, #reqDeptSel").val(0);
   $(
     "#reqNameInput, #startDate, #endDate, #specLocInput, #workOrder, #projName, #businessInput"
   ).val("");
-  $("#allowance").val("0");
   $("#siteDispatch").prop("checked", false);
   $("#whConfirm").prop("checked", false);
   to_add = 0;
   $("#daysCount").text("0 Day");
+  $("#allowanceDisplay").text("0");
 }
 function clearGroup() {
   $("#grpSel").val($("#grpSel option:first").val());
@@ -1579,7 +1647,9 @@ function getReqDepts() {
 }
 function fillReqDepts(depts) {
   var reqDeptSel = $("#reqDeptSel");
-  reqDeptSel.html("<option value='0'>Select Requester's Department</option>");
+  reqDeptSel.html(
+    "<option value='0' hidden>Select Requester's Department</option>"
+  );
   $("#editentryReqDept").empty();
 
   $.each(depts, function (index, item) {
@@ -1656,8 +1726,6 @@ function addWorkHistory() {
   const business_cont = $("#addbusinessContent").val();
   const work_loc = $("#addworkLocation").val();
   let errcount = 0;
-  console.log(startMonthYear);
-  console.log(endMonthYear);
 
   if (!comp_name) {
     $("#addcompanyName").addClass("bg-red-100  border-red-400");
@@ -2017,7 +2085,6 @@ function getYearly() {
       },
       dataType: "json",
       success: function (response) {
-        // console.log(response);
         const yrly = response;
         resolve(yrly);
       },
@@ -2155,7 +2222,6 @@ function logOut() {
       url: "global/logout.php",
       dataType: "json",
       success: function (response) {
-        console.log(response);
         const res = response;
         resolve(res);
       },
