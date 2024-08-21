@@ -42,25 +42,46 @@ td {
   font-size: 12px;
   /* text-transform: uppercase; */
 }
+
+thead{
+  position: sticky;
+  top: 0;
+}
+table{
+  border-collapse: separate !important;
+  border-spacing: 0;
+  width: 100%;
+}
+.table-container table thead tr th {
+  background-color: var(--tableheader);
+  padding:  0.75rem;
+  text-transform: uppercase;
+  vertical-align: middle;
+  font-size: 12px;
+  font-weight: 500;
+  color: #555;
+  white-space: nowrap;
+  border-top: 1px solid #ebebeb ;
+  border-bottom: 1px solid #ebebeb ;
+  
+}
 .table-container table thead tr th:first-of-type {
-  border-top-left-radius: 8px;
-  border-bottom-left-radius: 8px;
+  border-top-left-radius: 8px !important;
+  border-bottom-left-radius: 8px !important;
+  border-left: 1px solid #ebebeb ;
+
 }
 .table-container table thead tr th:last-of-type {
   border-top-right-radius: 8px;
   border-bottom-right-radius: 8px;
+  border-right: 1px solid #ebebeb ;
 }
 
-.table-container table thead tr th {
-  background-color: var(--tableheader);
-  padding: 1.25rem 0.75rem;
-  text-transform: uppercase;
-  font-size: 12px;
-  font-weight: 600;
-  white-space: nowrap;
-}
 .table-container table td {
   white-space: nowrap;
+padding: 12px 10px;
+border-bottom: 1px solid var(--gray);
+font-weight: 400;
 }
 table tbody tr:hover {
   background-color: #ededed;

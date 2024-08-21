@@ -2,12 +2,24 @@
 .help i {
   font-size: 25px;
 }
+table{
+  border-collapse: separate !important;
+  border-spacing: 0;
+}
 table tbody tr td {
   vertical-align: middle;
+  padding: 16px 14px;
+  border-bottom: 1px solid var(--gray);
+  background-color: #fff;
+}
+table tbody tr:hover td{
+  background-color: var(--tablehover);
 }
 table thead tr {
   background-color: var(--tableheader);
 }
+
+
 
 .main .table-titles {
   position: relative;
@@ -43,21 +55,26 @@ table thead tr {
   box-shadow: 0px 4px 4px -4px rgba(0, 0, 0, 0.2) !important; border-radius: 8px;
 }
 .main .tables thead tr th {
-  background-color: inherit;
+  background-color: var(--tableheader);
   font-size: 12px !important;
   text-transform: uppercase;
   white-space: nowrap;
   vertical-align: middle;
-  font-weight: 700;
-  padding: 1.25rem .75rem;
+  font-weight: 500;
+  padding: .75rem 1rem;
+  color: #555;
+  border-bottom: 1px solid var(--gray);
+  border-top: 1px solid var(--gray);
 }
 .main .tables thead tr th:first-of-type{
   border-top-left-radius: 8px;
   border-bottom-left-radius: 8px;
+  border-left: 1px solid var(--gray);
 }
 .main .tables thead tr th:last-of-type{
   border-top-right-radius: 8px;
   border-bottom-right-radius: 8px;
+  border-right: 1px solid var(--gray);
 }
 
 .main .tables tbody tr:hover {
