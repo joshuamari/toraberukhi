@@ -281,7 +281,7 @@ function fillAttachment(data) {
   $("#printJap, #printPh, #printThird").text("");
   var date = data.date_request;
   var khi = data.dispatch_request.requester_name;
-  var khibu = data.dispatch_request.request_by_dept;
+  var khibu = data.dispatch_request.request_dept;
   var name = data.dispatch_request.emp_name;
   var from = data.dispatch_request.start;
   var to = data.dispatch_request.end;
@@ -389,6 +389,7 @@ function fillAttachment2(data) {
   $("#whMonth").text(month + 1);
   $("#whDay").text(day);
   $("#whName").text(name);
+  $("#whBusiness").text(data.dispatch_request.business);
 }
 function insertIconCountry(id) {
   $(".countries").empty();

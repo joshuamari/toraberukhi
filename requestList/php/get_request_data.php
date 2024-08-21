@@ -37,13 +37,14 @@ if (!empty($_GET['request_id'])) {
 
 #region main function
 try {
-    $getQ = "SELECT * FROM `request_list` rl WHERE `request_id`=:request_id";
+    $getQ = "SELECT `rl`.*,`rd`.department_name FROM `request_list` rl JOIN `requesters_dep` rd ON `rl`.dept_id = `rd`.id WHERE `request_id`=:request_id";
     $getStmt = $connpcs->prepare($getQ);
     $getStmt->execute([":request_id" => $requestID]);
     if ($getStmt->rowCount() > 0) {
         $details = $getStmt->fetch();
         $details['emp_name'] = getName($details['emp_number']);
         $details['requester_name'] = getName($details['requester_id']);
+        $details['request_dept'] = $details['department_name'];
         $details['start'] = date("d M Y", strtotime($details['dispatch_from']));
         $details['end'] = date("d M Y", strtotime($details['dispatch_to']));
         $details['date_request'] = date("d M Y", strtotime($details['date_requested']));
@@ -52,7 +53,7 @@ try {
         $details['invitation_id'] = (int)$details['invitation_id'];
         $details['site_dispatch'] = (int)$details['site_dispatch'];
         $details['allowance'] = getAllowance($details['emp_number']);
-        // $details['work_history'] = getWorkHistory($details['emp_number']);
+        $details['business'] = $details['work_content'];
         $result['isSuccess'] = TRUE;
         $result['message'] = 'Successfully fetched data';
         $result['data']['dispatch_request'] = $details;
