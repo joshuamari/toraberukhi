@@ -514,7 +514,7 @@
       <div class="modal-content">
         <div class="modal-header border-0">
           <h1 class="modal-title text-[18px]" id="titleModal">
-            Review Request for Dispatch File
+            Review dispatch request file
           </h1>
           <!-- <button type="button" class="btn-close text-[14px]  m-1 w-0 h-0  w-auto h-auto" data-bs-dismiss="modal"
           aria-label="Close"></button> -->
@@ -977,7 +977,186 @@
             </div>
           </div>
           <div class="flex h-full px-3 flex-col gap-2">
-            <p class="" style="font-family: 'Poppins', sans-serif">
+            <p
+              class="text-[12px]"
+              style="font-size: 12.25px; font-family: 'Poppins', sans-serif"
+            >
+              This file is generated based on your input.Please review if
+              everything is correct, click the "Next" button to review the "Work
+              History" file. If changes are needed, click "Back" button and edit
+              your information before submitting.
+            </p>
+            <p
+              class="text-[var(--gray-text)]"
+              style="font-size: 12.25px; font-family: 'Poppins', sans-serif"
+            >
+              <i
+                class="bx bxs-info-circle text-[var(--gray-text)] align-middle pr-1"
+              ></i
+              >Keep track of your request on "Request List" tab.
+            </p>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button
+            type="button"
+            data-bs-dismiss="modal"
+            aria-label="Close"
+            class="btn bg-[var(--dark)] hover:bg-[var(--dark-200)] text-[var(--white)] hover:text-[var(--white)] border-0"
+          >
+            Back
+          </button>
+          <button
+            class="btn bg-[var(--secondary)] hover:bg-[var(--tertiary)] font-semibold border-0"
+            id="btnNext"
+          >
+            Next
+          </button>
+          <!-- <button class="btn-send btn" id="btnSend">Submit Request</button> -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div
+    class="modal fade"
+    id="attachmentModal2"
+    data-bs-backdrop="static"
+    data-bs-keyboard="false"
+    tabindex="-1"
+    aria-hidden="true"
+  >
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content">
+        <div class="modal-header border-0">
+          <h1 class="modal-title text-[18px]" id="titleModal">
+            Review work history file
+          </h1>
+          <button
+            type="button"
+            class="btn-close text-[14px] m-1 w-0 h-0 w-auto h-auto"
+            data-bs-dismiss="modal"
+            aria-label="Close"
+          ></button>
+        </div>
+        <div
+          class="modal-body flex-col items-center justify-content-center bg-[var(--gray)]"
+        >
+          <div
+            class="w-[210mm] h-[297mm] min-w-[210mm] min-h-[297mm] bg-[#fff] p-[14mm] my-[-50mm] mx-[-2.5mm] gap-2"
+            id="toPrint2"
+            style="transform: scale(0.65)"
+          >
+            <div class="top flex justify-content-end w-100 mb-4">
+              <span class="">（別紙）</span>
+            </div>
+            <div class="top flex justify-content-end w-100 mb-2 gap-2">
+              <span id="whYear">2024</span>
+              年
+              <span id="whMonth">7</span>
+              月
+              <span id="whDay">29</span>
+              日
+            </div>
+            <div class="mb-4">大阪入国管理局　様</div>
+            <div
+              class="top flex justify-content-end w-100 mb-2 tracking-[1rem]"
+            >
+              川崎重工業株式会社
+            </div>
+            <div class="text-[14px] top flex justify-content-end w-100 mb-5">
+              エネルギーソリューション＆マリンカンパニー
+            </div>
+            <div class="indent-6 leading-[2rem] mb-3">
+              申請人の職務経歴および弊社内での職務内容について下記の通り補足させていただきます。つきましては、申請人の在留資格認定証明書の交付にご配慮賜りますよう、お願い致します。
+            </div>
+            <div class="flex gap-2 mb-4">
+              <span>1.</span>
+              <div class="flex flex-col">
+                <span>申請人</span>
+                <span class="font-semibold font-['Arial']" id="whName"
+                  >Pangilinan, Seanne Kyle Beltran</span
+                >
+              </div>
+            </div>
+            <div class="flex gap-2 mb-4">
+              <span>2.</span>
+              <div class="flex flex-col">
+                <span>申請内容</span>
+                <span class=""
+                  >企業内転勤にかかわる在留資格認定証明書の交付</span
+                >
+              </div>
+            </div>
+            <div class="flex gap-2 mb-4 w-full">
+              <span>3.</span>
+              <div class="flex flex-col">
+                <span>職務経歴詳細</span>
+                <span class=""
+                  >申請人はフィリピンにおいて、主に技術設計業務等に従事してきました。</span
+                >
+                <span>申請人の職務経歴の詳細は下表の通りです。</span>
+
+                <table class="table mt-2" id="workHistoryTable">
+                  <thead>
+                    <tr>
+                      <th colspan="2">Start</th>
+                      <th colspan="2">End</th>
+                      <th rowspan="2">Company's name</th>
+                      <th rowspan="2">Company's business</th>
+                      <th rowspan="2">Business content</th>
+                      <th rowspan="2">Work location</th>
+                    </tr>
+                    <tr>
+                      <th>Year</th>
+                      <th>Month</th>
+                      <th>Year</th>
+                      <th>Month</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>2007</td>
+                      <td>3</td>
+                      <td></td>
+                      <td></td>
+                      <td>KHI Design & Technical Service Inc.</td>
+                      <td>プラントエンジニアリング</td>
+                      <td>土建設計業務</td>
+                      <td>マニラ</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <div class="flex gap-2 mb-4">
+              <span>4.</span>
+              <div class="flex flex-col">
+                <span>業務内容（予定</span>
+                <span class="">水素実証設備の設計業務</span>
+              </div>
+            </div>
+            <div class="flex gap-2 mb-4">
+              <span>5.</span>
+              <div class="flex flex-col">
+                <span>本件担当</span>
+                <span class=""
+                  >川崎重工業　エネルギーソリューション＆マリンカンパニー</span
+                >
+                <span class="">企画本部　人事総務部　人事総務一課</span>
+                <span class="">佐々木　萌香（ササキ　モカ）</span>
+                <span>℡　078-682-5202</span>
+              </div>
+            </div>
+            <div class="top flex justify-content-end w-100 mb-4">
+              <span class="">以　上</span>
+            </div>
+          </div>
+          <div class="flex h-full px-3 flex-col gap-2">
+            <p
+              class=""
+              style="font-size: 12.25px; font-family: 'Poppins', sans-serif"
+            >
               This file is generated based on your input.Please review if
               everything is correct, click the "Submit Request" button to
               finalize your request. If changes are needed, click "Back" button
@@ -985,7 +1164,7 @@
             </p>
             <p
               class="text-[var(--gray-text)]"
-              style="font-family: 'Poppins', sans-serif"
+              style="font-size: 12.25px; font-family: 'Poppins', sans-serif"
             >
               <i
                 class="bx bxs-info-circle text-[var(--gray-text)] align-middle pr-1"
@@ -996,136 +1175,22 @@
         </div>
         <div class="modal-footer" id="buttonHere">
           <button
-            type="button"
-            data-bs-dismiss="modal"
-            aria-label="Close"
-            class="btn bg-[var(--dark)] hover:bg-[var(--dark-200)] text-[var(--white)]"
+            class="bg-[var(--dark)] hover:bg-[var(--dark-200)] text-[var(--white)] hover:text-[var(--white)] font-medium btn border-0"
             id="btnBack"
           >
             Back
           </button>
           <button class="btn-send btn" id="btnSend">Submit Request</button>
+          <!-- <button
+            class="bg-[var(--secondary)] hover:bg-[var(--tertiary)] font-semibold rounded-md px-3 py-1 text-[var(--dark)]"
+            id="btnSend"
+          >
+            Send Dispatch Request
+          </button> -->
         </div>
       </div>
     </div>
   </div>
-
-  <!-- <div class="modal fade" id="attachmentModal2" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
-  aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered modal-xl">
-    <div class="modal-content">
-      <div class="  modal-header border-0 ">
-        <h1 class="modal-title text-[18px]" id="titleModal">Review Work History</h1>
-        <button type="button" class="btn-close text-[14px]  m-1 w-0 h-0  w-auto h-auto" data-bs-dismiss="modal"
-          aria-label="Close"></button>
-      </div>
-      <div class="modal-body  flex items-center justify-content-center bg-[var(--gray)]">
-        <div class="w-[210mm] h-[297mm] min-w-[210mm] min-h-[297mm] bg-[#fff] p-[14mm]  my-[-37mm]" id="toPrint2" style="transform: scale(0.75);">
-          <div class="top flex  justify-content-end w-100 mb-4">
-            <span class="">（別紙）</span>
-          </div> 
-          <div class="top flex  justify-content-end w-100 mb-2 gap-2">
-            <span id="whYear">2024</span>
-            年
-            <span id="whMonth">7</span>
-            月
-            <span id="whDay">29</span>
-            日
-          </div>
-          <div class="mb-4">大阪入国管理局　様</div>
-          <div class="top flex  justify-content-end w-100 mb-2 tracking-[1rem]">
-            川崎重工業株式会社</div>
-          <div class="text-[14px] top flex  justify-content-end w-100 mb-5">
-            エネルギーソリューション＆マリンカンパニー
-          </div>
-          <div class="indent-6 leading-[2rem] mb-3">
-            申請人の職務経歴および弊社内での職務内容について下記の通り補足させていただきます。つきましては、申請人の在留資格認定証明書の交付にご配慮賜りますよう、お願い致します。
-          </div>
-          <div class="flex gap-2 mb-4">
-            <span>1.</span>
-            <div class="flex flex-col">
-              <span>申請人</span>
-              <span class="font-semibold font-['Arial']" id="whName">Pangilinan, Seanne Kyle Beltran</span>
-            </div>
-          </div>
-          <div class="flex gap-2 mb-4">
-            <span>2.</span>
-            <div class="flex flex-col">
-              <span>申請内容</span>
-              <span class="" >企業内転勤にかかわる在留資格認定証明書の交付</span>
-            </div>
-          </div>
-          <div class="flex gap-2 mb-4 w-full">
-            <span>3.</span>
-            <div class="flex flex-col">
-              <span>職務経歴詳細</span>
-              <span class="" >申請人はフィリピンにおいて、主に技術設計業務等に従事してきました。</span>
-              <span>申請人の職務経歴の詳細は下表の通りです。</span>
-       
-               <table class="table mt-2" id="workHistoryTable">
-                 <thead>
-                   <tr>
-                     <th colspan="2">Start</th>
-                     <th colspan="2">End</th>
-                     <th rowspan="2">Company's name</th>
-                     <th rowspan="2">Company's business</th>
-                     <th rowspan="2">Business content</th>
-                     <th rowspan="2">Work location</th>
-                   </tr>
-                   <tr>
-                     <th>Year</th>
-                     <th>Month</th>
-                     <th>Year</th>
-                     <th>Month</th>
-                   </tr>
-                 </thead>
-                 <tbody>
-                  <tr>
-                    <td>2007</td>
-                    <td>3</td>
-                    <td></td>
-                    <td></td>
-                    <td>KHI Design & Technical Service Inc.</td>
-                    <td>プラントエンジニアリング</td>
-                    <td>土建設計業務</td>
-                    <td>マニラ</td>
-                  </tr>
-                 </tbody>
-               </table>
-           
-            </div>
-          </div>
-          <div class="flex gap-2 mb-4">
-            <span>4.</span>
-            <div class="flex flex-col">
-              <span>業務内容（予定</span>
-              <span class="" >水素実証設備の設計業務</span>
-            </div>
-          </div>
-          <div class="flex gap-2 mb-4">
-            <span>5.</span>
-            <div class="flex flex-col">
-              <span>本件担当</span>
-              <span class="" >川崎重工業　エネルギーソリューション＆マリンカンパニー</span>
-              <span class="" >企画本部　人事総務部　人事総務一課</span>
-              <span class="" >佐々木　萌香（ササキ　モカ）</span>
-              <span>℡　078-682-5202</span>
-            </div>
-          </div>
-          <div class="top flex  justify-content-end w-100 mb-4">
-            <span class="">以　上</span>
-          </div> 
-
-          
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button class="bg-[var(--dark)] hover:bg-[var(--dark-200)] text-[var(--white)] font-medium transition rounded-md px-3 py-1" id="btnBack">Back</button>
-        <button class="bg-[var(--secondary)] hover:bg-[var(--tertiary)] font-semibold rounded-md px-3 py-1  text-[var(--dark)]" id="btnSend">Send Dispatch Request</button>
-      </div>
-    </div>
-    </div>
-</div> -->
   <!-- #endregion modal-->
 
   <body>
@@ -1305,13 +1370,15 @@
                       />
                     </div>
                     <div class="mb-1 row">
-                      <label for="" class="col-form-label pl-0"
+                      <label for="japaneseInput" class="col-form-label pl-0"
                         >業務内容（予定）</label
                       >
                       <textarea
                         type="text"
-                        name=""
+                        rows="3"
                         class="input"
+                        name="japaneseInput"
+                        title="Please enter only Japanese characters (Hiragana, Katakana, or Kanji)."
                         id="businessInput"
                         placeholder="水素実証設備の設計業務"
                       ></textarea>

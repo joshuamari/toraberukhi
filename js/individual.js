@@ -453,14 +453,14 @@ $(document).on("click", ".btn-bug", function () {
 $(document).on("click", ".sentry-error-embed-wrapper", function () {
   isSentryModalOpen = false;
 });
-// $(document).on("click", "#btnNext", function () {
-//   $("#attachmentModal").modal("hide");
-//   fillAttachment2();
-// });
-// $(document).on("click", "#btnBack", function () {
-//   $("#attachmentModal2").modal("hide");
-//   $("#attachmentModal").modal("show");
-// });
+$(document).on("click", "#btnNext", function () {
+  $("#attachmentModal").modal("hide");
+  fillAttachment2();
+});
+$(document).on("click", "#btnBack", function () {
+  $("#attachmentModal2").modal("hide");
+  $("#attachmentModal").modal("show");
+});
 $(document).on("click", "#btnSend", function () {
   $("#btnSend").prop("disabled", true);
   console.log("disabling send email btn");
@@ -549,6 +549,20 @@ $(document).on("click", "#whConfirm", function () {
 
 $(document).on("click", ".toggle.small", function () {
   $(this).removeClass("outline outline-offset-2 outline-red-500  ");
+});
+
+$(document).on("input", "#businessInput", function (e) {
+  const value = e.target.value;
+  const pattern = /^[\u3040-\u30FF\u4E00-\u9FFF\uFF66-\uFF9F]*$/;
+
+  if (!pattern.test(value)) {
+    $(this).addClass("bg-red-100  border-red-400");
+    e.target.value = value.replace(/[^ぁ-んァ-ン一-龥ｦ-ﾟ]/g, "");
+    e.target.setCustomValidity("Invalid input");
+  } else {
+    $(this).removeClass("bg-red-100  border-red-400");
+    e.target.setCustomValidity("");
+  }
 });
 
 //#endregion
@@ -658,27 +672,27 @@ function formatDate(date) {
   return day + " " + monthName + " " + year;
 }
 
-// function fillAttachment2() {
-//   const emp = $("#empSel").find("option:selected").text();
-//   var today = new Date();
-//   var day = today.getDate();
-//   var month = today.getMonth() + 1;
-//   var year = today.getFullYear();
+function fillAttachment2() {
+  const emp = $("#empSel").find("option:selected").text();
+  var today = new Date();
+  var day = today.getDate();
+  var month = today.getMonth() + 1;
+  var year = today.getFullYear();
 
-//   if (day < 10) {
-//     day = "0" + day;
-//   }
-//   if (month < 10) {
-//     month = "0" + month;
-//   }
+  if (day < 10) {
+    day = "0" + day;
+  }
+  if (month < 10) {
+    month = "0" + month;
+  }
 
-//   $("#whYear").text(year);
-//   $("#whMonth").text(month);
-//   $("#whDay").text(day);
-//   $("#whName").text(emp);
+  $("#whYear").text(year);
+  $("#whMonth").text(month);
+  $("#whDay").text(day);
+  $("#whName").text(emp);
 
-//   $("#attachmentModal2").modal("show");
-// }
+  $("#attachmentModal2").modal("show");
+}
 
 function insertIconCountry(id) {
   $(".countries").empty();
