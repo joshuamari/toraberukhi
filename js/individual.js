@@ -552,19 +552,19 @@ $(document).on("click", ".toggle.small", function () {
   $(this).removeClass("outline outline-offset-2 outline-red-500  ");
 });
 
-$(document).on("input", "#businessInput", function (e) {
-  const value = e.target.value;
-  const pattern = /^[\u3040-\u30FF\u4E00-\u9FFF\uFF66-\uFF9F]*$/;
+// $(document).on("input", "#businessInput", function (e) {
+//   const value = e.target.value;
+//   const pattern = /^[\u3040-\u30FF\u4E00-\u9FFF\uFF66-\uFF9F]*$/;
 
-  if (!pattern.test(value)) {
-    $(this).addClass("bg-red-100  border-red-400");
-    e.target.value = value.replace(/[^ぁ-んァ-ン一-龥ｦ-ﾟ]/g, "");
-    e.target.setCustomValidity("Invalid input");
-  } else {
-    $(this).removeClass("bg-red-100  border-red-400");
-    e.target.setCustomValidity("");
-  }
-});
+//   if (!pattern.test(value)) {
+//     $(this).addClass("bg-red-100  border-red-400");
+//     e.target.value = value.replace(/[^ぁ-んァ-ン一-龥ｦ-ﾟ]/g, "");
+//     e.target.setCustomValidity("Invalid input");
+//   } else {
+//     $(this).removeClass("bg-red-100  border-red-400");
+//     e.target.setCustomValidity("");
+//   }
+// });
 
 //#endregion
 
@@ -1226,24 +1226,25 @@ function fillDispatchHistory(dlist) {
         );
       }
 
-      row.append(`<td data-exclude='true'>
-        <div class="d-flex gap-2 justify-end">
-        <button
-          class="btn-edit"
-          title="Edit Entry"
-          
-        >
-        <i class='bx bxs-edit fs-5' ></i>
-        </button>
-        <button
-          class="btn-delete"
-          title="Delete Entry"
-          data-bs-toggle="modal"
-          data-bs-target="#deleteEntry"
-        >
-          <i class="bx bx-trash fs-5"></i>
-        </button>
-      </div></td>`);
+      // row.append(`<td data-exclude='true'>
+      //   <div class="d-flex gap-2 justify-end">
+      //   <button
+      //     class="btn-edit"
+      //     title="Edit Entry"
+
+      //   >
+      //   <i class='bx bxs-edit fs-5' ></i>
+      //   </button>
+      //   <button
+      //     class="btn-delete"
+      //     title="Delete Entry"
+      //     data-bs-toggle="modal"
+      //     data-bs-target="#deleteEntry"
+      //   >
+      //     <i class="bx bx-trash fs-5"></i>
+      //   </button>
+      // </div></td>`);
+      row.append(`<td data-exclude='true'></td>`);
 
       tableBody.append(row);
     });
