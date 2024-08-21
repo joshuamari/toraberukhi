@@ -435,7 +435,8 @@ function fillAttachment(data) {
   var workOrder = data.dispatch_request.work_order;
   var project = data.dispatch_request.project_name;
   var siteDispatch = data.dispatch_request.site_dispatch;
-  var salary = data.dispatch_request.allowance;
+  var salary = data.dispatch_request.allowance[0].amount;
+  var salaryOthers = data.dispatch_request.allowance[1].amount;
 
   if (country === 1) {
     insertIconCountry(1);
@@ -472,6 +473,7 @@ function fillAttachment(data) {
   $("#printWO").text(workOrder);
   $("#printProject").text(project);
   $("#printSalary").text(salary);
+  $("#printSalaryOthers").text(salaryOthers);
   $("#printDate").text(date);
 }
 function formatName(name) {
