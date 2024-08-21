@@ -1,0 +1,76 @@
+ td, tbody tr{
+  background-color: #fff ;
+}
+table {
+  border-collapse:separate !important;
+  border-spacing: 0;
+  width: 100%;
+}
+table thead tr th, table tbody tr td{
+  text-align: center;
+  vertical-align: middle;
+  border: 1px solid var(--gray) ;
+  white-space: nowrap;
+  border-right: 0;
+  border-bottom: 0;
+}
+table thead tr th:last-of-type{
+  width: 8%;
+}
+table thead tr th{
+  background-color: var(--tableheader) !important;
+  font-size: 12px !important;
+  text-transform: uppercase;
+  white-space: nowrap;
+  vertical-align: middle;
+  font-weight: 700;
+  padding: .75rem;
+  border: 1px solid var(--gray);
+  border-right: 0;
+  border-top: 0;
+}
+
+
+table thead tr {
+  background-color: var(--tableheader);
+}
+table tbody tr:hover td{
+  background-color: rgba(0, 0, 0,  0.075);
+}
+table tbody td[colspan="8"]{
+  background-color: var(--tableheader);
+}
+
+thead{
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  position: sticky;
+  top: 0;
+}
+.selection{
+  justify-content: space-between;
+}
+.form-floating:not(.form-control:disabled)::before{
+  pointer-events: none;
+}
+.form-floating .form-select:focus{
+  border: 1px solid var(--darkest) !important;
+  outline: 0;
+  box-shadow: 0 0 0.25rem 0.25rem rgba(74, 222, 128, 0.25) !important;
+}
+
+@media (max-width: 946px){
+  .selection{
+    flex-direction: column;
+    gap: 18px;
+  }
+  .selection > div{
+    width: 100%;
+  }
+  .btn-export{
+    width: 100%;
+  }
+  .form-floating{
+    width: 50% !important;
+  }
+
+}

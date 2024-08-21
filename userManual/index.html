@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Passport Control System</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta charset="UTF-8" />
+
+    <script src="js/html2canvas.js"></script>
+    <script src="js/jquery.js"></script>
+    <script src="js/jquery.inview.min.js"></script>
+    <!-- <script src="js/jquery.table2excel.js"></script> -->
+    <script>
+      var busterCall = ["js/individual.js", "css/index.css"];
+      $.post(
+        "php/get_version.php",
+        {
+          busterCall: busterCall,
+          titleName: "トラベる",
+        },
+        function (data) {
+          $("head").html(data);
+        }
+      );
+    </script>
+  </head>
+
+  <!-- #region modal -->
+
+  <!-- #endregion modal-->
+
+  <body>
+    <div class="position-relative flex h-screen">
+      <div class="navigation">
+        <div
+          class="title p-3 d-flex justify-content-between align-items-center"
+        >
+          <div class="w-full h-[36px] px-[.75rem]">
+            <img src="../images/pcs logo bold.png" alt="logo" class="h-full" />
+          </div>
+          <div
+            id="closeNav"
+            class="justify-content-center align-items-center m-0"
+          >
+            <i class="bx bx-x fs-3"></i>
+          </div>
+        </div>
+        <nav class="flex flex-col justify-content-between h-[calc(100%-63px)]">
+          <section>
+            <ul class="list-unstyled d-grid gap-2">
+              <a href="../"
+                ><li>
+                  <div class="d-flex align-items-center gap-2">
+                    <i class="bx bxs-briefcase"></i>
+                    <p>Dispatch Request by KHI</p>
+                  </div>
+                </li></a
+              >
+              <a href="../requestList/">
+                <li>
+                  <div class="d-flex align-items-center gap-2">
+                    <i class="bx bx-task text-[18px]"></i>
+                    <p>Request List</p>
+                  </div>
+                </li>
+              </a>
+              <a href="../dashboard"
+                ><li>
+                  <div class="d-flex align-items-center gap-2">
+                    <i class="bx bxs-dashboard"></i>
+                    <p>Dashboard</p>
+                  </div>
+                </li></a
+              >
+              <a href="./"
+                ><li class="active">
+                  <div class="d-flex align-items-center gap-2">
+                    <i class="bx bxs-report"></i>
+                    <p>Report</p>
+                  </div>
+                </li></a
+              >
+            </ul>
+          </section>
+          <section class="grid gap-2">
+            <li class="bg-[var(--main)] hover:bg-green-100">
+              <div class="flex gap-2 items-center">
+                <div
+                  class="bg-[var(--secondary)] rounded-full h-[45px] w-[45px] min-w-[45px] flex justify-content-center items-center"
+                  id="empInitials"
+                >
+                  BM
+                </div>
+
+                <div class="w-full">
+                  <div class="" id="empLabel">Baddogswa Mari</div>
+                  <div
+                    class="text-uppercase text-[10px] text-gray-400"
+                    id="grpLabel"
+                  >
+                    Systems group
+                  </div>
+                </div>
+              </div>
+            </li>
+            <a href="../admin/"
+              ><li>
+                <div class="d-flex align-items-center gap-2">
+                  <i class="bx bxs-buildings"></i>
+                  <p>User Management</p>
+                </div>
+              </li></a
+            >
+            <a href="#"
+              ><li>
+                <div class="d-flex align-items-center gap-2">
+                  <i class="bx bxs-buildings"></i>
+                  <p>User Manual</p>
+                </div>
+              </li></a
+            >
+            <a href="../login/"
+              ><li id="logoutBtn">
+                <div class="d-flex align-items-center gap-2">
+                  <i class="bx bx-log-out"></i>
+                  <p>Logout</p>
+                </div>
+              </li></a
+            >
+            <div class="relative">
+              <p
+                class="absolute bottom-[-10px] text-[var(--gray-text)] text-xs"
+              >
+                ©2024 KDT.トラベる v1.0.0
+              </p>
+            </div>
+          </section>
+        </nav>
+      </div>
+      <div class="content h-screen">
+        <div class="flex h-full">
+          <div
+            class="flex flex-col gap-3 overflow-auto p-[14px] md:p-8 h-full w-full"
+          >
+            <div class="pageTitle w-100 gap-3 d-flex">
+              <div id="menu">
+                <i class="bx bx-menu-alt-left fs-3"></i>
+              </div>
+              <h1 class="fw-semibold m-0">User's Manual</h1>
+            </div>
+
+            <div
+              class="w-100 h-[calc(100%-50px)] flex flex-col gap-3 relative"
+            ></div>
+          </div>
+        </div>
+      </div>
+      <div class="absolute top-[10px] right-[10px] z-1">
+        <button
+          class="flex gap-2 items-center py-2 px-3 bg-[var(--dark)] rounded-md btn-bug transition"
+          title="Report a bug"
+        >
+          <i class="bx bxs-megaphone text-[var(--white-100)]"></i>
+          <p class="text-[var(--white-100)] hidden lg:block">Report a bug</p>
+        </button>
+      </div>
+    </div>
+  </body>
+</html>
