@@ -376,4 +376,16 @@ function getGroupManagersEmail($group_id)
     }
     return $mgEmail;
 }
+function getAllowance($id)
+{
+    global $connpcs;
+    $allowance = array();
+    $allowanceQ = "SELECT `location_id`,`amount` FROM `allowance_list` WHERE `level_id` = IFNULL((SELECT `da`.level_id FROM `pcosdb`.designation_allowance da JOIN `kdtphdb_new`.employee_list el ON `da`.designation_id=`el`.designation WHERE el.id=:id),1)";
+    $allowanceStmt = $connpcs->prepare($allowanceQ);
+    $allowanceStmt->execute([":id" => $id]);
+    if ($allowanceStmt->rowCount() > 0) {
+        $allowance = $allowanceStmt->fetchAll();
+    }
+    return $allowance;
+}
 #endregion
