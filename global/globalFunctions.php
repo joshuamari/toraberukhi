@@ -155,27 +155,16 @@ function getName($id)
 
     return ucwords(strtolower($name));
 }
-function getPresID()
+function getPresDetails()
 {
     global $connnew;
-    $idp = 0;
-    $idQ = "SELECT `id` FROM `employee_list` WHERE `designation`=29 AND `resignation_date` < CURRENT_DATE()";
-    $idStmt = $connnew->query($idQ);
-    if ($idStmt->rowCount() > 0) {
-        $idp = $idStmt->fetchColumn();
+    $presData = [];
+    $dataQ = "SELECT `id`,`email`,`surname` FROM `employee_list` WHERE `designation`=29 AND `resignation_date` < CURRENT_DATE()";
+    $dataStmt = $connnew->query($dataQ);
+    if ($dataStmt->rowCount() > 0) {
+        $presData = $dataStmt->fetch();
     }
-    return (int)$idp;
-}
-function getPresEmail()
-{
-    global $connnew;
-    $emailp = '';
-    $emailQ = "SELECT `email` FROM `employee_list` WHERE `designation`=29 AND `resignation_date` < CURRENT_DATE()";
-    $emailStmt = $connnew->query($emailQ);
-    if ($emailStmt->rowCount() > 0) {
-        $emailp = $emailStmt->fetchColumn();
-    }
-    return $emailp;
+    return $presData;
 }
 function getAdminEmails()
 {
@@ -274,16 +263,33 @@ function emailRequest($details)
     $headers .= "Content-type:text/html;charset=UTF-8" . "\r\n";
     $headers .= "From: kdt_toraberu@global.kawasaki.com" . "\r\n";
     $subject = 'Dispatch Request Notification(TEST ONLY)';
-    $CCarray = array('medrano_c-kdt@global.kawasaki.com', 'hernandez-kdt@global.kawasaki.com', 'reyes_d-kdt@global.kawasaki.com', 'cabiso-kdt@global.kawasaki.com', 'coquia-kdt@global.kawasaki.com'); //COMMENT PAG PROD
     $khidetails = getKHIUserDetails($details['requester_id']);
-    $admins = getAdminEmails();
-    $khipic = getKHIPICEmail($details['emp_group'], $details['requester_id']);
-    $khiAdmins = getKHIAdminEmails();
-    $kdtManagers = getGroupManagersEmail($details['emp_group']);
-    // $CCarray = array_merge($khipic, $khiAdmins, $kdtManagers);//UNCOMMENT PAG PROD
-    $emails = array("coquia-kdt@global.kawasaki.com", "medrano_c-kdt@global.kawasaki.com"); //COMMENT PAG PROD
-    // $emails = $admins;//UNCOMMENT PAG PROD
-    // $emails[] = getPresEmail();//UNCOMMENT PAG PROD
+    $presdata = getPresDetails();
+    #region TESTING
+    #region systesting
+    $CCarray = array('medrano_c-kdt@global.kawasaki.com', 'hernandez-kdt@global.kawasaki.com', 'reyes_d-kdt@global.kawasaki.com', 'cabiso-kdt@global.kawasaki.com', 'coquia-kdt@global.kawasaki.com');
+    $emails = array("coquia-kdt@global.kawasaki.com", "medrano_c-kdt@global.kawasaki.com");
+    #endregion
+
+    #region prekhitesting
+    // $admins = array("sangalang_m-kdt@global.kawasaki.com"); //COMMENT PAG PROD
+    // $khipic = getKHIPICEmail($details['emp_group']);
+    // $khiAdmins = getKHIAdminEmails();
+    // $kdtManagers = array("lazaro-kdt@global.kawasaki.com"); //COMMENT PAG PROD
+    // $CCarray = array_unique(array_merge($khipic, $khiAdmins, $kdtManagers)); //UNCOMMENT PAG PROD
+    // $emails = $admins; //UNCOMMENT PAG PROD
+    // $emails[] = "hernandez-kdt@global.kawasaki.com"; //UNCOMMENT PAG PROD
+    #endregion
+    #endregion
+
+    #region PROD
+    // $admins = getAdminEmails();
+    // $khipic = getKHIPICEmail($details['emp_group']);
+    // $khiAdmins = getKHIAdminEmails();
+    // $kdtManagers = getGroupManagersEmail($details['emp_group']);
+    // $CCarray = array_unique(array_merge($khipic, $khiAdmins, $kdtManagers, $admins)); //UNCOMMENT PAG PROD
+    // $emails[] = $presdata['email']; //UNCOMMENT PAG PROD
+    #endregion
     $CC = implode(",", $CCarray);
     $email_to = implode(",", $emails);
     $headers .= "CC: " . $CC;
@@ -293,7 +299,7 @@ function emailRequest($details)
                 <title>Dispatch Request</title>
                 </head>
                 <body>
-        <p>Dear KDT,</p>
+        <p>Dear President " . $presdata['surname'] . "-san,</p>
         <p>A new request has been submitted by " . ucwords(strtolower($khidetails['surname'])) . "-san.</p>
         <p>Details:</p>
         <p>Employee: " . getName($details['emp_number']) . "</p>
@@ -302,11 +308,11 @@ function emailRequest($details)
         <p>Location: " . getLocationName($details['location_id']) . "</p>
         <p>Date Requested: " . $details['date_requested'] . "</p>
         <br>
-        <p>For <strong>KDT</strong>, please use the following link to take action on this request:</p>
+        <p>For <strong>KDT</strong>, take action for next procedure:</p>
         <ul>
             <li><a href='http://kdt-ph/PCS/requestList/'>Dispatch Request List</a></li>
         </ul>
-        <p>For <strong>KHI</strong>, you can track the status of the submitted request here:</p>
+        <p>For <strong>KHI</strong>, track the request status:</p>
         <ul>
             <li><a href='http://kdt-ph/PCSKHI/requestList/'>Track Request Status</a></li>
         </ul>
