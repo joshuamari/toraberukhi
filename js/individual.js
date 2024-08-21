@@ -463,7 +463,7 @@ $(document).on("click", ".sentry-error-embed-wrapper", function () {
 });
 $(document).on("click", "#btnNext", function () {
   $("#attachmentModal").modal("hide");
-  fillAttachment2();
+  fillAttachment2(wHistory);
 });
 $(document).on("click", "#btnBack", function () {
   $("#attachmentModal2").modal("hide");
@@ -660,7 +660,6 @@ function fillAttachment() {
   const locID = $("#locSel").find("option:selected").attr("loc-id");
   const specLoc = $("#specLocInput").val();
   const inviteID = $("#inviteSel").find("option:selected").attr("inv-id");
-  const business = $("#businessInput").val();
   const workOrder = $("#workOrder").val();
   const projName = $("#projName").val();
   const allowance_jp = allowance[0]["amount"];
@@ -729,11 +728,12 @@ function formatDate(date) {
 }
 
 function fillAttachment2(wList) {
+  const business = $("#businessInput").val();
   const emp = $("#empSel").find("option:selected").text();
-  const today = new Date();
-  const day = today.getDate();
-  const month = today.getMonth() + 1;
-  const year = today.getFullYear();
+  let today = new Date();
+  let day = today.getDate();
+  let month = today.getMonth() + 1;
+  let year = today.getFullYear();
 
   if (day < 10) {
     day = "0" + day;
@@ -742,10 +742,51 @@ function fillAttachment2(wList) {
     month = "0" + month;
   }
 
+  let str = "";
+  $("#workHistoryTable tbody").empty();
+  if (wList.length != 0) {
+    $.each(wList, function (index, item) {
+      if (item.end_year == null) {
+        item.end_year = "";
+      }
+      if (item.end_month == null) {
+        item.end_month = "";
+      }
+      if (item.end_year == "-0001") {
+        item.end_year = "";
+      }
+      if (item.end_month == "11") {
+        item.end_month = "";
+      }
+      str += `
+      <tr>
+        <td>${item.start_year}</td>
+        <td>${item.start_month}</td>
+        <td>${item.end_year}</td>
+        <td>${item.end_month}</td>
+        <td>${item.comp_name}</td>
+        <td>${item.comp_business}</td>
+        <td>${item.business_cont}</td>
+        <td>${item.work_loc}</td>
+      </tr>
+    `;
+    });
+  } else {
+    str = `
+    <tr>
+      <td colspan="9" class="text-center">
+        No data found.
+      </td>
+    </tr>
+    `;
+  }
+  $("#workHistoryTable tbody").append(str);
+
   $("#whYear").text(year);
   $("#whMonth").text(month);
   $("#whDay").text(day);
   $("#whName").text(emp);
+  $("#whBusiness").text(business);
 
   $("#attachmentModal2").modal("show");
 }
