@@ -45,6 +45,7 @@ let monthNames2 = [
   "Dec",
 ];
 let isSentryModalOpen = false;
+let allowance = [];
 //#endregion
 checkAccess()
   .then((emp) => {
@@ -95,6 +96,7 @@ $(document).on("click", "#closeNav", function () {
 $(document).on("change", "#grpSel", function () {
   getEmployees().then((emps) => {
     fillEmployees(emps);
+    displayAllowance();
   });
 });
 $(document).on("click", ".btn-close", function () {
@@ -142,8 +144,9 @@ $(document).on("change", "#empSel", function () {
     getDispatchDays(),
     getYearly(),
     getWorkHistory(),
+    getAllowance(),
   ])
-    .then(([pass, vsa, dlst, dd, yrl, wlst]) => {
+    .then(([pass, vsa, dlst, dd, yrl, wlst, baon]) => {
       fillPassport(pass);
       fillVisa(vsa);
       dispatch_days = dd;
@@ -153,6 +156,8 @@ $(document).on("change", "#empSel", function () {
       fillWorkHistory(wHistory);
       countTotal();
       fillYearly(yrl);
+      allowance = baon;
+      displayAllowance();
       toggleLoadingAnimation(false);
     })
     .catch((error) => {
@@ -170,6 +175,9 @@ $(document).on("change", "#empSel", function () {
     $(".emptyState").addClass("d-none");
     $(".withContent").removeClass("d-none");
   }
+});
+$(document).on("change", "#locSel", function () {
+  displayAllowance();
 });
 $(document).on("click", "#btnApply", function () {
   checkDispatch();
@@ -362,7 +370,7 @@ $(document).on("click", ".rmvToast", function () {
 });
 $(document).on(
   "click",
-  "#reqDeptSel, #reqNameInput, #grpSel, #empSel, #startDate, #endDate, #locSel, #specLocInput, #inviteSel, #workOrder, #projName, #allowance, #businessInput",
+  "#reqDeptSel, #reqNameInput, #empSel, #startDate, #endDate, #locSel, #specLocInput, #inviteSel, #workOrder, #projName, #businessInput",
   function () {
     $(this).removeClass("bg-red-100  border-red-400");
     $(".errTxt").remove();
@@ -433,20 +441,20 @@ $(document).on("click", "#logoutBtn", function () {
       alert(`${error}`);
     });
 });
-$(document).on("keydown", "#allowance", function (e) {
-  if (
-    e.which === 38 ||
-    e.which === 40 ||
-    e.which === 187 ||
-    e.which === 189 ||
-    e.which === 109 ||
-    e.which === 107 ||
-    e.key === "e" ||
-    e.key === "E"
-  ) {
-    e.preventDefault();
-  }
-});
+// $(document).on("keydown", "#allowance", function (e) {
+//   if (
+//     e.which === 38 ||
+//     e.which === 40 ||
+//     e.which === 187 ||
+//     e.which === 189 ||
+//     e.which === 109 ||
+//     e.which === 107 ||
+//     e.key === "e" ||
+//     e.key === "E"
+//   ) {
+//     e.preventDefault();
+//   }
+// });
 $(document).on("click", ".btn-bug", function () {
   openReport();
 });
@@ -501,7 +509,7 @@ $(document).on("click", "#btnSend", function () {
             alert(`${error}`);
           });
       }
-      $("#attachmentModal").modal("hide");
+      $("#attachmentModal2").modal("hide");
       $("#btnSend").prop("disabled", false);
       toggleLoadingAnimation(false);
     })
@@ -586,6 +594,52 @@ function openReport() {
   }
   isSentryModalOpen = true;
 }
+function getAllowance() {
+  const empID = $("#empSel").find("option:selected").attr("emp-id");
+  return new Promise((resolve, reject) => {
+    $.ajax({
+      type: "GET",
+      url: "php/get_allowance.php",
+      data: {
+        empID: empID,
+      },
+      dataType: "json",
+      success: function (response) {
+        const allowance = response;
+        resolve(allowance);
+      },
+      error: function (xhr, status, error) {
+        if (xhr.status === 404) {
+          reject("Not Found Error: The requested resource was not found.");
+        } else if (xhr.status === 500) {
+          reject("Internal Server Error: There was a server error.");
+        } else {
+          reject(
+            `An unspecified error occurred while fetching allowance: ${error}`
+          );
+        }
+      },
+    });
+  });
+}
+function displayAllowance() {
+  const empVal = parseInt($("#empSel").val());
+  let locVal = parseInt($("#locSel").val());
+  let currency = "¥";
+  let amount = 0;
+
+  if (locVal === 2) {
+    locVal = 1;
+  } else if (locVal === 3) {
+    currency = "$";
+  }
+
+  if (empVal !== 0 && locVal !== 0) {
+    const result = allowance.find((item) => item.location_id == locVal);
+    amount = result ? result.amount : 0;
+  }
+  $("#allowanceDisplay").text(`${currency}${amount}`);
+}
 function formatName(name) {
   const [last, given] = name.split(",");
   const surname = last.toUpperCase();
@@ -609,7 +663,8 @@ function fillAttachment() {
   const business = $("#businessInput").val();
   const workOrder = $("#workOrder").val();
   const projName = $("#projName").val();
-  const allowance = $("#allowance").val();
+  const allowance_jp = allowance[0]["amount"];
+  const allowance_us = allowance[1]["amount"];
   const siteDispatch = $("#siteDispatch").is(":checked");
   $("#printJap, #printPh, #printThird").empty();
 
@@ -645,7 +700,8 @@ function fillAttachment() {
   if (siteDispatch === false) {
     $(".siteDispatch").empty();
   }
-  $("#printSalary").text(allowance);
+  $("#printSalaryJP").text(allowance_jp);
+  $("#printSalaryUS").text(allowance_us);
   $("#printWO").text(workOrder);
   $("#printProject").text(projName);
 
@@ -672,12 +728,12 @@ function formatDate(date) {
   return day + " " + monthName + " " + year;
 }
 
-function fillAttachment2() {
+function fillAttachment2(wList) {
   const emp = $("#empSel").find("option:selected").text();
-  var today = new Date();
-  var day = today.getDate();
-  var month = today.getMonth() + 1;
-  var year = today.getFullYear();
+  const today = new Date();
+  const day = today.getDate();
+  const month = today.getMonth() + 1;
+  const year = today.getFullYear();
 
   if (day < 10) {
     day = "0" + day;
@@ -1250,7 +1306,6 @@ function checkDispatch() {
   // const reqDept = $("#reqDeptInput").val(); //Input Type Req Dept
   const reqDept = $("#reqDeptSel").find("option:selected").attr("reqdept-name"); //Select Type Req Dept
   // const reqName = $("#reqNameInput").val();
-  const grp = $("#grpSel").find("option:selected").attr("grp-id");
   const empID = $("#empSel").find("option:selected").attr("emp-id");
   const startD = $("#startDate").val();
   const endD = $("#endDate").val();
@@ -1259,7 +1314,6 @@ function checkDispatch() {
   const inviteID = $("#inviteSel").find("option:selected").attr("inv-id");
   const workOrder = $("#workOrder").val();
   const projName = $("#projName").val();
-  const allowance = $("#allowance").val();
   const business = $("#businessInput").val();
   const siteDispatch = $("#siteDispatch").is(":checked");
   const workConfirm = $("#whConfirm").is(":checked");
@@ -1277,11 +1331,6 @@ function checkDispatch() {
   if (!business) {
     $("#businessInput").addClass("bg-red-100  border-red-400");
     if (!firstIncompleteInput) firstIncompleteInput = $("#businessInput");
-    ctr++;
-  }
-  if (!grp) {
-    $("#grpSel").addClass("bg-red-100  border-red-400");
-    if (!firstIncompleteInput) firstIncompleteInput = $("#grpSel");
     ctr++;
   }
   if (!empID) {
@@ -1322,11 +1371,6 @@ function checkDispatch() {
   if (!projName) {
     $("#projName").addClass("bg-red-100  border-red-400");
     if (!firstIncompleteInput) firstIncompleteInput = $("#projName");
-    ctr++;
-  }
-  if (!allowance) {
-    $("#allowance").addClass("bg-red-100  border-red-400");
-    if (!firstIncompleteInput) firstIncompleteInput = $("#allowance");
     ctr++;
   }
   if (ctr > 0) {
@@ -1381,9 +1425,8 @@ function checkDispatch() {
 }
 function insertDispatch() {
   // const reqDept = $("#reqDeptInput").val(); //Input Type Req Dept
-  const reqDept = $("#reqDeptSel").find("option:selected").attr("reqdept-name"); //Select Type Req Dept
+  const reqDept = $("#reqDeptSel").val(); //Select Type Req Dept
   // const reqName = $("#reqNameInput").val();
-  const grp = $("#grpSel").find("option:selected").attr("grp-id");
   const empID = $("#empSel").find("option:selected").attr("emp-id");
   const startD = $("#startDate").val();
   const endD = $("#endDate").val();
@@ -1393,7 +1436,6 @@ function insertDispatch() {
   const inviteID = $("#inviteSel").find("option:selected").attr("inv-id");
   const workOrder = $("#workOrder").val();
   const projName = $("#projName").val();
-  const allowance = $("#allowance").val();
   const siteDispatch = $("#siteDispatch").is(":checked");
   const workConfirm = $("#whConfirm").is(":checked");
 
@@ -1433,8 +1475,8 @@ function insertDispatch() {
         inviID: inviteID,
         workOrder: workOrder,
         project_name: projName,
-        allowance: allowance,
         site_dispatch: siteDispatch,
+        business: business,
       },
       dataType: "json",
       success: function (response) {
@@ -1455,18 +1497,18 @@ function insertDispatch() {
 }
 function clearInput() {
   $(
-    "#reqDeptSel, #reqNameInput, #grpSel, #empSel, #startDate, #endDate, #locSel, #specLocInput, #inviteSel, #workOrder, #projName, #allowance, #businessInput"
+    "#reqDeptSel, #reqNameInput, #grpSel, #empSel, #startDate, #endDate, #locSel, #specLocInput, #inviteSel, #workOrder, #projName, #businessInput"
   ).removeClass("bg-red-100  border-red-400");
   $(".errTxt").remove();
   $("#locSel, #inviteSel, #reqDeptSel").val(0);
   $(
     "#reqNameInput, #startDate, #endDate, #specLocInput, #workOrder, #projName, #businessInput"
   ).val("");
-  $("#allowance").val("0");
   $("#siteDispatch").prop("checked", false);
   $("#whConfirm").prop("checked", false);
   to_add = 0;
   $("#daysCount").text("0 Day");
+  $("#allowanceDisplay").text("0");
 }
 function clearGroup() {
   $("#grpSel").val($("#grpSel option:first").val());
@@ -1579,7 +1621,9 @@ function getReqDepts() {
 }
 function fillReqDepts(depts) {
   var reqDeptSel = $("#reqDeptSel");
-  reqDeptSel.html("<option value='0'>Select Requester's Department</option>");
+  reqDeptSel.html(
+    "<option value='0' hidden>Select Requester's Department</option>"
+  );
   $("#editentryReqDept").empty();
 
   $.each(depts, function (index, item) {

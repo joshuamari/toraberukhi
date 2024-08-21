@@ -77,7 +77,7 @@ if (!empty($_POST['workOrder'])) {
   $workOrder = $_POST['workOrder'];
 } else {
   $msg["isSuccess"] = false;
-  $msg['error'][] = "Word Order";
+  $msg['error'][] = "Work Order";
 }
 
 $project_name = '';
@@ -92,15 +92,7 @@ if (!empty($_POST['site_dispatch'])) {
   $site_dispatch = json_decode($_POST['site_dispatch']);
 }
 
-$allowance = 0;
-if (!empty($_POST['allowance'])) {
-  $allowance = $_POST['allowance'];
-} else {
-  $msg["isSuccess"] = false;
-  $msg['error'][] = "Allowance";
-}
-
-$request_dept = '';
+$request_dept = 0;
 if (!empty($_POST['request_dept'])) {
   $request_dept = $_POST['request_dept'];
 } else {
@@ -108,6 +100,13 @@ if (!empty($_POST['request_dept'])) {
   $msg['error'][] = "Requesting Department";
 }
 
+$business = '';
+if (!empty($_POST['business'])) {
+  $business = $_POST['business'];
+} else {
+  $msg["isSuccess"] = false;
+  $msg['error'][] = "Business Content";
+}
 // $request_name = '';
 // if (!empty($_POST['request_name'])) {
 //   $request_name = $_POST['request_name'];
@@ -172,8 +171,8 @@ try {
                                           `work_order`, 
                                           `project_name`, 
                                           `site_dispatch`, 
-                                          `allowance`, 
-                                          `request_by_dept`) 
+                                          `dept_id`,
+                                          `work_content`) 
               VALUES (:userID,
                       :empNumber,
                       :locID,
@@ -184,8 +183,8 @@ try {
                       :workOrder,
                       :project_name,
                       :site_dispatch,
-                      :allowance,
-                      :request_dept)";
+                      :request_dept,
+                      :business)";
   $insertStmt = $connpcs->prepare($insertQ);
   $insertStmt->execute([
     ":userID" => $userID,
@@ -198,8 +197,8 @@ try {
     ":workOrder" => $workOrder,
     ":project_name" => $project_name,
     ":site_dispatch" => $site_dispatch,
-    ":allowance" => $allowance,
-    ":request_dept" => $request_dept
+    ":request_dept" => $request_dept,
+    ":business" => $business
     // ":request_name" => $request_name
   ]);
 
