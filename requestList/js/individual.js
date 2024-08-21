@@ -789,7 +789,7 @@ function fillTable(sampleData) {
     });
   } else {
     str = `<td colspan="12" class="h-[530px]"><div class="flex items-center justify-center flex-col gap-3"><img src="../images/empty.png"   class="w-[150px] h-auto opacity-[0.75]" alt="empty">
-    <h5 class="font-semibold text-[16px] text-[var(--gray-text)]">No item found.</h5>
+    <h5 class="font-semibold text-[16px] text-[var(--gray-text)]">No item found</h5>
     <p class="text-[var(--gray-text)]">Try adjusting your search or filter to find what you're looking for.</p>
     </div></td>`;
     $("#tableBody").append(str);

@@ -341,7 +341,7 @@
               class="grid grid-cols-[repeat(2,_1fr)] xl:grid-cols-[minmax(auto,_calc(100%-400px))_400px] gap-3 w-full h-full"
             >
               <div
-                class="col-span-2 xl:col-span-1 bg-white rounded-4 shadow-sm p-3 flex flex-col justify-between"
+                class="col-span-2 xl:col-span-1 bg-white rounded-4 border-[var(--gray)] border p-3 flex flex-col justify-between"
               >
                 <div>
                   <h5
@@ -360,14 +360,16 @@
               </div>
 
               <div
-                class="col-span-2 lg:col-span-1 min-h-[250px] alert1 w-full bg-white shadow-sm rounded-4 d-flex flex-column position-relative overflow-hidden"
+                class="col-span-2 lg:col-span-1 min-h-[250px] alert1 w-full bg-white border-[var(--gray)] border rounded-4 d-flex flex-column position-relative overflow-hidden"
               >
                 <div class="title text-center p-3">
                   <h5 class="text-[18px] font-semibold">
                     Upcoming Passport Expirations
                   </h5>
                 </div>
-                <div class="passportExp overflow-auto h-full w-100 px-3">
+                <div
+                  class="passportExp overflow-auto overscroll-contain h-full w-100 px-3"
+                >
                   <table class="table">
                     <thead class="sticky-top bg-body">
                       <tr>
@@ -402,14 +404,16 @@
                 </div>
               </div>
               <div
-                class="col-span-2 lg:col-span-1 xl:col-start-2 min-h-[250px] alert2 w-full bg-white shadow-sm rounded-4 d-flex flex-column position-relative overflow-hidden"
+                class="col-span-2 lg:col-span-1 xl:col-start-2 min-h-[250px] alert2 w-full bg-white border-[var(--gray)] border rounded-4 d-flex flex-column position-relative overflow-hidden"
               >
                 <div class="title text-center p-3">
                   <h5 class="text-[18px] font-semibold">
                     Upcoming Visa Expirations
                   </h5>
                 </div>
-                <div class="visaExp w-100 h-full px-3 overflow-auto">
+                <div
+                  class="visaExp w-100 h-full px-3 overflow-auto overscroll-contain"
+                >
                   <table class="table">
                     <thead class="sticky-top bg-body">
                       <tr>
@@ -435,7 +439,7 @@
                 </div>
               </div>
               <div
-                class="col-span-2 row-start-4 lg:row-start-3 xl:col-start-1 xl:col-end-1 xl:row-start-2 bottom h-full xl:pb-0"
+                class="col-span-2 row-start-4 lg:row-start-3 xl:col-start-1 xl:col-end-1 xl:row-start-2 bg-white border-[var(--gray)] rounded-4 p-3 border bottom h-full xl:pb-0"
               >
                 <div class="title d-flex justify-content-between">
                   <h3 class="font-semibold text-[18px] mb-3">
@@ -443,10 +447,10 @@
                   </h3>
                 </div>
                 <div
-                  class="table-container overflow-auto min-h-[450px] lg:max-h-[450px] lg:h-[calc(100% - 42px)]"
+                  class="table-container overflow-auto overscroll-contain max-h-[700px] min-h-[450px] lg:max-h-[450px] lg:h-[calc(100% - 42px)]"
                 >
                   <table class="table">
-                    <thead class="sticky-top bg-body">
+                    <thead class="sticky top-0 bg-body">
                       <tr>
                         <th>Name</th>
                         <th>Location</th>

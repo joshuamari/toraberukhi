@@ -87,6 +87,7 @@
 .viewForm {
   /* max-height: 79vh; */
   overflow-y: scroll;
+  overscroll-behavior: contain;
   background-color: #fff;
   border-radius: 8px;
   padding: 0 10px 10px 10px;
