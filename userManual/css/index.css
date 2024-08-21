@@ -1,76 +1,48 @@
- td, tbody tr{
-  background-color: #fff ;
+.item-manual:hover{
+transform: translateX(10px) translateY(10px) ;
+transition: transform 0.25s ease;
+perspective: 550px;
+transform-style: preserve-3d;
+box-shadow: 0 1px 8px 0 rgba(0, 0,0, 0.2);
 }
-table {
-  border-collapse:separate !important;
-  border-spacing: 0;
+.item-manual{
+  min-height: 140px;
+  height: 100%;
+}
+.item-manual span{
+  overflow: hidden;
+  border: 1px solid var(--secondary-100);
+}
+.item-manual:hover span i.bxs-plane-alt{
+  animation: fly 2s ease-in-out infinite;
+} 
+.item-manual:hover span i.bxs-briefcase{
+  animation: bounce 1s infinite;
+} 
+@keyframes fly{
+  0%{
+    transform: translateX(-30px) translateY(30px);
+  }
+  30%{
+    transform: translateX(0) translateY(0);
+  } 85%{
+    transform: translateX(0) translateY(0);
+  }
+  100%{
+    transform: translateX(30px) translateY(-30px);
+  }
+}
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(-20%);
+    animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
+  }
+  50% {
+    transform: translateY(0);
+    animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
+  }
+}
+.item-manual svg path{
   width: 100%;
-}
-table thead tr th, table tbody tr td{
-  text-align: center;
-  vertical-align: middle;
-  border: 1px solid var(--gray) ;
-  white-space: nowrap;
-  border-right: 0;
-  border-bottom: 0;
-}
-table thead tr th:last-of-type{
-  width: 8%;
-}
-table thead tr th{
-  background-color: var(--tableheader) !important;
-  font-size: 12px !important;
-  text-transform: uppercase;
-  white-space: nowrap;
-  vertical-align: middle;
-  font-weight: 700;
-  padding: .75rem;
-  border: 1px solid var(--gray);
-  border-right: 0;
-  border-top: 0;
-}
-
-
-table thead tr {
-  background-color: var(--tableheader);
-}
-table tbody tr:hover td{
-  background-color: rgba(0, 0, 0,  0.075);
-}
-table tbody td[colspan="8"]{
-  background-color: var(--tableheader);
-}
-
-thead{
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  position: sticky;
-  top: 0;
-}
-.selection{
-  justify-content: space-between;
-}
-.form-floating:not(.form-control:disabled)::before{
-  pointer-events: none;
-}
-.form-floating .form-select:focus{
-  border: 1px solid var(--darkest) !important;
-  outline: 0;
-  box-shadow: 0 0 0.25rem 0.25rem rgba(74, 222, 128, 0.25) !important;
-}
-
-@media (max-width: 946px){
-  .selection{
-    flex-direction: column;
-    gap: 18px;
-  }
-  .selection > div{
-    width: 100%;
-  }
-  .btn-export{
-    width: 100%;
-  }
-  .form-floating{
-    width: 50% !important;
-  }
-
+  height: 20px;
 }
