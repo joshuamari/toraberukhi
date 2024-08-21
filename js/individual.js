@@ -471,7 +471,6 @@ $(document).on("click", "#btnBack", function () {
 });
 $(document).on("click", "#btnSend", function () {
   $("#btnSend").prop("disabled", true);
-  console.log("disabling send email btn");
   // $('#btnSend').addClass("bg-[var(--secondary)] hover:bg-[var(--tertiary)] font-semibold rounded-md px-3 py-1  text-[var(--dark)]")
   insertDispatch()
     .then((res) => {
@@ -503,7 +502,6 @@ $(document).on("click", "#btnSend", function () {
               "success",
               "Successfully sent a dispatch request to KDT."
             );
-            console.log("enabling send email btn");
           })
           .catch((error) => {
             alert(`${error}`);
@@ -548,11 +546,6 @@ $(document).on("click", ".lbl-viewForm", function () {
 
 $(document).on("click", "#whConfirm", function () {
   const workConfirm = $("#whConfirm").is(":checked");
-  if (workConfirm) {
-    console.log("checked");
-  } else {
-    console.log("not checked");
-  }
 });
 
 $(document).on("click", ".toggle.small", function () {
@@ -646,7 +639,6 @@ function formatName(name) {
   return given + " " + surname;
 }
 function fillAttachment() {
-  console.log(empDetails);
   // const reqDept = $("#reqDeptInput").val(); //Input Type Req Dept
   const reqDept = $("#reqDeptSel").find("option:selected").attr("reqdept-name"); //Select Type Req Dept
   // const reqName = $("#reqNameInput").val();
@@ -1135,7 +1127,6 @@ function getDispatchHistory() {
       },
       dataType: "json",
       success: function (response) {
-        // console.log("getDHistory: ", response);
         const dList = response;
         resolve(dList);
       },
@@ -1231,7 +1222,6 @@ function getDispatchDays() {
       },
       dataType: "json",
       success: function (response) {
-        // console.log(response);
         const dDays = response;
         resolve(dDays);
       },
@@ -1258,7 +1248,6 @@ function countTotal() {
     if (dd > 183) {
       $("#rangeCount").addClass("redText");
       countText = `${dd} days`;
-      console.log("lagpas");
     } else {
       $("#rangeCount").removeClass("redText");
       countText = `${dd} days`;
@@ -1379,7 +1368,6 @@ function checkDispatch() {
     <i class='bx bx-info-circle text-red-600'></i>
     <p class="text-red-600">Please complete all fields.</p>
     </div>`);
-    console.log("complete required fields");
     if (firstIncompleteInput) {
       const offsetTop =
         firstIncompleteInput.offset().top -
@@ -1392,7 +1380,6 @@ function checkDispatch() {
     return;
   }
   if (!workConfirm) {
-    console.log("checkbox: ", workConfirm);
     $(".whConfirm-lbl").addClass("text-red-600");
     // $(".error-msg").html(`
     // <div class="errTxt  flex items-center gap-1">
@@ -1404,7 +1391,6 @@ function checkDispatch() {
       "Please confirm that you have checked the work history table."
     );
     $(".toggle.small").addClass("outline outline-offset-2 outline-red-500  ");
-    console.log("confirm work history");
 
     toggleLoadingAnimation(false);
     return;
@@ -1456,7 +1442,6 @@ function insertDispatch() {
     <i class='bx bx-info-circle text-red-600'></i>
     <p class="text-red-600">Please confirm Work History first.</p>
     </div>`);
-    console.log("confirm work history");
     toggleLoadingAnimation(false);
     return;
   }
@@ -1700,8 +1685,6 @@ function addWorkHistory() {
   const business_cont = $("#addbusinessContent").val();
   const work_loc = $("#addworkLocation").val();
   let errcount = 0;
-  console.log(startMonthYear);
-  console.log(endMonthYear);
 
   if (!comp_name) {
     $("#addcompanyName").addClass("bg-red-100  border-red-400");
@@ -2061,7 +2044,6 @@ function getYearly() {
       },
       dataType: "json",
       success: function (response) {
-        // console.log(response);
         const yrly = response;
         resolve(yrly);
       },
@@ -2199,7 +2181,6 @@ function logOut() {
       url: "global/logout.php",
       dataType: "json",
       success: function (response) {
-        console.log(response);
         const res = response;
         resolve(res);
       },
