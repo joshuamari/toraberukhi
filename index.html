@@ -8,10 +8,10 @@
     <script src="js/html2canvas.js"></script>
     <script src="js/jquery.js"></script>
     <script src="js/jquery.inview.min.js"></script>
-    <script
+    <!-- <script
       src="http://js.sentry-cdn.com/996e6a7f7f64d413dd43124ae5dece7e.min.js"
       crossorigin="anonymous"
-    ></script>
+    ></script> -->
     <!-- <script src="js/jquery.table2excel.js"></script> -->
     <script>
       var busterCall = ["js/individual.js", "css/index.css"];
@@ -937,7 +937,7 @@
                   <td>
                     <div class="flex">
                       <p class="font-['Arial']">US$</p>
-                      <p class="font-['Arial']"  id="printSalaryUS">40</p>
+                      <p class="font-['Arial']" id="printSalaryUS">40</p>
                       <p class="font-['Arial']">(*)/Calendar Day</p>
                     </div>
                     <small class="font-['Arial'] text-[11px] leading-2 flex"
@@ -1132,7 +1132,7 @@
             <div class="flex gap-2 mb-4">
               <span>4.</span>
               <div class="flex flex-col">
-                <span>業務内容（予定)</span>
+                <span>業務内容（予定）</span>
                 <span class="" id="whBusiness">水素実証設備の設計業務</span>
               </div>
             </div>
@@ -1180,7 +1180,7 @@
           >
             Back
           </button>
-          <button class="btn-send btn" id="btnSend">Submit Request</button>
+          <button class="btn-send btn" id="btnSend">Send Dispatch Request</button>
           <!-- <button
             class="bg-[var(--secondary)] hover:bg-[var(--tertiary)] font-semibold rounded-md px-3 py-1 text-[var(--dark)]"
             id="btnSend"
@@ -1388,7 +1388,7 @@
                         name="japaneseInput"
                         title="Please enter only Japanese characters (Hiragana, Katakana, or Kanji)."
                         id="businessInput"
-                        placeholder="水素実証設備の設計業務"
+                        placeholder="業務内容（予定）"
                       ></textarea>
                     </div>
                     <div class="mb-1 row">
@@ -1468,12 +1468,12 @@
                     <label
                       for=""
                       class="whConfirm-lbl text-[var(--gray-text2)] text-[12px] text-pretty"
-                      >I hereby confirm that I have carefully checked the
+                    >
                       <span
                         class="font-bold text-[var(--gray-text2)] text-[12px]"
-                        >Work History table</span
-                      >
-                      before submitting this request.
+                        >Work History
+                      </span>
+                      Completed.
                     </label>
                     <div class="d-flex justify-center">
                       <input id="whConfirm" type="checkbox" /><label
@@ -1497,7 +1497,7 @@
                   <div class="submit-btns flex gap-2">
                     <button class="btn btn-clear" id="btnClear">Clear</button>
                     <button class="btn btn-dispatch" id="btnApply">
-                      Send Dispatch Request
+                      Click to Continue
                     </button>
                   </div>
                 </div>
@@ -2070,7 +2070,7 @@
           </div>
         </div>
       </div>
-      <div class="absolute top-[10px] right-[10px] z-1">
+      <!-- <div class="absolute top-[10px] right-[10px] z-1">
         <button
           id="btn-bug"
           class="flex gap-2 items-center py-2 px-3 bg-[var(--dark)] rounded-md btn-bug transition"
@@ -2079,7 +2079,7 @@
           <i class="bx bxs-megaphone text-[var(--white-100)]"></i>
           <p class="text-[var(--white-100)] hidden lg:block">Report a bug</p>
         </button>
-      </div>
+      </div> -->
     </div>
   </body>
 </html>
