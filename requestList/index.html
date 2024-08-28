@@ -282,7 +282,8 @@
                     <p class="font-['Arial'] min-w-[28px]">From:</p>
                     <div class="flex flex-col">
                       <p
-                        class="font-['Arial'] border-b-[1px] whitespace-nowrap"
+                        class="font-['Arial'] border-b-[1px] whitespace-nowrap font-semibold"
+                        id="printCompany"
                       >
                         Kawasaki Heavy Industries, Ltd.
                       </p>
@@ -304,7 +305,7 @@
                     <p for="from" class="font-['Arial'] min-w-[28px]">TEL:</p>
 
                     <p
-                      class="font-['Arial'] w-[calc(100%-28px)] border-b-[1px] whitespace-nowrap"
+                      class="font-['Arial'] w-[calc(100%-28px)] bg-[var(--white)] border-b-[1px] whitespace-nowrap font-semibold"
                       id="printTel"
                     >
                       +81-(0)78-682-5084
@@ -313,7 +314,7 @@
                   <div class="flex gap-2">
                     <p for="from" class="font-['Arial'] min-w-[28px]">FAX:</p>
                     <p
-                      class="font-['Arial'] w-[calc(100%-28px)] border-b-[1px] whitespace-nowrap"
+                      class="font-['Arial'] w-[calc(100%-28px)] bg-[var(--white)] border-b-[1px] whitespace-nowrap font-semibold"
                       id="printFax"
                     >
                       +81-(0)78-682-5433
@@ -553,7 +554,10 @@
                   <td>
                     <div class="flex">
                       <p class="font-['Arial']">JP¥</p>
-                      <p class="font-['Arial']" id="printSalary"></p>
+                      <p
+                        class="font-['Arial'] font-semibold"
+                        id="printSalary"
+                      ></p>
                       <p class="font-['Arial']">(*)/Calendar Day</p>
                     </div>
                     <small class="font-['Arial'] text-[11px] leading-2 flex"
@@ -612,7 +616,10 @@
                   <td>
                     <div class="flex">
                       <p class="font-['Arial']">US$</p>
-                      <p class="font-['Arial']" id="printSalaryOthers"></p>
+                      <p
+                        class="font-['Arial'] font-semibold"
+                        id="printSalaryOthers"
+                      ></p>
                       <p class="font-['Arial']">(*)/Calendar Day</p>
                     </div>
                     <small class="font-['Arial'] text-[11px] leading-2 flex"
@@ -638,16 +645,42 @@
             <div class="bottom-text mt-[0.5rem]">
               <p class="font-['Arial']">Copy:</p>
               <div class="flex justify-content-between">
-                <p class="font-['Arial']" id="gap">
-                  General Affairs and Personal Gr.: Mr. T. Kurosumi
+                <p class="font-['Arial']">
+                  General Affairs and Personal Gr.:
+                  <span
+                    class="w-full bg-[var(--white)] font-['Arial'] font-semibold"
+                    id="printGAPName"
+                  >
+                    Mr. T. Kurosumi
+                  </span>
                 </p>
-                <p class="font-['Arial']" id="gap_tel">(81-78-682-5202/Ext. 7-20-81101)</p>
+                <p class="font-['Arial']">
+                  <span
+                    class="w-full bg-[var(--white)] font-['Arial'] font-semibold"
+                    id="printGAPNumber"
+                  >
+                    (81-78-682-5202/Ext. 7-20-81101)
+                  </span>
+                </p>
               </div>
               <div class="flex justify-content-between">
-                <p class="font-['Arial']" id="cdcp">
-                  Control Dep't Corporate Planning Gr.: Mr. H. Kanari
+                <p class="font-['Arial']">
+                  Control Dep't Corporate Planning Gr.:
+                  <span
+                    class="w-full bg-[var(--white)] font-['Arial'] font-semibold"
+                    id="printCDCPName"
+                  >
+                    Mr. H. Kanari
+                  </span>
                 </p>
-                <p class="font-['Arial']" id="cdcp_tel">(81-78-682-5072/Ext. 7-30-33217)</p>
+                <p class="font-['Arial']">
+                  <span
+                    class="w-full bg-[var(--white)] font-['Arial'] font-semibold"
+                    id="printCDCPNumber"
+                  >
+                    (81-78-682-5072/Ext. 7-30-33217)
+                  </span>
+                </p>
               </div>
             </div>
           </div>
