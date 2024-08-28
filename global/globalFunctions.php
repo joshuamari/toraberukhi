@@ -395,4 +395,31 @@ function getAllowance($id)
     }
     return $allowance;
 }
+function getCompanyByDept($dept_id)
+{
+    global $connpcs;
+    $comp_id = 0;
+    $compQ = "SELECT `comp_id` FROM requesters_dep WHERE `id`=:dept_id";
+    $compStmt = $connpcs->prepare($compQ);
+    $compStmt->execute([":dept_id" => $dept_id]);
+    if ($compStmt->rowCount() > 0) {
+        $comp_id = $compStmt->fetchColumn();
+    }
+    return $comp_id;
+}
+function getCompanyDetails($comp_id)
+{
+    global $connpcs;
+    $company_details = [
+        "company_jap" => "",
+        "company_desc" => ""
+    ];
+    $compQ = "SELECT * FROM `company_list` WHERE `id`=:comp_id";
+    $compStmt = $connpcs->prepare($compQ);
+    $compStmt->execute([":comp_id" => $comp_id]);
+    if ($compStmt->rowCount() > 0) {
+        $company_details = $compStmt->fetch();
+    }
+    return $company_details;
+}
 #endregion

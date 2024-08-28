@@ -305,6 +305,7 @@
 
                     <p
                       class="font-['Arial'] w-[calc(100%-28px)] border-b-[1px] whitespace-nowrap"
+                      id="printTel"
                     >
                       +81-(0)78-682-5084
                     </p>
@@ -313,6 +314,7 @@
                     <p for="from" class="font-['Arial'] min-w-[28px]">FAX:</p>
                     <p
                       class="font-['Arial'] w-[calc(100%-28px)] border-b-[1px] whitespace-nowrap"
+                      id="printFax"
                     >
                       +81-(0)78-682-5433
                     </p>
@@ -636,16 +638,16 @@
             <div class="bottom-text mt-[0.5rem]">
               <p class="font-['Arial']">Copy:</p>
               <div class="flex justify-content-between">
-                <p class="font-['Arial']">
+                <p class="font-['Arial']" id="gap">
                   General Affairs and Personal Gr.: Mr. T. Kurosumi
                 </p>
-                <p class="font-['Arial']">(81-78-682-5202/Ext. 7-20-81101)</p>
+                <p class="font-['Arial']" id="gap_tel">(81-78-682-5202/Ext. 7-20-81101)</p>
               </div>
               <div class="flex justify-content-between">
-                <p class="font-['Arial']">
+                <p class="font-['Arial']" id="cdcp">
                   Control Dep't Corporate Planning Gr.: Mr. H. Kanari
                 </p>
-                <p class="font-['Arial']">(81-78-682-5072/Ext. 7-30-33217)</p>
+                <p class="font-['Arial']" id="cdcp_tel">(81-78-682-5072/Ext. 7-30-33217)</p>
               </div>
             </div>
           </div>
@@ -704,10 +706,12 @@
             <div class="mb-4">大阪入国管理局　様</div>
             <div
               class="top flex justify-content-end w-100 mb-2 tracking-[1rem]"
+              id="comp_jap"
             >
               川崎重工業株式会社
             </div>
-            <div class="text-[14px] top flex justify-content-end w-100 mb-5">
+            <div class="text-[14px] top flex justify-content-end w-100 mb-5"
+            id="comp_desc">
               エネルギーソリューション＆マリンカンパニー
             </div>
             <div class="indent-6 leading-[2rem] mb-3">
@@ -786,11 +790,12 @@
               <div class="flex flex-col">
                 <span>本件担当</span>
                 <span class=""
+                id="company_n_desc"
                   >川崎重工業　エネルギーソリューション＆マリンカンパニー</span
                 >
-                <span class="">企画本部　人事総務部　人事総務一課</span>
-                <span class="">佐々木　萌香（ササキ　モカ）</span>
-                <span>℡　078-682-5202</span>
+                <span class="" id="dic">企画本部　人事総務部　人事総務一課</span>
+                <span class="" id="dic_name">佐々木　萌香（ササキ　モカ）</span>
+                <span id="dic_tel">℡　078-682-5202</span>
               </div>
             </div>
             <div class="top flex justify-content-end w-100 mb-4">
