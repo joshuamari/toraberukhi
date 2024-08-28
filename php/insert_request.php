@@ -77,7 +77,7 @@ if (!empty($_POST['workOrder'])) {
   $workOrder = $_POST['workOrder'];
 } else {
   $msg["isSuccess"] = false;
-  $msg['error'][] = "Word Order";
+  $msg['error'][] = "Work Order";
 }
 
 $project_name = '';
@@ -92,15 +92,7 @@ if (!empty($_POST['site_dispatch'])) {
   $site_dispatch = json_decode($_POST['site_dispatch']);
 }
 
-$allowance = 0;
-if (!empty($_POST['allowance'])) {
-  $allowance = $_POST['allowance'];
-} else {
-  $msg["isSuccess"] = false;
-  $msg['error'][] = "Allowance";
-}
-
-$request_dept = '';
+$request_dept = 0;
 if (!empty($_POST['request_dept'])) {
   $request_dept = $_POST['request_dept'];
 } else {
@@ -108,13 +100,93 @@ if (!empty($_POST['request_dept'])) {
   $msg['error'][] = "Requesting Department";
 }
 
-// $request_name = '';
-// if (!empty($_POST['request_name'])) {
-//   $request_name = $_POST['request_name'];
-// } else {
-//   $msg["isSuccess"] = false;
-//   $msg['error'][] = "Requester";
-// }
+$business = '';
+if (!empty($_POST['business'])) {
+  $business = $_POST['business'];
+} else {
+  $msg["isSuccess"] = false;
+  $msg['error'][] = "Business Content";
+}
+
+$req_name = '';
+if (!empty($_POST['req_name'])) {
+  $req_name = $_POST['req_name'];
+} else {
+  $msg["isSuccess"] = false;
+  $msg['error'][] = "Requester's Name";
+}
+
+$req_tel = '';
+if (!empty($_POST['req_tel'])) {
+  $req_tel = $_POST['req_tel'];
+} else {
+  $msg["isSuccess"] = false;
+  $msg['error'][] = "Requester's Telephone Number";
+}
+
+$req_fax = '';
+if (!empty($_POST['req_fax'])) {
+  $req_fax = $_POST['req_fax'];
+} else {
+  $msg["isSuccess"] = false;
+  $msg['error'][] = "Requester's Fax Number";
+}
+
+$gap_name = '';
+if (!empty($_POST['gap_name'])) {
+  $gap_name = $_POST['gap_name'];
+} else {
+  $msg["isSuccess"] = false;
+  $msg['error'][] = "General Affairs and Personal Group Personnel";
+}
+
+$gap_tel = '';
+if (!empty($_POST['gap_tel'])) {
+  $gap_tel = $_POST['gap_tel'];
+} else {
+  $msg["isSuccess"] = false;
+  $msg['error'][] = "General Affairs and Personal Group Telephone Number";
+}
+
+$cdcp_name = '';
+if (!empty($_POST['cdcp_name'])) {
+  $cdcp_name = $_POST['cdcp_name'];
+} else {
+  $msg["isSuccess"] = false;
+  $msg['error'][] = "Control Dep't Corporate Planning Personnel";
+}
+
+$cdcp_tel = '';
+if (!empty($_POST['cdcp_tel'])) {
+  $cdcp_tel = $_POST['cdcp_tel'];
+} else {
+  $msg["isSuccess"] = false;
+  $msg['error'][] = "Control Dep't Corporate Planning Telephone Number";
+}
+
+$dept_in_charge = '';
+if (!empty($_POST['dept_in_charge'])) {
+  $dept_in_charge = $_POST['dept_in_charge'];
+} else {
+  $msg["isSuccess"] = false;
+  $msg['error'][] = "Department in Charge";
+}
+
+$dic_name = '';
+if (!empty($_POST['dic_name'])) {
+  $dic_name = $_POST['dic_name'];
+} else {
+  $msg["isSuccess"] = false;
+  $msg['error'][] = "Department in Charge Supervisor";
+}
+
+$dic_tel = '';
+if (!empty($_POST['dic_tel'])) {
+  $dic_tel = $_POST['dic_tel'];
+} else {
+  $msg["isSuccess"] = false;
+  $msg['error'][] = "Department in Charge Telephone Number";
+}
 
 #for separtion of error
 if (!empty($msg)) {
@@ -172,8 +244,18 @@ try {
                                           `work_order`, 
                                           `project_name`, 
                                           `site_dispatch`, 
-                                          `allowance`, 
-                                          `request_by_dept`) 
+                                          `dept_id`,
+                                          `work_content`,
+                                          `req_name`,
+                                          `req_tel`,
+                                          `req_fax`,
+                                          `gap_name`,
+                                          `gap_tel`,
+                                          `cdcp_name`,
+                                          `cdcp_tel`,
+                                          `dept_in_charge`,
+                                          `dic_name`,
+                                          `dic_tel`) 
               VALUES (:userID,
                       :empNumber,
                       :locID,
@@ -184,8 +266,18 @@ try {
                       :workOrder,
                       :project_name,
                       :site_dispatch,
-                      :allowance,
-                      :request_dept)";
+                      :request_dept,
+                      :business,
+                      :req_name,
+                      :req_tel,
+                      :req_fax,
+                      :gap_name,
+                      :gap_tel,
+                      :cdcp_name,
+                      :cdcp_tel,
+                      :dept_in_charge,
+                      :dic_name,
+                      :dic_tel)";
   $insertStmt = $connpcs->prepare($insertQ);
   $insertStmt->execute([
     ":userID" => $userID,
@@ -198,9 +290,18 @@ try {
     ":workOrder" => $workOrder,
     ":project_name" => $project_name,
     ":site_dispatch" => $site_dispatch,
-    ":allowance" => $allowance,
-    ":request_dept" => $request_dept
-    // ":request_name" => $request_name
+    ":request_dept" => $request_dept,
+    ":business" => $business,
+    ":req_name" => $req_name,
+    ":req_tel" => $req_tel,
+    ":req_fax" => $req_fax,
+    ":gap_name" => $gap_name,
+    ":gap_tel" => $gap_tel,
+    ":cdcp_name" => $cdcp_name,
+    ":cdcp_tel" => $cdcp_tel,
+    ":dept_in_charge" => $dept_in_charge,
+    ":dic_name" => $dic_name,
+    ":dic_tel" => $dic_tel
   ]);
 
   if ($insertStmt->rowCount() > 0) {
@@ -208,11 +309,11 @@ try {
     $details = getRequestDetails($id);
     if (emailRequest($details)) {
       $msg["isSuccess"] = true;
-      $msg["error"] = "Adding Work History successfully";
+      $msg["error"] = "Adding Dispatch Request successfully";
     }
   } else {
     $msg["isSuccess"] = false;
-    $msg["error"] = "Adding Work History unsuccessful";
+    $msg["error"] = "Adding Dispatch Request unsuccessful";
   }
 } catch (Exception $e) {
   $msg["isSuccess"] = false;

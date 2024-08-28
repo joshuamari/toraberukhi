@@ -1,3 +1,27 @@
+Sentry.init({
+  dsn: "http://996e6a7f7f64d413dd43124ae5dece7e@o4507730788483072.ingest.us.sentry.io/4507767647436800",
+});
+// try {
+//   // Your code that might throw an error
+//   throw new Error("Test error for user feedback");
+// } catch (error) {
+//   // Capture the exception and get the event ID
+//   const eventId = Sentry.captureException(error);
+
+//   // Show the user feedback dialog
+//   Sentry.showReportDialog({
+//     eventId: eventId, // Use the captured event ID here
+//     title: "We're sorry about that!",
+//     subtitle: "Please provide us with some feedback so we can fix the issue.",
+//     subtitle2: "We appreciate your help!",
+//     labelName: "Name",
+//     labelEmail: "Email",
+//     labelComments: "Anyare?",
+//     labelSubmit: "Send Feedback",
+//     successMessage: "Thank you for your feedback!",
+//     // You can add your branding or message here if needed
+//   });
+// }
 //#region GLOBALS
 const rootFolder = `//${document.location.hostname}`;
 const dispTableID = ["eList", "eListNon"];
@@ -31,203 +55,9 @@ let monthNames2 = [
   "Nov",
   "Dec",
 ];
-// const sampleData = [
-//   {
-//     req_id: 37,
-//     emp_name: "Coquia, Joshua Mari",
-//     group_id: 16,
-//     specific_loc: "Kobe",
-//     location: "Japan",
-//     group_name: "Systems Group",
-//     requester_name: "Coquia, Joshua Mari",
-//     requester_group: "Systems Group",
-//     from: "2024-04-04",
-//     to: "2024-04-05",
-//     duration: 2,
-//     req_date: "2024-07-23",
-//     passValid: true,
-//     visaValid: true,
-//     status: 1,
-//     modified: "2024-07-29 13:06:18",
-//   },
-//   {
-//     req_id: 23,
-//     emp_name: "Herrera, Rhanzces Julia",
-//     group_id: 16,
-//     specific_loc: "Tokyo Tokyo",
-//     location: "Japan",
-//     group_name: "Systems Group",
-//     requester_name: "Reyes, Dave",
-//     requester_group: "Systems Group",
-//     from: "2024-07-18",
-//     to: "2024-07-28",
-//     duration: 11,
-//     req_date: "2024-07-23",
-//     passValid: false,
-//     visaValid: false,
-//     status: 1,
-//     modified: "2024-07-29 13:06:23",
-//   },
-//   {
-//     req_id: 39,
-//     emp_name: "Herrera, Rhanzces Julia",
-//     group_id: 16,
-//     specific_loc: "Tokyo Tokyo",
-//     location: "Japan",
-//     group_name: "Systems Group",
-//     requester_name: "Becina, Artemio Roel",
-//     requester_group: "Electrical Engineering Group",
-//     from: "2024-06-01",
-//     to: "2024-06-05",
-//     duration: 5,
-//     req_date: "2024-07-23",
-//     passValid: false,
-//     visaValid: false,
-//     status: null,
-//     modified: null,
-//   },
-//   {
-//     req_id: 38,
-//     emp_name: "Reyes, Dave",
-//     group_id: 16,
-//     specific_loc: "gasg",
-//     location: "Japan",
-//     group_name: "Systems Group",
-//     requester_name: "Reyes, Dave",
-//     requester_group: "Systems Group",
-//     from: "2024-05-01",
-//     to: "2024-05-03",
-//     duration: 3,
-//     req_date: "2024-07-19",
-//     passValid: false,
-//     visaValid: false,
-//     status: null,
-//     modified: null,
-//   },
-//   {
-//     req_id: 36,
-//     emp_name: "Reyes, Dave",
-//     group_id: 16,
-//     specific_loc: "dsdfsd",
-//     location: "Japan",
-//     group_name: "Systems Group",
-//     requester_name: "Reyes, Dave",
-//     requester_group: "Systems Group",
-//     from: "2024-03-27",
-//     to: "2024-03-30",
-//     duration: 4,
-//     req_date: "2024-07-19",
-//     passValid: false,
-//     visaValid: false,
-//     status: null,
-//     modified: null,
-//   },
-//   {
-//     req_id: 35,
-//     emp_name: "Coquia, Joshua Mari",
-//     group_id: 16,
-//     specific_loc: "Tokyo Tokyo",
-//     location: "Japan",
-//     group_name: "Systems Group",
-//     requester_name: "Reyes, Dave",
-//     requester_group: "Systems Group",
-//     from: "2024-02-21",
-//     to: "2024-03-01",
-//     duration: 10,
-//     req_date: "2024-07-19",
-//     passValid: true,
-//     visaValid: true,
-//     status: null,
-//     modified: null,
-//   },
-//   {
-//     req_id: 34,
-//     emp_name: "Cabiso, Sean Patrick",
-//     group_id: 16,
-//     specific_loc: "Tokyo Tokyo",
-//     location: "Japan",
-//     group_name: "Systems Group",
-//     requester_name: "Reyes, Dave",
-//     requester_group: "Systems Group",
-//     from: "2024-09-25",
-//     to: "2024-09-27",
-//     duration: 3,
-//     req_date: "2024-07-19",
-//     passValid: false,
-//     visaValid: false,
-//     status: null,
-//     modified: null,
-//   },
-//   {
-//     req_id: 29,
-//     emp_name: "Reyes, Dave",
-//     group_id: 16,
-//     specific_loc: "fgsfgsf",
-//     location: "Japan",
-//     group_name: "Systems Group",
-//     requester_name: "Reyes, Dave",
-//     requester_group: "Systems Group",
-//     from: "2024-06-05",
-//     to: "2024-06-18",
-//     duration: 14,
-//     req_date: "2024-07-19",
-//     passValid: false,
-//     visaValid: false,
-//     status: null,
-//     modified: null,
-//   },
-//   {
-//     req_id: 24,
-//     emp_name: "Herrera, Rhanzces Julia",
-//     group_id: 16,
-//     specific_loc: "Tokyo Tokyo",
-//     location: "Japan",
-//     group_name: "Systems Group",
-//     requester_name: "Reyes, Dave",
-//     requester_group: "Systems Group",
-//     from: "2024-07-19",
-//     to: "2024-07-27",
-//     duration: 9,
-//     req_date: "2024-07-19",
-//     passValid: false,
-//     visaValid: false,
-//     status: null,
-//     modified: null,
-//   },
-//   {
-//     req_id: 20,
-//     emp_name: "Reyes, Dave",
-//     group_id: 16,
-//     specific_loc: "fsdzfsdf",
-//     location: "Japan",
-//     group_name: "Systems Group",
-//     requester_name: "Reyes, Dave",
-//     requester_group: "Systems Group",
-//     from: "2024-06-26",
-//     to: "2024-06-29",
-//     duration: 4,
-//     req_date: "2024-07-19",
-//     passValid: false,
-//     visaValid: false,
-//     status: null,
-//     modified: null,
-//   },
-// ];
-// const cardData = {
-//   isSuccess: true,
-//   message: "",
-//   data: {
-//     pending: 27,
-//     accepted: 2,
-//     cancelled: 0,
-//     todaytotal: 1,
-//     todayaccept: 2,
-//     total: 29,
-//   },
-// };
 let reqList = [];
 let cardData = [];
-
+let isSentryModalOpen = false;
 let printData = {};
 let sortDateAsc = false;
 //#endregion
@@ -364,6 +194,14 @@ $(document).on("click", "#logoutBtn", function () {
       alert(`${error}`);
     });
 });
+
+$(document).on("click", ".btn-bug", function () {
+  openReport();
+});
+$(document).on("click", ".sentry-error-embed-wrapper", function () {
+  isSentryModalOpen = false;
+});
+
 $(document).on("click", "#sortDate", function () {
   sortDateAsc = !sortDateAsc;
   searchFilter(reqList);
@@ -389,6 +227,24 @@ $(document).on("click", "#btnBack2", function () {
 //#endregion
 
 //#region FUNCTIONS
+function openReport() {
+  if (!isSentryModalOpen) {
+    const eventId = Sentry.captureException(new Error("Error report"));
+
+    Sentry.showReportDialog({
+      eventId: eventId,
+      title: "We're sorry about that!",
+      subtitle: "Please provide us with some feedback so we can fix the issue.",
+      subtitle2: "We appreciate your help!",
+      labelName: "Name",
+      labelEmail: "Email",
+      labelComments: "What process did you do?",
+      labelSubmit: "Send Feedback",
+      successMessage: "Thank you for your feedback!",
+    });
+  }
+  isSentryModalOpen = true;
+}
 function getRequestData(req_id) {
   return new Promise((resolve, reject) => {
     $.ajax({
@@ -425,7 +281,7 @@ function fillAttachment(data) {
   $("#printJap, #printPh, #printThird").text("");
   var date = data.date_request;
   var khi = data.dispatch_request.requester_name;
-  var khibu = data.dispatch_request.request_by_dept;
+  var khibu = data.dispatch_request.request_dept;
   var name = data.dispatch_request.emp_name;
   var from = data.dispatch_request.start;
   var to = data.dispatch_request.end;
@@ -435,7 +291,8 @@ function fillAttachment(data) {
   var workOrder = data.dispatch_request.work_order;
   var project = data.dispatch_request.project_name;
   var siteDispatch = data.dispatch_request.site_dispatch;
-  var salary = data.dispatch_request.allowance;
+  var salary = data.dispatch_request.allowance[0].amount;
+  var salaryOthers = data.dispatch_request.allowance[1].amount;
 
   if (country === 1) {
     insertIconCountry(1);
@@ -472,6 +329,7 @@ function fillAttachment(data) {
   $("#printWO").text(workOrder);
   $("#printProject").text(project);
   $("#printSalary").text(salary);
+  $("#printSalaryOthers").text(salaryOthers);
   $("#printDate").text(date);
 }
 function formatName(name) {
@@ -531,6 +389,7 @@ function fillAttachment2(data) {
   $("#whMonth").text(month + 1);
   $("#whDay").text(day);
   $("#whName").text(name);
+  $("#whBusiness").text(data.dispatch_request.business);
 }
 function insertIconCountry(id) {
   $(".countries").empty();
@@ -789,7 +648,7 @@ function fillTable(sampleData) {
     });
   } else {
     str = `<td colspan="12" class="h-[530px]"><div class="flex items-center justify-center flex-col gap-3"><img src="../images/empty.png"   class="w-[150px] h-auto opacity-[0.75]" alt="empty">
-    <h5 class="font-semibold text-[16px] text-[var(--gray-text)]">No item found.</h5>
+    <h5 class="font-semibold text-[16px] text-[var(--gray-text)]">No item found</h5>
     <p class="text-[var(--gray-text)]">Try adjusting your search or filter to find what you're looking for.</p>
     </div></td>`;
     $("#tableBody").append(str);
@@ -974,7 +833,6 @@ function logOut() {
       url: "../global/logout.php",
       dataType: "json",
       success: function (response) {
-        console.log(response);
         const res = response;
         resolve(res);
       },

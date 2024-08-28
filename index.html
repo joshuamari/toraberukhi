@@ -8,7 +8,10 @@
     <script src="js/html2canvas.js"></script>
     <script src="js/jquery.js"></script>
     <script src="js/jquery.inview.min.js"></script>
-    <script src='http://js.sentry-cdn.com/996e6a7f7f64d413dd43124ae5dece7e.min.js' crossorigin='anonymous'></script>
+    <script
+      src="http://js.sentry-cdn.com/996e6a7f7f64d413dd43124ae5dece7e.min.js"
+      crossorigin="anonymous"
+    ></script>
     <!-- <script src="js/jquery.table2excel.js"></script> -->
     <script>
       var busterCall = ["js/individual.js", "css/index.css"];
@@ -511,7 +514,7 @@
       <div class="modal-content">
         <div class="modal-header border-0">
           <h1 class="modal-title text-[18px]" id="titleModal">
-            Review Request for Dispatch File
+            Review dispatch request file
           </h1>
           <!-- <button type="button" class="btn-close text-[14px]  m-1 w-0 h-0  w-auto h-auto" data-bs-dismiss="modal"
           aria-label="Close"></button> -->
@@ -875,7 +878,7 @@
                   <td>
                     <div class="flex">
                       <p class="font-['Arial']">JP¥</p>
-                      <p class="font-['Arial'] font-bold" id="printSalary"></p>
+                      <p class="font-['Arial']" id="printSalaryJP"></p>
                       <p class="font-['Arial']">(*)/Calendar Day</p>
                     </div>
                     <small class="font-['Arial'] text-[11px] leading-2 flex"
@@ -934,7 +937,7 @@
                   <td>
                     <div class="flex">
                       <p class="font-['Arial']">US$</p>
-                      <p class="font-['Arial']" id="printSalary">40</p>
+                      <p class="font-['Arial']"  id="printSalaryUS">40</p>
                       <p class="font-['Arial']">(*)/Calendar Day</p>
                     </div>
                     <small class="font-['Arial'] text-[11px] leading-2 flex"
@@ -974,7 +977,186 @@
             </div>
           </div>
           <div class="flex h-full px-3 flex-col gap-2">
-            <p class="" style="font-family: 'Poppins', sans-serif">
+            <p
+              class="text-[12px]"
+              style="font-size: 12.25px; font-family: 'Poppins', sans-serif"
+            >
+              This file is generated based on your input.Please review if
+              everything is correct, click the "Next" button to review the "Work
+              History" file. If changes are needed, click "Back" button and edit
+              your information before submitting.
+            </p>
+            <p
+              class="text-[var(--gray-text)]"
+              style="font-size: 12.25px; font-family: 'Poppins', sans-serif"
+            >
+              <i
+                class="bx bxs-info-circle text-[var(--gray-text)] align-middle pr-1"
+              ></i
+              >Keep track of your request on "Request List" tab.
+            </p>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button
+            type="button"
+            data-bs-dismiss="modal"
+            aria-label="Close"
+            class="btn bg-[var(--dark)] hover:bg-[var(--dark-200)] text-[var(--white)] hover:text-[var(--white)] border-0"
+          >
+            Back
+          </button>
+          <button
+            class="btn bg-[var(--secondary)] hover:bg-[var(--tertiary)] font-semibold border-0"
+            id="btnNext"
+          >
+            Next
+          </button>
+          <!-- <button class="btn-send btn" id="btnSend">Submit Request</button> -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div
+    class="modal fade"
+    id="attachmentModal2"
+    data-bs-backdrop="static"
+    data-bs-keyboard="false"
+    tabindex="-1"
+    aria-hidden="true"
+  >
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content">
+        <div class="modal-header border-0">
+          <h1 class="modal-title text-[18px]" id="titleModal">
+            Review work history file
+          </h1>
+          <button
+            type="button"
+            class="btn-close text-[14px] m-1 w-0 h-0 w-auto h-auto"
+            data-bs-dismiss="modal"
+            aria-label="Close"
+          ></button>
+        </div>
+        <div
+          class="modal-body flex flex-col items-center justify-content-center bg-[var(--gray)]"
+        >
+          <div
+            class="w-[210mm] h-[297mm] min-w-[210mm] min-h-[297mm] bg-[#fff] p-[14mm] my-[-50mm] mx-[-2.5mm] gap-2"
+            id="toPrint2"
+            style="transform: scale(0.65)"
+          >
+            <div class="top flex justify-content-end w-100 mb-4">
+              <span class="">（別紙）</span>
+            </div>
+            <div class="top flex justify-content-end w-100 mb-2 gap-2">
+              <span id="whYear">2024</span>
+              年
+              <span id="whMonth">7</span>
+              月
+              <span id="whDay">29</span>
+              日
+            </div>
+            <div class="mb-4">大阪入国管理局　様</div>
+            <div
+              class="top flex justify-content-end w-100 mb-2 tracking-[1rem]"
+            >
+              川崎重工業株式会社
+            </div>
+            <div class="text-[14px] top flex justify-content-end w-100 mb-5">
+              エネルギーソリューション＆マリンカンパニー
+            </div>
+            <div class="indent-6 leading-[2rem] mb-3">
+              申請人の職務経歴および弊社内での職務内容について下記の通り補足させていただきます。つきましては、申請人の在留資格認定証明書の交付にご配慮賜りますよう、お願い致します。
+            </div>
+            <div class="flex gap-2 mb-4">
+              <span>1.</span>
+              <div class="flex flex-col">
+                <span>申請人</span>
+                <span class="font-semibold font-['Arial']" id="whName"
+                  >Pangilinan, Seanne Kyle Beltran</span
+                >
+              </div>
+            </div>
+            <div class="flex gap-2 mb-4">
+              <span>2.</span>
+              <div class="flex flex-col">
+                <span>申請内容</span>
+                <span class=""
+                  >企業内転勤にかかわる在留資格認定証明書の交付</span
+                >
+              </div>
+            </div>
+            <div class="flex gap-2 mb-4 w-full">
+              <span>3.</span>
+              <div class="flex flex-col">
+                <span>職務経歴詳細</span>
+                <span class=""
+                  >申請人はフィリピンにおいて、主に技術設計業務等に従事してきました。</span
+                >
+                <span>申請人の職務経歴の詳細は下表の通りです。</span>
+
+                <table class="table mt-2" id="workHistoryTable">
+                  <thead>
+                    <tr>
+                      <th colspan="2">Start</th>
+                      <th colspan="2">End</th>
+                      <th rowspan="2">Company's name</th>
+                      <th rowspan="2">Company's business</th>
+                      <th rowspan="2">Business content</th>
+                      <th rowspan="2">Work location</th>
+                    </tr>
+                    <tr>
+                      <th>Year</th>
+                      <th>Month</th>
+                      <th>Year</th>
+                      <th>Month</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>2007</td>
+                      <td>3</td>
+                      <td></td>
+                      <td></td>
+                      <td>KHI Design & Technical Service Inc.</td>
+                      <td>プラントエンジニアリング</td>
+                      <td>土建設計業務</td>
+                      <td>マニラ</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <div class="flex gap-2 mb-4">
+              <span>4.</span>
+              <div class="flex flex-col">
+                <span>業務内容（予定)</span>
+                <span class="" id="whBusiness">水素実証設備の設計業務</span>
+              </div>
+            </div>
+            <div class="flex gap-2 mb-4">
+              <span>5.</span>
+              <div class="flex flex-col">
+                <span>本件担当</span>
+                <span class=""
+                  >川崎重工業　エネルギーソリューション＆マリンカンパニー</span
+                >
+                <span class="">企画本部　人事総務部　人事総務一課</span>
+                <span class="">佐々木　萌香（ササキ　モカ）</span>
+                <span>℡　078-682-5202</span>
+              </div>
+            </div>
+            <div class="top flex justify-content-end w-100 mb-4">
+              <span class="">以　上</span>
+            </div>
+          </div>
+          <div class="flex h-full px-3 flex-col gap-2">
+            <p
+              class=""
+              style="font-size: 12.25px; font-family: 'Poppins', sans-serif"
+            >
               This file is generated based on your input.Please review if
               everything is correct, click the "Submit Request" button to
               finalize your request. If changes are needed, click "Back" button
@@ -982,7 +1164,7 @@
             </p>
             <p
               class="text-[var(--gray-text)]"
-              style="font-family: 'Poppins', sans-serif"
+              style="font-size: 12.25px; font-family: 'Poppins', sans-serif"
             >
               <i
                 class="bx bxs-info-circle text-[var(--gray-text)] align-middle pr-1"
@@ -993,136 +1175,22 @@
         </div>
         <div class="modal-footer" id="buttonHere">
           <button
-            type="button"
-            data-bs-dismiss="modal"
-            aria-label="Close"
-            class="btn bg-[var(--dark)] hover:bg-[var(--dark-200)] text-[var(--white)]"
+            class="bg-[var(--dark)] hover:bg-[var(--dark-200)] text-[var(--white)] hover:text-[var(--white)] font-medium btn border-0"
             id="btnBack"
           >
             Back
           </button>
           <button class="btn-send btn" id="btnSend">Submit Request</button>
+          <!-- <button
+            class="bg-[var(--secondary)] hover:bg-[var(--tertiary)] font-semibold rounded-md px-3 py-1 text-[var(--dark)]"
+            id="btnSend"
+          >
+            Send Dispatch Request
+          </button> -->
         </div>
       </div>
     </div>
   </div>
-
-  <!-- <div class="modal fade" id="attachmentModal2" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
-  aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered modal-xl">
-    <div class="modal-content">
-      <div class="  modal-header border-0 ">
-        <h1 class="modal-title text-[18px]" id="titleModal">Review Work History</h1>
-        <button type="button" class="btn-close text-[14px]  m-1 w-0 h-0  w-auto h-auto" data-bs-dismiss="modal"
-          aria-label="Close"></button>
-      </div>
-      <div class="modal-body  flex items-center justify-content-center bg-[var(--gray)]">
-        <div class="w-[210mm] h-[297mm] min-w-[210mm] min-h-[297mm] bg-[#fff] p-[14mm]  my-[-37mm]" id="toPrint2" style="transform: scale(0.75);">
-          <div class="top flex  justify-content-end w-100 mb-4">
-            <span class="">（別紙）</span>
-          </div> 
-          <div class="top flex  justify-content-end w-100 mb-2 gap-2">
-            <span id="whYear">2024</span>
-            年
-            <span id="whMonth">7</span>
-            月
-            <span id="whDay">29</span>
-            日
-          </div>
-          <div class="mb-4">大阪入国管理局　様</div>
-          <div class="top flex  justify-content-end w-100 mb-2 tracking-[1rem]">
-            川崎重工業株式会社</div>
-          <div class="text-[14px] top flex  justify-content-end w-100 mb-5">
-            エネルギーソリューション＆マリンカンパニー
-          </div>
-          <div class="indent-6 leading-[2rem] mb-3">
-            申請人の職務経歴および弊社内での職務内容について下記の通り補足させていただきます。つきましては、申請人の在留資格認定証明書の交付にご配慮賜りますよう、お願い致します。
-          </div>
-          <div class="flex gap-2 mb-4">
-            <span>1.</span>
-            <div class="flex flex-col">
-              <span>申請人</span>
-              <span class="font-semibold font-['Arial']" id="whName">Pangilinan, Seanne Kyle Beltran</span>
-            </div>
-          </div>
-          <div class="flex gap-2 mb-4">
-            <span>2.</span>
-            <div class="flex flex-col">
-              <span>申請内容</span>
-              <span class="" >企業内転勤にかかわる在留資格認定証明書の交付</span>
-            </div>
-          </div>
-          <div class="flex gap-2 mb-4 w-full">
-            <span>3.</span>
-            <div class="flex flex-col">
-              <span>職務経歴詳細</span>
-              <span class="" >申請人はフィリピンにおいて、主に技術設計業務等に従事してきました。</span>
-              <span>申請人の職務経歴の詳細は下表の通りです。</span>
-       
-               <table class="table mt-2" id="workHistoryTable">
-                 <thead>
-                   <tr>
-                     <th colspan="2">Start</th>
-                     <th colspan="2">End</th>
-                     <th rowspan="2">Company's name</th>
-                     <th rowspan="2">Company's business</th>
-                     <th rowspan="2">Business content</th>
-                     <th rowspan="2">Work location</th>
-                   </tr>
-                   <tr>
-                     <th>Year</th>
-                     <th>Month</th>
-                     <th>Year</th>
-                     <th>Month</th>
-                   </tr>
-                 </thead>
-                 <tbody>
-                  <tr>
-                    <td>2007</td>
-                    <td>3</td>
-                    <td></td>
-                    <td></td>
-                    <td>KHI Design & Technical Service Inc.</td>
-                    <td>プラントエンジニアリング</td>
-                    <td>土建設計業務</td>
-                    <td>マニラ</td>
-                  </tr>
-                 </tbody>
-               </table>
-           
-            </div>
-          </div>
-          <div class="flex gap-2 mb-4">
-            <span>4.</span>
-            <div class="flex flex-col">
-              <span>業務内容（予定</span>
-              <span class="" >水素実証設備の設計業務</span>
-            </div>
-          </div>
-          <div class="flex gap-2 mb-4">
-            <span>5.</span>
-            <div class="flex flex-col">
-              <span>本件担当</span>
-              <span class="" >川崎重工業　エネルギーソリューション＆マリンカンパニー</span>
-              <span class="" >企画本部　人事総務部　人事総務一課</span>
-              <span class="" >佐々木　萌香（ササキ　モカ）</span>
-              <span>℡　078-682-5202</span>
-            </div>
-          </div>
-          <div class="top flex  justify-content-end w-100 mb-4">
-            <span class="">以　上</span>
-          </div> 
-
-          
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button class="bg-[var(--dark)] hover:bg-[var(--dark-200)] text-[var(--white)] font-medium transition rounded-md px-3 py-1" id="btnBack">Back</button>
-        <button class="bg-[var(--secondary)] hover:bg-[var(--tertiary)] font-semibold rounded-md px-3 py-1  text-[var(--dark)]" id="btnSend">Send Dispatch Request</button>
-      </div>
-    </div>
-    </div>
-</div> -->
   <!-- #endregion modal-->
 
   <body>
@@ -1208,6 +1276,14 @@
                 </div>
               </li></a
             >
+            <a href="./userManual/"
+              ><li>
+                <div class="d-flex align-items-center gap-2">
+                  <i class="bx bxs-book"></i>
+                  <p>User Manual</p>
+                </div>
+              </li></a
+            >
             <a href="#"
               ><li id="logoutBtn">
                 <div class="d-flex align-items-center gap-2">
@@ -1216,6 +1292,13 @@
                 </div>
               </li></a
             >
+            <div class="relative">
+              <p
+                class="absolute bottom-[-10px] text-[var(--gray-text)] text-xs"
+              >
+                ©2024 KDT.トラベる v1.0.0
+              </p>
+            </div>
           </section>
         </nav>
       </div>
@@ -1227,18 +1310,20 @@
                 <i class="bx bx-menu-alt-left fs-3"></i>
               </div>
               <h1 class="fw-semibold m-0">Dispatch Request by KHI</h1>
+              <!-- <span class="tooltip-modal" id="tooltip-modal"><i class='bx bxs-info-circle text-[var(--secondary)] align-middle pr-1'></i><span class="tooltiptext">Click to View a Sample Dispatch Form</span></span> -->
             </div>
             <div
               class="main w-100 d-flex pb-[14px] lg:pb-8 pt-0 h-[calc(100%-57px)]"
               id="appendHere"
             >
               <div class="left px-[14px] lg:px-8 pt-0" id="left">
-                <small class="text-[12px]"
-                  >To send a dispatch request to KDT, please fill up the form
-                  below.</small
-                >
+                <p class="text-pretty" style="font-size: 12px">
+                  To send a dispatch request to KDT, please fill up the form
+                  below.
+                </p>
                 <div class="viewForm mt-2">
                   <div class="form">
+                    <div class="error-msg mt-2"></div>
                     <div class="mb-1 row">
                       <label for="" class="col-form-label pl-0"
                         >Employee Group:</label
@@ -1293,6 +1378,20 @@
                       />
                     </div>
                     <div class="mb-1 row">
+                      <label for="japaneseInput" class="col-form-label pl-0"
+                        >業務内容（予定）</label
+                      >
+                      <textarea
+                        type="text"
+                        rows="3"
+                        class="input"
+                        name="japaneseInput"
+                        title="Please enter only Japanese characters (Hiragana, Katakana, or Kanji)."
+                        id="businessInput"
+                        placeholder="水素実証設備の設計業務"
+                      ></textarea>
+                    </div>
+                    <div class="mb-1 row">
                       <label for="" class="col-form-label pl-0"
                         >Invitation:</label
                       >
@@ -1343,44 +1442,47 @@
                       <label for="" class="col-form-label pl-0"
                         >Daily Allowance with Meals:</label
                       >
-                      <input
+                      <!-- <input
                         type="number"
                         name=""
                         class="input"
                         id="allowance"
                         placeholder="Allowance"
                         min="0"
-                      />
+                      /> -->
+                      <span id="allowanceDisplay">0</span>
                     </div>
-
                     <div class="mb-1 row">
                       <label for="" class="col-form-label pl-0"
                         >Requester's Department:</label
                       >
-                      <select name="" class="select" id="reqDepSel"></select>
+                      <select name="" class="select" id="reqDeptSel"></select>
                     </div>
-
-                    <!-- <div class="mb-1 row">
-                      <label for="" class="col-form-label pl-0"
-                        >Requester's Department:</label
-                      >
-                      <input
-                        type="text"
-                        name=""
-                        class="input"
-                        id="reqDeptInput"
-                        placeholder="Department"
-                      />
-                    </div> -->
-                    <!-- <div class="mb-1 row">
-                  <label for="" class="col-form-label pl-0">Requester's Name:</label>
-                    <input type="text" name="" class="input" id="reqNameInput" placeholder="Name">
-                </div> -->
-                    <div class="error-msg mb-1 row"></div>
                   </div>
                 </div>
-                <div class="sticky-buttons align-middle pr-5 pt-3 mb-2">
-                  <div class="count-total-days mb-4">
+                <div class="sticky-buttons align-middle mb-2">
+                  <div
+                    class="mb-1 flex gap-2 items-start flex-row-reverse w-full"
+                    style="justify-content: start"
+                  >
+                    <label
+                      for=""
+                      class="whConfirm-lbl text-[var(--gray-text2)] text-[12px] text-pretty"
+                      >I hereby confirm that I have carefully checked the
+                      <span
+                        class="font-bold text-[var(--gray-text2)] text-[12px]"
+                        >Work History table</span
+                      >
+                      before submitting this request.
+                    </label>
+                    <div class="d-flex justify-center">
+                      <input id="whConfirm" type="checkbox" /><label
+                        for="whConfirm"
+                        class="toggle small"
+                      ></label>
+                    </div>
+                  </div>
+                  <div class="count-total-days mb-2">
                     <label for="" class="countlabel col-form-label pl-0 pr-5"
                       >Total days:</label
                     >
@@ -1391,6 +1493,7 @@
                       0 Day
                     </h5>
                   </div>
+
                   <div class="submit-btns flex gap-2">
                     <button class="btn btn-clear" id="btnClear">Clear</button>
                     <button class="btn btn-dispatch" id="btnApply">
@@ -1430,7 +1533,9 @@
                   </div>
                   <div class="flex flex-col empmoreDetails h-full gap-3">
                     <div class="cards d-grid h-auto">
-                      <div class="card shadow-sm">
+                      <div
+                        class="card rounded-sm border-1 border-[var(--gray)]"
+                      >
                         <div class="card-body">
                           <h5 class="card-title">Latest Passport</h5>
 
@@ -1505,7 +1610,7 @@
                         </div>
                       </div>
 
-                      <div class="card shadow-sm">
+                      <div class="card border-1 border-[var(--gray)]">
                         <div class="card-body">
                           <h5 class="card-title">Latest Japan Visa</h5>
 
@@ -1569,7 +1674,7 @@
                         </div>
                       </div>
 
-                      <div class="card shadow-sm">
+                      <div class="card border-1 border-[var(--gray)]">
                         <div class="card-body">
                           <h5 class="card-title text-capitalize">
                             Total dispatch days per year
@@ -1623,9 +1728,7 @@
                         </div>
                       </div>
                     </div>
-                    <div
-                      class="d-flex totalThisYear flex-column shadow-sm p-3 gap-3"
-                    >
+                    <div class="d-flex totalThisYear flex-column p-3 gap-3">
                       <div class="label">
                         Estimated Total Days of Dispatch this Year
                       </div>
@@ -1651,120 +1754,7 @@
                       </div>
                     </div>
                     <div
-                      class="dispatch-hist p-3 bg-white rounded-lg h-full shadow-sm xl:pb-0"
-                    >
-                      <div class="top flex justify-content-between">
-                        <h5 class="title text-[var(--dark)]">
-                          Dispatch History to Japan
-                        </h5>
-
-                        <div>
-                          <button class="btn btn-success" id="btnExport">
-                            Export table
-                          </button>
-                        </div>
-                      </div>
-                      <p class="normal-case text-[12px] pb-3">
-                        View records of your members dispatches to Japan.
-                      </p>
-                      <div class="table-cont overflow-auto min-h-[200px]">
-                        <table class="table" id="histTable">
-                          <thead class="sticky top-0 bg-gray-200">
-                            <tr>
-                              <th data-exclude="true">No.</th>
-                              <th
-                                data-f-name="Arial"
-                                data-f-sz="9"
-                                data-f-bold="true"
-                                data-a-h="center"
-                                data-a-v="middle"
-                                data-b-a-s="thin"
-                                data-b-a-c="000000"
-                              >
-                                Location
-                              </th>
-                              <th
-                                data-f-name="Arial"
-                                data-f-sz="9"
-                                data-f-bold="true"
-                                data-a-h="center"
-                                data-a-v="middle"
-                                data-b-a-s="thin"
-                                data-b-a-c="000000"
-                              >
-                                Date to Japan
-                              </th>
-                              <th
-                                data-f-name="Arial"
-                                data-f-sz="9"
-                                data-f-bold="true"
-                                data-a-h="center"
-                                data-a-v="middle"
-                                data-b-a-s="thin"
-                                data-b-a-c="000000"
-                              >
-                                Date to Philippines
-                              </th>
-                              <th
-                                data-f-name="Arial"
-                                data-f-sz="9"
-                                data-f-bold="true"
-                                data-a-h="center"
-                                data-a-v="middle"
-                                data-b-a-s="thin"
-                                data-b-a-c="000000"
-                              >
-                                No. of Days
-                              </th>
-                              <th
-                                data-f-name="Arial"
-                                data-f-sz="9"
-                                data-f-bold="true"
-                                data-a-h="center"
-                                data-a-v="middle"
-                                data-b-a-s="thin"
-                                data-b-a-c="000000"
-                              >
-                                Total Days past 1 year
-                              </th>
-
-                              <th data-exclude="true"></th>
-                            </tr>
-                          </thead>
-                          <tbody id="dList">
-                            <tr>
-                              <td colspan="7" class="text-center">
-                                No data found
-                              </td>
-                            </tr>
-                            <!-- <tr>
-                            <td>1</td>
-                            <td>Kobe</td>
-                            <td>07 AUG 2023</td>
-                            <td>20 NOV 2023</td>
-                            <td>105</td>
-                            <td>105</td>
-                            <td>
-                              <div class="d-flex gap-2">
-                              <button
-                                class="btn-delete"
-                                title="Delete Entry"
-                                data-bs-toggle="modal"
-                                data-bs-target="#deleteEntry"
-                              >
-                                <i class="bx bx-trash fs-5" ></i>
-                              </button>
-                            </div>
-                            </td>
-                            
-                          </td>
-                          </tr> -->
-                          </tbody>
-                        </table>
-                      </div>
-                    </div>
-                    <div
-                      class="work-hist h-full pb-[50px] bg-white rounded-lg shadow-sm xl:pb-0"
+                      class="work-hist h-full pb-[50px] bg-white rounded-lg xl:pb-0"
                     >
                       <div class="top flex justify-content-between">
                         <div class="flex flex-col gap-1 pb-3">
@@ -1775,6 +1765,7 @@
                             Manage your members Work details and history.
                           </p>
                         </div>
+                        <div></div>
 
                         <!-- <div>
                       <button class="btn btn-success bg-[var(--darkest)]" id="btnExportss">
@@ -1782,7 +1773,9 @@
                       </button>
                     </div> -->
                       </div>
-                      <div class="h-[300px] table-cont overflow-auto">
+                      <div
+                        class="h-[225px] table-cont overflow-auto overscroll-contain"
+                      >
                         <table class="table" id="workhistTable">
                           <thead class="sticky top-0 bg-gray-200">
                             <tr>
@@ -1945,6 +1938,121 @@
                         </table>
                       </div>
                     </div>
+                    <div
+                      class="dispatch-hist p-3 bg-white rounded-lg h-full border-1 border-[var(--gray)] xl:pb-0"
+                    >
+                      <div class="top flex justify-content-between">
+                        <h5 class="title text-[var(--dark)]">
+                          Dispatch History to Japan
+                        </h5>
+
+                        <div>
+                          <button class="btn btn-success" id="btnExport">
+                            Export table
+                          </button>
+                        </div>
+                      </div>
+                      <p class="normal-case text-[12px] pb-3">
+                        View records of your members dispatches to Japan.
+                      </p>
+                      <div
+                        class="table-cont overflow-auto overscroll-contain min-h-[200px]"
+                      >
+                        <table class="table" id="histTable">
+                          <thead class="sticky top-0 bg-gray-200">
+                            <tr>
+                              <th data-exclude="true">No.</th>
+                              <th
+                                data-f-name="Arial"
+                                data-f-sz="9"
+                                data-f-bold="true"
+                                data-a-h="center"
+                                data-a-v="middle"
+                                data-b-a-s="thin"
+                                data-b-a-c="000000"
+                              >
+                                Location
+                              </th>
+                              <th
+                                data-f-name="Arial"
+                                data-f-sz="9"
+                                data-f-bold="true"
+                                data-a-h="center"
+                                data-a-v="middle"
+                                data-b-a-s="thin"
+                                data-b-a-c="000000"
+                              >
+                                Date to Japan
+                              </th>
+                              <th
+                                data-f-name="Arial"
+                                data-f-sz="9"
+                                data-f-bold="true"
+                                data-a-h="center"
+                                data-a-v="middle"
+                                data-b-a-s="thin"
+                                data-b-a-c="000000"
+                              >
+                                Date to Philippines
+                              </th>
+                              <th
+                                data-f-name="Arial"
+                                data-f-sz="9"
+                                data-f-bold="true"
+                                data-a-h="center"
+                                data-a-v="middle"
+                                data-b-a-s="thin"
+                                data-b-a-c="000000"
+                              >
+                                No. of Days
+                              </th>
+                              <th
+                                data-f-name="Arial"
+                                data-f-sz="9"
+                                data-f-bold="true"
+                                data-a-h="center"
+                                data-a-v="middle"
+                                data-b-a-s="thin"
+                                data-b-a-c="000000"
+                              >
+                                Total Days past 1 year
+                              </th>
+
+                              <th data-exclude="true"></th>
+                            </tr>
+                          </thead>
+                          <tbody id="dList">
+                            <tr>
+                              <td colspan="7" class="text-center">
+                                No data found
+                              </td>
+                            </tr>
+                            <!-- <tr>
+                            <td>1</td>
+                            <td>Kobe</td>
+                            <td>07 AUG 2023</td>
+                            <td>20 NOV 2023</td>
+                            <td>105</td>
+                            <td>105</td>
+                            <td>
+                              <div class="d-flex gap-2">
+                              <button
+                                class="btn-delete"
+                                title="Delete Entry"
+                                data-bs-toggle="modal"
+                                data-bs-target="#deleteEntry"
+                              >
+                                <i class="bx bx-trash fs-5" ></i>
+                              </button>
+                            </div>
+                            </td>
+                            
+                          </td>
+                          </tr> -->
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
                   </div>
                   <!--end of emp details -->
                 </div>
@@ -1964,7 +2072,7 @@
       </div>
       <div class="absolute top-[10px] right-[10px] z-1">
         <button
-        id="btn-bug"
+          id="btn-bug"
           class="flex gap-2 items-center py-2 px-3 bg-[var(--dark)] rounded-md btn-bug transition"
           title="Report a bug"
         >

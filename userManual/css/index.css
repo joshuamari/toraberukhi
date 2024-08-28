@@ -1,0 +1,48 @@
+.item-manual:hover{
+transform: translateX(10px) translateY(10px) ;
+transition: transform 0.25s ease;
+perspective: 550px;
+transform-style: preserve-3d;
+box-shadow: 0 1px 8px 0 rgba(0, 0,0, 0.2);
+}
+.item-manual{
+  min-height: 140px;
+  height: 100%;
+}
+.item-manual span{
+  overflow: hidden;
+  border: 1px solid var(--secondary-100);
+}
+.item-manual:hover span i.bxs-plane-alt{
+  animation: fly 2s ease-in-out infinite;
+} 
+.item-manual:hover span i.bxs-briefcase{
+  animation: bounce 1s infinite;
+} 
+@keyframes fly{
+  0%{
+    transform: translateX(-30px) translateY(30px);
+  }
+  30%{
+    transform: translateX(0) translateY(0);
+  } 85%{
+    transform: translateX(0) translateY(0);
+  }
+  100%{
+    transform: translateX(30px) translateY(-30px);
+  }
+}
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(-20%);
+    animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
+  }
+  50% {
+    transform: translateY(0);
+    animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
+  }
+}
+.item-manual svg path{
+  width: 100%;
+  height: 20px;
+}

@@ -8,6 +8,10 @@
     <script src="js/html2canvas.js"></script>
     <script src="js/jquery.js"></script>
     <script src="js/jquery.inview.min.js"></script>
+    <script
+      src="http://js.sentry-cdn.com/996e6a7f7f64d413dd43124ae5dece7e.min.js"
+      crossorigin="anonymous"
+    ></script>
     <!-- <script src="js/jquery.table2excel.js"></script> -->
     <script>
       var busterCall = ["js/individual.js", "css/index.css"];
@@ -110,6 +114,14 @@
                 </div>
               </li></a
             >
+            <a href="../userManual/"
+              ><li>
+                <div class="d-flex align-items-center gap-2">
+                  <i class="bx bxs-book"></i>
+                  <p>User Manual</p>
+                </div>
+              </li></a
+            >
             <a href="#"
               ><li id="logoutBtn">
                 <div class="d-flex align-items-center gap-2">
@@ -118,6 +130,13 @@
                 </div>
               </li></a
             >
+            <div class="relative">
+              <p
+                class="absolute bottom-[-10px] text-[var(--gray-text)] text-xs"
+              >
+                ©2024 KDT.トラベる v1.0.0
+              </p>
+            </div>
           </section>
         </nav>
       </div>
@@ -162,7 +181,9 @@
                 </div>
               </div>
 
-              <div class="overflow-auto h-[calc(100%-55px)]">
+              <div
+                class="overflow-auto overscroll-contain h-[calc(100%-55px)] border-[1px] border-[var(--gray)] rounded-[8px]"
+              >
                 <table class="table" id="repTable">
                   <thead class="">
                     <tr>

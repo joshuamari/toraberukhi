@@ -9,27 +9,36 @@ table {
 table thead tr th, table tbody tr td{
   text-align: center;
   vertical-align: middle;
-  border: 1px solid #cbcbcb ;
+  border: 1px solid var(--gray) ;
   white-space: nowrap;
+  border-right: 0;
+  border-bottom: 0;
 }
 table thead tr th:last-of-type{
   width: 8%;
 }
 table thead tr th{
-  background-color: inherit;
+  background-color: var(--tableheader) !important;
   font-size: 12px !important;
   text-transform: uppercase;
   white-space: nowrap;
   vertical-align: middle;
   font-weight: 700;
-  padding: 1.25rem .75rem;
+  padding: .75rem;
+  border: 1px solid var(--gray);
+  border-right: 0;
+  border-top: 0;
 }
+
 
 table thead tr {
   background-color: var(--tableheader);
 }
 table tbody tr:hover td{
   background-color: rgba(0, 0, 0,  0.075);
+}
+table tbody td[colspan="8"]{
+  background-color: var(--tableheader);
 }
 
 thead{

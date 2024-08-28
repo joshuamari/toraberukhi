@@ -8,6 +8,10 @@
     <script src="js/html2canvas.js"></script>
     <script src="js/jquery.js"></script>
     <script src="js/jquery.inview.min.js"></script>
+    <script
+      src="http://js.sentry-cdn.com/996e6a7f7f64d413dd43124ae5dece7e.min.js"
+      crossorigin="anonymous"
+    ></script>
     <!-- <script src="js/jquery.table2excel.js"></script> -->
     <script>
       var busterCall = ["js/individual.js", "css/index.css"];
@@ -547,7 +551,7 @@
                   <td>
                     <div class="flex">
                       <p class="font-['Arial']">JP¥</p>
-                      <p class="font-['Arial'] font-bold" id="printSalary"></p>
+                      <p class="font-['Arial']" id="printSalary"></p>
                       <p class="font-['Arial']">(*)/Calendar Day</p>
                     </div>
                     <small class="font-['Arial'] text-[11px] leading-2 flex"
@@ -606,7 +610,7 @@
                   <td>
                     <div class="flex">
                       <p class="font-['Arial']">US$</p>
-                      <p class="font-['Arial']" id="printSalary">40</p>
+                      <p class="font-['Arial']" id="printSalaryOthers"></p>
                       <p class="font-['Arial']">(*)/Calendar Day</p>
                     </div>
                     <small class="font-['Arial'] text-[11px] leading-2 flex"
@@ -773,8 +777,8 @@
             <div class="flex gap-2 mb-4">
               <span>4.</span>
               <div class="flex flex-col">
-                <span>業務内容（予定</span>
-                <span class="">水素実証設備の設計業務</span>
+                <span>業務内容（予定）</span>
+                <span class="" id="whBusiness">水素実証設備の設計業務</span>
               </div>
             </div>
             <div class="flex gap-2 mb-4">
@@ -807,7 +811,7 @@
     </div>
   </div>
 
-  <!-- #region end-->
+  <!-- #endregion -->
 
   <body>
     <div class="position-relative flex h-screen">
@@ -891,6 +895,14 @@
                 </div>
               </li></a
             >
+            <a href="../userManual/"
+              ><li>
+                <div class="d-flex align-items-center gap-2">
+                  <i class="bx bxs-book"></i>
+                  <p>User Manual</p>
+                </div>
+              </li></a
+            >
             <a href="#"
               ><li id="logoutBtn">
                 <div class="d-flex align-items-center gap-2">
@@ -899,6 +911,13 @@
                 </div>
               </li></a
             >
+            <div class="relative">
+              <p
+                class="absolute bottom-[-10px] text-[var(--gray-text)] text-xs"
+              >
+                ©2024 KDT.トラベる v1.0.0
+              </p>
+            </div>
           </section>
         </nav>
       </div>
@@ -1112,7 +1131,7 @@
               </div>
 
               <div
-                class="relative h-[calc(100%-104px)] lg:h-[calc(100%-93px)] p-3 pt-0 mt-3 overflow-auto"
+                class="relative h-[calc(100%-104px)] lg:h-[calc(100%-93px)] p-3 pt-0 mt-3 overflow-auto overscroll-contain"
               >
                 <table class="">
                   <thead>

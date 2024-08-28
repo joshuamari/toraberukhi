@@ -45,6 +45,7 @@ let monthNames2 = [
   "Dec",
 ];
 let isSentryModalOpen = false;
+let allowance = [];
 //#endregion
 checkAccess()
   .then((emp) => {
@@ -56,12 +57,17 @@ checkAccess()
         getGroups()
           .then((grps) => {
             fillGroups(grps);
-            Promise.all([getEmployees(), getLocations(), getInviteTypes(), getReqDepartment()])
-              .then(([emps, locs, invs, deps]) => {
+            Promise.all([
+              getEmployees(),
+              getLocations(),
+              getInviteTypes(),
+              getReqDepts(),
+            ])
+              .then(([emps, locs, invs, depts]) => {
                 fillEmployees(emps);
                 fillLocations(locs);
                 fillInvitations(invs);
-                fillReqDeps(deps);
+                fillReqDepts(depts);
               })
               .catch((error) => {
                 alert(`${error}`);
@@ -90,6 +96,7 @@ $(document).on("click", "#closeNav", function () {
 $(document).on("change", "#grpSel", function () {
   getEmployees().then((emps) => {
     fillEmployees(emps);
+    displayAllowance();
   });
 });
 $(document).on("click", ".btn-close", function () {
@@ -137,8 +144,9 @@ $(document).on("change", "#empSel", function () {
     getDispatchDays(),
     getYearly(),
     getWorkHistory(),
+    getAllowance(),
   ])
-    .then(([pass, vsa, dlst, dd, yrl, wlst]) => {
+    .then(([pass, vsa, dlst, dd, yrl, wlst, baon]) => {
       fillPassport(pass);
       fillVisa(vsa);
       dispatch_days = dd;
@@ -148,6 +156,8 @@ $(document).on("change", "#empSel", function () {
       fillWorkHistory(wHistory);
       countTotal();
       fillYearly(yrl);
+      allowance = baon;
+      displayAllowance();
       toggleLoadingAnimation(false);
     })
     .catch((error) => {
@@ -165,6 +175,9 @@ $(document).on("change", "#empSel", function () {
     $(".emptyState").addClass("d-none");
     $(".withContent").removeClass("d-none");
   }
+});
+$(document).on("change", "#locSel", function () {
+  displayAllowance();
 });
 $(document).on("click", "#btnApply", function () {
   checkDispatch();
@@ -357,12 +370,16 @@ $(document).on("click", ".rmvToast", function () {
 });
 $(document).on(
   "click",
-  "#reqDeptInput, #reqNameInput, #grpSel, #empSel, #startDate, #endDate, #locSel, #specLocInput, #inviteSel, #workOrder, #projName, #allowance",
+  "#reqDeptSel, #reqNameInput, #empSel, #startDate, #endDate, #locSel, #specLocInput, #inviteSel, #workOrder, #projName, #businessInput",
   function () {
     $(this).removeClass("bg-red-100  border-red-400");
     $(".errTxt").remove();
   }
 );
+$(document).on("click", "#whConfirm", function () {
+  $(".whConfirm-lbl").removeClass("text-red-600");
+  $(".errTxt").remove();
+});
 $(document).on(
   "click",
   "#addcompanyName, #addStartMonthYear, #addEndMonthYear, #addcompanyBusiness, #addbusinessContent, #addworkLocation",
@@ -424,37 +441,36 @@ $(document).on("click", "#logoutBtn", function () {
       alert(`${error}`);
     });
 });
-$(document).on("keydown", "#allowance", function (e) {
-  if (
-    e.which === 38 ||
-    e.which === 40 ||
-    e.which === 187 ||
-    e.which === 189 ||
-    e.which === 109 ||
-    e.which === 107 ||
-    e.key === "e" ||
-    e.key === "E"
-  ) {
-    e.preventDefault();
-  }
-});
+// $(document).on("keydown", "#allowance", function (e) {
+//   if (
+//     e.which === 38 ||
+//     e.which === 40 ||
+//     e.which === 187 ||
+//     e.which === 189 ||
+//     e.which === 109 ||
+//     e.which === 107 ||
+//     e.key === "e" ||
+//     e.key === "E"
+//   ) {
+//     e.preventDefault();
+//   }
+// });
 $(document).on("click", ".btn-bug", function () {
   openReport();
 });
 $(document).on("click", ".sentry-error-embed-wrapper", function () {
   isSentryModalOpen = false;
 });
-// $(document).on("click", "#btnNext", function () {
-//   $("#attachmentModal").modal("hide");
-//   fillAttachment2();
-// });
-// $(document).on("click", "#btnBack", function () {
-//   $("#attachmentModal2").modal("hide");
-//   $("#attachmentModal").modal("show");
-// });
+$(document).on("click", "#btnNext", function () {
+  $("#attachmentModal").modal("hide");
+  fillAttachment2(wHistory);
+});
+$(document).on("click", "#btnBack", function () {
+  $("#attachmentModal2").modal("hide");
+  $("#attachmentModal").modal("show");
+});
 $(document).on("click", "#btnSend", function () {
   $("#btnSend").prop("disabled", true);
-  console.log("disabling send email btn");
   // $('#btnSend').addClass("bg-[var(--secondary)] hover:bg-[var(--tertiary)] font-semibold rounded-md px-3 py-1  text-[var(--dark)]")
   insertDispatch()
     .then((res) => {
@@ -486,13 +502,12 @@ $(document).on("click", "#btnSend", function () {
               "success",
               "Successfully sent a dispatch request to KDT."
             );
-            console.log("enabling send email btn");
           })
           .catch((error) => {
             alert(`${error}`);
           });
       }
-      $("#attachmentModal").modal("hide");
+      $("#attachmentModal2").modal("hide");
       $("#btnSend").prop("disabled", false);
       toggleLoadingAnimation(false);
     })
@@ -505,6 +520,7 @@ $(document).on("click", "#btnSend", function () {
 });
 $(document).on("click", ".lbl-viewForm", function () {
   $("#left").toggleClass("changeSize");
+  $(".errTxt").remove();
   $(".sticky-buttons").toggleClass("appear");
   $(".viewForm").toggleClass("bgChange");
   if ($("#left").hasClass("changeSize")) {
@@ -530,12 +546,25 @@ $(document).on("click", ".lbl-viewForm", function () {
 
 $(document).on("click", "#whConfirm", function () {
   const workConfirm = $("#whConfirm").is(":checked");
-  if (workConfirm) {
-    console.log("checked");
-  } else {
-    console.log("not checked");
-  }
 });
+
+$(document).on("click", ".toggle.small", function () {
+  $(this).removeClass("outline outline-offset-2 outline-red-500  ");
+});
+
+// $(document).on("input", "#businessInput", function (e) {
+//   const value = e.target.value;
+//   const pattern = /^[\u3040-\u30FF\u4E00-\u9FFF\uFF66-\uFF9F]*$/;
+
+//   if (!pattern.test(value)) {
+//     $(this).addClass("bg-red-100  border-red-400");
+//     e.target.value = value.replace(/[^ぁ-んァ-ン一-龥ｦ-ﾟ]/g, "");
+//     e.target.setCustomValidity("Invalid input");
+//   } else {
+//     $(this).removeClass("bg-red-100  border-red-400");
+//     e.target.setCustomValidity("");
+//   }
+// });
 
 //#endregion
 
@@ -558,14 +587,60 @@ function openReport() {
   }
   isSentryModalOpen = true;
 }
+function getAllowance() {
+  const empID = $("#empSel").find("option:selected").attr("emp-id");
+  return new Promise((resolve, reject) => {
+    $.ajax({
+      type: "GET",
+      url: "php/get_allowance.php",
+      data: {
+        empID: empID,
+      },
+      dataType: "json",
+      success: function (response) {
+        const allowance = response;
+        resolve(allowance);
+      },
+      error: function (xhr, status, error) {
+        if (xhr.status === 404) {
+          reject("Not Found Error: The requested resource was not found.");
+        } else if (xhr.status === 500) {
+          reject("Internal Server Error: There was a server error.");
+        } else {
+          reject(
+            `An unspecified error occurred while fetching allowance: ${error}`
+          );
+        }
+      },
+    });
+  });
+}
+function displayAllowance() {
+  const empVal = parseInt($("#empSel").val());
+  let locVal = parseInt($("#locSel").val());
+  let currency = "¥";
+  let amount = 0;
+
+  if (locVal === 2) {
+    locVal = 1;
+  } else if (locVal === 3) {
+    currency = "$";
+  }
+
+  if (empVal !== 0 && locVal !== 0) {
+    const result = allowance.find((item) => item.location_id == locVal);
+    amount = result ? result.amount : 0;
+  }
+  $("#allowanceDisplay").text(`${currency}${amount}`);
+}
 function formatName(name) {
   const [last, given] = name.split(",");
   const surname = last.toUpperCase();
   return given + " " + surname;
 }
 function fillAttachment() {
-  console.log(empDetails);
-  const reqDept = $("#reqDepSel").find("option:selected").attr("dep-name");
+  // const reqDept = $("#reqDeptInput").val(); //Input Type Req Dept
+  const reqDept = $("#reqDeptSel").find("option:selected").attr("reqdept-name"); //Select Type Req Dept
   // const reqName = $("#reqNameInput").val();
   const fName = empDetails.firstname;
   const sName = empDetails.surname;
@@ -579,7 +654,8 @@ function fillAttachment() {
   const inviteID = $("#inviteSel").find("option:selected").attr("inv-id");
   const workOrder = $("#workOrder").val();
   const projName = $("#projName").val();
-  const allowance = $("#allowance").val();
+  const allowance_jp = allowance[0]["amount"];
+  const allowance_us = allowance[1]["amount"];
   const siteDispatch = $("#siteDispatch").is(":checked");
   $("#printJap, #printPh, #printThird").empty();
 
@@ -615,7 +691,8 @@ function fillAttachment() {
   if (siteDispatch === false) {
     $(".siteDispatch").empty();
   }
-  $("#printSalary").text(allowance);
+  $("#printSalaryJP").text(allowance_jp);
+  $("#printSalaryUS").text(allowance_us);
   $("#printWO").text(workOrder);
   $("#printProject").text(projName);
 
@@ -642,27 +719,69 @@ function formatDate(date) {
   return day + " " + monthName + " " + year;
 }
 
-// function fillAttachment2() {
-//   const emp = $("#empSel").find("option:selected").text();
-//   var today = new Date();
-//   var day = today.getDate();
-//   var month = today.getMonth() + 1;
-//   var year = today.getFullYear();
+function fillAttachment2(wList) {
+  const business = $("#businessInput").val();
+  const emp = $("#empSel").find("option:selected").text();
+  let today = new Date();
+  let day = today.getDate();
+  let month = today.getMonth() + 1;
+  let year = today.getFullYear();
 
-//   if (day < 10) {
-//     day = "0" + day;
-//   }
-//   if (month < 10) {
-//     month = "0" + month;
-//   }
+  if (day < 10) {
+    day = "0" + day;
+  }
+  if (month < 10) {
+    month = "0" + month;
+  }
 
-//   $("#whYear").text(year);
-//   $("#whMonth").text(month);
-//   $("#whDay").text(day);
-//   $("#whName").text(emp);
+  let str = "";
+  $("#workHistoryTable tbody").empty();
+  if (wList.length != 0) {
+    $.each(wList, function (index, item) {
+      if (item.end_year == null) {
+        item.end_year = "";
+      }
+      if (item.end_month == null) {
+        item.end_month = "";
+      }
+      if (item.end_year == "-0001") {
+        item.end_year = "";
+      }
+      if (item.end_month == "11") {
+        item.end_month = "";
+      }
+      str += `
+      <tr>
+        <td>${item.start_year}</td>
+        <td>${item.start_month}</td>
+        <td>${item.end_year}</td>
+        <td>${item.end_month}</td>
+        <td>${item.comp_name}</td>
+        <td>${item.comp_business}</td>
+        <td>${item.business_cont}</td>
+        <td>${item.work_loc}</td>
+      </tr>
+    `;
+    });
+  } else {
+    str = `
+    <tr>
+      <td colspan="9" class="text-center">
+        No data found.
+      </td>
+    </tr>
+    `;
+  }
+  $("#workHistoryTable tbody").append(str);
 
-//   $("#attachmentModal2").modal("show");
-// }
+  $("#whYear").text(year);
+  $("#whMonth").text(month);
+  $("#whDay").text(day);
+  $("#whName").text(emp);
+  $("#whBusiness").text(business);
+
+  $("#attachmentModal2").modal("show");
+}
 
 function insertIconCountry(id) {
   $(".countries").empty();
@@ -1004,7 +1123,7 @@ function fillWorkHistory(wList) {
       );
 
       row.append(`<td data-exclude='true'>
-        <div class="d-flex gap-2">
+        <div class="d-flex gap-2 justify-end">
         <button
           class="btn-edit-work"
           title="Edit Work Entry"
@@ -1049,7 +1168,6 @@ function getDispatchHistory() {
       },
       dataType: "json",
       success: function (response) {
-        // console.log("getDHistory: ", response);
         const dList = response;
         resolve(dList);
       },
@@ -1108,24 +1226,25 @@ function fillDispatchHistory(dlist) {
         );
       }
 
-      row.append(`<td data-exclude='true'>
-        <div class="d-flex gap-2">
-        <button
-          class="btn-edit"
-          title="Edit Entry"
-          
-        >
-        <i class='bx bxs-edit fs-5' ></i>
-        </button>
-        <button
-          class="btn-delete"
-          title="Delete Entry"
-          data-bs-toggle="modal"
-          data-bs-target="#deleteEntry"
-        >
-          <i class="bx bx-trash fs-5"></i>
-        </button>
-      </div></td>`);
+      // row.append(`<td data-exclude='true'>
+      //   <div class="d-flex gap-2 justify-end">
+      //   <button
+      //     class="btn-edit"
+      //     title="Edit Entry"
+
+      //   >
+      //   <i class='bx bxs-edit fs-5' ></i>
+      //   </button>
+      //   <button
+      //     class="btn-delete"
+      //     title="Delete Entry"
+      //     data-bs-toggle="modal"
+      //     data-bs-target="#deleteEntry"
+      //   >
+      //     <i class="bx bx-trash fs-5"></i>
+      //   </button>
+      // </div></td>`);
+      row.append(`<td data-exclude='true'></td>`);
 
       tableBody.append(row);
     });
@@ -1145,7 +1264,6 @@ function getDispatchDays() {
       },
       dataType: "json",
       success: function (response) {
-        // console.log(response);
         const dDays = response;
         resolve(dDays);
       },
@@ -1172,7 +1290,6 @@ function countTotal() {
     if (dd > 183) {
       $("#rangeCount").addClass("redText");
       countText = `${dd} days`;
-      console.log("lagpas");
     } else {
       $("#rangeCount").removeClass("redText");
       countText = `${dd} days`;
@@ -1217,9 +1334,9 @@ function removeOutline() {
   ).removeClass("bg-red-100  border-red-400");
 }
 function checkDispatch() {
-  const reqDept = $("#reqDepSel").find("option:selected").attr("dep-name");
+  // const reqDept = $("#reqDeptInput").val(); //Input Type Req Dept
+  const reqDept = $("#reqDeptSel").find("option:selected").attr("reqdept-name"); //Select Type Req Dept
   // const reqName = $("#reqNameInput").val();
-  const grp = $("#grpSel").find("option:selected").attr("grp-id");
   const empID = $("#empSel").find("option:selected").attr("emp-id");
   const startD = $("#startDate").val();
   const endD = $("#endDate").val();
@@ -1228,57 +1345,63 @@ function checkDispatch() {
   const inviteID = $("#inviteSel").find("option:selected").attr("inv-id");
   const workOrder = $("#workOrder").val();
   const projName = $("#projName").val();
-  const allowance = $("#allowance").val();
+  const business = $("#businessInput").val();
   const siteDispatch = $("#siteDispatch").is(":checked");
+  const workConfirm = $("#whConfirm").is(":checked");
   let ctr = 0;
+  let firstIncompleteInput = null;
+  const viewForm = $(".viewForm");
 
   toggleLoadingAnimation(true);
+
   if (!reqDept) {
-    $("#reqDeptInput").addClass("bg-red-100  border-red-400");
+    $("#reqDeptSel").addClass("bg-red-100  border-red-400");
+    if (!firstIncompleteInput) firstIncompleteInput = $("#reqDeptSel");
     ctr++;
   }
-  // if (!reqName) {
-  //   $("#reqNameInput").addClass("bg-red-100  border-red-400");
-  //   ctr++;
-  // }
-  if (!grp) {
-    $("#grpSel").addClass("bg-red-100  border-red-400");
+  if (!business) {
+    $("#businessInput").addClass("bg-red-100  border-red-400");
+    if (!firstIncompleteInput) firstIncompleteInput = $("#businessInput");
     ctr++;
   }
   if (!empID) {
     $("#empSel").addClass("bg-red-100  border-red-400");
+    if (!firstIncompleteInput) firstIncompleteInput = $("#empSel");
     ctr++;
   }
   if (!startD) {
     $("#startDate").addClass("bg-red-100  border-red-400");
+    if (!firstIncompleteInput) firstIncompleteInput = $("#startDate");
     ctr++;
   }
   if (!endD) {
     $("#endDate").addClass("bg-red-100  border-red-400");
+    if (!firstIncompleteInput) firstIncompleteInput = $("#endDate");
     ctr++;
   }
   if (!locID) {
     $("#locSel").addClass("bg-red-100  border-red-400");
+    if (!firstIncompleteInput) firstIncompleteInput = $("#locSel");
     ctr++;
   }
   if (!specLoc) {
     $("#specLocInput").addClass("bg-red-100  border-red-400");
+    if (!firstIncompleteInput) firstIncompleteInput = $("#specLocInput");
     ctr++;
   }
   if (!inviteID) {
     $("#inviteSel").addClass("bg-red-100  border-red-400");
+    if (!firstIncompleteInput) firstIncompleteInput = $("#inviteSel");
     ctr++;
   }
   if (!workOrder) {
     $("#workOrder").addClass("bg-red-100  border-red-400");
+    if (!firstIncompleteInput) firstIncompleteInput = $("#workOrder");
     ctr++;
   }
   if (!projName) {
     $("#projName").addClass("bg-red-100  border-red-400");
-    ctr++;
-  }
-  if (!allowance) {
-    $("#allowance").addClass("bg-red-100  border-red-400");
+    if (!firstIncompleteInput) firstIncompleteInput = $("#projName");
     ctr++;
   }
   if (ctr > 0) {
@@ -1287,7 +1410,30 @@ function checkDispatch() {
     <i class='bx bx-info-circle text-red-600'></i>
     <p class="text-red-600">Please complete all fields.</p>
     </div>`);
-    console.log("complete required fields");
+    if (firstIncompleteInput) {
+      const offsetTop =
+        firstIncompleteInput.offset().top -
+        viewForm.offset().top +
+        viewForm.scrollTop();
+      viewForm.animate({ scrollTop: offsetTop }, 500);
+    }
+
+    toggleLoadingAnimation(false);
+    return;
+  }
+  if (!workConfirm) {
+    $(".whConfirm-lbl").addClass("text-red-600");
+    // $(".error-msg").html(`
+    // <div class="errTxt  flex items-center gap-1">
+    // <i class='bx bx-info-circle text-red-600'></i>
+    // <p class="text-red-600">Please confirm Work History first.</p>
+    // </div>`);
+    showToast(
+      "error",
+      "Please confirm that you have checked the work history table."
+    );
+    $(".toggle.small").addClass("outline outline-offset-2 outline-red-500  ");
+
     toggleLoadingAnimation(false);
     return;
   }
@@ -1306,19 +1452,20 @@ function checkDispatch() {
   fillAttachment();
 }
 function insertDispatch() {
-  const reqDept = $("#reqDepSel").find("option:selected").attr("dep-name");
+  // const reqDept = $("#reqDeptInput").val(); //Input Type Req Dept
+  const reqDept = $("#reqDeptSel").val(); //Select Type Req Dept
   // const reqName = $("#reqNameInput").val();
-  const grp = $("#grpSel").find("option:selected").attr("grp-id");
   const empID = $("#empSel").find("option:selected").attr("emp-id");
   const startD = $("#startDate").val();
   const endD = $("#endDate").val();
   const locID = $("#locSel").find("option:selected").attr("loc-id");
   const specLoc = $("#specLocInput").val();
+  const business = $("#businessInput").val();
   const inviteID = $("#inviteSel").find("option:selected").attr("inv-id");
   const workOrder = $("#workOrder").val();
   const projName = $("#projName").val();
-  const allowance = $("#allowance").val();
   const siteDispatch = $("#siteDispatch").is(":checked");
+  const workConfirm = $("#whConfirm").is(":checked");
 
   toggleLoadingAnimation(true);
   $("#buttonHere").html(`
@@ -1330,6 +1477,16 @@ function insertDispatch() {
      Sending Request . . .
     </button>
    `);
+  if (!workConfirm) {
+    $("#whConfirm-lbl").addClass("text-red-600");
+    $(".error-msg").html(`
+    <div class="errTxt  flex items-center gap-1">
+    <i class='bx bx-info-circle text-red-600'></i>
+    <p class="text-red-600">Please confirm Work History first.</p>
+    </div>`);
+    toggleLoadingAnimation(false);
+    return;
+  }
   return new Promise((resolve, reject) => {
     $.ajax({
       type: "POST",
@@ -1345,8 +1502,8 @@ function insertDispatch() {
         inviID: inviteID,
         workOrder: workOrder,
         project_name: projName,
-        allowance: allowance,
         site_dispatch: siteDispatch,
+        business: business,
       },
       dataType: "json",
       success: function (response) {
@@ -1367,17 +1524,18 @@ function insertDispatch() {
 }
 function clearInput() {
   $(
-    "#reqDeptInput, #reqNameInput, #grpSel, #empSel, #startDate, #endDate, #locSel, #specLocInput, #inviteSel, #workOrder, #projName, #allowance"
+    "#reqDeptSel, #reqNameInput, #grpSel, #empSel, #startDate, #endDate, #locSel, #specLocInput, #inviteSel, #workOrder, #projName, #businessInput"
   ).removeClass("bg-red-100  border-red-400");
   $(".errTxt").remove();
-  $("#locSel, #inviteSel").val(0);
+  $("#locSel, #inviteSel, #reqDeptSel").val(0);
   $(
-    "#reqDeptInput, #reqNameInput, #startDate, #endDate, #specLocInput, #workOrder, #projName"
+    "#reqNameInput, #startDate, #endDate, #specLocInput, #workOrder, #projName, #businessInput"
   ).val("");
-  $("#allowance").val("0");
   $("#siteDispatch").prop("checked", false);
+  $("#whConfirm").prop("checked", false);
   to_add = 0;
   $("#daysCount").text("0 Day");
+  $("#allowanceDisplay").text("0");
 }
 function clearGroup() {
   $("#grpSel").val($("#grpSel option:first").val());
@@ -1416,7 +1574,7 @@ function getLocations() {
 }
 function fillLocations(locs) {
   var locSelect = $("#locSel");
-  locSelect.html("<option value='0'>Select Place of Service</option>");
+  locSelect.html("<option value='0' hidden>Select Place of Service</option>");
   $("#editentryLocation").empty();
   $.each(locs, function (index, item) {
     var option = $("<option>")
@@ -1451,7 +1609,7 @@ function getInviteTypes() {
 }
 function fillInvitations(invis) {
   var invSelect = $("#inviteSel");
-  invSelect.html("<option value='0'>Select Invitation</option>");
+  invSelect.html("<option value='0' hidden>Select Invitation</option>");
   $("#editentryInvite").empty();
   $.each(invis, function (index, item) {
     var option = $("<option>")
@@ -1462,16 +1620,16 @@ function fillInvitations(invis) {
     $("#editentryInvite").append(option.clone());
   });
 }
-function getReqDepartment() {
+function getReqDepts() {
   return new Promise((resolve, reject) => {
     $.ajax({
       type: "GET",
       url: "php/get_req_dep.php",
       dataType: "json",
       success: function (response) {
-        if(response.isSuccess){
-          const reqDep = response.result;
-          resolve(reqDep);
+        if (response.isSuccess) {
+          const reqdepts = response.result;
+          resolve(reqdepts);
         }
       },
       error: function (xhr, status, error) {
@@ -1480,23 +1638,28 @@ function getReqDepartment() {
         } else if (xhr.status === 500) {
           reject("Internal Server Error: There was a server error.");
         } else {
-          reject("An unspecified error occurred fetching requester's department.");
+          reject(
+            "An unspecified error occurred fetching requester's department."
+          );
         }
       },
     });
   });
 }
-function fillReqDeps(reqDep) {
-  var invSelect = $("#reqDepSel");
-  $("#reqDepSel").empty();
-  invSelect.html("<option value='0'>Select Requester's Department</option>");
-  $.each(reqDep, function (index, item) {
+function fillReqDepts(depts) {
+  var reqDeptSel = $("#reqDeptSel");
+  reqDeptSel.html(
+    "<option value='0' hidden>Select Requester's Department</option>"
+  );
+  $("#editentryReqDept").empty();
+
+  $.each(depts, function (index, item) {
     var option = $("<option>")
       .attr("value", item.id)
       .text(item.dep_name)
-      .attr("dep-name", item.dep_name);
-    invSelect.append(option);
-    $("#editentryInvite").append(option.clone());
+      .attr("reqdept-name", item.dep_name);
+    reqDeptSel.append(option);
+    $("#editentryReqDept").append(option.clone());
   });
 }
 function deleteDispatch() {
@@ -1564,8 +1727,6 @@ function addWorkHistory() {
   const business_cont = $("#addbusinessContent").val();
   const work_loc = $("#addworkLocation").val();
   let errcount = 0;
-  console.log(startMonthYear);
-  console.log(endMonthYear);
 
   if (!comp_name) {
     $("#addcompanyName").addClass("bg-red-100  border-red-400");
@@ -1925,7 +2086,6 @@ function getYearly() {
       },
       dataType: "json",
       success: function (response) {
-        // console.log(response);
         const yrly = response;
         resolve(yrly);
       },
@@ -2054,7 +2214,7 @@ function showToast(type, str) {
 
   setTimeout(() => {
     toast.remove();
-  }, 3000);
+  }, 4000);
 }
 function logOut() {
   return new Promise((resolve, reject) => {
@@ -2063,7 +2223,6 @@ function logOut() {
       url: "global/logout.php",
       dataType: "json",
       success: function (response) {
-        console.log(response);
         const res = response;
         resolve(res);
       },
