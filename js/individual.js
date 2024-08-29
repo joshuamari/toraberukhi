@@ -58,12 +58,14 @@ checkAccess()
           .then((grps) => {
             fillGroups(grps);
             Promise.all([
+              getCompany(),
               getEmployees(),
               getLocations(),
               getInviteTypes(),
               getReqDepts(),
             ])
-              .then(([emps, locs, invs, depts]) => {
+              .then(([comps, emps, locs, invs, depts]) => {
+                fillCompany(comps);
                 fillEmployees(emps);
                 fillLocations(locs);
                 fillInvitations(invs);
@@ -846,6 +848,44 @@ function insertIconInvitation(id) {
     countriesContainers.eq(2).append(iconElement);
   }
 }
+
+function getCompany() {
+  return new Promise((resolve, reject) => {
+    $.ajax({
+      type: "GET",
+      url: "php/get_req_comp.php",
+      dataType: "json",
+      success: function (response) {
+        const comps = response;
+        resolve(comps);
+      },
+      error: function (xhr, status, error) {
+        if (xhr.status === 404) {
+          reject("Not Found Error: The requested resource was not found.");
+        } else if (xhr.status === 500) {
+          reject("Internal Server Error: There was a server error.");
+        } else {
+          reject("An unspecified error occurred while fetching groups.");
+        }
+      },
+    });
+  });
+}
+function fillCompany(comps) {
+  const compIDs = comps.map((obj) => obj.id);
+  var compSelect = $("#reqCompanySel");
+  compSelect.html(
+    `<option value=${compIDs.toString()}>Select Company</option>`
+  );
+  // compSelect.html(`<option value='0' hidden>Select Company</option>`);
+  $.each(comps, function (index, item) {
+    var option = $("<option>")
+      .attr("value", item.id)
+      .text(item.name)
+      .attr("comp-id", item.id);
+    compSelect.append(option);
+  });
+}
 function getGroups() {
   return new Promise((resolve, reject) => {
     $.ajax({
@@ -1379,7 +1419,9 @@ function checkDispatch() {
   const business = $("#businessInput").val();
   const siteDispatch = $("#siteDispatch").is(":checked");
   const workConfirm = $("#whConfirm").is(":checked");
-  const reqCompany = $("#reqCompany").val();
+  const reqCompany = $("#reqCompanySel")
+    .find("option:selected")
+    .attr("comp-id");
   const reqName = $("#reqName").val();
   const reqTel = $("#reqTel").val();
   const reqFax = $("#reqFax").val();
@@ -1568,7 +1610,9 @@ function insertDispatch() {
   const siteDispatch = $("#siteDispatch").is(":checked");
   const workConfirm = $("#whConfirm").is(":checked");
 
-  const reqCompany = $("#reqCompany").val();
+  const reqCompany = $("#reqCompanySel")
+    .find("option:selected")
+    .attr("comp-id");
   const reqName = $("#reqName").val();
   const reqTel = $("#reqTel").val();
   const reqFax = $("#reqFax").val();
@@ -1651,9 +1695,9 @@ function clearInput() {
     "#reqDeptSel, #grpSel, #empSel, #startDate, #endDate, #locSel, #specLocInput, #inviteSel, #workOrder, #projName, #businessInput"
   ).removeClass("bg-red-100  border-red-400");
   $(".errTxt").remove();
-  $("#locSel, #inviteSel, #reqDeptSel").val(0);
+  $("#locSel, #inviteSel, #reqDeptSel, #reqCompany").val(0);
   $(
-    "#reqCompany, #reqName, #reqTel, #reqFax, #startDate, #endDate, #specLocInput, #workOrder, #projName, #businessInput, #gapName, #gapNum, #cdcpName, #cdcpNum, #deptCharge, #picName, #deptChargeTel"
+    "#reqName, #reqTel, #reqFax, #startDate, #endDate, #specLocInput, #workOrder, #projName, #businessInput, #gapName, #gapNum, #cdcpName, #cdcpNum, #deptCharge, #picName, #deptChargeTel"
   ).val("");
 
   $("#siteDispatch").prop("checked", false);
