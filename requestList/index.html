@@ -553,12 +553,13 @@
                   <td class="sm"></td>
                   <td>
                     <div class="flex">
-                      <p class="font-['Arial']">JP¥</p>
-                      <p
-                        class="font-['Arial'] font-semibold"
-                        id="printSalary"
-                      ></p>
-                      <p class="font-['Arial']">(*)/Calendar Day</p>
+                      <span class="bg-[var(--white)] h-[16px] top bottom">
+                        <p class="font-['Arial'] top">JP¥</p>
+                      </span>
+                      <span class="bg-[var(--white)] h-[16px] top bottom">
+                        <p class="font-['Arial'] top  font-bold" id="printSalary"></p>
+                      </span>
+                    <p class="font-['Arial']">(*)/Calendar Day</p>
                     </div>
                     <small class="font-['Arial'] text-[11px] leading-2 flex"
                       >(*)AM/Mg class according to KDT Rule</small
@@ -614,14 +615,19 @@
                   <td class="sm"><i class="bx bx-x"></i></td>
                   <td class="sm"></td>
                   <td>
-                    <div class="flex">
-                      <p class="font-['Arial']">US$</p>
-                      <p
-                        class="font-['Arial'] font-semibold"
-                        id="printSalaryOthers"
-                      ></p>
-                      <p class="font-['Arial']">(*)/Calendar Day</p>
-                    </div>
+                    <div class="flex ">
+                      <span class=" bg-[var(--white)] h-[16px] top bottom">
+                        <p class="font-['Arial']  top">
+                          US$
+                        </p>
+                       </span>
+                        
+           
+                     <span class="bg-[var(--white)] h-[16px] top bottom">
+                       <p class="font-['Arial'] relative top z-1" id="printSalaryOthers">40</p>
+                     </span>
+                     <p class="font-['Arial'] ">(*)/Calendar Day</p>
+                     </div>
                     <small class="font-['Arial'] text-[11px] leading-2 flex"
                       >(*)AM/Mg class according to KDT Rule</small
                     >

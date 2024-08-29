@@ -48,6 +48,7 @@ try {
         $details['start'] = date("d M Y", strtotime($details['dispatch_from']));
         $details['end'] = date("d M Y", strtotime($details['dispatch_to']));
         $details['date_request'] = date("d M Y", strtotime($details['date_requested']));
+        $details['dh_date'] = date("F d, Y", strtotime($details['date_requested']));
         $details['location'] = getLocationName($details['location_id']);
         $details['location_id'] = (int)$details['location_id'];
         $details['invitation_id'] = (int)$details['invitation_id'];

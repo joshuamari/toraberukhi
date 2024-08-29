@@ -278,6 +278,9 @@ tbody tr:hover td {
 #toPrint2 tr:nth-of-type(2) th {
   border-top: 0;
 }
+span.active{
+  color: var(--dark) !important;
+}
 
 @media (max-width: 946px) {
   .selection {
