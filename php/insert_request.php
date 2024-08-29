@@ -187,7 +187,7 @@ if (!empty($_POST['dic_tel'])) {
   $msg["isSuccess"] = false;
   $msg['error'][] = "Department in Charge Telephone Number";
 }
-
+$msg['error'] = array();
 #for separtion of error
 if (!empty($msg)) {
   if (count($msg['error']) > 1) {
