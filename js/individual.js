@@ -380,7 +380,7 @@ $(document).on("click", ".rmvToast", function () {
 });
 $(document).on(
   "click",
-  "#reqCompany, #reqDeptSel, #reqName, #reqTel, #reqFax, #empSel, #startDate, #endDate, #locSel, #specLocInput, #businessInput, #inviteSel, #workOrder, #projName, #gapName, #gapNum, #cdcpName, #cdcpNum, #deptCharge, #picName, #deptChargeTel",
+  "#reqCompanySel, #reqDeptSel, #reqName, #reqTel, #reqFax, #empSel, #startDate, #endDate, #locSel, #specLocInput, #businessInput, #inviteSel, #workOrder, #projName, #gapName, #gapNum, #cdcpName, #cdcpNum, #deptCharge, #picName, #deptChargeTel",
   function () {
     $(this).removeClass("bg-red-100  border-red-400");
     $(".errTxt").remove();
@@ -1515,8 +1515,8 @@ function checkDispatch() {
   }
 
   if (!reqCompany) {
-    $("#reqCompany").addClass("bg-red-100  border-red-400");
-    if (!firstIncompleteInput) firstIncompleteInput = $("#reqCompany");
+    $("#reqCompanySel").addClass("bg-red-100  border-red-400");
+    if (!firstIncompleteInput) firstIncompleteInput = $("#reqCompanySel");
     ctr++;
   }
   if (!reqDept) {
@@ -1703,7 +1703,7 @@ function clearInput() {
     "#reqDeptSel, #grpSel, #empSel, #startDate, #endDate, #locSel, #specLocInput, #inviteSel, #workOrder, #projName, #businessInput"
   ).removeClass("bg-red-100  border-red-400");
   $(".errTxt").remove();
-  $("#locSel, #inviteSel, #reqDeptSel, #reqCompany").val(0);
+  $("#locSel, #inviteSel, #reqDeptSel, #reqCompanySel").val(0);
   $(
     "#reqName, #reqTel, #reqFax, #startDate, #endDate, #specLocInput, #workOrder, #projName, #businessInput, #gapName, #gapNum, #cdcpName, #cdcpNum, #deptCharge, #picName, #deptChargeTel"
   ).val("");
