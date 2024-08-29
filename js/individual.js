@@ -57,23 +57,26 @@ checkAccess()
         getGroups()
           .then((grps) => {
             fillGroups(grps);
-            Promise.all([
-              getCompany(),
-              getEmployees(),
-              getLocations(),
-              getInviteTypes(),
-              getReqDepts(),
-            ])
-              .then(([comps, emps, locs, invs, depts]) => {
-                fillCompany(comps);
-                fillEmployees(emps);
-                fillLocations(locs);
-                fillInvitations(invs);
-                fillReqDepts(depts);
-              })
-              .catch((error) => {
-                alert(`${error}`);
-              });
+            getCompany().then((comps) => {
+              fillCompany(comps);
+              Promise.all([
+                // getCompany(),
+                getEmployees(),
+                getLocations(),
+                getInviteTypes(),
+                getReqDepts(),
+              ])
+                .then(([emps, locs, invs, depts]) => {
+                  // fillCompany(comps);
+                  fillEmployees(emps);
+                  fillLocations(locs);
+                  fillInvitations(invs);
+                  fillReqDepts(depts);
+                })
+                .catch((error) => {
+                  alert(`${error}`);
+                });
+            });
           })
           .catch(() => {});
       });
@@ -99,6 +102,11 @@ $(document).on("change", "#grpSel", function () {
   getEmployees().then((emps) => {
     fillEmployees(emps);
     displayAllowance();
+  });
+});
+$(document).on("change", "#reqCompanySel", function () {
+  getReqDepts().then((depts) => {
+    fillReqDepts(depts);
   });
 });
 $(document).on("click", ".btn-close", function () {
@@ -659,7 +667,7 @@ function fillAttachment() {
   const allowance_us = allowance[1]["amount"];
   const siteDispatch = $("#siteDispatch").is(":checked");
 
-  const reqCompany = $("#reqCompany").val();
+  const reqCompany = $("#reqCompanySel").find("option:selected").text();
   const reqName = $("#reqName").val();
   const reqTel = $("#reqTel").val();
   const reqFax = $("#reqFax").val();
@@ -745,7 +753,7 @@ function formatDate(date) {
 function fillAttachment2(wList) {
   const business = $("#businessInput").val();
   const emp = $("#empSel").find("option:selected").text();
-  const reqCompany = $("#reqCompany").val();
+  const reqCompany = $("#reqCompanySel").find("option:selected").text();
   const deptCharge = $("#deptCharge").val();
   const picName = $("#picName").val();
   const deptChargeTel = $("#deptChargeTel").val();
@@ -856,7 +864,7 @@ function getCompany() {
       url: "php/get_req_comp.php",
       dataType: "json",
       success: function (response) {
-        const comps = response;
+        const comps = response.result;
         resolve(comps);
       },
       error: function (xhr, status, error) {
@@ -865,7 +873,7 @@ function getCompany() {
         } else if (xhr.status === 500) {
           reject("Internal Server Error: There was a server error.");
         } else {
-          reject("An unspecified error occurred while fetching groups.");
+          reject("An unspecified error occurred while fetching companies.");
         }
       },
     });
@@ -881,7 +889,7 @@ function fillCompany(comps) {
   $.each(comps, function (index, item) {
     var option = $("<option>")
       .attr("value", item.id)
-      .text(item.name)
+      .text(item.comp_name)
       .attr("comp-id", item.id);
     compSelect.append(option);
   });
@@ -1790,10 +1798,21 @@ function fillInvitations(invis) {
   });
 }
 function getReqDepts() {
+  const compID = $("#reqCompanySel").val();
+  if (compID.length > 1) {
+    //disables the req's dept selection if there's no company selected
+    $("#reqDeptSel").prop("disabled", true);
+    return;
+  } else {
+    $("#reqDeptSel").prop("disabled", false);
+  }
   return new Promise((resolve, reject) => {
     $.ajax({
-      type: "GET",
+      type: "POST",
       url: "php/get_req_dep.php",
+      data: {
+        compID: compID,
+      },
       dataType: "json",
       success: function (response) {
         if (response.isSuccess) {

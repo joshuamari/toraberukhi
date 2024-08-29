@@ -95,6 +95,10 @@
   /* margin-top: 10px; */
 }
 
+.reqDeptSel[disabled] {
+  background-color: #e9ecef;
+}
+
 .countlabel {
   margin-top: 10px;
   margin-right: 20px;
