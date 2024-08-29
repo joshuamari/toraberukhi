@@ -4,8 +4,8 @@ require_once '../dbconn/dbconnectpcs.php';
 #endregion
 
 #region MAIN QUERY
-try{
-  $getCompQ = "SELECT `id`, `company_name` as `comp_name` FROM `company_list`";
+try {
+  $getCompQ = "SELECT * FROM `company_list`";
   $getCompQStmt = $connpcs->prepare($getCompQ);
   $getCompQStmt->execute([]);
   if ($getCompQStmt->rowCount() > 0) {
@@ -13,8 +13,7 @@ try{
     $msg['result'] = $result;
     $msg['isSuccess'] = true;
     $msg['error'] = "Successfully retrieved!";
-  }
-  else {
+  } else {
     $msg['isSuccess'] = false;
     $msg['error'] = "Failed to retrieve!";
   }

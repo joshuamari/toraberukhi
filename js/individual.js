@@ -46,6 +46,7 @@ let monthNames2 = [
 ];
 let isSentryModalOpen = false;
 let allowance = [];
+let companies = [];
 //#endregion
 checkAccess()
   .then((emp) => {
@@ -58,16 +59,16 @@ checkAccess()
           .then((grps) => {
             fillGroups(grps);
             getCompany().then((comps) => {
-              fillCompany(comps);
+              companies = comps;
+              console.log(companies);
+              fillCompany(companies);
               Promise.all([
-                // getCompany(),
                 getEmployees(),
                 getLocations(),
                 getInviteTypes(),
                 getReqDepts(),
               ])
                 .then(([emps, locs, invs, depts]) => {
-                  // fillCompany(comps);
                   fillEmployees(emps);
                   fillLocations(locs);
                   fillInvitations(invs);
@@ -753,7 +754,13 @@ function formatDate(date) {
 function fillAttachment2(wList) {
   const business = $("#businessInput").val();
   const emp = $("#empSel").find("option:selected").text();
-  const reqCompany = $("#reqCompanySel").find("option:selected").text();
+  const selected_company = $("#reqCompanySel")
+    .find("option:selected")
+    .attr("comp-id");
+  const company_jap =
+    companies.find((item) => item.id == selected_company)?.company_jap || null;
+  const company_desc =
+    companies.find((item) => item.id == selected_company)?.company_desc || null;
   const deptCharge = $("#deptCharge").val();
   const picName = $("#picName").val();
   const deptChargeTel = $("#deptChargeTel").val();
@@ -816,7 +823,9 @@ function fillAttachment2(wList) {
   $("#whBusiness").text(business);
 
   //About
-  $("#printWorkCompany").text(reqCompany);
+  $("#comp_jap").text(company_jap);
+  $("#comp_desc").text(company_desc);
+  $("#printWorkCompany").text(`${company_jap} ${company_desc}`);
   $("#printDeptCharge").text(deptCharge);
   $("#printPICName").text(picName);
   $("#printPICNumber").text(deptChargeTel);
@@ -889,7 +898,7 @@ function fillCompany(comps) {
   $.each(comps, function (index, item) {
     var option = $("<option>")
       .attr("value", item.id)
-      .text(item.comp_name)
+      .text(item.company_name)
       .attr("comp-id", item.id);
     compSelect.append(option);
   });
