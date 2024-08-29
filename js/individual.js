@@ -196,6 +196,7 @@ $(document).on("click", ".btn-clear", function () {
   dispatch_days = 0;
   clearInput();
   clearGroup();
+  clearCompany();
 
   $(".emptyState").removeClass("d-none");
   $(".withContent").addClass("d-none");
@@ -1704,6 +1705,7 @@ function clearInput() {
   ).removeClass("bg-red-100  border-red-400");
   $(".errTxt").remove();
   $("#locSel, #inviteSel, #reqDeptSel, #reqCompanySel").val(0);
+
   $(
     "#reqName, #reqTel, #reqFax, #startDate, #endDate, #specLocInput, #workOrder, #projName, #businessInput, #gapName, #gapNum, #cdcpName, #cdcpNum, #deptCharge, #picName, #deptChargeTel"
   ).val("");
@@ -1717,6 +1719,10 @@ function clearInput() {
 function clearGroup() {
   $("#grpSel").val($("#grpSel option:first").val());
   $("#grpSel").change();
+}
+function clearCompany() {
+  $("#reqCompanySel").val($("#reqCompanySel option:first").val());
+  $("#reqCompanySel").change();
 }
 function clearAddWorkInputs() {
   $(
