@@ -1,6 +1,6 @@
-Sentry.init({
-  dsn: "http://996e6a7f7f64d413dd43124ae5dece7e@o4507730788483072.ingest.us.sentry.io/4507767647436800",
-});
+// Sentry.init({
+//   dsn: "http://996e6a7f7f64d413dd43124ae5dece7e@o4507730788483072.ingest.us.sentry.io/4507767647436800",
+// });
 // try {
 //   // Your code that might throw an error
 //   throw new Error("Test error for user feedback");
@@ -280,7 +280,7 @@ function fillAttachment(data) {
   $(".siteDispatch").empty();
   $("#printJap, #printPh, #printThird").text("");
   var date = data.date_request;
-  var khi = data.dispatch_request.requester_name;
+  var khi = data.dispatch_request.req_name;
   var khibu = data.dispatch_request.request_dept;
   var name = data.dispatch_request.emp_name;
   var from = data.dispatch_request.start;
@@ -293,6 +293,12 @@ function fillAttachment(data) {
   var siteDispatch = data.dispatch_request.site_dispatch;
   var salary = data.dispatch_request.allowance[0].amount;
   var salaryOthers = data.dispatch_request.allowance[1].amount;
+  let khiTel = data.dispatch_request.req_tel;
+  let khiFax = data.dispatch_request.req_fax;
+  let gap = data.dispatch_request.gap_name;
+  let cdcp = data.dispatch_request.cdcp_name;
+  let gap_tel = data.dispatch_request.gap_tel;
+  let cdcp_tel = data.dispatch_request.cdcp_tel;
 
   if (country === 1) {
     insertIconCountry(1);
@@ -321,7 +327,7 @@ function fillAttachment(data) {
   if (siteDispatch === 0) {
     $(".siteDispatch").empty();
   }
-  $("#printKHI").text(formatName(khi));
+  $("#printKHI").text(khi);
   $("#printBU").text(khibu);
   $("#printName").text(formatName(name));
   $("#printFrom").text(from);
@@ -331,6 +337,12 @@ function fillAttachment(data) {
   $("#printSalary").text(salary);
   $("#printSalaryOthers").text(salaryOthers);
   $("#printDate").text(date);
+  $("#printTel").text(khiTel);
+  $("#printFax").text(khiFax);
+  $("#gap").text(gap);
+  $("#cdcp").text(cdcp);
+  $("#gap_tel").text(gap_tel);
+  $("#cdcp_tel").text(cdcp_tel);
 }
 function formatName(name) {
   const [last, given] = name.split(",");
@@ -390,6 +402,14 @@ function fillAttachment2(data) {
   $("#whDay").text(day);
   $("#whName").text(name);
   $("#whBusiness").text(data.dispatch_request.business);
+  $("#dic").text(data.dispatch_request.dept_in_charge);
+  $("#dic_name").text(data.dispatch_request.dic_name);
+  $("#dic_tel").text(data.dispatch_request.dic_tel);
+  $("#comp_jap").text(data.dispatch_request.company_jap);
+  $("#comp_desc").text(data.dispatch_request.company_desc);
+  $("#company_n_desc").text(
+    `${data.dispatch_request.company_jap} ${data.dispatch_request.company_desc}`
+  );
 }
 function insertIconCountry(id) {
   $(".countries").empty();

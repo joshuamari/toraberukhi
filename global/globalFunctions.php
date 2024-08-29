@@ -267,8 +267,9 @@ function emailRequest($details)
     $presdata = getPresDetails();
     #region TESTING
     #region systesting
-    $CCarray = array('medrano_c-kdt@global.kawasaki.com', 'hernandez-kdt@global.kawasaki.com', 'reyes_d-kdt@global.kawasaki.com', 'cabiso-kdt@global.kawasaki.com', 'coquia-kdt@global.kawasaki.com');
-    $emails = array("coquia-kdt@global.kawasaki.com", "medrano_c-kdt@global.kawasaki.com");
+    $CCarray = array('tan-g1@global.kawasaki.com', 'becina-kdt@global.kawasaki.com', 'lazaro-kdt@global.kawasaki.com', 'soriano-kdt@global.kawasaki.com', 'magno-kdt@global.kawasaki.com', 'medrano_c-kdt@global.kawasaki.com', 'hernandez-kdt@global.kawasaki.com', 'reyes_d-kdt@global.kawasaki.com', 'cabiso-kdt@global.kawasaki.com', 'coquia-kdt@global.kawasaki.com');
+    // $emails = array("coquia-kdt@global.kawasaki.com", "medrano_c-kdt@global.kawasaki.com");
+    $emails = array("takenaka_yu@global.kawasaki.com");
     #endregion
 
     #region prekhitesting
@@ -393,5 +394,32 @@ function getAllowance($id)
         $allowance = $allowanceStmt->fetchAll();
     }
     return $allowance;
+}
+function getCompanyByDept($dept_id)
+{
+    global $connpcs;
+    $comp_id = 0;
+    $compQ = "SELECT `comp_id` FROM requesters_dep WHERE `id`=:dept_id";
+    $compStmt = $connpcs->prepare($compQ);
+    $compStmt->execute([":dept_id" => $dept_id]);
+    if ($compStmt->rowCount() > 0) {
+        $comp_id = $compStmt->fetchColumn();
+    }
+    return $comp_id;
+}
+function getCompanyDetails($comp_id)
+{
+    global $connpcs;
+    $company_details = [
+        "company_jap" => "",
+        "company_desc" => ""
+    ];
+    $compQ = "SELECT * FROM `company_list` WHERE `id`=:comp_id";
+    $compStmt = $connpcs->prepare($compQ);
+    $compStmt->execute([":comp_id" => $comp_id]);
+    if ($compStmt->rowCount() > 0) {
+        $company_details = $compStmt->fetch();
+    }
+    return $company_details;
 }
 #endregion

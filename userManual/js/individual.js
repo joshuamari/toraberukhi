@@ -1,6 +1,6 @@
-Sentry.init({
-  dsn: "http://996e6a7f7f64d413dd43124ae5dece7e@o4507730788483072.ingest.us.sentry.io/4507767647436800",
-});
+// Sentry.init({
+//   dsn: "http://996e6a7f7f64d413dd43124ae5dece7e@o4507730788483072.ingest.us.sentry.io/4507767647436800",
+// });
 //#region GLOBALS
 const rootFolder = `//${document.location.hostname}`;
 let empDetails = [];

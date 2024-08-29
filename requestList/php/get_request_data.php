@@ -43,7 +43,7 @@ try {
     if ($getStmt->rowCount() > 0) {
         $details = $getStmt->fetch();
         $details['emp_name'] = getName($details['emp_number']);
-        $details['requester_name'] = getName($details['requester_id']);
+        // $details['requester_name'] = getName($details['requester_id']);
         $details['request_dept'] = $details['department_name'];
         $details['start'] = date("d M Y", strtotime($details['dispatch_from']));
         $details['end'] = date("d M Y", strtotime($details['dispatch_to']));
@@ -54,6 +54,15 @@ try {
         $details['site_dispatch'] = (int)$details['site_dispatch'];
         $details['allowance'] = getAllowance($details['emp_number']);
         $details['business'] = $details['work_content'];
+        $details['gap_name'] = "General Affairs and Personal Gr.: " . $details['gap_name'];
+        $details['cdcp_name'] = "Control Dep't Corporate Planning Gr.: " . $details['cdcp_name'];
+        $details['gap_tel'] = "(" . $details['gap_tel'] . ")";
+        $details['cdcp_tel'] = "(" . $details['cdcp_tel'] . ")";
+        $details['dic_tel'] = "℡ " . $details['dic_tel'];
+        $compID = getCompanyByDept($details['dept_id']);
+        $compDetails = getCompanyDetails($compID);
+        $details['company_jap'] = $compDetails['company_jap'];
+        $details['company_desc'] = $compDetails['company_desc'];
         $result['isSuccess'] = TRUE;
         $result['message'] = 'Successfully fetched data';
         $result['data']['dispatch_request'] = $details;
