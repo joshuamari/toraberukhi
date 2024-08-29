@@ -267,9 +267,13 @@ function emailRequest($details)
     $presdata = getPresDetails();
     #region TESTING
     #region systesting
-    $CCarray = array('tan-g1@global.kawasaki.com', 'becina-kdt@global.kawasaki.com', 'lazaro-kdt@global.kawasaki.com', 'soriano-kdt@global.kawasaki.com', 'magno-kdt@global.kawasaki.com', 'medrano_c-kdt@global.kawasaki.com', 'hernandez-kdt@global.kawasaki.com', 'reyes_d-kdt@global.kawasaki.com', 'cabiso-kdt@global.kawasaki.com', 'coquia-kdt@global.kawasaki.com');
-    // $emails = array("coquia-kdt@global.kawasaki.com", "medrano_c-kdt@global.kawasaki.com");
-    $emails = array("takenaka_yu@global.kawasaki.com");
+    $CCarray = array('medrano_c-kdt@global.kawasaki.com', 'hernandez-kdt@global.kawasaki.com', 'reyes_d-kdt@global.kawasaki.com', 'cabiso-kdt@global.kawasaki.com', 'coquia-kdt@global.kawasaki.com');
+    $emails = array("coquia-kdt@global.kawasaki.com", "medrano_c-kdt@global.kawasaki.com");
+    #endregion
+
+    #region kdttesting
+    // $CCarray = array('tan-g1@global.kawasaki.com', 'becina-kdt@global.kawasaki.com', 'lazaro-kdt@global.kawasaki.com', 'soriano-kdt@global.kawasaki.com', 'magno-kdt@global.kawasaki.com', 'medrano_c-kdt@global.kawasaki.com', 'hernandez-kdt@global.kawasaki.com', 'reyes_d-kdt@global.kawasaki.com', 'cabiso-kdt@global.kawasaki.com', 'coquia-kdt@global.kawasaki.com');
+    // $emails = array("takenaka_yu@global.kawasaki.com");
     #endregion
 
     #region prekhitesting
