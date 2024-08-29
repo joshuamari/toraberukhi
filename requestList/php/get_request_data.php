@@ -54,8 +54,8 @@ try {
         $details['site_dispatch'] = (int)$details['site_dispatch'];
         $details['allowance'] = getAllowance($details['emp_number']);
         $details['business'] = $details['work_content'];
-        $details['gap_name'] = "General Affairs and Personal Gr.: " . $details['gap_name'];
-        $details['cdcp_name'] = "Control Dep't Corporate Planning Gr.: " . $details['cdcp_name'];
+        $details['gap_name'] =  $details['gap_name'];
+        $details['cdcp_name'] =  $details['cdcp_name'];
         $details['gap_tel'] = "(" . $details['gap_tel'] . ")";
         $details['cdcp_tel'] = "(" . $details['cdcp_tel'] . ")";
         $details['dic_tel'] = "℡ " . $details['dic_tel'];

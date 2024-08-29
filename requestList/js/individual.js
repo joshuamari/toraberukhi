@@ -339,10 +339,10 @@ function fillAttachment(data) {
   $("#printDate").text(date);
   $("#printTel").text(khiTel);
   $("#printFax").text(khiFax);
-  $("#gap").text(gap);
-  $("#cdcp").text(cdcp);
-  $("#gap_tel").text(gap_tel);
-  $("#cdcp_tel").text(cdcp_tel);
+  $("#printGAPName").text(gap);
+  $("#printCDCPName").text(cdcp);
+  $("#printGAPNumber").text(gap_tel);
+  $("#printCDCPNumber").text(cdcp_tel);
 }
 function formatName(name) {
   const [last, given] = name.split(",");
