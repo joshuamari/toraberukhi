@@ -487,7 +487,7 @@ $(document).on("click", "#btnSend", function () {
     .then((res) => {
       const isSuccess = res.isSuccess;
       if (!isSuccess) {
-        showToast("error", `${res.error}`);
+        showToast("error", `${res.message}`);
         $("#buttonHere").html(` <button type="button" data-bs-dismiss="modal"
           aria-label="Close" class="btn bg-[var(--dark)] hover:bg-[var(--dark-200)] text-[var(--white)]" id="btnBack">
             Back

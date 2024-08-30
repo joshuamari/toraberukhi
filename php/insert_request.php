@@ -12,227 +12,97 @@ date_default_timezone_set('Asia/Manila');
 #endregion
 
 #region Initialize Variable
-$msg = array();
-
+$result = [
+  "isSuccess" => FALSE,
+  "message" => ''
+];
+$required_fields = [
+  'empID' => "Employee Number",
+  'locID' => "Location",
+  'spec_loc' => "Employee Number",
+  'dateFrom' => "Date From",
+  'dateTo' => "Date To",
+  'inviID' => "Invitation Type",
+  'workOrder' => "Work Order",
+  'project_name' => "Project Name",
+  'request_dept' => "Requesting Department",
+  'business' => "Business Content",
+  'req_name' => "Requester's Name",
+  'req_tel' => "Requester's Telephone Number",
+  'req_fax' => "Requester's Fax Number",
+  'gap_name' => "General Affairs and Personal Group Personnel",
+  'gap_tel' => "General Affairs and Personal Group Telephone Number",
+  'cdcp_name' => "Control Dep't Corporate Planning Personnel",
+  'cdcp_tel' => "Control Dep't Corporate Planning Telephone Number",
+  'dept_in_charge' => "Department in Charge",
+  'dic_name' => "Department in Charge Supervisor",
+  'dic_tel' => "Department in Charge Telephone Number",
+];
+$input = $_POST;
+$missing_fields = [];
+#endregion
 #initialize Session
 session_start();
 
-#input checking region
+#region input checking region
 if (!empty($_SESSION["IDKHI"])) {
   $userID = $_SESSION["IDKHI"];
   $userID = hex2bin($userID);
   $userID = base64_decode(urldecode($userID));
 }
-
-$empNumber = NULL;
-if (!empty($_POST['empID'])) {
-  $empNumber = $_POST['empID'];
-} else {
-  $msg["isSuccess"] = false;
-  $msg['error'][] = "Employee Number";
-}
-
-$locID = 0;
-if (!empty($_POST['locID'])) {
-  $locID = $_POST['locID'];
-} else {
-  $msg["isSuccess"] = false;
-  $msg['error'][] = "Location";
-}
-
-$spec_loc = '';
-if (!empty($_POST['spec_loc'])) {
-  $spec_loc = $_POST['spec_loc'];
-} else {
-  $msg["isSuccess"] = false;
-  $msg['error'][] = "Specific Location";
-}
-
-$dateFrom = date("Y-m-d");
-if (!empty($_POST['dateFrom'])) {
-  $dateFrom = $_POST['dateFrom'];
-} else {
-  $msg["isSuccess"] = false;
-  $msg['error'][] = "Date From";
-}
-
-$dateTo = date("Y-m-d");
-if (!empty($_POST['dateTo'])) {
-  $dateTo = $_POST['dateTo'];
-} else {
-  $msg["isSuccess"] = false;
-  $msg['error'][] = "Date To";
-}
-
-$inviID = 0;
-if (!empty($_POST['inviID'])) {
-  $inviID = $_POST['inviID'];
-} else {
-  $msg["isSuccess"] = false;
-  $msg['error'][] = "Invitation Type";
-}
-
-$workOrder = '';
-if (!empty($_POST['workOrder'])) {
-  $workOrder = $_POST['workOrder'];
-} else {
-  $msg["isSuccess"] = false;
-  $msg['error'][] = "Work Order";
-}
-
-$project_name = '';
-if (!empty($_POST['project_name'])) {
-  $project_name = $_POST['project_name'];
-} else {
-  $msg["isSuccess"] = false;
-  $msg['error'][] = "Project Name";
+foreach ($required_fields as $key => $descrpition) {
+  if (empty($input[$key])) {
+    $missing_fields[] = $descrpition;
+  }
 }
 $site_dispatch = FALSE;
-if (!empty($_POST['site_dispatch'])) {
-  $site_dispatch = json_decode($_POST['site_dispatch']);
+if (!empty($input['site_dispatch'])) {
+  $site_dispatch = json_decode($input['site_dispatch']);
 }
-
-$request_dept = 0;
-if (!empty($_POST['request_dept'])) {
-  $request_dept = $_POST['request_dept'];
-} else {
-  $msg["isSuccess"] = false;
-  $msg['error'][] = "Requesting Department";
-}
-
-$business = '';
-if (!empty($_POST['business'])) {
-  $business = $_POST['business'];
-} else {
-  $msg["isSuccess"] = false;
-  $msg['error'][] = "Business Content";
-}
-
-$req_name = '';
-if (!empty($_POST['req_name'])) {
-  $req_name = $_POST['req_name'];
-} else {
-  $msg["isSuccess"] = false;
-  $msg['error'][] = "Requester's Name";
-}
-
-$req_tel = '';
-if (!empty($_POST['req_tel'])) {
-  $req_tel = $_POST['req_tel'];
-} else {
-  $msg["isSuccess"] = false;
-  $msg['error'][] = "Requester's Telephone Number";
-}
-
-$req_fax = '';
-if (!empty($_POST['req_fax'])) {
-  $req_fax = $_POST['req_fax'];
-} else {
-  $msg["isSuccess"] = false;
-  $msg['error'][] = "Requester's Fax Number";
-}
-
-$gap_name = '';
-if (!empty($_POST['gap_name'])) {
-  $gap_name = $_POST['gap_name'];
-} else {
-  $msg["isSuccess"] = false;
-  $msg['error'][] = "General Affairs and Personal Group Personnel";
-}
-
-$gap_tel = '';
-if (!empty($_POST['gap_tel'])) {
-  $gap_tel = $_POST['gap_tel'];
-} else {
-  $msg["isSuccess"] = false;
-  $msg['error'][] = "General Affairs and Personal Group Telephone Number";
-}
-
-$cdcp_name = '';
-if (!empty($_POST['cdcp_name'])) {
-  $cdcp_name = $_POST['cdcp_name'];
-} else {
-  $msg["isSuccess"] = false;
-  $msg['error'][] = "Control Dep't Corporate Planning Personnel";
-}
-
-$cdcp_tel = '';
-if (!empty($_POST['cdcp_tel'])) {
-  $cdcp_tel = $_POST['cdcp_tel'];
-} else {
-  $msg["isSuccess"] = false;
-  $msg['error'][] = "Control Dep't Corporate Planning Telephone Number";
-}
-
-$dept_in_charge = '';
-if (!empty($_POST['dept_in_charge'])) {
-  $dept_in_charge = $_POST['dept_in_charge'];
-} else {
-  $msg["isSuccess"] = false;
-  $msg['error'][] = "Department in Charge";
-}
-
-$dic_name = '';
-if (!empty($_POST['dic_name'])) {
-  $dic_name = $_POST['dic_name'];
-} else {
-  $msg["isSuccess"] = false;
-  $msg['error'][] = "Department in Charge Supervisor";
-}
-
-$dic_tel = '';
-if (!empty($_POST['dic_tel'])) {
-  $dic_tel = $_POST['dic_tel'];
-} else {
-  $msg["isSuccess"] = false;
-  $msg['error'][] = "Department in Charge Telephone Number";
-}
-$msg['error'] = array();
-#for separtion of error
-if (!empty($msg)) {
-  if (count($msg['error']) > 1) {
-    $errorString = '';
-    foreach ($msg['error'] as $result) {
-      if ($result === end($msg['error'])) {
-        $errorString .= "and '$result' Missing";
-      } else {
-        $errorString .= "'$result', ";
-      }
-    }
-    $msg['error'] = $errorString;
+$empNumber = $input['empID'];
+$dateFrom = $input['dateFrom'];
+$dateTo = $input['dateTo'];
+#endregion
+#region for separtion of error
+$count = count($missing_fields);
+if ($count > 0) {
+  if ($count === 1) {
+    $result['message'] = "{$missing_fields[0]} is missing.";
+  } elseif ($count === 2) {
+    $result['message'] = "{$missing_fields[0]} and {$missing_fields[1]} are missing.";
   } else {
-    $msg['error'] = implode("", $msg['error']);
-    $msg['error'] .= " Missing";
+    $last_field = array_pop($missing_fields);
+    $result['message'] = implode(', ', $missing_fields) . ", and $last_field are missing.";
   }
-  die(json_encode($msg));
+  die(json_encode($result));
 }
 #endregion
 
-# for conflicting schedule in dispatch list
+#region checking for conflicting schedule in dispatch list
 $newRange = [
   'start' => $dateFrom,
   'end' => $dateTo,
 ];
 if (checkOverlap($empNumber, $newRange)) {
-  $msg["isSuccess"] = false;
-  $msg['error'][] = "Dispatch Conflict";
-  die(json_encode($msg));
+  $result["isSuccess"] = false;
+  $result['message'] = "Dispatch Conflict";
+  die(json_encode($result));
 }
 #endregion
 
-# for conflicting schedule in request list
+#region for checking conflicting schedule in request list
 $checkConflict = "SELECT COUNT(*) FROM `request_list` WHERE `emp_number` = :empNumber AND (((`dispatch_from` BETWEEN :dateFrom AND :dateTo OR `dispatch_to` BETWEEN :dateFrom AND :dateTo) OR (:dateFrom BETWEEN `dispatch_from` AND `dispatch_to` OR :dateTo BETWEEN `dispatch_from` AND `dispatch_to`)) AND `request_status` IS NULL)";
 $checkConflictStmt = $connpcs->prepare($checkConflict);
 $checkConflictStmt->execute([":empNumber" => "$empNumber", ":dateFrom" => "$dateFrom", ":dateTo" => "$dateTo"]);
 $checkCount = $checkConflictStmt->fetchColumn();
 if ($checkCount > 0) {
-  $msg["isSuccess"] = false;
-  $msg['error'] = "Dispatch request conflict";
-  die(json_encode($msg));
+  $result["isSuccess"] = false;
+  $result['message'] = "Dispatch request conflict";
+  die(json_encode($result));
 }
 #endregion
 
-#region Entries Query
+#region insert request
 try {
   $insertQ = "INSERT INTO `request_list`(`requester_id`,
                                           `emp_number`, 
@@ -282,43 +152,43 @@ try {
   $insertStmt->execute([
     ":userID" => $userID,
     ":empNumber" => $empNumber,
-    ":locID" => $locID,
-    ":spec_loc" => $spec_loc,
+    ":locID" => $input['locID'],
+    ":spec_loc" => $input['spec_loc'],
     ":dateFrom" => $dateFrom,
     ":dateTo" => $dateTo,
-    ":inviID" => $inviID,
-    ":workOrder" => $workOrder,
-    ":project_name" => $project_name,
+    ":inviID" => $input['inviID'],
+    ":workOrder" => $input['workOrder'],
+    ":project_name" => $input['project_name'],
     ":site_dispatch" => $site_dispatch,
-    ":request_dept" => $request_dept,
-    ":business" => $business,
-    ":req_name" => $req_name,
-    ":req_tel" => $req_tel,
-    ":req_fax" => $req_fax,
-    ":gap_name" => $gap_name,
-    ":gap_tel" => $gap_tel,
-    ":cdcp_name" => $cdcp_name,
-    ":cdcp_tel" => $cdcp_tel,
-    ":dept_in_charge" => $dept_in_charge,
-    ":dic_name" => $dic_name,
-    ":dic_tel" => $dic_tel
+    ":request_dept" => $input['request_dept'],
+    ":business" => $input['business'],
+    ":req_name" => $input['req_name'],
+    ":req_tel" => $input['req_tel'],
+    ":req_fax" => $input['req_fax'],
+    ":gap_name" => $input['gap_name'],
+    ":gap_tel" => $input['gap_tel'],
+    ":cdcp_name" => $input['cdcp_name'],
+    ":cdcp_tel" => $input['cdcp_tel'],
+    ":dept_in_charge" => $input['dept_in_charge'],
+    ":dic_name" => $input['dic_name'],
+    ":dic_tel" => $input['dic_tel']
   ]);
 
   if ($insertStmt->rowCount() > 0) {
     $id = $connpcs->lastInsertId();
     $details = getRequestDetails($id);
     if (emailRequest($details)) {
-      $msg["isSuccess"] = true;
-      $msg["error"] = "Adding Dispatch Request successfully";
+      $result["isSuccess"] = true;
+      $result["message"] = "Adding Dispatch Request successfully";
     }
   } else {
-    $msg["isSuccess"] = false;
-    $msg["error"] = "Adding Dispatch Request unsuccessful";
+    $result["isSuccess"] = false;
+    $result["message"] = "Adding Dispatch Request unsuccessful";
   }
 } catch (Exception $e) {
-  $msg["isSuccess"] = false;
-  $msg['error'] =  "Connection failed: " . $e->getMessage();
+  $result["isSuccess"] = false;
+  $result['message'] =  "Connection failed: " . $e->getMessage();
 }
 
-echo json_encode($msg);
+echo json_encode($result);
 #endregion
