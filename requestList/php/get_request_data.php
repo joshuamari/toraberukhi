@@ -57,8 +57,8 @@ try {
         $details['business'] = $details['work_content'];
         $details['gap_name'] =  $details['gap_name'];
         $details['cdcp_name'] =  $details['cdcp_name'];
-        $details['gap_tel'] = "(" . $details['gap_tel'] . ")";
-        $details['cdcp_tel'] = "(" . $details['cdcp_tel'] . ")";
+        $details['gap_tel'] = $details['gap_tel'];
+        $details['cdcp_tel'] = $details['cdcp_tel'];
         $details['dic_tel'] = "℡ " . $details['dic_tel'];
         $compID = getCompanyByDept($details['dept_id']);
         $compDetails = getCompanyDetails($compID);
