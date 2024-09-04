@@ -60,7 +60,6 @@ checkAccess()
             fillGroups(grps);
             getCompany().then((comps) => {
               companies = comps;
-              console.log(companies);
               fillCompany(companies);
               Promise.all([
                 getEmployees(),
@@ -509,6 +508,8 @@ $(document).on("click", "#btnSend", function () {
             dispatch_days = dd;
             fillYearly(yrl);
             clearInput();
+            clearGroup();
+            clearCompany();
             showToast(
               "success",
               "Successfully sent a dispatch request to KDT."
@@ -1716,7 +1717,7 @@ function clearInput() {
   $("#locSel, #inviteSel, #reqDeptSel, #reqCompanySel").val(0);
 
   $(
-    "#reqName, #reqTel, #reqFax, #startDate, #endDate, #specLocInput, #workOrder, #projName, #businessInput, #gapName, #gapNum, #cdcpName, #cdcpNum, #deptCharge, #picName, #deptChargeTel"
+    "#startDate, #endDate, #specLocInput, #workOrder, #projName, #businessInput"
   ).val("");
 
   $("#siteDispatch").prop("checked", false);
