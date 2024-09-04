@@ -62,6 +62,7 @@ try {
         $details['dic_tel'] = "℡ " . $details['dic_tel'];
         $compID = getCompanyByDept($details['dept_id']);
         $compDetails = getCompanyDetails($compID);
+        $details['company_name'] = $compDetails['company_name'];
         $details['company_jap'] = $compDetails['company_jap'];
         $details['company_desc'] = $compDetails['company_desc'];
         $result['isSuccess'] = TRUE;

@@ -280,6 +280,7 @@ function fillAttachment(data) {
   $(".siteDispatch").empty();
   $("#printJap, #printPh, #printThird").text("");
   let date = data.dispatch_request.dh_date;
+  let company = data.dispatch_request.company_name;
   let khi = data.dispatch_request.req_name;
   let khibu = data.dispatch_request.request_dept;
   let name = data.dispatch_request.emp_name;
@@ -327,6 +328,7 @@ function fillAttachment(data) {
   if (siteDispatch === 0) {
     $(".siteDispatch").empty();
   }
+  $("#printCompany").text(company);
   $("#printKHI").text(khi);
   $("#printBU").text(khibu);
   $("#printName").text(formatName(name));
