@@ -508,7 +508,6 @@ $(document).on("click", "#btnSend", function () {
             dispatch_days = dd;
             fillYearly(yrl);
             clearInput();
-            clearGroup();
             clearCompany();
             showToast(
               "success",
@@ -1244,7 +1243,6 @@ function fillWorkHistory(wList) {
 }
 function getDispatchHistory() {
   const empID = $("#empSel").find("option:selected").attr("emp-id");
-  const yScope = $("#dToggle").val();
   return new Promise((resolve, reject) => {
     if (empID === undefined) {
       resolve([]);
@@ -1254,7 +1252,6 @@ function getDispatchHistory() {
       url: "php/get_dispatch_history.php",
       data: {
         empID: empID,
-        yScope: yScope,
       },
       dataType: "json",
       success: function (response) {
@@ -1814,15 +1811,15 @@ function fillInvitations(invis) {
   });
 }
 function getReqDepts() {
-  const compID = $("#reqCompanySel").val();
-  if (compID.length > 1) {
-    //disables the req's dept selection if there's no company selected
-    $("#reqDeptSel").prop("disabled", true);
-    return;
-  } else {
-    $("#reqDeptSel").prop("disabled", false);
-  }
   return new Promise((resolve, reject) => {
+    const compID = $("#reqCompanySel").val();
+    if (compID.length > 1) {
+      //disables the req's dept selection if there's no company selected
+      $("#reqDeptSel").prop("disabled", true);
+      resolve([]);
+    } else {
+      $("#reqDeptSel").prop("disabled", false);
+    }
     $.ajax({
       type: "POST",
       url: "php/get_req_dep.php",
