@@ -8,7 +8,6 @@ var sortKey = 1;
 
 checkAccess()
   .then((emp) => {
-    console.log(emp);
     if (emp.isSuccess) {
       window.location.href = `${rootFolder}/PCSKHI/`;
     } else {
@@ -25,7 +24,6 @@ checkAccess()
 //#region BINDS
 $(document).on("submit", "#loginForm", function (event) {
   event.preventDefault();
-  console.log("gana");
   Login()
     .then((res) => {
       if (res.isSuccess) {

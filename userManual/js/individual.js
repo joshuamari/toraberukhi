@@ -145,7 +145,6 @@ function logOut() {
       url: "../global/logout.php",
       dataType: "json",
       success: function (response) {
-        console.log(response);
         const res = response;
         resolve(res);
       },

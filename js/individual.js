@@ -762,6 +762,8 @@ function fillAttachment2(wList) {
     companies.find((item) => item.id == selected_company)?.company_jap || null;
   const company_desc =
     companies.find((item) => item.id == selected_company)?.company_desc || null;
+  const company_loc =
+    companies.find((item) => item.id == selected_company)?.company_loc || null;
   const deptCharge = $("#deptCharge").val();
   const picName = $("#picName").val();
   const deptChargeTel = $("#deptChargeTel").val();
@@ -826,6 +828,7 @@ function fillAttachment2(wList) {
   //About
   $("#comp_jap").text(company_jap);
   $("#comp_desc").text(company_desc);
+  $("#comp_loc").text(company_loc);
   $("#printWorkCompany").text(`${company_jap} ${company_desc}`);
   $("#printDeptCharge").text(deptCharge);
   $("#printPICName").text(picName);

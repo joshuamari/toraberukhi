@@ -409,6 +409,7 @@ function fillAttachment2(data) {
   $("#dic_tel").text(data.dispatch_request.dic_tel);
   $("#comp_jap").text(data.dispatch_request.company_jap);
   $("#comp_desc").text(data.dispatch_request.company_desc);
+  $("#comp_loc").text(data.dispatch_request.company_loc);
   $("#company_n_desc").text(
     `${data.dispatch_request.company_jap} ${data.dispatch_request.company_desc}`
   );

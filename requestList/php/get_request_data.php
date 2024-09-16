@@ -65,6 +65,7 @@ try {
         $details['company_name'] = $compDetails['company_name'];
         $details['company_jap'] = $compDetails['company_jap'];
         $details['company_desc'] = $compDetails['company_desc'];
+        $details['company_loc'] = $compDetails['company_loc'];
         $result['isSuccess'] = TRUE;
         $result['message'] = 'Successfully fetched data';
         $result['data']['dispatch_request'] = $details;
