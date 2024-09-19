@@ -3,3 +3,6 @@
 
 #ignore email template
 mail.html
+
+#ignore manuals folder
+/userManual/manuals
