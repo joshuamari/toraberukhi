@@ -389,6 +389,7 @@ $(document).on(
 );
 $(document).on("click", "#whConfirm", function () {
   $(".whConfirm-lbl").removeClass("text-red-600");
+  $("#cbOutline").removeClass("outline outline-[2px] outline-[var(--red-200)]");
   $(".errTxt").remove();
 });
 $(document).on(
@@ -1724,6 +1725,9 @@ function clearInput() {
 
   $("#siteDispatch").prop("checked", false);
   $("#whConfirm").prop("checked", false);
+
+  $(".whConfirm-lbl").removeClass("text-red-600");
+  $("#cbOutline").removeClass("outline outline-[2px] outline-[var(--red-200)]");
   to_add = 0;
   $("#daysCount").text("0 Day");
   $("#allowanceDisplay").text("0");
@@ -2420,7 +2424,7 @@ function showToast(type, str) {
 
   setTimeout(() => {
     toast.remove();
-  }, 4000);
+  }, 8000);
 }
 function logOut() {
   return new Promise((resolve, reject) => {

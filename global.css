@@ -221,7 +221,7 @@ nav li.active {
   bottom: 0;
   height: 3px;
   left: 0;
-  animation: anim 4s linear forwards;
+  animation: anim 8s linear forwards;
 }
 
 .toasty.success::after {
@@ -249,7 +249,6 @@ nav li.active {
   }
 }
 /* END TOAST ITO */
-
 
 .btn-bug:hover i,
 .btn-bug:hover p {
@@ -307,7 +306,6 @@ nav li.active {
   font-size: 20px !important;
   color: var(--text-color) !important;
 }
-
 
 @media (max-width: 886px) {
   .pageTitle {
