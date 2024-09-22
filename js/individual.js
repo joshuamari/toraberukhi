@@ -1585,6 +1585,7 @@ function checkDispatch() {
   }
   if (!workConfirm) {
     $(".whConfirm-lbl").addClass("text-red-600");
+    $("#cbOutline").addClass("outline outline-[2px] outline-[var(--red-200)]");
     // $(".error-msg").html(`
     // <div class="errTxt  flex items-center gap-1">
     // <i class='bx bx-info-circle text-red-600'></i>
@@ -1655,6 +1656,7 @@ function insertDispatch() {
    `);
   if (!workConfirm) {
     $("#whConfirm-lbl").addClass("text-red-600");
+    $("#cbOutline").addClass("outline outline-[2px] outline-[var(--red-200)]");
     $(".error-msg").html(`
     <div class="errTxt  flex items-center gap-1">
     <i class='bx bx-info-circle text-red-600'></i>
