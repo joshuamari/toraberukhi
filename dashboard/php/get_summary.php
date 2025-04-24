@@ -28,14 +28,15 @@ try {
     foreach ($months as $month) {
         $totalPerMonth = [];
         $endDate = date('Y-m-t', strtotime($yNow . '-' . $month));
+        $startDate = date('Y-m', strtotime($yNow . '-' . $month)) . "-01";
         $montn = date("F", strtotime($endDate));
 
         $dateObj   = DateTime::createFromFormat('!m', $month);
         $monthName = $dateObj->format('F');
 
-        $getSummary = "SELECT COUNT(*) as `total` FROM `dispatch_list` WHERE :endDate BETWEEN `dispatch_from` AND `dispatch_to`";
+        $getSummary = "SELECT COUNT(*) as `total` FROM `dispatch_list` WHERE (:endDate BETWEEN `dispatch_from` AND `dispatch_to`) OR (:startDate BETWEEN `dispatch_from` AND `dispatch_to`)";
         $getSummaryStmt = $connpcs->prepare($getSummary);
-        $getSummaryStmt->execute([":endDate" => "$endDate"]);
+        $getSummaryStmt->execute([":endDate" => "$endDate", ":startDate" => "$startDate"]);
         $total = $getSummaryStmt->fetchColumn();
 
         $totalPerMonth['month'] = $montn;

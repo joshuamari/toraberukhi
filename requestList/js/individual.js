@@ -354,7 +354,9 @@ function formatName(name) {
 function fillAttachment2(data) {
   var dates = data.dispatch_request.date_request;
   var name = data.dispatch_request.emp_name;
-
+  const departmentSelected = data.dispatch_request.dept_id;
+  const company_desc =
+    departmentSelected != 15 ? data.dispatch_request.company_desc : "坂出工場";
   const [day, monthName, year] = dates.split(" ");
   const month = monthNames2.indexOf(monthName);
   var str = "";
@@ -408,7 +410,7 @@ function fillAttachment2(data) {
   $("#dic_name").text(data.dispatch_request.dic_name);
   $("#dic_tel").text(data.dispatch_request.dic_tel);
   $("#comp_jap").text(data.dispatch_request.company_jap);
-  $("#comp_desc").text(data.dispatch_request.company_desc);
+  $("#comp_desc").text(company_desc);
   $("#comp_loc").text(data.dispatch_request.company_loc);
   $("#company_n_desc").text(
     `${data.dispatch_request.company_jap} ${data.dispatch_request.company_desc}`

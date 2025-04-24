@@ -47,6 +47,7 @@ let monthNames2 = [
 let isSentryModalOpen = false;
 let allowance = [];
 let companies = [];
+let previousDeptValue = 0;
 //#endregion
 checkAccess()
   .then((emp) => {
@@ -114,90 +115,104 @@ $(document).on("change", "#reqCompanySel", function () {
 });
 
 $(document).on("change", "#reqDeptSel", function () {
-  if($("#reqCompanySel").val() == 1) {
-    if($("#reqDeptSel").val() == 1) {
+  // if (previousDeptValue == 15) {
+  //   $("#copyInfoLabelOne").text("General Affairs & Personal Gr. Name:");
+  //   $("#copyInfoNumberOne").text("General Affairs & Personal Gr. Number:");
+  //   $("#copyInfoLabelTwo").text("Control Dept Corporate Planning Gr. Name:");
+  //   $("#copyInfoNumberTwo").text("Control Dept Corporate Planning Gr. Number:");
+  //   $("#printCopyInfoLabelOne")[0].firstChild.nodeValue =
+  //     "General Affairs & Personal Gr.:";
+  //   $("#printCopyInfoLabelTwo")[0].firstChild.nodeValue =
+  //     "Control Dept Corporate Planning Gr.:";
+  // }
+  // if ($(this).val() == 15) {
+  //   $("#copyInfoLabelOne").text(
+  //     "Sakaide Personnel and Labor Sec., Ship&Offshore Name:"
+  //   );
+  //   $("#copyInfoNumberOne").text(
+  //     "Sakaide Personnel and Labor Sec., Ship&Offshore Number:"
+  //   );
+  //   $("#copyInfoLabelTwo").text("General Affairs & Personal Gr Name:");
+  //   $("#copyInfoNumberTwo").text("General Affairs & Personal Gr. Number:");
+  //   $("#printCopyInfoLabelOne")[0].firstChild.nodeValue =
+  //     "Sakaide Personnel and Labor Sec., Ship&Offshore:";
+  //   $("#printCopyInfoLabelTwo")[0].firstChild.nodeValue =
+  //     "General Affairs & Personal Gr.:";
+  // }
+  if ($("#reqCompanySel").val() == 1) {
+    if ($("#reqDeptSel").val() == 1) {
       $("#reqName").val("S. Tabata");
       $("#reqTel").val("+81-(0)78-682-5039");
       $("#reqFax").val("+81-(0)78-682-5041");
-    }
-    else if($("#reqDeptSel").val() == 2) {
+    } else if ($("#reqDeptSel").val() == 2) {
       $("#reqName").val("Takahiro Aoki");
       $("#reqTel").val("+81-(0)80-4153-7433");
       $("#reqFax").val("+81-(0)78-682-5539");
-    }
-    else if($("#reqDeptSel").val() == 3) {
+    } else if ($("#reqDeptSel").val() == 3) {
       $("#reqName").val("Hitoshi Sunouchi");
       $("#reqTel").val("+81-(0)78-682-5380");
       $("#reqFax").val("+81-(0)78-682-5535");
-    }
-    else if($("#reqDeptSel").val() == 4) {
+    } else if ($("#reqDeptSel").val() == 4) {
       $("#reqName").val("Kenichi Iikawa");
       $("#reqTel").val("+81-(0)");
       $("#reqFax").val("+81-(0)");
-    }
-    else if($("#reqDeptSel").val() == 5) {
+    } else if ($("#reqDeptSel").val() == 5) {
       $("#reqName").val("Takashi Tsujimoto");
       $("#reqTel").val("+81-(0)78-682-5561");
       $("#reqFax").val("+81-(0)78-682-5431");
-    }
-    else if($("#reqDeptSel").val() == 6) {
+    } else if ($("#reqDeptSel").val() == 6) {
       $("#reqName").val("S. Fujita");
       $("#reqTel").val("+81-(0)78-682-5252");
       $("#reqFax").val("+81-(0)78-682-5542");
-    }
-    else if($("#reqDeptSel").val() == 7) {
+    } else if ($("#reqDeptSel").val() == 7) {
       $("#reqName").val("Jun Toshihiro");
       $("#reqTel").val("+81-(0)78-682-5084");
       $("#reqFax").val("+81-(0)78-682-5433");
-    }
-    else if($("#reqDeptSel").val() == 9) {
+    } else if ($("#reqDeptSel").val() == 9) {
       $("#reqName").val("Jun Kohnoki");
       $("#reqTel").val("+81-(0)78-682-5266");
       $("#reqFax").val("+81-(0)78-682-5585");
-    }
-    else if($("#reqDeptSel").val() == 10) {
+    } else if ($("#reqDeptSel").val() == 10) {
       $("#reqName").val("Kazuhide Kayo");
       $("#reqTel").val("+81-(0)79-435-2231");
       $("#reqFax").val("+81-(0)79-435-2378");
-    }
-    else if($("#reqDeptSel").val() == 11) {
+    } else if ($("#reqDeptSel").val() == 11) {
       $("#reqName").val("Hirofumi Kuroda");
       $("#reqTel").val("+81-(0)78-682-5233");
       $("#reqFax").val("+81-(0)78-682-5244");
-    }
-    else if($("#reqDeptSel").val() == 12) {
+    } else if ($("#reqDeptSel").val() == 12) {
       $("#reqName").val("Saburo Ochiai");
       $("#reqTel").val("+81-(0)78-682-5072");
       $("#reqFax").val("+81-(0)78-682-5574");
-    }
-    else if($("#reqDeptSel").val() == 14) {
+    } else if ($("#reqDeptSel").val() == 14) {
       $("#reqName").val("Kazuo Kudo");
       $("#reqTel").val("+81-(0)78-682-5363");
       $("#reqFax").val("+81-(0)78-682-5548");
-    }
-    else{
+    } else if ($("#reqDeptSel").val() == 15) {
+      $("#reqName").val("Ryo Yasunaga");
+      $("#reqTel").val("+81-(0)877-46-8780");
+      $("#reqFax").val("+81-(0)877-46-1416");
+    } else {
       $("#reqName").val("");
       $("#reqTel").val("");
       $("#reqFax").val("");
     }
-  }
-  else if($("#reqCompanySel").val() == 2) {
-    if($("#reqDeptSel").val() == 13) {
+  } else if ($("#reqCompanySel").val() == 2) {
+    if ($("#reqDeptSel").val() == 13) {
       $("#reqName").val("H. Kurita");
       $("#reqTel").val("+81-(0)47-483-5811");
       $("#reqFax").val("+81-(0)47-483-3733");
-    }
-    else{
+    } else {
       $("#reqName").val("");
       $("#reqTel").val("");
       $("#reqFax").val("");
     }
-  }
-  else{
+  } else {
     $("#reqName").val("");
     $("#reqTel").val("");
     $("#reqFax").val("");
   }
+  previousDeptValue = $(this).val();
 });
 
 $(document).on("click", ".btn-close", function () {
@@ -850,10 +865,13 @@ function fillAttachment2(wList) {
   const selected_company = $("#reqCompanySel")
     .find("option:selected")
     .attr("comp-id");
+  const departmentSelected = $("#reqDeptSel").val();
   const company_jap =
     companies.find((item) => item.id == selected_company)?.company_jap || null;
   const company_desc =
-    companies.find((item) => item.id == selected_company)?.company_desc || null;
+    companies.find(
+      (item) => item.id == selected_company && departmentSelected != 15
+    )?.company_desc || "坂出工場";
   const company_loc =
     companies.find((item) => item.id == selected_company)?.company_loc || null;
   const deptCharge = $("#deptCharge").val();

@@ -16,6 +16,7 @@ $dateNow = date('Y');
 $groupID = 0;
 $groupQuery = "";
 $finalReport = new ArrayObject();
+$yearMonth = date("Y-m-01");
 #endregion
 
 #region get data values
@@ -62,12 +63,12 @@ try {
 
         $reportQ = "SELECT el.id as `id`, CONCAT(UPPER(el.surname), ', ', el.firstname) as `empName`, gl.abbreviation as `groupName`, vd.visa_issue as visaIssue,
         vd.visa_expiry as visaExpiry FROM kdtphdb_new.employee_list as el LEFT JOIN kdtphdb_new.group_list as gl ON el.group_id = gl.id LEFT JOIN visa_details as vd ON el.id = 
-        vd.emp_number WHERE el.emp_status = 1 AND el.group_id = :oneGroupID ORDER BY el.id";
+        vd.emp_number WHERE (el.`resignation_date` IS NULL OR el.`resignation_date` = '0000-00-00' OR el.`resignation_date` > :yearMonth) AND el.group_id = :oneGroupID ORDER BY el.id";
 
         $reportStmt = $connpcs->prepare($reportQ);
 
         // $reportStmt->execute([":oneGroupID" => "$oneGroupID", ":startYear" => "$startYear", ":endYear" => "$endYear"]);
-        $reportStmt->execute([":oneGroupID" => "$oneGroupID"]);
+        $reportStmt->execute([":oneGroupID" => "$oneGroupID", ":yearMonth" => $yearMonth]);
         $report = $reportStmt->fetchAll();
         $reportCount = count($report);
 

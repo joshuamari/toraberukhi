@@ -6,3 +6,6 @@ mail.html
 
 #ignore manuals folder
 /userManual/manuals
+
+#ignore testing shit
+/php/check_recipients.php

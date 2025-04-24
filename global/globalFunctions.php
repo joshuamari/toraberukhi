@@ -215,7 +215,7 @@ function getKHIAdminEmails()
 {
     global $connpcs;
     $khiEmail = array();
-    $khiQ = "SELECT `email` FROM `khi_details` WHERE `group_id`=2 AND `number` != 905007";
+    $khiQ = "SELECT `email` FROM `khi_details` WHERE `group_id`=2 AND `number` != 905007 AND `is_active`=1";
     $khiStmt = $connpcs->prepare($khiQ);
     $khiStmt->execute();
     if ($khiStmt->rowCount() > 0) {
@@ -259,16 +259,20 @@ function getLocationName($id)
 }
 function emailRequest($details)
 {
+    $protocol = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') ? "https" : "http";
+    $host = $_SERVER['HTTP_HOST'];
+    $link = $protocol . "://" . $host;
     $headers = "MIME-Version: 1.0" . "\r\n";
     $headers .= "Content-type:text/html;charset=UTF-8" . "\r\n";
     $headers .= "From: kdt_toraberu@global.kawasaki.com" . "\r\n";
-    $subject = 'Dispatch Request Notification(TEST ONLY)';
+    $subject = 'Dispatch Request Notification';
     $khidetails = getKHIUserDetails($details['requester_id']);
     $presdata = getPresDetails();
+    $group = $details['dept_id'] == 15 ? 21 : $details['emp_group'];
     #region TESTING
     #region systesting
-    $CCarray = array('medrano_c-kdt@global.kawasaki.com', 'hernandez-kdt@global.kawasaki.com', 'reyes_d-kdt@global.kawasaki.com', 'cabiso-kdt@global.kawasaki.com', 'coquia-kdt@global.kawasaki.com');
-    $emails = array("coquia-kdt@global.kawasaki.com", "medrano_c-kdt@global.kawasaki.com");
+    // $CCarray = array('medrano_c-kdt@global.kawasaki.com', 'hernandez-kdt@global.kawasaki.com', 'reyes_d-kdt@global.kawasaki.com', 'cabiso-kdt@global.kawasaki.com', 'coquia-kdt@global.kawasaki.com');
+    // $emails = array("coquia-kdt@global.kawasaki.com", "medrano_c-kdt@global.kawasaki.com");
     #endregion
 
     #region kdttesting
@@ -288,12 +292,12 @@ function emailRequest($details)
     #endregion
 
     #region PROD
-    // $admins = getAdminEmails();
-    // $khipic = getKHIPICEmail($details['emp_group']);
-    // $khiAdmins = getKHIAdminEmails();
-    // $kdtManagers = getGroupManagersEmail($details['emp_group']);
-    // $CCarray = array_unique(array_merge($khipic, $khiAdmins, $kdtManagers, $admins)); //UNCOMMENT PAG PROD
-    // $emails[] = $presdata['email']; //UNCOMMENT PAG PROD
+    $admins = getAdminEmails();
+    $khipic = getKHIPICEmail($group);
+    $khiAdmins = getKHIAdminEmails();
+    $kdtManagers = getGroupManagersEmail($group);
+    $CCarray = array_unique(array_merge($khipic, $khiAdmins, $kdtManagers, $admins)); //UNCOMMENT PAG PROD
+    $emails[] = $presdata['email']; //UNCOMMENT PAG PROD
     #endregion
     $CC = implode(",", $CCarray);
     $email_to = implode(",", $emails);
@@ -315,11 +319,11 @@ function emailRequest($details)
         <br>
         <p>For <strong>KDT</strong>, take action for next procedure:</p>
         <ul>
-            <li><a href='http://kdt-ph/PCS/requestList/'>Dispatch Request List</a></li>
+            <li><a href='$link/PCS/requestList/'>Dispatch Request List</a></li>
         </ul>
         <p>For <strong>KHI</strong>, track the request status:</p>
         <ul>
-            <li><a href='http://kdt-ph/PCSKHI/requestList/'>Track Request Status</a></li>
+            <li><a href='$link/PCSKHI/requestList/'>Track Request Status</a></li>
         </ul>
         <p>If you have any questions or need further assistance, please do not hesitate to contact us.</p>
         <p>Best regards,</p>
