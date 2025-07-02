@@ -259,9 +259,10 @@ function getLocationName($id)
 }
 function emailRequest($details)
 {
-    $protocol = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') ? "https" : "http";
-    $host = $_SERVER['HTTP_HOST'];
-    $link = $protocol . "://" . $host;
+    // $protocol = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') ? "https" : "http";
+    // $host = $_SERVER['HTTP_HOST'];
+    // $link = $protocol . "://" . $host;
+    $link = "https://kdt-ph.kdts.net";
     $headers = "MIME-Version: 1.0" . "\r\n";
     $headers .= "Content-type:text/html;charset=UTF-8" . "\r\n";
     $headers .= "From: kdt_toraberu@global.kawasaki.com" . "\r\n";
