@@ -281,6 +281,7 @@ function fillAttachment(data) {
   $("#printJap, #printPh, #printThird").text("");
   let date = data.dispatch_request.dh_date;
   let company = data.dispatch_request.company_name;
+  const departmentSelected = data.dispatch_request.dept_id;
   let khi = data.dispatch_request.req_name;
   let khibu = data.dispatch_request.request_dept;
   let name = data.dispatch_request.emp_name;
@@ -345,6 +346,33 @@ function fillAttachment(data) {
   $("#printCDCPName").text(cdcp);
   $("#printGAPNumber").text(gap_tel);
   $("#printCDCPNumber").text(cdcp_tel);
+
+  if (departmentSelected == 15) {
+    const newAddress = ": 1, Kawasaki cho, Sakaide city, Kagawa 762-8507 Japan";
+    $("#disAddress").html(
+      '<span id="location" class="font-semibold text-[10px]">SAKAIDE</span>' +
+        newAddress
+    );
+    $("#disPhone").text("Phone: 81-(0)877-46-0315");
+    $("#disFax").text("Facsimile: 81-(0)877-46-4397");
+    $("#printCopyInfoLabelOne")[0].firstChild.nodeValue =
+      "Sakaide Personnel and Labor Sec., Ship&Offshore:";
+    $("#printCopyInfoLabelTwo")[0].firstChild.nodeValue =
+      "General Affairs & Personal Gr.:";
+  } else {
+    const newAddress =
+      ": 1-1, Higashikawasaki 3-Chome, Chuo-ku, KOBE 650-8670 Japan";
+    $("#disAddress").html(
+      '<span id="location" class="font-semibold text-[10px]">KOBE</span>' +
+        newAddress
+    );
+    $("#disPhone").text("Phone: 81-(0)78-682-5202");
+    $("#disFax").text("Facsimile:81-(0)78-682-5574");
+    $("#printCopyInfoLabelOne")[0].firstChild.nodeValue =
+      "General Affairs & Personal Gr.:";
+    $("#printCopyInfoLabelTwo")[0].firstChild.nodeValue =
+      "Control Dept Corporate Planning Gr.:";
+  }
 }
 function formatName(name) {
   const [last, given] = name.split(",");
@@ -357,6 +385,8 @@ function fillAttachment2(data) {
   const departmentSelected = data.dispatch_request.dept_id;
   const company_desc =
     departmentSelected != 15 ? data.dispatch_request.company_desc : "坂出工場";
+  const comp_loc =
+    departmentSelected != 15 ? "大阪入国管理局　様" : "高松入国管理局　様";
   const [day, monthName, year] = dates.split(" ");
   const month = monthNames2.indexOf(monthName);
   var str = "";
@@ -411,7 +441,7 @@ function fillAttachment2(data) {
   $("#dic_tel").text(data.dispatch_request.dic_tel);
   $("#comp_jap").text(data.dispatch_request.company_jap);
   $("#comp_desc").text(company_desc);
-  $("#comp_loc").text(data.dispatch_request.company_loc);
+  $("#comp_loc").text(comp_loc);
   $("#company_n_desc").text(
     `${data.dispatch_request.company_jap} ${data.dispatch_request.company_desc}`
   );

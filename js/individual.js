@@ -115,30 +115,30 @@ $(document).on("change", "#reqCompanySel", function () {
 });
 
 $(document).on("change", "#reqDeptSel", function () {
-  // if (previousDeptValue == 15) {
-  //   $("#copyInfoLabelOne").text("General Affairs & Personal Gr. Name:");
-  //   $("#copyInfoNumberOne").text("General Affairs & Personal Gr. Number:");
-  //   $("#copyInfoLabelTwo").text("Control Dept Corporate Planning Gr. Name:");
-  //   $("#copyInfoNumberTwo").text("Control Dept Corporate Planning Gr. Number:");
-  //   $("#printCopyInfoLabelOne")[0].firstChild.nodeValue =
-  //     "General Affairs & Personal Gr.:";
-  //   $("#printCopyInfoLabelTwo")[0].firstChild.nodeValue =
-  //     "Control Dept Corporate Planning Gr.:";
-  // }
-  // if ($(this).val() == 15) {
-  //   $("#copyInfoLabelOne").text(
-  //     "Sakaide Personnel and Labor Sec., Ship&Offshore Name:"
-  //   );
-  //   $("#copyInfoNumberOne").text(
-  //     "Sakaide Personnel and Labor Sec., Ship&Offshore Number:"
-  //   );
-  //   $("#copyInfoLabelTwo").text("General Affairs & Personal Gr Name:");
-  //   $("#copyInfoNumberTwo").text("General Affairs & Personal Gr. Number:");
-  //   $("#printCopyInfoLabelOne")[0].firstChild.nodeValue =
-  //     "Sakaide Personnel and Labor Sec., Ship&Offshore:";
-  //   $("#printCopyInfoLabelTwo")[0].firstChild.nodeValue =
-  //     "General Affairs & Personal Gr.:";
-  // }
+  if (previousDeptValue == 15) {
+    $("#copyInfoLabelOne").text("General Affairs & Personal Gr. Name:");
+    $("#copyInfoNumberOne").text("General Affairs & Personal Gr. Number:");
+    $("#copyInfoLabelTwo").text("Control Dept Corporate Planning Gr. Name:");
+    $("#copyInfoNumberTwo").text("Control Dept Corporate Planning Gr. Number:");
+    $("#comp_loc").text("大阪入国管理局　様");
+    $("#deptCharge").val("企画本部　人事総務部　人事総務一課");
+    $("#picName").val("貞方 由羽（サダカタ ユウ）");
+    $("#deptChargeTel").val("078-682-5202");
+  }
+  if ($(this).val() == 15) {
+    $("#copyInfoLabelOne").text(
+      "Sakaide Personnel and Labor Sec., Ship&Offshore Name:"
+    );
+    $("#copyInfoNumberOne").text(
+      "Sakaide Personnel and Labor Sec., Ship&Offshore Number:"
+    );
+    $("#copyInfoLabelTwo").text("General Affairs & Personal Gr Name:");
+    $("#copyInfoNumberTwo").text("General Affairs & Personal Gr. Number:");
+    $("#comp_loc").text("高松入国管理局　様");
+    $("#deptCharge").val("人事労務総括部　工場労務部　坂出勤労課");
+    $("#picName").val("重川 忍（シゲカワ シノブ）");
+    $("#deptChargeTel").val("0877-46-1474");
+  }
   if ($("#reqCompanySel").val() == 1) {
     if ($("#reqDeptSel").val() == 1) {
       $("#reqName").val("S. Tabata");
@@ -784,7 +784,33 @@ function fillAttachment() {
   const gapNum = $("#gapNum").val();
   const cdcpName = $("#cdcpName").val();
   const cdcpNum = $("#cdcpNum").val();
-
+  const departmentSelected = $("#reqDeptSel").val();
+  if (departmentSelected == 15) {
+    const newAddress = ": 1, Kawasaki cho, Sakaide city, Kagawa 762-8507 Japan";
+    $("#printCopyInfoLabelOne")[0].firstChild.nodeValue =
+      "Sakaide Personnel and Labor Sec., Ship&Offshore:";
+    $("#printCopyInfoLabelTwo")[0].firstChild.nodeValue =
+      "General Affairs & Personal Gr.:";
+    $("#disAddress").html(
+      '<span id="location" class="font-semibold text-[10px]">SAKAIDE</span>' +
+        newAddress
+    );
+    $("#disPhone").text("Phone: 81-(0)877-46-0315");
+    $("#disFax").text("Facsimile: 81-(0)877-46-4397");
+  } else {
+    const newAddress =
+      ": 1-1, Higashikawasaki 3-Chome, Chuo-ku, KOBE 650-8670 Japan";
+    $("#printCopyInfoLabelOne")[0].firstChild.nodeValue =
+      "General Affairs & Personal Gr.:";
+    $("#printCopyInfoLabelTwo")[0].firstChild.nodeValue =
+      "Control Dept Corporate Planning Gr.:";
+    $("#disAddress").html(
+      '<span id="location" class="font-semibold text-[10px]">KOBE</span>' +
+        newAddress
+    );
+    $("#disPhone").text("Phone: 81-(0)78-682-5202");
+    $("#disFax").text("Facsimile:81-(0)78-682-5574");
+  }
   $("#printJap, #printPh, #printThird").empty();
 
   // Requester Info
@@ -873,7 +899,9 @@ function fillAttachment2(wList) {
       (item) => item.id == selected_company && departmentSelected != 15
     )?.company_desc || "坂出工場";
   const company_loc =
-    companies.find((item) => item.id == selected_company)?.company_loc || null;
+    companies.find(
+      (item) => item.id == selected_company && departmentSelected != 15
+    )?.company_loc || "高松入国管理局　様";
   const deptCharge = $("#deptCharge").val();
   const picName = $("#picName").val();
   const deptChargeTel = $("#deptChargeTel").val();
@@ -1006,7 +1034,7 @@ function fillCompany(comps) {
   const compIDs = comps.map((obj) => obj.id);
   var compSelect = $("#reqCompanySel");
   compSelect.html(
-    `<option value=${compIDs.toString()}>Select Company</option>`
+    `<option value=${compIDs.toString()} hidden>Select Company</option>`
   );
   // compSelect.html(`<option value='0' hidden>Select Company</option>`);
   $.each(comps, function (index, item) {
