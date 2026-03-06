@@ -23,6 +23,7 @@ if (!empty($_POST["empID"])) {
 }
 if (!empty($_POST["grpID"])) {
     $grpID = $_POST["grpID"];
+    $grpID = explode(",", $grpID);
 } else {
   $msg['isSuccess'] = 0;
   $msg['message'][] = 'Group ID';
@@ -65,9 +66,19 @@ $permChanges = TRUE;
 
 #region main query
 try {
-  $editUser = "UPDATE `khi_details` SET `group_id` = :grpID, `email` = :empEMAIL WHERE `number` = :empID";
+  $editUser = "UPDATE `khi_details` SET `email` = :empEMAIL WHERE `number` = :empID";
   $editUserStmt = $connpcs->prepare($editUser);
-  $editUserStmt->execute([":grpID" => "$grpID", ":empID" => "$empID", ":empEMAIL" => "$empEMAIL"]);
+  $editUserStmt->execute([":empID" => "$empID", ":empEMAIL" => "$empEMAIL"]);
+
+  $deleteGroup = "DELETE FROM `khi_user_groups` WHERE `user_id` = :empID";
+  $deleteGroupStmt = $connpcs->prepare($deleteGroup);
+  $deleteGroupStmt->execute([":empID" => "$empID"]);
+
+  foreach ($grpID as $group) {
+    $addGroup = "INSERT INTO `khi_user_groups`(`user_id`, `group_id`) VALUES (:empID, :group)";
+    $addGroupStmt = $connpcs->prepare($addGroup);
+    $addGroupStmt->execute([":empID" => "$empID", ":group" => "$group"]);
+  }
 
   $delPerm = "DELETE FROM `khi_user_permissions` WHERE `employee_id` = :empID";
   $delPermStmt = $connpcs->prepare($delPerm);
