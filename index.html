@@ -1,31 +1,26 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
-    <title>Passport Control System</title>
+    <title>トラベる</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta charset="UTF-8" />
+
+    <!-- favicon -->
+    <link rel="icon" href="favicon.ico" type="image/x-icon" />
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="global.css" />
+    <link rel="stylesheet" href="css/tailwind.css" />
+    <link rel="stylesheet" href="css/font-awesome.css" />
+    <link rel="stylesheet" href="css/boxicons.css" />
+    <link rel="stylesheet" href="css/bootstrap.min.css" />
+    <link rel="stylesheet" href="css/index.css" />
 
     <script src="js/html2canvas.js"></script>
     <script src="js/jquery.js"></script>
     <script src="js/jquery.inview.min.js"></script>
-    <!-- <script
-      src="http://js.sentry-cdn.com/996e6a7f7f64d413dd43124ae5dece7e.min.js"
-      crossorigin="anonymous"
-    ></script> -->
-    <!-- <script src="js/jquery.table2excel.js"></script> -->
-    <script>
-      var busterCall = ["js/individual.js", "css/index.css"];
-      $.post(
-        "php/get_version.php",
-        {
-          busterCall: busterCall,
-          titleName: "トラベる",
-        },
-        function (data) {
-          $("head").html(data);
-        }
-      );
-    </script>
+
+    <script defer src="js/individual.js"></script>
   </head>
 
   <!-- #region modal -->
@@ -1016,7 +1011,10 @@
           <div class="flex h-full px-3 flex-col gap-2">
             <p
               class="text-[12px]"
-              style="font-size: 12.25px; font-family: 'Poppins', sans-serif"
+              style="
+                font-size: 12.25px;
+                font-family: &quot;Poppins&quot;, sans-serif;
+              "
             >
               This file is generated based on your input.Please review if
               everything is correct, click the "Next" button to review the "Work
@@ -1025,7 +1023,10 @@
             </p>
             <p
               class="text-[var(--gray-text)]"
-              style="font-size: 12.25px; font-family: 'Poppins', sans-serif"
+              style="
+                font-size: 12.25px;
+                font-family: &quot;Poppins&quot;, sans-serif;
+              "
             >
               <i
                 class="bx bxs-info-circle text-[var(--gray-text)] align-middle pr-1"
@@ -1200,7 +1201,10 @@
           <div class="flex h-full px-3 flex-col gap-2">
             <p
               class=""
-              style="font-size: 12.25px; font-family: 'Poppins', sans-serif"
+              style="
+                font-size: 12.25px;
+                font-family: &quot;Poppins&quot;, sans-serif;
+              "
             >
               This file is generated based on your input.Please review if
               everything is correct, click the "Submit Request" button to
@@ -1209,7 +1213,10 @@
             </p>
             <p
               class="text-[var(--gray-text)]"
-              style="font-size: 12.25px; font-family: 'Poppins', sans-serif"
+              style="
+                font-size: 12.25px;
+                font-family: &quot;Poppins&quot;, sans-serif;
+              "
             >
               <i
                 class="bx bxs-info-circle text-[var(--gray-text)] align-middle pr-1"

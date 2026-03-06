@@ -1,30 +1,30 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
-    <title>Passport Control System</title>
+    <title>トラベる</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta charset="UTF-8" />
-    <script src="js/html2canvas.js"></script>
-    <script src="js/jquery.js"></script>
-    <script src="js/jquery.inview.min.js"></script>
-    <!-- <script
-      src="http://js.sentry-cdn.com/996e6a7f7f64d413dd43124ae5dece7e.min.js"
-      crossorigin="anonymous"
-    ></script> -->
-    <!-- <script src="js/jquery.table2excel.js"></script> -->
-    <script>
-      var busterCall = ["js/individual.js", "css/index.css"];
-      $.post(
-        "php/get_version.php",
-        {
-          busterCall: busterCall,
-          titleName: "トラベる",
-        },
-        function (data) {
-          $("head").html(data);
-        }
-      );
-    </script>
+
+    <!-- CSS FIRST -->
+    <link rel="stylesheet" href="../global.css" />
+    <link rel="stylesheet" href="../css/tailwind.css" />
+    <link rel="stylesheet" href="../css/font-awesome.css" />
+    <link rel="stylesheet" href="../css/boxicons.css" />
+    <link rel="stylesheet" href="../css/bootstrap.min.css" />
+    <link rel="stylesheet" href="../css/tom-select.css" />
+    <link rel="stylesheet" href="css/index.css" />
+
+    <!-- JS libs -->
+    <script src="../js/jquery.js"></script>
+    <script src="../js/bootstrap.min.js"></script>
+    <script src="../js/html2canvas.js"></script>
+    <script src="../js/jquery.inview.min.js"></script>
+    <script src="../js/tom-select.complete.min.js"></script>
+    <!-- <script src="../js/jquery.table2excel.js"></script> -->
+    <!-- <script src="http://js.sentry-cdn.com/996e6a7f7f64d413dd43124ae5dece7e.min.js" crossorigin="anonymous"></script> -->
+
+    <!-- Page JS -->
+    <script defer src="js/individual.js"></script>
   </head>
 
   <!-- #region modal -->
@@ -88,12 +88,15 @@
           </div>
           <div class="mb-3">
             <label for="empGroup" class="form-label">Group</label>
-            <select name="empGroup" id="empGroup" class="select">
-              <option>SYS</option>
-              <option>IT</option>
-            </select>
+            <select
+              name="empGroup[]"
+              id="empGroup"
+              class=""
+              multiple
+              placeholder="Select one or more groups"
+            ></select>
             <small class="hidden text-[var(--red-color)]"
-              >Please select a group.</small
+              >Please select at least one group.</small
             >
           </div>
           <div class="mb-3">
@@ -196,13 +199,16 @@
             </div>
           </div>
           <div class="mb-3">
-            <label for="empGroup" class="form-label">Group</label>
-            <select name="empGroup" id="editGroup" class="select">
-              <option>SYS</option>
-              <option>IT</option>
-            </select>
+            <label for="editGroup" class="form-label">Group</label>
+            <select
+              name="editGroup[]"
+              id="editGroup"
+              class=""
+              multiple
+              placeholder="Select one or more groups"
+            ></select>
             <small class="hidden text-[var(--red-color)]"
-              >Please select a group.</small
+              >Please select at least one group.</small
             >
           </div>
           <div class="mb-3">
@@ -282,7 +288,7 @@
             class="button text-white bg-[var(--red-color)] hover:bg-red-700"
             id="removeUser"
           >
-          Delete
+            Delete
           </button>
         </div>
       </div>

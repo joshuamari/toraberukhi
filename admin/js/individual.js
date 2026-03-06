@@ -36,6 +36,8 @@ let groups = [];
 let sortNumAsc = false;
 let sortNameAsc = true;
 let isSentryModalOpen = false;
+let empGroupTom = null;
+let editGroupTom = null;
 //#endregion
 checkAccess()
   .then((emp) => {
@@ -44,6 +46,8 @@ checkAccess()
       $(document).ready(function () {
         createAccessSelections();
         fillEmployeeDetails();
+        initTomSelects();
+
         Promise.all([getGroups(), getEmployees()])
           .then(([grps, emps]) => {
             groups = grps;
@@ -103,13 +107,19 @@ $(document).on("click", "#addUser", function () {
     });
 });
 $(document).on(
-  "click",
-  "#empId, #empFName, #empLName, #empGroup, #empAccess, #empEmail",
+  "click input change",
+  "#empId, #empFName, #empLName, #empAccess, #empEmail, #empAccessEdit, #empEmailEdit",
   function () {
     $(this).removeClass("border-[var(--red-color)] bg-red-200");
     $(this).siblings("small").addClass("hidden");
-  }
+  },
 );
+$(document).on("change", "#empGroup", function () {
+  clearGroupValidation("#empGroup");
+});
+$(document).on("change", "#editGroup", function () {
+  clearGroupValidation("#editGroup");
+});
 $(document).on("click", "#addUserModal .btn-close", function () {
   resetAddModal();
 });
@@ -217,7 +227,7 @@ function createAccessSelections() {
       $("<option>", {
         value: key,
         text: value,
-      })
+      }),
     );
   });
 }
@@ -246,24 +256,54 @@ function getGroups() {
     });
   });
 }
+
 function fillGroups(grps) {
   const grpSelect = $("#grpSel");
   const addSelect = $("#empGroup");
   const editSelect = $("#editGroup");
+
   grpSelect.empty();
   addSelect.empty();
   editSelect.empty();
-  grpSelect.html("<option value=0>Select Group</option>");
+
+  grpSelect.html("<option value='0'>Select Group</option>");
+
   $.each(grps, function (index, item) {
-    var option = $("<option>")
+    const option = $("<option>")
       .attr("value", item.id)
       .text(item.name)
       .attr("grp-id", item.id);
+
     grpSelect.append(option.clone());
     addSelect.append(option.clone());
     editSelect.append(option.clone());
   });
+
+  if (empGroupTom) {
+    empGroupTom.clear(true);
+    empGroupTom.clearOptions();
+    $.each(grps, function (index, item) {
+      empGroupTom.addOption({
+        value: String(item.id),
+        text: item.name,
+      });
+    });
+    empGroupTom.refreshOptions(false);
+  }
+
+  if (editGroupTom) {
+    editGroupTom.clear(true);
+    editGroupTom.clearOptions();
+    $.each(grps, function (index, item) {
+      editGroupTom.addOption({
+        value: String(item.id),
+        text: item.name,
+      });
+    });
+    editGroupTom.refreshOptions(false);
+  }
 }
+
 function getEmployees() {
   return new Promise((resolve, reject) => {
     $.ajax({
@@ -295,9 +335,21 @@ function fillEmployees(emps) {
   $.each(emps, function (index, item) {
     var row = $(`<tr d-id=${item.empID}>`);
     const fullName = capitalizeWords(`${item.sname}, ${item.fname}`);
+    const groupText =
+      Array.isArray(item.groups) && item.groups.length
+        ? item.groups.map((g) => g.abbr).join(", ")
+        : item.group
+          ? item.group.abbr
+          : "-";
+
+    const groupIds = Array.isArray(item.groups)
+      ? item.groups.map((g) => g.id).join(",")
+      : item.group
+        ? item.group.id
+        : "";
     row.append(`<td>${item.id}</td>`);
     row.append(`<td>${fullName}</td>`);
-    row.append(`<td grp-id='${item.group.id}'>${item.group.abbr}</td>`);
+    row.append(`<td grp-id='${groupIds}'>${groupText}</td>`);
     if (accessTypes[item.type] === "Admin (Only for KDT)") {
       accessTypes[item.type] = "Admin";
     }
@@ -332,7 +384,11 @@ function searchEmployee() {
       emp.fname.toLowerCase().includes(keyword) ||
       emp.sname.toLowerCase().includes(keyword) ||
       emp.id.toString().includes(keyword);
-    const groupMatch = grp == 0 || emp.group.id == grp;
+    const groupMatch =
+      grp == 0 ||
+      (Array.isArray(emp.groups)
+        ? emp.groups.some((g) => String(g.id) === String(grp))
+        : emp.group && String(emp.group.id) === String(grp));
     return searchMatch && groupMatch;
   });
   filtered_employees = results;
@@ -436,7 +492,9 @@ function addUser() {
   var empId = $("#empId").val();
   var empFName = $("#empFName").val();
   var empLName = $("#empLName").val();
-  var empGroup = $("#empGroup").val();
+  var empGroup = empGroupTom
+    ? empGroupTom.items.slice()
+    : $("#empGroup").val() || [];
   var empAccess = $("#empAccessAdd").val();
   var empEMAIL = $("#empEmail").val();
   var ctr = 0;
@@ -456,14 +514,13 @@ function addUser() {
     $("#empLName").siblings("small").removeClass("hidden");
     ctr++;
   }
-  if (!empGroup) {
-    $("#empGroup").addClass("border-[var(--red-color)] bg-red-200");
-    $("#empGroup").siblings("small").removeClass("hidden");
+  if (!empGroup || empGroup.length === 0) {
+    markGroupValidationError("#empGroup");
     ctr++;
   }
-  if (empAccess == undefined) {
-    $("#empAccess").addClass("border-[var(--red-color)] bg-red-200");
-    $("#empAccess").siblings("small").removeClass("hidden");
+  if (empAccess == undefined || empAccess === null || empAccess === "") {
+    $("#empAccessAdd").addClass("border-[var(--red-color)] bg-red-200");
+    $("#empAccessAdd").siblings("small").removeClass("hidden");
     ctr++;
   }
   if (!empEMAIL) {
@@ -471,6 +528,7 @@ function addUser() {
     $("#empEmail").siblings("small").removeClass("hidden");
     ctr++;
   }
+
   return new Promise((resolve, reject) => {
     if (ctr > 0) {
       resolve({ isSuccess: false, error: "Incomplete Fields" });
@@ -478,6 +536,7 @@ function addUser() {
       $.ajax({
         type: "POST",
         url: "php/add_khi_user.php",
+        traditional: true,
         data: {
           empID: empId,
           fname: empFName,
@@ -506,28 +565,49 @@ function addUser() {
 }
 
 function resetAddModal() {
-  var selectedG = $("#empGroup").children(":first").val();
-  var selectedA = $("#empAccessAdd").children(":first").val();
   $("#empId, #empFName, #empLName, #empEmail").val("");
-  $("#empGroup").val(selectedG);
-  $("#empAccessAdd").val(selectedA);
-  $("#empAccessAdd , #empGroup, #empLName, #empFName, #empId")
+
+  if (empGroupTom) {
+    empGroupTom.clear(true);
+  } else {
+    $("#empGroup").val([]);
+  }
+
+  $("#empAccessAdd").prop("selectedIndex", 0);
+
+  $("#empAccessAdd, #empGroup, #empLName, #empFName, #empId, #empEmail")
     .siblings("small")
     .addClass("hidden");
-  $("#empId, #empFName, #empLName, #empGroup, #empAccessAdd").removeClass(
-    "border-[var(--red-color)] bg-red-200"
-  );
+
+  $(
+    "#empId, #empFName, #empLName, #empGroup, #empAccessAdd, #empEmail",
+  ).removeClass("border-[var(--red-color)] bg-red-200");
+
+  clearGroupValidation("#empGroup");
 }
+
 function fillEditModal(empnum) {
   $("#empIdEdit").val(empnum);
   let empdeets = employees.find((emp) => emp.id == empnum);
+
   $("#empFNameEdit").val(capitalizeWords(empdeets.fname));
   $("#empLNameEdit").val(capitalizeWords(empdeets.sname));
-  $("#editGroup").val(empdeets.group.id);
   $("#empAccessEdit").val(empdeets.type);
   $("#empEmailEdit").val(empdeets.email);
+
+  if (editGroupTom) {
+    editGroupTom.clear(true);
+
+    if (Array.isArray(empdeets.groups) && empdeets.groups.length) {
+      editGroupTom.setValue(empdeets.groups.map((g) => String(g.id)));
+    } else if (empdeets.group && empdeets.group.id) {
+      editGroupTom.setValue([String(empdeets.group.id)]);
+    }
+  }
+
   $("#editUserModal").modal("show");
 }
+
 function fillRemoveModal(empnum, empname) {
   $("#removeId").text(empnum);
   $("#removeName").text(empname);
@@ -559,15 +639,20 @@ function removeUser() {
     });
   });
 }
+
 function saveUser() {
   const empnumber = $("#empIdEdit").val();
-  const groupid = $("#editGroup").val();
+  const groupid = editGroupTom
+    ? editGroupTom.items.slice()
+    : $("#editGroup").val() || [];
   const accessid = $("#empAccessEdit").val();
   const emp_email = $("#empEmailEdit").val();
+  console.log(groupid);
   return new Promise((resolve, reject) => {
     $.ajax({
       type: "POST",
       url: "php/edit_khit_user.php",
+      traditional: true,
       data: {
         empID: empnumber,
         grpID: groupid,
@@ -591,6 +676,7 @@ function saveUser() {
     });
   });
 }
+
 function logOut() {
   return new Promise((resolve, reject) => {
     $.ajax({
@@ -658,5 +744,54 @@ function showToast(type, str) {
   setTimeout(() => {
     toast.remove();
   }, 3000);
+}
+
+function initTomSelects() {
+  if ($("#empGroup").length && !empGroupTom) {
+    empGroupTom = new TomSelect("#empGroup", {
+      plugins: {
+        remove_button: { title: "Remove" },
+      },
+      create: false,
+      persist: false,
+      maxOptions: 100,
+      hideSelected: true,
+      closeAfterSelect: false,
+      placeholder: "Select one or more groups",
+    });
+
+    // REMOVE select styling from TomSelect wrapper
+    $("#empGroup").next(".ts-wrapper").removeClass("select");
+  }
+
+  if ($("#editGroup").length && !editGroupTom) {
+    editGroupTom = new TomSelect("#editGroup", {
+      plugins: {
+        remove_button: { title: "Remove" },
+      },
+      create: false,
+      persist: false,
+      maxOptions: 100,
+      hideSelected: true,
+      closeAfterSelect: false,
+      placeholder: "Select one or more groups",
+    });
+
+    $("#editGroup").next(".ts-wrapper").removeClass("select");
+  }
+}
+
+function clearGroupValidation(selector) {
+  const $el = $(selector);
+  $el.removeClass("border-[var(--red-color)] bg-red-200");
+  $el.siblings("small").addClass("hidden");
+  $el.next(".ts-wrapper").removeClass("error");
+}
+
+function markGroupValidationError(selector) {
+  const $el = $(selector);
+  $el.addClass("border-[var(--red-color)] bg-red-200");
+  $el.siblings("small").removeClass("hidden");
+  $el.next(".ts-wrapper").addClass("error");
 }
 //#endregion

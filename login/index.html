@@ -1,25 +1,27 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
-    <title>Passport Control System</title>
+    <title>トラベる</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta charset="UTF-8" />
-    <script src="js/html2canvas.js"></script>
-    <script src="js/jquery.js"></script>
-    <script src="js/jquery.inview.min.js"></script>
-    <script>
-      var busterCall = ["js/individual.js", "css/index.css"];
-      $.post(
-        "php/get_version.php",
-        {
-          busterCall: busterCall,
-          titleName: "トラベる",
-        },
-        function (data) {
-          $("head").html(data);
-        }
-      );
-    </script>
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="../global.css" />
+    <link rel="stylesheet" href="../css/tailwind.css" />
+    <link rel="stylesheet" href="../css/font-awesome.css" />
+    <link rel="stylesheet" href="../css/boxicons.css" />
+    <link rel="stylesheet" href="../css/bootstrap.min.css" />
+    <link rel="stylesheet" href="css/index.css" />
+
+    <!-- JS libraries -->
+    <script src="../js/jquery.js"></script>
+    <script src="../js/bootstrap.min.js"></script>
+    <script src="../js/html2canvas.js"></script>
+    <script src="../js/jquery.inview.min.js"></script>
+    <script src="../lottie.min.js"></script>
+
+    <!-- Page script -->
+    <script defer src="js/individual.js"></script>
   </head>
 
   <!-- #region modal -->
