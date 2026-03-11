@@ -82,41 +82,103 @@ function getGroups($empnum)
     }
     return $myGroups;
 }
+function getKHIUserGroups($empID)
+{
+    global $connpcs;
+    $groups = array();
 
+    $groupQ = "SELECT gl.`id`, gl.`name`, gl.`abbreviation` AS `abbr`
+               FROM `pcosdb`.`khi_user_groups` AS kug
+               INNER JOIN `kdtphdb_new`.`group_list` AS gl
+                   ON gl.`id` = kug.`group_id`
+               WHERE kug.`user_id` = :empID
+               ORDER BY kug.`id` ASC";
+
+    $groupStmt = $connpcs->prepare($groupQ);
+    $groupStmt->execute([":empID" => $empID]);
+
+    if ($groupStmt->rowCount() > 0) {
+        $groupArr = $groupStmt->fetchAll();
+        foreach ($groupArr as $grp) {
+            $groups[] = [
+                "id" => $grp["id"],
+                "name" => $grp["name"],
+                "abbr" => $grp["abbr"]
+            ];
+        }
+    }
+
+    return $groups;
+}
+function getKHIMainGroup($empID)
+{
+    $groups = getKHIUserGroups($empID);
+
+    if (!empty($groups)) {
+        return $groups[0];
+    }
+
+    return null;
+}
 function getKHIMembers($empnum)
 {
     global $connpcs;
     $members = array();
+
     $myGroups = getGroups($empnum);
     $group_ids = array_map(function ($group) {
-        return $group['id'];
+        return (int)$group['id'];
     }, $myGroups);
-    $grpStmt = "AND kd.`group_id` IN (" . implode(',', $group_ids) . ")";
-    $memsQ = "SELECT kd.`number` ,kd.`surname`, kd.`firstname`, gl.`id`, gl.`abbreviation`, kd.`email` FROM `pcosdb`.`khi_details` AS kd JOIN `kdtphdb_new`.`group_list` AS gl ON kd.`group_id` = gl.`id` WHERE 
-    kd.`is_active` = 1 $grpStmt ORDER BY `number`";
+
+    if (empty($group_ids)) {
+        return $members;
+    }
+
+    $grpStmt = implode(',', $group_ids);
+
+    $memsQ = "SELECT DISTINCT
+                    kd.`number`,
+                    kd.`surname`,
+                    kd.`firstname`,
+                    kd.`email`
+              FROM `pcosdb`.`khi_details` AS kd
+              INNER JOIN `pcosdb`.`khi_user_groups` AS kug
+                  ON kd.`number` = kug.`user_id`
+              WHERE kd.`is_active` = 1
+                AND kug.`group_id` IN ($grpStmt)
+              ORDER BY kd.`number`";
+
     $memsStmt = $connpcs->prepare($memsQ);
     $memsStmt->execute();
+
     if ($memsStmt->rowCount() > 0) {
         $memArr = $memsStmt->fetchAll();
+
         foreach ($memArr as $mem) {
             $output = array();
+
             $khi_id = $mem['number'];
             $khi_fname = $mem['firstname'];
             $khi_sname = $mem['surname'];
-            $group_id = $mem['id'];
-            $group_abbr = $mem['abbreviation'];
             $emp_email = $mem['email'];
             $adminType = allGroupAccess($khi_id) ? 1 : 0;
+
+            $groupArray = getKHIUserGroups($khi_id);
+            $mainGroup = getKHIMainGroup($khi_id);
+
             $output['id'] = $khi_id;
+            $output['empID'] = $khi_id;
             $output['fname'] = $khi_fname;
             $output['sname'] = $khi_sname;
-            $output['group']['id'] = $group_id;
-            $output['group']['abbr'] = $group_abbr;
+            $output['group'] = $mainGroup;
+            $output['groups'] = $groupArray;
             $output['type'] = $adminType;
             $output['email'] = $emp_email;
+
             array_push($members, $output);
         }
     }
+
     return $members;
 }
 

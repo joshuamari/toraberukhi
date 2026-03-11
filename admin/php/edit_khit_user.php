@@ -10,101 +10,131 @@ require_once '../../global/globalFunctions.php';
 date_default_timezone_set('Asia/Manila');
 #endregion
 
-#region Initialize Variable
-$groupID = $empnum = $empacc = 0;
-#endregion
+header('Content-Type: application/json');
+
+$message = [
+    "isSuccess" => 0,
+    "message" => ""
+];
+
+$errors = [];
 
 #region Set Variable Values
-if (!empty($_POST["empID"])) {
-    $empID = $_POST["empID"];
+$empID = isset($_POST["empID"]) ? trim($_POST["empID"]) : "";
+if ($empID === "") {
+    $errors[] = "Employee ID";
+}
+
+$empacc = isset($_POST["empacc"]) ? trim($_POST["empacc"]) : "";
+if ($empacc === "") {
+    $errors[] = "Access Type";
+}
+
+$empEMAIL = isset($_POST["empemail"]) ? trim($_POST["empemail"]) : "";
+if ($empEMAIL === "") {
+    $errors[] = "Employee Email";
+}
+
+$grpID = $_POST["grpID"] ?? null;
+
+if ($grpID === null || $grpID === "") {
+    $errors[] = "Group ID";
+    $grpID = [];
 } else {
-  $msg['isSuccess'] = 0;
-  $msg['message'][] = 'Employee ID';
+    if (!is_array($grpID)) {
+        $grpID = [$grpID];
+    }
+
+    $grpID = array_map(function ($value) {
+        return trim((string)$value);
+    }, $grpID);
+
+    $grpID = array_filter($grpID, function ($value) {
+        return $value !== '' && is_numeric($value);
+    });
+
+    $grpID = array_values(array_unique($grpID));
+
+    if (count($grpID) === 0) {
+        $errors[] = "Group ID";
+    }
 }
-if (!empty($_POST["grpID"])) {
-    $grpID = $_POST["grpID"];
-    $grpID = explode(",", $grpID);
-} else {
-  $msg['isSuccess'] = 0;
-  $msg['message'][] = 'Group ID';
-}
-if (isset($_POST["empacc"])) {
-    $empacc = $_POST["empacc"];
-} else {
-  $msg['isSuccess'] = 0;
-  $msg['message'][] = 'Access Type';
-}
-if (!empty($_POST["empemail"])) {
-  $empEMAIL = $_POST["empemail"];
-} else {
-  $msg['isSuccess'] = 0;
-  $msg['message'][] = 'Employee Email';
-}
-#for separation of error
-if (!empty($msg)) {
-	if (count($msg['message']) > 1) {
-		$errorString = '';
-		foreach ($msg['message'] as $result) {
-			if ($result === end($msg['message'])) {
-				$errorString .= "and '$result' Missing";
-			}
-			else {
-				$errorString .= "'$result', ";
-			}
-		}
-		$msg['message'] = $errorString;
-	} else {
-    $msg['message'] = implode("", $msg['message']);
-    $msg['message'] .= " Missing";
-  }
-	die(json_encode($msg));
-}
-$connpcs->beginTransaction();
 #endregion
 
-$permChanges = TRUE;
+#region Return validation errors
+if (!empty($errors)) {
+    if (count($errors) > 1) {
+        $last = array_pop($errors);
+        $message["message"] = "'" . implode("', '", $errors) . "' and '" . $last . "' Missing";
+    } else {
+        $message["message"] = $errors[0] . " Missing";
+    }
 
-#region main query
+    echo json_encode($message);
+    exit;
+}
+#endregion
+
+$primaryGroupID = $grpID[0];
+
 try {
-  $editUser = "UPDATE `khi_details` SET `email` = :empEMAIL WHERE `number` = :empID";
-  $editUserStmt = $connpcs->prepare($editUser);
-  $editUserStmt->execute([":empID" => "$empID", ":empEMAIL" => "$empEMAIL"]);
+    $connpcs->beginTransaction();
 
-  $deleteGroup = "DELETE FROM `khi_user_groups` WHERE `user_id` = :empID";
-  $deleteGroupStmt = $connpcs->prepare($deleteGroup);
-  $deleteGroupStmt->execute([":empID" => "$empID"]);
+    // update user email and main group
+    $editUser = "UPDATE `khi_details`
+                 SET `email` = :empEMAIL,
+                     `group_id` = :groupID
+                 WHERE `number` = :empID";
+    $editUserStmt = $connpcs->prepare($editUser);
+    $editUserStmt->execute([
+        ":empID" => $empID,
+        ":empEMAIL" => $empEMAIL,
+        ":groupID" => $primaryGroupID
+    ]);
 
-  foreach ($grpID as $group) {
-    $addGroup = "INSERT INTO `khi_user_groups`(`user_id`, `group_id`) VALUES (:empID, :group)";
+    // replace groups
+    $deleteGroup = "DELETE FROM `khi_user_groups` WHERE `user_id` = :empID";
+    $deleteGroupStmt = $connpcs->prepare($deleteGroup);
+    $deleteGroupStmt->execute([
+        ":empID" => $empID
+    ]);
+
+    $addGroup = "INSERT INTO `khi_user_groups` (`user_id`, `group_id`) VALUES (:empID, :groupID)";
     $addGroupStmt = $connpcs->prepare($addGroup);
-    $addGroupStmt->execute([":empID" => "$empID", ":group" => "$group"]);
-  }
 
-  $delPerm = "DELETE FROM `khi_user_permissions` WHERE `employee_id` = :empID";
-  $delPermStmt = $connpcs->prepare($delPerm);
-  $delPermStmt->execute([":empID" => "$empID"]);
-  $counterPerm = 0;
+    foreach ($grpID as $groupID) {
+        $addGroupStmt->execute([
+            ":empID" => $empID,
+            ":groupID" => $groupID
+        ]);
+    }
 
-  if ($empacc == 1) {
-    $editPerm = "INSERT INTO `khi_user_permissions`(`permission_id`, `employee_id`) VALUES (1, :empID)";
-    $editPermStmt = $connpcs->prepare($editPerm);
-    $editPermStmt->execute([":empID" => "$empID"]);
-    $counterPerm = $editPermStmt->rowCount();
-  }
+    // replace permissions
+    $delPerm = "DELETE FROM `khi_user_permissions` WHERE `employee_id` = :empID";
+    $delPermStmt = $connpcs->prepare($delPerm);
+    $delPermStmt->execute([
+        ":empID" => $empID
+    ]);
 
-  if ($editUserStmt->rowCount() > 0 || ($delPermStmt->rowCount() != $counterPerm)) {
-      $connpcs->commit();
-      $message["isSuccess"] = 1;
-      $message["message"] = "User successfully updated";
-  } else {
-      $connpcs->rollBack();
-      $message["isSuccess"] = 0;
-      $message["message"] = "No change has been made";
-  }
-    // }
+    if ((string)$empacc === "1") {
+        $editPerm = "INSERT INTO `khi_user_permissions` (`permission_id`, `employee_id`) VALUES (1, :empID)";
+        $editPermStmt = $connpcs->prepare($editPerm);
+        $editPermStmt->execute([
+            ":empID" => $empID
+        ]);
+    }
+
+    $connpcs->commit();
+
+    $message["isSuccess"] = 1;
+    $message["message"] = "User successfully updated";
 } catch (Exception $e) {
-    $connpcs->rollBack();
-    echo "Connection failed: " . $e->getMessage();
+    if ($connpcs->inTransaction()) {
+        $connpcs->rollBack();
+    }
+
+    $message["isSuccess"] = 0;
+    $message["message"] = $e->getMessage();
 }
-#endregion
+
 echo json_encode($message);

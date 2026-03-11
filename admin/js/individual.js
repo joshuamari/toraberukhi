@@ -489,40 +489,53 @@ function getInitials(firstname, surname) {
   return initials.toUpperCase();
 }
 function addUser() {
-  var empId = $("#empId").val();
-  var empFName = $("#empFName").val();
-  var empLName = $("#empLName").val();
-  var empGroup = empGroupTom
+  const empId = $("#empId").val();
+  const empFName = $("#empFName").val();
+  const empLName = $("#empLName").val();
+
+  const rawEmpGroup = empGroupTom
     ? empGroupTom.items.slice()
-    : $("#empGroup").val() || [];
-  var empAccess = $("#empAccessAdd").val();
-  var empEMAIL = $("#empEmail").val();
-  var ctr = 0;
+    : $("#empGroup").val();
+
+  const empGroup = Array.isArray(rawEmpGroup)
+    ? rawEmpGroup
+    : rawEmpGroup
+    ? [rawEmpGroup]
+    : [];
+
+  const empAccess = $("#empAccessAdd").val();
+  const empEMAIL = $("#empEmail").val();
+  let ctr = 0;
 
   if (!empId) {
     $("#empId").addClass("border-[var(--red-color)] bg-red-200");
     $("#empId").siblings("small").removeClass("hidden");
     ctr++;
   }
+
   if (!empFName) {
     $("#empFName").addClass("border-[var(--red-color)] bg-red-200");
     $("#empFName").siblings("small").removeClass("hidden");
     ctr++;
   }
+
   if (!empLName) {
     $("#empLName").addClass("border-[var(--red-color)] bg-red-200");
     $("#empLName").siblings("small").removeClass("hidden");
     ctr++;
   }
+
   if (!empGroup || empGroup.length === 0) {
     markGroupValidationError("#empGroup");
     ctr++;
   }
-  if (empAccess == undefined || empAccess === null || empAccess === "") {
+
+  if (empAccess === undefined || empAccess === null || empAccess === "") {
     $("#empAccessAdd").addClass("border-[var(--red-color)] bg-red-200");
     $("#empAccessAdd").siblings("small").removeClass("hidden");
     ctr++;
   }
+
   if (!empEMAIL) {
     $("#empEmail").addClass("border-[var(--red-color)] bg-red-200");
     $("#empEmail").siblings("small").removeClass("hidden");
@@ -532,35 +545,34 @@ function addUser() {
   return new Promise((resolve, reject) => {
     if (ctr > 0) {
       resolve({ isSuccess: false, error: "Incomplete Fields" });
-    } else {
-      $.ajax({
-        type: "POST",
-        url: "php/add_khi_user.php",
-        traditional: true,
-        data: {
-          empID: empId,
-          fname: empFName,
-          lname: empLName,
-          grpID: empGroup,
-          empacc: empAccess,
-          empemail: empEMAIL,
-        },
-        dataType: "json",
-        success: function (response) {
-          const res = response;
-          resolve(res);
-        },
-        error: function (xhr, status, error) {
-          if (xhr.status === 404) {
-            reject("Not Found Error: The requested resource was not found.");
-          } else if (xhr.status === 500) {
-            reject("Internal Server Error: There was a server error.");
-          } else {
-            reject("An unspecified error occurred while adding KHI member.");
-          }
-        },
-      });
+      return;
     }
+
+    $.ajax({
+      type: "POST",
+      url: "php/add_khi_user.php",
+      data: {
+        empID: empId,
+        fname: empFName,
+        lname: empLName,
+        grpID: empGroup,
+        empacc: empAccess,
+        empemail: empEMAIL,
+      },
+      dataType: "json",
+      success: function (response) {
+        resolve(response);
+      },
+      error: function (xhr) {
+        if (xhr.status === 404) {
+          reject("Not Found Error: The requested resource was not found.");
+        } else if (xhr.status === 500) {
+          reject("Internal Server Error: There was a server error.");
+        } else {
+          reject("An unspecified error occurred while adding KHI member.");
+        }
+      },
+    });
   });
 }
 
@@ -642,17 +654,24 @@ function removeUser() {
 
 function saveUser() {
   const empnumber = $("#empIdEdit").val();
-  const groupid = editGroupTom
+
+  const rawGroupId = editGroupTom
     ? editGroupTom.items.slice()
-    : $("#editGroup").val() || [];
+    : $("#editGroup").val();
+
+  const groupid = Array.isArray(rawGroupId)
+    ? rawGroupId
+    : rawGroupId
+    ? [rawGroupId]
+    : [];
+
   const accessid = $("#empAccessEdit").val();
   const emp_email = $("#empEmailEdit").val();
-  console.log(groupid);
+
   return new Promise((resolve, reject) => {
     $.ajax({
       type: "POST",
       url: "php/edit_khit_user.php",
-      traditional: true,
       data: {
         empID: empnumber,
         grpID: groupid,
@@ -661,10 +680,9 @@ function saveUser() {
       },
       dataType: "json",
       success: function (response) {
-        const res = response;
-        resolve(res);
+        resolve(response);
       },
-      error: function (xhr, status, error) {
+      error: function (xhr) {
         if (xhr.status === 404) {
           reject("Not Found Error: The requested resource was not found.");
         } else if (xhr.status === 500) {
@@ -758,10 +776,10 @@ function initTomSelects() {
       hideSelected: true,
       closeAfterSelect: false,
       placeholder: "Select one or more groups",
+      clearAfterSelect: true
     });
 
-    // REMOVE select styling from TomSelect wrapper
-    $("#empGroup").next(".ts-wrapper").removeClass("select");
+   
   }
 
   if ($("#editGroup").length && !editGroupTom) {
@@ -775,9 +793,9 @@ function initTomSelects() {
       hideSelected: true,
       closeAfterSelect: false,
       placeholder: "Select one or more groups",
+      clearAfterSelect: true
     });
 
-    $("#editGroup").next(".ts-wrapper").removeClass("select");
   }
 }
 

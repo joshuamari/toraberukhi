@@ -10,115 +10,164 @@ require_once '../../global/globalFunctions.php';
 date_default_timezone_set('Asia/Manila');
 #endregion
 
-#region Initialize Variable
-$groupID = $empnum = $empacc = 0;
-$fname = $lname = "";
-$msg = array();
-#endregion
+header('Content-Type: application/json');
+
+$message = [
+    "isSuccess" => 0,
+    "message" => ""
+];
+
+$errors = [];
 
 #region Set Variable Values
-if (!empty($_POST["empID"])) {
-    $empID = $_POST["empID"];
-} else {
-    $msg['isSuccess'] = 0;
-    $msg['message'][] = 'Employee ID';
-}
-if (!empty($_POST["fname"])) {
-    $fname = $_POST["fname"];
-} else {
-    $msg['isSuccess'] = 0;
-    $msg['message'][] = 'First Name';
-}
-if (!empty($_POST["lname"])) {
-    $lname = $_POST["lname"];
-} else {
-    $msg['isSuccess'] = 0;
-    $msg['message'][] = 'Last Name';
-}
-if (!empty($_POST["grpID"])) {
-    $grpID = $_POST["grpID"];
-} else {
-    $msg['isSuccess'] = 0;
-    $msg['message'][] = 'Group';
-}
-if (!empty($_POST["empacc"])) {
-    $empacc = $_POST["empacc"];
+$empID = isset($_POST["empID"]) ? trim($_POST["empID"]) : "";
+if ($empID === "") {
+    $errors[] = "Employee ID";
 }
 
-if (!empty($_POST["empemail"])) {
-    $empEMAIL = $_POST["empemail"];
+$fname = isset($_POST["fname"]) ? trim($_POST["fname"]) : "";
+if ($fname === "") {
+    $errors[] = "First Name";
+}
+
+$lname = isset($_POST["lname"]) ? trim($_POST["lname"]) : "";
+if ($lname === "") {
+    $errors[] = "Last Name";
+}
+
+$empacc = isset($_POST["empacc"]) ? trim($_POST["empacc"]) : "";
+
+$empEMAIL = isset($_POST["empemail"]) ? trim($_POST["empemail"]) : "";
+if ($empEMAIL === "") {
+    $errors[] = "Employee Email";
+}
+
+$grpID = $_POST["grpID"] ?? null;
+
+if ($grpID === null || $grpID === "") {
+    $errors[] = "Group";
+    $grpID = [];
 } else {
-    $msg['isSuccess'] = 0;
-    $msg['message'][] = 'Employee Email';
-}
-#for separation of error
-if (!empty($msg)) {
-    if (count($msg['message']) > 1) {
-        $errorString = '';
-        foreach ($msg['message'] as $result) {
-            if ($result === end($msg['message'])) {
-                $errorString .= "and '$result' Missing";
-            } else {
-                $errorString .= "'$result', ";
-            }
-        }
-        $msg['message'] = $errorString;
-    } else {
-        $msg['message'] = implode("", $msg['message']);
-        $msg['message'] .= " Missing";
+    if (!is_array($grpID)) {
+        $grpID = [$grpID];
     }
-    die(json_encode($msg));
+
+    $grpID = array_map(function ($value) {
+        return trim((string)$value);
+    }, $grpID);
+
+    $grpID = array_filter($grpID, function ($value) {
+        return $value !== '' && is_numeric($value);
+    });
+
+    $grpID = array_values(array_unique($grpID));
+
+    if (count($grpID) === 0) {
+        $errors[] = "Group";
+    }
 }
-$connpcs->beginTransaction();
 #endregion
 
-#region main query
+#region Return validation errors
+if (!empty($errors)) {
+    if (count($errors) > 1) {
+        $last = array_pop($errors);
+        $message["message"] = "'" . implode("', '", $errors) . "' and '" . $last . "' Missing";
+    } else {
+        $message["message"] = $errors[0] . " Missing";
+    }
+
+    echo json_encode($message);
+    exit;
+}
+#endregion
+
+// first selected group becomes main group in khi_details
+$primaryGroupID = $grpID[0];
+
 try {
+    $connpcs->beginTransaction();
+
     $checkID = "SELECT `is_active` FROM `khi_details` WHERE `number` = :empID";
     $checkIDStmt = $connpcs->prepare($checkID);
-    $checkIDStmt->execute([":empID" => "$empID"]);
-    $checkCount = $checkIDStmt->rowCount();
-    $isActive = $checkIDStmt->fetchColumn();
+    $checkIDStmt->execute([":empID" => $empID]);
+    $existingRow = $checkIDStmt->fetch(PDO::FETCH_ASSOC);
 
-    if ($checkCount == 0) {
-        $insertUser = "INSERT INTO `khi_details`(`number`, `surname`, `firstname`, `group_id`, `email`, `is_active`) 
-        VALUES (:empID, :lname, :fname, :grpID, :email, 1)";
+    if (!$existingRow) {
+        $insertUser = "INSERT INTO `khi_details`
+            (`number`, `surname`, `firstname`, `group_id`, `email`, `is_active`)
+            VALUES
+            (:empID, :lname, :fname, :grpID, :email, 1)";
+        $insertUserStmt = $connpcs->prepare($insertUser);
+        $insertUserStmt->execute([
+            ":empID" => $empID,
+            ":lname" => $lname,
+            ":fname" => $fname,
+            ":grpID" => $primaryGroupID,
+            ":email" => $empEMAIL
+        ]);
     } else {
-        if ($isActive == 0) {
-            $insertUser = "UPDATE `khi_details` SET `surname` = :lname, `firstname` = :fname, `group_id` = :grpID, `email` = :email, `is_active` = 1 WHERE `number` = :empID";
-        } else {
+        if ((int)$existingRow["is_active"] === 1) {
             $connpcs->rollBack();
             $message["isSuccess"] = 0;
             $message["message"] = "User ID already registered";
+            echo json_encode($message);
+            exit;
         }
+
+        $updateUser = "UPDATE `khi_details`
+            SET `surname` = :lname,
+                `firstname` = :fname,
+                `group_id` = :grpID,
+                `email` = :email,
+                `is_active` = 1
+            WHERE `number` = :empID";
+        $updateUserStmt = $connpcs->prepare($updateUser);
+        $updateUserStmt->execute([
+            ":empID" => $empID,
+            ":lname" => $lname,
+            ":fname" => $fname,
+            ":grpID" => $primaryGroupID,
+            ":email" => $empEMAIL
+        ]);
+
+        $deleteOldGroups = "DELETE FROM `khi_user_groups` WHERE `user_id` = :empID";
+        $deleteOldGroupsStmt = $connpcs->prepare($deleteOldGroups);
+        $deleteOldGroupsStmt->execute([":empID" => $empID]);
+
+        $deleteOldPerms = "DELETE FROM `khi_user_permissions` WHERE `employee_id` = :empID";
+        $deleteOldPermsStmt = $connpcs->prepare($deleteOldPerms);
+        $deleteOldPermsStmt->execute([":empID" => $empID]);
     }
 
-    $insertUserStmt = $connpcs->prepare($insertUser);
-    if ($insertUserStmt->execute([":empID" => "$empID", ":lname" => "$lname", ":fname" => "$fname", ":grpID" => "$grpID", ":email" => $empEMAIL])) {
-        if ($empacc == 1) {
-            $insertAccess = "INSERT INTO `khi_user_permissions`(`permission_id`, `employee_id`) VALUES (1, :empID)";
-            $insertAccessStmt = $connpcs->prepare($insertAccess);
-            if ($insertAccessStmt->execute([":empID" => "$empID"])) {
-            } else {
-                $connpcs->rollBack();
-            }
-        }
+    if ((string)$empacc === "1") {
+        $insertAccess = "INSERT INTO `khi_user_permissions` (`permission_id`, `employee_id`)
+                         VALUES (1, :empID)";
+        $insertAccessStmt = $connpcs->prepare($insertAccess);
+        $insertAccessStmt->execute([":empID" => $empID]);
+    }
 
-        $insertGroups = "INSERT INTO `khi_user_groups`(`user_id`,`group_id`) VALUE (:empID, :grpID)";
-        $insertGroupsStmt = $connpcs->prepare($insertGroups);
-        if ($insertGroupsStmt->execute([":empID" => "$empID", ":grpID" => "$grpID"])) {
-            $connpcs->commit();
-            $message["isSuccess"] = 1;
-            $message["message"] = "User successfully added";
-        } else {
-            $connpcs->rollBack();
-        }
-    } else {
+    $insertGroups = "INSERT INTO `khi_user_groups` (`user_id`, `group_id`)
+                     VALUES (:empID, :grpID)";
+    $insertGroupsStmt = $connpcs->prepare($insertGroups);
+
+    foreach ($grpID as $groupID) {
+        $insertGroupsStmt->execute([
+            ":empID" => $empID,
+            ":grpID" => $groupID
+        ]);
+    }
+
+    $connpcs->commit();
+    $message["isSuccess"] = 1;
+    $message["message"] = "User successfully added";
+} catch (Exception $e) {
+    if ($connpcs->inTransaction()) {
         $connpcs->rollBack();
     }
-} catch (Exception $e) {
-    $connpcs->rollBack();
-    echo "Connection failed: " . $e->getMessage();
+
+    $message["isSuccess"] = 0;
+    $message["message"] = $e->getMessage();
 }
-#endregion
+
 echo json_encode($message);
