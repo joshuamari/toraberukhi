@@ -231,19 +231,35 @@ function getPresDetails()
 function getAdminEmails()
 {
     global $connnew;
-    $adminEmail = array();
+
+    $adminEmail = [];
     $exclude = [29, 40, 43, 44, 45, 49, 51, 53];
     $adminGroupID = 2;
+
     $excludeStmt = "AND `designation` NOT IN (" . implode(",", $exclude) . ")";
-    $emailQ = "SELECT `email` FROM `employee_list` WHERE `group_id`=:group_id $excludeStmt";
+
+    $emailQ = "
+        SELECT `email`
+        FROM `employee_list`
+        WHERE `group_id` = :group_id
+        $excludeStmt
+        AND (
+            `resignation_date` IS NULL
+            OR `resignation_date` = '0000-00-00'
+            OR `resignation_date` >= CURDATE()
+        )
+    ";
+
     $emailStmt = $connnew->prepare($emailQ);
     $emailStmt->execute([":group_id" => $adminGroupID]);
+
     if ($emailStmt->rowCount() > 0) {
-        $emailArr = $emailStmt->fetchAll();
+        $emailArr = $emailStmt->fetchAll(PDO::FETCH_ASSOC);
         foreach ($emailArr as $emails) {
             $adminEmail[] = $emails['email'];
         }
     }
+
     return $adminEmail;
 }
 function groupByID($id)
@@ -262,30 +278,58 @@ function getKHIPICEmail($group_id, $exclude = 0)
 {
     global $connpcs;
     $khiEmail = array();
-    $khiQ = "SELECT `email` FROM `khi_details` WHERE `group_id`=:group_id AND `number` != :exclude";
+
+    $khiQ = "
+        SELECT `email`
+        FROM `khi_details`
+        WHERE `group_id` = :group_id
+          AND `number` != :exclude
+          AND `is_active` = 1
+    ";
+
     $khiStmt = $connpcs->prepare($khiQ);
-    $khiStmt->execute([":group_id" => $group_id, ":exclude" => $exclude]);
+    $khiStmt->execute([
+        ":group_id" => $group_id,
+        ":exclude" => $exclude
+    ]);
+
     if ($khiStmt->rowCount() > 0) {
-        $khiArr = $khiStmt->fetchAll();
+        $khiArr = $khiStmt->fetchAll(PDO::FETCH_ASSOC);
         foreach ($khiArr as $emails) {
-            $khiEmail[] = $emails['email'];
+            if (!empty($emails['email'])) {
+                $khiEmail[] = $emails['email'];
+            }
         }
     }
+
     return $khiEmail;
 }
+
 function getKHIAdminEmails()
 {
     global $connpcs;
     $khiEmail = array();
-    $khiQ = "SELECT `email` FROM `khi_details` WHERE `group_id`=2 AND `number` != 905007 AND `is_active`=1";
+
+    $khiQ = "
+        SELECT `email`
+        FROM `khi_details`
+        WHERE `group_id` = 2
+          AND `number` != 905007
+          AND `is_active` = 1
+    ";
+
     $khiStmt = $connpcs->prepare($khiQ);
     $khiStmt->execute();
+
     if ($khiStmt->rowCount() > 0) {
-        $khiArr = $khiStmt->fetchAll();
+        $khiArr = $khiStmt->fetchAll(PDO::FETCH_ASSOC);
         foreach ($khiArr as $emails) {
-            $khiEmail[] = $emails['email'];
+            if (!empty($emails['email'])) {
+                $khiEmail[] = $emails['email'];
+            }
         }
     }
+
     return $khiEmail;
 }
 function getRequestDetails($request_id)
