@@ -15,12 +15,4 @@ function bindEvents() {
   $(document).on("click", "#logoutBtn", function () {
     handleLogout();
   });
-
-  $(document).on("click", ".btn-bug", function () {
-    openReportDialog();
-  });
-
-  $(document).on("click", ".sentry-error-embed-wrapper", function () {
-    closeReportDialogState();
-  });
 }

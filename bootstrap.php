@@ -22,8 +22,11 @@ require_once __DIR__ . '/dbconn_new/dbconnectnew.php';
 
 require_once __DIR__ . '/global/globalFunctions.php';
 
+require_once __DIR__ . '/services/GroupService.php';
 require_once __DIR__ . '/services/AuthService.php';
-require_once __DIR__ . '/services/DashboardService.php';
-
 require_once __DIR__ . '/services/LoginService.php';
+
+
+require_once __DIR__ . '/services/DashboardService.php';
+require_once __DIR__ . '/services/ReportService.php';
 $appConfig = getAppConfig();

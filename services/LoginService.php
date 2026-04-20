@@ -1,10 +1,5 @@
 <?php
 
-function encodeKhiSessionId(int $userId): string
-{
-    return bin2hex(urlencode(base64_encode((string) $userId)));
-}
-
 function loginKhiUser(PDO $connpcs, string $khiID): array
 {
     $khiID = trim($khiID);

@@ -19,6 +19,11 @@ function decodeKhiSessionId($encodedValue): int
     return (int) $decodedBase64;
 }
 
+function encodeKhiSessionId(int $userId): string
+{
+    return bin2hex(urlencode(base64_encode((string) $userId)));
+}
+
 function getCurrentUserId(): int
 {
     return decodeKhiSessionId($_SESSION['IDKHI'] ?? '');
@@ -52,45 +57,6 @@ function hasAllGroupAccess(PDO $connpcs, int $empId): bool
     return ((int) $stmt->fetchColumn()) > 0;
 }
 
-function getUserGroups(PDO $connpcs, int $empId): array
-{
-    $sql = "
-        SELECT
-            gl.`id`,
-            gl.`name`,
-            gl.`abbreviation` AS `abbr`
-        FROM `pcosdb`.`khi_user_groups` AS kug
-        INNER JOIN `kdtphdb_new`.`group_list` AS gl
-            ON gl.`id` = kug.`group_id`
-        WHERE kug.`user_id` = :emp_id
-        ORDER BY kug.`id` ASC
-    ";
-
-    $stmt = $connpcs->prepare($sql);
-    $stmt->execute([
-        ':emp_id' => $empId
-    ]);
-
-    $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-    if (!$rows) {
-        return [];
-    }
-
-    return array_map(function ($row) {
-        return [
-            'id' => (int) $row['id'],
-            'name' => $row['name'],
-            'abbr' => $row['abbr'],
-        ];
-    }, $rows);
-}
-
-function getMainGroupFromGroups(array $groups): ?array
-{
-    return !empty($groups) ? $groups[0] : null;
-}
-
 function getCurrentUserProfile(PDO $connpcs, int $userId): array
 {
     $sql = "
@@ -116,7 +82,7 @@ function getCurrentUserProfile(PDO $connpcs, int $userId): array
         throw new RuntimeException('User not found or inactive', 403);
     }
 
-    $groups = getUserGroups($connpcs, $userId);
+    $groups = getAccessibleGroups($connpcs, $userId);
     $mainGroup = getMainGroupFromGroups($groups);
 
     $employee['id'] = (int) $employee['id'];
