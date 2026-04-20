@@ -1,27 +1,3 @@
-// Sentry.init({
-//   dsn: "http://996e6a7f7f64d413dd43124ae5dece7e@o4507730788483072.ingest.us.sentry.io/4507767647436800",
-// });
-// try {
-//   // Your code that might throw an error
-//   throw new Error("Test error for user feedback");
-// } catch (error) {
-//   // Capture the exception and get the event ID
-//   const eventId = Sentry.captureException(error);
-
-//   // Show the user feedback dialog
-//   Sentry.showReportDialog({
-//     eventId: eventId, // Use the captured event ID here
-//     title: "We're sorry about that!",
-//     subtitle: "Please provide us with some feedback so we can fix the issue.",
-//     subtitle2: "We appreciate your help!",
-//     labelName: "Name",
-//     labelEmail: "Email",
-//     labelComments: "Anyare?",
-//     labelSubmit: "Send Feedback",
-//     successMessage: "Thank you for your feedback!",
-//     // You can add your branding or message here if needed
-//   });
-// }
 //#region GLOBALS
 const rootFolder = `//${document.location.hostname}`;
 let empDetails = [];

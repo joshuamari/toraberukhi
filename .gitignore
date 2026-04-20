@@ -9,3 +9,9 @@ mail.html
 
 #ignore testing shit
 /php/check_recipients.php
+
+#ignore composer dependencies
+/vendor/
+
+#ignore environment config
+.env
