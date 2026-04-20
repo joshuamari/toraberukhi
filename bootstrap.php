@@ -25,4 +25,5 @@ require_once __DIR__ . '/global/globalFunctions.php';
 require_once __DIR__ . '/services/AuthService.php';
 require_once __DIR__ . '/services/DashboardService.php';
 
+require_once __DIR__ . '/services/LoginService.php';
 $appConfig = getAppConfig();
