@@ -161,7 +161,7 @@ $(document).on("change", "#reqDeptSel", function () {
       $("#reqTel").val("+81-(0)78-682-5561");
       $("#reqFax").val("+81-(0)78-682-5431");
     } else if ($("#reqDeptSel").val() == 6) {
-      $("#reqName").val("S. Fujita");
+      $("#reqName").val("Shigeyuki Oka");
       $("#reqTel").val("+81-(0)78-682-5252");
       $("#reqFax").val("+81-(0)78-682-5542");
     } else if ($("#reqDeptSel").val() == 7) {
@@ -185,7 +185,7 @@ $(document).on("change", "#reqDeptSel", function () {
       $("#reqTel").val("+81-(0)78-682-5072");
       $("#reqFax").val("+81-(0)78-682-5574");
     } else if ($("#reqDeptSel").val() == 14) {
-      $("#reqName").val("Kazuo Kudo");
+      $("#reqName").val("Narimichi Oda");
       $("#reqTel").val("+81-(0)78-682-5363");
       $("#reqFax").val("+81-(0)78-682-5548");
     } else if ($("#reqDeptSel").val() == 15) {
