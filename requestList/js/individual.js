@@ -56,10 +56,15 @@ let monthNames2 = [
   "Dec",
 ];
 let reqList = [];
+let allRequests = [];
 let cardData = [];
+let requestCurrentPage = 1;
+let filteredRequests = [];
+const REQUESTS_PER_PAGE = 10;
 let isSentryModalOpen = false;
 let printData = {};
 let sortDateAsc = false;
+let requestModalReturnTrigger = null;
 //#endregion
 checkAccess()
   .then((emp) => {
@@ -72,6 +77,7 @@ checkAccess()
             groupList = grps;
             fillGroups(groupList);
             reqList = reqs["data"];
+            allRequests = [...reqs["data"]];
             cardData = counts;
             fillCards();
             $(".tab")[0].click();
@@ -113,7 +119,8 @@ $(document).on("change", "#grpSel", function () {
       <i class='bx bx-x text-[18px] ml-3 z-[100]' id="removeGroup"></i>`
   );
   toggleLoadingAnimation(true);
-  searchFilter(reqList);
+  requestCurrentPage = 1;
+  searchFilter(allRequests, true);
 });
 $(document).on("click", "#removeGroup", function () {
   $("#grpSel").removeClass("active");
@@ -141,7 +148,7 @@ $(document).on("input", "#monthSel", function () {
                       <span class="" id="monthLabel">${display}</span>
                       ${iClass}
                       `);
-  searchFilter(reqList);
+  searchFilter(allRequests, true);
 });
 $(document).on("click", "#removeMonth", function () {
   $("#monthSel").removeClass("active");
@@ -149,7 +156,7 @@ $(document).on("click", "#removeMonth", function () {
                       <span class="" id="monthLabel">Requested Month</span>
                       <i class='bx bx-chevron-down text-[18px] ml-3'></i>`);
   $("#monthSel").val("");
-  searchFilter(reqList);
+  searchFilter(allRequests, true);
 });
 $(document).on("click", ".tab", function () {
   var indicator = document.querySelector(".indicator");
@@ -162,7 +169,7 @@ $(document).on("click", ".tab", function () {
   $(".tab span").removeClass("font-semibold text-[var(--dark)] active");
   $(this).find("span").addClass("font-semibold text-[var(--dark)] active");
 
-  searchFilter(reqList);
+  searchFilter(allRequests, true);
 });
 $(document).on("click", "td", function () {
   var rowID = $(this).closest("tr").attr("req-id");
@@ -177,11 +184,8 @@ $(document).on("click", "td", function () {
       alert(`Error: ${error}`);
     });
 });
-$(document).on("click", "#openModal .btn-close", function () {
-  $("#openModal").modal("hide");
-});
 $(document).on("input", "#searchbar", function () {
-  searchFilter(reqList);
+  searchFilter(allRequests, true);
 });
 $(document).on("click", "#logoutBtn", function () {
   logOut()
@@ -204,29 +208,250 @@ $(document).on("click", ".sentry-error-embed-wrapper", function () {
 
 $(document).on("click", "#sortDate", function () {
   sortDateAsc = !sortDateAsc;
-  searchFilter(reqList);
+  searchFilter(allRequests);
 });
-$(document).on("click", "#attachment", function () {
-  fillAttachment(printData);
-  $("#openModal .btn-close").click();
-  $("#attachmentModal").modal("show");
+$(document).on("click", "#requestPaginationPrev", function () {
+  if (requestCurrentPage > 1) {
+    requestCurrentPage -= 1;
+    renderRequestTable();
+  }
 });
-$(document).on("click", "#attachment2", function () {
-  fillAttachment2(printData);
-  $("#openModal .btn-close").click();
-  $("#attachmentModal2").modal("show");
+$(document).on("click", "#requestPaginationNext", function () {
+  const totalPages = getRequestTotalPages();
+  if (requestCurrentPage < totalPages) {
+    requestCurrentPage += 1;
+    renderRequestTable();
+  }
+});
+$(document).on("click", ".request-pagination__page", function () {
+  const page = parseInt($(this).attr("data-page"), 10);
+  if (!isNaN(page) && page !== requestCurrentPage) {
+    requestCurrentPage = page;
+    renderRequestTable();
+  }
+});
+$(document).on("click", "#attachment", function (event) {
+  requestModalReturnTrigger = event.currentTarget;
+  openAttachmentModalFromRequest("attachmentModal", function () {
+    fillAttachment(printData);
+  });
+});
+$(document).on("click", "#attachment2", function (event) {
+  requestModalReturnTrigger = event.currentTarget;
+  openAttachmentModalFromRequest("attachmentModal2", function () {
+    fillAttachment2(printData);
+  });
 });
 $(document).on("click", "#btnBack", function () {
-  $("#attachmentModal .btn-close").click();
-  $("#openModal").modal("show");
+  returnToRequestModalFromAttachment("attachmentModal");
 });
 $(document).on("click", "#btnBack2", function () {
-  $("#attachmentModal2 .btn-close").click();
-  $("#openModal").modal("show");
+  returnToRequestModalFromAttachment("attachmentModal2");
 });
 //#endregion
 
 //#region FUNCTIONS
+function getBootstrapModal(elementId) {
+  const element = document.getElementById(elementId);
+
+  if (!element || !window.bootstrap) {
+    return { element: null, instance: null };
+  }
+
+  return {
+    element,
+    instance: bootstrap.Modal.getOrCreateInstance(element),
+  };
+}
+
+function blurFocusedDescendant(modalElement) {
+  const activeElement = document.activeElement;
+
+  if (
+    activeElement instanceof HTMLElement &&
+    modalElement.contains(activeElement)
+  ) {
+    activeElement.blur();
+  }
+}
+
+function focusInitialModalControl(modalElement) {
+  const focusTarget = modalElement.querySelector(".btn-close");
+
+  if (focusTarget instanceof HTMLElement) {
+    focusTarget.focus();
+  }
+}
+
+function openAttachmentModalFromRequest(attachmentModalId, beforeShow) {
+  const requestModalElement = document.getElementById("openModal");
+  const attachmentModalElement = document.getElementById(attachmentModalId);
+
+  if (!requestModalElement || !attachmentModalElement || !window.bootstrap) {
+    return;
+  }
+
+  const requestModal =
+    bootstrap.Modal.getOrCreateInstance(requestModalElement);
+  const attachmentModal =
+    bootstrap.Modal.getOrCreateInstance(attachmentModalElement);
+
+  const onRequestHidden = function () {
+    requestModalElement.removeEventListener("hidden.bs.modal", onRequestHidden);
+
+    if (typeof beforeShow === "function") {
+      beforeShow();
+    }
+
+    const onAttachmentShown = function () {
+      attachmentModalElement.removeEventListener(
+        "shown.bs.modal",
+        onAttachmentShown
+      );
+      focusInitialModalControl(attachmentModalElement);
+    };
+
+    attachmentModalElement.addEventListener(
+      "shown.bs.modal",
+      onAttachmentShown
+    );
+    attachmentModal.show();
+  };
+
+  requestModalElement.addEventListener("hidden.bs.modal", onRequestHidden);
+  requestModal.hide();
+}
+
+function returnToRequestModalFromAttachment(attachmentModalId) {
+  const requestModalElement = document.getElementById("openModal");
+  const attachmentModalElement = document.getElementById(attachmentModalId);
+
+  if (!requestModalElement || !attachmentModalElement || !window.bootstrap) {
+    return;
+  }
+
+  const requestModal =
+    bootstrap.Modal.getOrCreateInstance(requestModalElement);
+  const attachmentModal =
+    bootstrap.Modal.getOrCreateInstance(attachmentModalElement);
+
+  blurFocusedDescendant(attachmentModalElement);
+
+  const onAttachmentHidden = function () {
+    attachmentModalElement.removeEventListener(
+      "hidden.bs.modal",
+      onAttachmentHidden
+    );
+
+    const onRequestShown = function () {
+      requestModalElement.removeEventListener("shown.bs.modal", onRequestShown);
+
+      if (requestModalReturnTrigger instanceof HTMLElement) {
+        requestModalReturnTrigger.focus();
+      }
+    };
+
+    requestModalElement.addEventListener("shown.bs.modal", onRequestShown);
+    requestModal.show();
+  };
+
+  attachmentModalElement.addEventListener(
+    "hidden.bs.modal",
+    onAttachmentHidden
+  );
+  attachmentModal.hide();
+}
+
+function showRequestModal() {
+  const requestModalElement = document.getElementById("openModal");
+
+  if (!requestModalElement || !window.bootstrap) {
+    return;
+  }
+
+  bootstrap.Modal.getOrCreateInstance(requestModalElement).show();
+}
+
+function getRawDispatchStatus(request) {
+  return request.status;
+}
+
+function normalizeDispatchStatus(rawValue) {
+  if (rawValue === null || rawValue === undefined) {
+    return "pending";
+  }
+
+  const value = String(rawValue).trim().toLowerCase();
+
+  const statusMap = {
+    pending: "pending",
+    approved: "accepted",
+    accepted: "accepted",
+    cancelled: "cancelled",
+    canceled: "cancelled",
+    "0": "cancelled",
+    "1": "accepted",
+  };
+
+  const normalized = statusMap[value];
+
+  if (!normalized) {
+    console.warn("Unknown dispatch status:", rawValue);
+    return "unknown";
+  }
+
+  return normalized;
+}
+
+function getStatusBadgeHtml(normalizedStatus) {
+  const statusConfig = {
+    pending: { label: "Pending", className: "pending" },
+    accepted: { label: "Accepted", className: "accepted" },
+    cancelled: { label: "Cancelled", className: "cancelled" },
+    unknown: { label: "Unknown", className: "" },
+  };
+
+  const config = statusConfig[normalizedStatus] || statusConfig.unknown;
+
+  return `<span class=" status ${config.className} ">
+                        ${config.label}
+                      </span>`;
+}
+
+function getDispatchStatusCounts(requests) {
+  const counts = {
+    pending: 0,
+    accepted: 0,
+    cancelled: 0,
+    total: requests.length,
+    todaytotal: 0,
+    todayaccept: 0,
+  };
+
+  const today = new Date().toISOString().slice(0, 10);
+
+  requests.forEach((request) => {
+    const status = normalizeDispatchStatus(getRawDispatchStatus(request));
+
+    if (Object.prototype.hasOwnProperty.call(counts, status)) {
+      counts[status] += 1;
+    }
+
+    if (request.req_date === today) {
+      counts.todaytotal += 1;
+    }
+
+    if (status === "accepted" && request.modified) {
+      const modifiedDate = String(request.modified).split(" ")[0];
+      if (modifiedDate === today) {
+        counts.todayaccept += 1;
+      }
+    }
+  });
+
+  return counts;
+}
+
 function openReport() {
   if (!isSentryModalOpen) {
     const eventId = Sentry.captureException(new Error("Error report"));
@@ -523,13 +748,13 @@ function getCount() {
   });
 }
 function fillCards() {
-  var pending = cardData.data.pending;
-  var accepted = cardData.data.accepted;
-  var cancelled = cardData.data.cancelled;
-  var todayTotal = cardData.data.todaytotal;
-  var todayAccept = cardData.data.todayaccept;
-
-  var total = cardData.data.total;
+  const counts = getDispatchStatusCounts(allRequests);
+  const pending = counts.pending;
+  const accepted = counts.accepted;
+  const cancelled = counts.cancelled;
+  const todayTotal = counts.todaytotal;
+  const todayAccept = counts.todayaccept;
+  const total = counts.total;
 
   if (pending != 0) {
     $("#tab-2").append(`
@@ -554,7 +779,7 @@ function fillCards() {
 }
 
 function fillOpenModal(trID) {
-  const req = reqList.find((req) => req.req_id == trID);
+  const req = allRequests.find((req) => req.req_id == trID);
   const name = req.emp_name;
   const grp = req.group_name;
   const passValidity = req.passValid;
@@ -563,7 +788,7 @@ function fillOpenModal(trID) {
   const endDate = req.to;
   const reqName = req.requester_name;
   const reqDate = req.req_date;
-  const status = parseInt(req.status);
+  const normalizedStatus = normalizeDispatchStatus(getRawDispatchStatus(req));
   const location = req.specific_loc;
   const country = req.location;
   const duration = req.duration;
@@ -574,7 +799,7 @@ function fillOpenModal(trID) {
   const [last, given] = name.split(",");
   const surname = last.toUpperCase();
   const first = given.replace(/\s+/g, "");
-  formatStatus(status);
+  formatStatus(normalizedStatus);
   formatVisaPassport(visaValidity, passValidity);
   $("#modalEmpName").text(name);
   $("#modalGroup").text(grp);
@@ -607,12 +832,12 @@ function fillOpenModal(trID) {
        <p>day in total</p>`
     );
   }
-  if (status === null || isNaN(status)) {
+  if (normalizedStatus === "pending") {
     $("#modifyFooter").addClass("d-none");
   } else {
     $("#modifyFooter").removeClass("d-none");
   }
-  $("#openModal").modal("show");
+  showRequestModal();
 }
 function formatDate(date) {
   var [year, month, day] = date.split("-");
@@ -620,19 +845,18 @@ function formatDate(date) {
 
   return day + " " + monthName + " " + year;
 }
-function formatStatus(status) {
-  let statusString =
-    isNaN(status) || status === null
-      ? "pending"
-      : status === 1
-      ? "accepted"
-      : "cancelled";
-  $("#titleModal").html(
+function formatStatus(normalizedStatus) {
+  const statusLabels = {
+    pending: "pending",
+    accepted: "accepted",
+    cancelled: "cancelled",
+    unknown: "unknown",
+  };
+  const statusString = statusLabels[normalizedStatus] || statusLabels.unknown;
+  $("#openModalTitle").html(
     `  Dispatch Request<span class="status lg ${statusString} ms-3">${statusString}</span>`
   );
-  if (!isNaN(status) || status === null) {
-    $("#modiLabel").text(`${statusString}`);
-  }
+  $("#modiLabel").text(`${statusString}`);
 }
 function formatVisaPassport(visa, passport) {
   function updateModal(id, isValid) {
@@ -655,6 +879,109 @@ function formatVisaPassport(visa, passport) {
   updateModal("#modalVisa", visa);
 }
 
+function getRequestTotalPages() {
+  return Math.max(1, Math.ceil(filteredRequests.length / REQUESTS_PER_PAGE));
+}
+
+function getRequestPageNumbers(currentPage, totalPages) {
+  if (totalPages <= 5) {
+    return Array.from({ length: totalPages }, (_, index) => index + 1);
+  }
+
+  const pages = [1];
+  const start = Math.max(2, currentPage - 1);
+  const end = Math.min(totalPages - 1, currentPage + 1);
+
+  if (start > 2) {
+    pages.push("ellipsis-start");
+  }
+
+  for (let page = start; page <= end; page += 1) {
+    pages.push(page);
+  }
+
+  if (end < totalPages - 1) {
+    pages.push("ellipsis-end");
+  }
+
+  pages.push(totalPages);
+  return pages;
+}
+
+function renderRequestPaginationIcons() {
+  if (window.lucide && typeof window.lucide.createIcons === "function") {
+    window.lucide.createIcons({
+      attrs: {
+        width: 16,
+        height: 16,
+        "stroke-width": 2,
+      },
+    });
+  }
+}
+
+function renderRequestPagination() {
+  const totalItems = filteredRequests.length;
+  const totalPages = Math.max(1, Math.ceil(totalItems / REQUESTS_PER_PAGE));
+
+  if (requestCurrentPage > totalPages) {
+    requestCurrentPage = totalPages;
+  }
+  if (requestCurrentPage < 1) {
+    requestCurrentPage = 1;
+  }
+
+  const startIndex = (requestCurrentPage - 1) * REQUESTS_PER_PAGE;
+  const endIndex = Math.min(startIndex + REQUESTS_PER_PAGE, totalItems);
+  const rangeStart = totalItems > 0 ? startIndex + 1 : 0;
+  const rangeEnd = totalItems > 0 ? endIndex : 0;
+
+  $("#requestPaginationInfo").text(
+    `Showing ${rangeStart} to ${rangeEnd} of ${totalItems} requests`
+  );
+
+  $("#requestPaginationPrev").prop("disabled", requestCurrentPage <= 1);
+  $("#requestPaginationNext").prop(
+    "disabled",
+    totalItems === 0 || requestCurrentPage >= totalPages
+  );
+
+  const pagesMarkup = getRequestPageNumbers(requestCurrentPage, totalPages)
+    .map((page) => {
+      if (typeof page === "string") {
+        return `<span class="request-pagination__ellipsis">...</span>`;
+      }
+
+      const isActive = page === requestCurrentPage;
+      return `<button type="button" class="request-pagination__page${
+        isActive ? " is-active" : ""
+      }" data-page="${page}">${page}</button>`;
+    })
+    .join("");
+
+  $("#requestPaginationPages").html(pagesMarkup);
+  renderRequestPaginationIcons();
+}
+
+function renderRequestTable() {
+  const totalItems = filteredRequests.length;
+  const totalPages = Math.max(1, Math.ceil(totalItems / REQUESTS_PER_PAGE));
+
+  if (requestCurrentPage > totalPages) {
+    requestCurrentPage = totalPages;
+  }
+  if (requestCurrentPage < 1) {
+    requestCurrentPage = 1;
+  }
+
+  const startIndex = (requestCurrentPage - 1) * REQUESTS_PER_PAGE;
+  const endIndex = Math.min(startIndex + REQUESTS_PER_PAGE, totalItems);
+  const pageItems = filteredRequests.slice(startIndex, endIndex);
+
+  fillTable(pageItems);
+  renderRequestPagination();
+}
+
 function fillTable(sampleData) {
   $("#tableBody").empty();
   var str = "";
@@ -667,19 +994,9 @@ function fillTable(sampleData) {
       <td>${formatDate(item.from)}</td>
       <td>${formatDate(item.to)}</td>
       <td>${item.requester_name}</td>
-      <td>${
-        item.status === null
-          ? ` <span class=" status pending ">
-                        Pending
-                      </span>`
-          : item.status == 1
-          ? `  <span class=" status accepted ">
-                        Accepted
-                      </span>`
-          : `<span class=" status cancelled ">
-                        Cancelled
-                      </span>`
-      }</td>
+      <td>${getStatusBadgeHtml(
+        normalizeDispatchStatus(getRawDispatchStatus(item))
+      )}</td>
       <td>${
         item.passValid === true
           ? `  <span class="validity "><i class='bx bx-check text-[18px]   font-semibold'></i></span>`
@@ -702,26 +1019,29 @@ function fillTable(sampleData) {
       $("#tableBody").append(str);
     });
   } else {
-    str = `<td colspan="12" class="h-[530px]"><div class="flex items-center justify-center flex-col gap-3"><img src="../images/empty.png"   class="w-[150px] h-auto opacity-[0.75]" alt="empty">
+    str = `<td colspan="12" class="h-[280px]"><div class="flex items-center justify-center flex-col gap-3 py-20"><img src="../images/empty.png"   class="w-[150px] h-auto opacity-[0.75] pt-20" alt="empty">
     <h5 class="font-semibold text-[16px] text-[var(--gray-text)]">No item found</h5>
-    <p class="text-[var(--gray-text)]">Try adjusting your search or filter to find what you're looking for.</p>
+    <p class="text-[var(--gray-text)] pb-20">Try adjusting your search or filter to find what you're looking for.</p>
     </div></td>`;
     $("#tableBody").append(str);
   }
 }
 
-function searchFilter(req_list) {
+function searchFilter(req_list, resetPage = false) {
+  if (resetPage) {
+    requestCurrentPage = 1;
+  }
+
   const keyword = $("#searchbar").val().toLowerCase().trim();
   const grps = $("#grpSel").val().split(",").map(Number);
   const dateFilter = $("#monthSel").val();
   const activeTabId = $("button").has("span.active").attr("id");
   const tabFilters = {
-    "tab-2": null,
-    "tab-3": 1,
-    "tab-4": 0,
+    "tab-2": "pending",
+    "tab-3": "accepted",
+    "tab-4": "cancelled",
   };
-  const filter =
-    tabFilters[activeTabId] !== undefined ? tabFilters[activeTabId] : undefined;
+  const selectedStatus = tabFilters[activeTabId];
   const results = req_list.filter((emp) => {
     const searchMatch =
       emp.emp_name.toLowerCase().includes(keyword) ||
@@ -731,7 +1051,11 @@ function searchFilter(req_list) {
 
     const dateMatch = dateFilter ? emp.req_date.startsWith(dateFilter) : true;
 
-    const statusMatch = filter !== undefined ? emp.status == filter : true;
+    const normalizedStatus = normalizeDispatchStatus(
+      getRawDispatchStatus(emp)
+    );
+    const statusMatch =
+      selectedStatus === undefined || normalizedStatus === selectedStatus;
 
     return searchMatch && groupMatch && statusMatch && dateMatch;
   });
@@ -742,7 +1066,8 @@ function searchFilter(req_list) {
       : new Date(b.req_date) - new Date(a.req_date);
   });
 
-  fillTable(results);
+  filteredRequests = [...results];
+  renderRequestTable();
 }
 function getGroups() {
   return new Promise((resolve, reject) => {

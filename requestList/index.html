@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="en">
   <head>
     <title>トラベる - KDT</title>
@@ -9,17 +9,18 @@
 
     <!-- CSS -->
     <link rel="stylesheet" href="../global.css" />
-    <link rel="stylesheet" href="../css/tailwind.css" />
     <link rel="stylesheet" href="../css/font-awesome.css" />
     <link rel="stylesheet" href="../css/boxicons.css" />
     <link rel="stylesheet" href="../css/bootstrap.min.css" />
     <link rel="stylesheet" href="css/index.css" />
+    <link rel="stylesheet" href="../tailwindcss/output.css" />
 
     <!-- JS libs -->
     <script src="../js/jquery.js"></script>
     <script src="../js/bootstrap.min.js"></script>
     <script src="../js/html2canvas.js"></script>
     <script src="../js/jquery.inview.min.js"></script>
+    <script src="../node_modules/lucide/dist/umd/lucide.min.js"></script>
     <!-- <script src="../js/jquery.table2excel.js"></script> -->
     <!-- <script src="http://js.sentry-cdn.com/996e6a7f7f64d413dd43124ae5dece7e.min.js" crossorigin="anonymous"></script> -->
 
@@ -34,12 +35,13 @@
     data-bs-backdrop="static"
     data-bs-keyboard="false"
     tabindex="-1"
+    aria-labelledby="openModalTitle"
     aria-hidden="true"
   >
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
         <div class="modal-header border-0">
-          <h1 class="modal-title text-[18px]" id="titleModal"></h1>
+          <h1 class="modal-title text-[18px]" id="openModalTitle"></h1>
           <button
             type="button"
             class="btn-close text-[14px] m-1 w-0 h-0 w-auto h-auto"
@@ -697,6 +699,7 @@
         </div>
         <div class="modal-footer">
           <button
+            type="button"
             class="bg-[var(--dark)] hover:bg-[var(--dark-200)] text-[var(--white)] font-medium transition rounded-md px-3 py-1"
             id="btnBack"
           >
@@ -853,6 +856,7 @@
         </div>
         <div class="modal-footer">
           <button
+            type="button"
             class="bg-[var(--dark)] hover:bg-[var(--dark-200)] text-[var(--white)] font-medium transition rounded-md px-3 py-1"
             id="btnBack2"
           >
@@ -988,9 +992,7 @@
             </p>
           </div>
 
-          <div
-            class="w-100 h-[calc(100%-60px)] pt-3 flex flex-col gap-3 relative"
-          >
+          <div class="w-100 pt-3 flex flex-col gap-3 relative">
             <div class="lg:flex gap-2 lg:gap-4 w-100 grid grid-cols-2">
               <span class="card active">
                 <div class="flex gap-2 items-center">
@@ -1068,9 +1070,7 @@
                 </div>
               </span>
             </div>
-            <div
-              class="w-100 h-[calc(100%-275px)] lg:h-[calc(100%-130px)] bg-white rounded-lg border"
-            >
+            <div class="w-100 bg-white rounded-lg border flex flex-col">
               <div
                 class="flex lg:flex-row flex-col justify-content-between p-3 gap-2 lg:gap-0 border-b-[1px]"
               >
@@ -1184,9 +1184,9 @@
               </div>
 
               <div
-                class="relative h-[calc(100%-104px)] lg:h-[calc(100%-93px)] p-3 pt-0 mt-3 overflow-auto overscroll-contain"
+                class="relative p-3 pt-0 mt-3 overflow-x-auto overflow-y-visible"
               >
-                <table class="">
+                <table class="min-w-full w-100">
                   <thead>
                     <tr>
                       <th>Employee</th>
@@ -1211,6 +1211,52 @@
                   </thead>
                   <tbody id="tableBody"></tbody>
                 </table>
+              </div>
+
+              <div
+                id="requestPagination"
+                class="request-pagination d-flex flex-column flex-lg-row justify-content-lg-between align-items-lg-center gap-3 border-t border-[#ebebeb] p-3"
+              >
+                <p
+                  id="requestPaginationInfo"
+                  class="text-[12px] text-[var(--gray-text)] m-0"
+                >
+                  Showing 0 to 0 of 0 requests
+                </p>
+                <div
+                  class="d-flex flex-wrap align-items-center gap-2 justify-content-end"
+                >
+                  <button
+                    type="button"
+                    id="requestPaginationPrev"
+                    class="request-pagination__nav"
+                    disabled
+                  >
+                    <i
+                      data-lucide="chevron-left"
+                      class="request-pagination__icon"
+                      aria-hidden="true"
+                    ></i>
+                    <span>Previous</span>
+                  </button>
+                  <div
+                    id="requestPaginationPages"
+                    class="d-flex align-items-center gap-1"
+                  ></div>
+                  <button
+                    type="button"
+                    id="requestPaginationNext"
+                    class="request-pagination__nav"
+                    disabled
+                  >
+                    <span>Next</span>
+                    <i
+                      data-lucide="chevron-right"
+                      class="request-pagination__icon"
+                      aria-hidden="true"
+                    ></i>
+                  </button>
+                </div>
               </div>
             </div>
           </div>
