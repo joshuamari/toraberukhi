@@ -65,6 +65,11 @@ let isSentryModalOpen = false;
 let printData = {};
 let sortDateAsc = false;
 let requestModalReturnTrigger = null;
+let openingDispatchRequestId = null;
+let selectedDispatchRequest = null;
+let pendingChangeRequestType = null;
+let changeRequestTriggerElement = null;
+let isChangeRequestSubmitting = false;
 //#endregion
 checkAccess()
   .then((emp) => {
@@ -171,19 +176,35 @@ $(document).on("click", ".tab", function () {
 
   searchFilter(allRequests, true);
 });
-$(document).on("click", "td", function () {
-  var rowID = $(this).closest("tr").attr("req-id");
-  fillOpenModal(rowID);
-  getRequestData(rowID)
-    .then((res) => {
-      if (res.isSuccess) {
-        printData = res.data;
-      }
-    })
-    .catch((error) => {
-      alert(`Error: ${error}`);
-    });
-});
+$(document)
+  .off("click.dispatchRequestRow", ".dispatch-request-row")
+  .on("click.dispatchRequestRow", ".dispatch-request-row", function (event) {
+    if (
+      $(event.target).closest("button, a, input, select, textarea, label")
+        .length
+    ) {
+      return;
+    }
+
+    const requestId = $(this).data("request-id");
+    openDispatchRequestById(requestId);
+  });
+$(document)
+  .off("click.dispatchRequestDetails", ".view-dispatch-request")
+  .on(
+    "click.dispatchRequestDetails",
+    ".view-dispatch-request",
+    function (event) {
+      event.preventDefault();
+      event.stopPropagation();
+
+      const requestId =
+        $(this).data("request-id") ||
+        $(this).closest(".dispatch-request-row").data("request-id");
+
+      openDispatchRequestById(requestId);
+    }
+  );
 $(document).on("input", "#searchbar", function () {
   searchFilter(allRequests, true);
 });
@@ -232,21 +253,67 @@ $(document).on("click", ".request-pagination__page", function () {
 });
 $(document).on("click", "#attachment", function (event) {
   requestModalReturnTrigger = event.currentTarget;
-  openAttachmentModalFromRequest("attachmentModal", function () {
-    fillAttachment(printData);
-  });
+  openAttachmentForSelectedRequest("attachmentModal", fillAttachment);
 });
 $(document).on("click", "#attachment2", function (event) {
   requestModalReturnTrigger = event.currentTarget;
-  openAttachmentModalFromRequest("attachmentModal2", function () {
-    fillAttachment2(printData);
-  });
+  openAttachmentForSelectedRequest("attachmentModal2", fillAttachment2);
 });
 $(document).on("click", "#btnBack", function () {
   returnToRequestModalFromAttachment("attachmentModal");
 });
 $(document).on("click", "#btnBack2", function () {
   returnToRequestModalFromAttachment("attachmentModal2");
+});
+$(document).on("click", "#btnRequestDateChange", function (event) {
+  changeRequestTriggerElement = event.currentTarget;
+  pendingChangeRequestType = "date_change";
+  openChangeRequestModalFromRequest("dateChangeRequestModal", function () {
+    populateDateChangeRequestForm(selectedDispatchRequest);
+  });
+});
+$(document).on("click", "#btnRequestCancellation", function (event) {
+  changeRequestTriggerElement = event.currentTarget;
+  pendingChangeRequestType = "cancellation";
+  openChangeRequestModalFromRequest("cancellationRequestModal", function () {
+    populateCancellationRequestForm(selectedDispatchRequest);
+  });
+});
+$(document).on("click", "#btnDateChangeBack", function () {
+  returnToRequestModalFromChangeRequest("dateChangeRequestModal");
+});
+$(document).on("click", "#btnCancellationBack", function () {
+  returnToRequestModalFromChangeRequest("cancellationRequestModal");
+});
+$(document).on("click", "#btnSubmitDateChange", function () {
+  handleDateChangeSubmit();
+});
+$(document).on("click", "#btnSubmitCancellation", function () {
+  handleCancellationSubmit();
+});
+$(document).on(
+  "input change blur",
+  "#dcProposedStartDate, #dcProposedEndDate",
+  function () {
+    updateDateChangeScheduleComparison();
+    validateDateChangeDateFields();
+  }
+);
+$(document).on("input blur", "#dcReason", function () {
+  validateDateChangeReasonField();
+});
+$(document).on("submit", "#dateChangeRequestForm", function (event) {
+  event.preventDefault();
+  handleDateChangeSubmit();
+});
+$(document).on("click", "#btnDateChangeClose", function () {
+  returnToRequestModalFromChangeRequest("dateChangeRequestModal");
+});
+$(document).on("click", "#btnCancellationClose", function () {
+  returnToRequestModalFromChangeRequest("cancellationRequestModal");
+});
+$(document).on("click", ".rmvToast", function () {
+  $(this).closest(".toasty").remove();
 });
 //#endregion
 
@@ -471,36 +538,239 @@ function openReport() {
   isSentryModalOpen = true;
 }
 function getRequestData(req_id) {
+  return fetchDispatchRequest(req_id);
+}
+
+function normalizeRequestId(value) {
+  const requestId = String(value ?? "").trim();
+
+  if (!requestId) {
+    throw new Error("Missing dispatch request ID.");
+  }
+
+  return requestId;
+}
+
+function fetchDispatchRequest(requestId) {
   return new Promise((resolve, reject) => {
     $.ajax({
       type: "GET",
       url: "php/get_request_data.php",
       data: {
-        request_id: req_id,
+        request_id: requestId,
       },
       dataType: "json",
       success: function (response) {
-        const res = response;
-        resolve(res);
+        resolve(response);
       },
-      error: function (xhr, status, error) {
-        if (xhr.status === 404) {
-          reject("Not Found Error: The requested resource was not found.");
-        } else if (xhr.status === 500) {
-          reject("Internal Server Error: There was a server error.");
-        } else {
-          reject("An unspecified error occurred while fetching request data.");
+      error: function (xhr, textStatus) {
+        if (textStatus === "parsererror") {
+          reject(new Error("The server returned an invalid response."));
+          return;
         }
+
+        if (xhr.status === 404) {
+          reject(
+            new Error("Not Found Error: The requested resource was not found.")
+          );
+          return;
+        }
+
+        if (xhr.status === 500) {
+          reject(new Error("Internal Server Error: There was a server error."));
+          return;
+        }
+
+        const payload = xhr.responseJSON;
+        reject(
+          new Error(
+            (payload && payload.message) ||
+              "An error occurred while fetching request data."
+          )
+        );
       },
     });
   });
 }
-function formatDate(date) {
-  var [year, month, day] = date.split("-");
-  monthName = monthNames2[parseInt(month) - 1];
 
-  return day + " " + monthName + " " + year;
+function clearDispatchRequestModal() {
+  $("#openModalTitle").html("Dispatch Request");
+  $("#modalEmpName, #modalGroup, #modalDateFrom, #modalDateTo").text("");
+  $("#modalReqName, #modalReqDate, #modalLoc, #modalCountry, #modalReqGrp").text(
+    ""
+  );
+  $("#modalModiDate, #attachment, #attachment2").text("");
+  $("#modalPassport, #modalVisa").empty();
+  $("#modalDuration").html(
+    `<span class="text-[16px] font-semibold"></span><p>days in total</p>`
+  );
+  $("#modifyFooter").addClass("d-none");
+  $("#changeRequestActions").addClass("d-none");
 }
+
+function showRequestLoadError(message) {
+  showToast("error", message);
+}
+
+function findDispatchRequestById(requestId) {
+  return allRequests.find((req) => String(req.req_id) === String(requestId));
+}
+
+async function openDispatchRequestById(rawRequestId) {
+  let requestId;
+
+  try {
+    requestId = normalizeRequestId(rawRequestId);
+  } catch (error) {
+    showRequestLoadError(error.message);
+    return;
+  }
+
+  if (openingDispatchRequestId === requestId) {
+    return;
+  }
+
+  openingDispatchRequestId = requestId;
+
+  try {
+    clearDispatchRequestModal();
+    printData = {};
+
+    const listRequest = findDispatchRequestById(requestId);
+
+    if (!listRequest) {
+      throw new Error("Dispatch request not found.");
+    }
+
+    selectedDispatchRequest = listRequest;
+    populateDispatchRequestModal(listRequest);
+    showRequestModal();
+  } catch (error) {
+    selectedDispatchRequest = null;
+    printData = {};
+    console.error("Failed to open Dispatch Request:", {
+      requestId,
+      error,
+    });
+    showRequestLoadError(
+      error.message || "Unable to load the dispatch request."
+    );
+  } finally {
+    openingDispatchRequestId = null;
+  }
+}
+
+async function loadAttachmentData(requestId) {
+  const normalizedId = normalizeRequestId(requestId);
+  const cachedRequestId =
+    printData &&
+    printData.dispatch_request &&
+    String(printData.dispatch_request.request_id);
+
+  if (cachedRequestId === normalizedId) {
+    return printData;
+  }
+
+  const response = await fetchDispatchRequest(normalizedId);
+
+  if (!response || !response.isSuccess || !response.data) {
+    throw new Error(
+      (response && response.message) ||
+        "Unable to load dispatch request attachments."
+    );
+  }
+
+  printData = response.data;
+  return printData;
+}
+
+async function openAttachmentForSelectedRequest(attachmentModalId, fillFn) {
+  if (!selectedDispatchRequest) {
+    showRequestLoadError("No dispatch request is selected.");
+    return;
+  }
+
+  try {
+    const data = await loadAttachmentData(selectedDispatchRequest.req_id);
+    openAttachmentModalFromRequest(attachmentModalId, function () {
+      fillFn(data);
+    });
+  } catch (error) {
+    console.error("Failed to load attachment data:", {
+      requestId: selectedDispatchRequest.req_id,
+      error,
+    });
+    showRequestLoadError(
+      error.message || "Unable to load dispatch request attachments."
+    );
+  }
+}
+
+function populateDispatchRequestModal(req) {
+  const name = req.emp_name;
+  const grp = req.group_name;
+  const passValidity = req.passValid;
+  const visaValidity = req.visaValid;
+  const startDate = req.from;
+  const endDate = req.to;
+  const reqName = req.requester_name;
+  const reqDate = req.req_date;
+  const normalizedStatus = normalizeDispatchStatus(getRawDispatchStatus(req));
+  const location = req.specific_loc;
+  const country = req.location;
+  const duration = req.duration;
+  const reqGrp = req.requester_group;
+  const modi = req.modified;
+
+  const empnum = req.emp_number;
+  const [last, given] = name.split(",");
+  const surname = last.toUpperCase();
+  const first = given.replace(/\s+/g, "");
+  formatStatus(normalizedStatus);
+  formatVisaPassport(visaValidity, passValidity);
+  $("#modalEmpName").text(name);
+  $("#modalGroup").text(grp);
+  $("#modalDateFrom").text(formatDate(startDate));
+  $("#modalDateTo").text(formatDate(endDate));
+  $("#modalReqName").text(reqName);
+  $("#modalReqDate").text(formatDate(reqDate));
+  $("#modalLoc").text(location);
+  $("#modalCountry").text(country);
+  $("#modalReqGrp").text(reqGrp);
+
+  $("#attachment").text(`${empnum}_${surname}${first}_DispatchRequest`);
+  $("#attachment2").text(`${empnum}_${surname}${first}_WorkHistory`);
+
+  if (!modi) {
+    $("#modalModiDate").text("");
+  } else {
+    var [date, time] = modi.split(" ");
+    $("#modalModiDate").text(formatDate(date) + " " + time);
+  }
+
+  if (duration > 1) {
+    $("#modalDuration").html(
+      `<span class="text-[16px] font-semibold" >${duration}</span>
+       <p>days in total</p>`
+    );
+  } else {
+    $("#modalDuration").html(
+      `<span class="text-[16px] font-semibold" >${duration}</span>
+       <p>day in total</p>`
+    );
+  }
+  if (normalizedStatus === "pending") {
+    $("#modifyFooter").addClass("d-none");
+  } else {
+    $("#modifyFooter").removeClass("d-none");
+  }
+  updateChangeRequestActionsVisibility(req);
+}
+
+function fillOpenModal(trID) {
+  openDispatchRequestById(trID);
+}
+
 function fillAttachment(data) {
   $(".siteDispatch").empty();
   $("#printJap, #printPh, #printThird").text("");
@@ -599,6 +869,14 @@ function fillAttachment(data) {
       "Control Dept Corporate Planning Gr.:";
   }
 }
+
+function formatDate(date) {
+  var [year, month, day] = date.split("-");
+  monthName = monthNames2[parseInt(month) - 1];
+
+  return day + " " + monthName + " " + year;
+}
+
 function formatName(name) {
   const [last, given] = name.split(",");
   const surname = last.toUpperCase();
@@ -778,73 +1056,6 @@ function fillCards() {
   $("#cardTotal").text(total);
 }
 
-function fillOpenModal(trID) {
-  const req = allRequests.find((req) => req.req_id == trID);
-  const name = req.emp_name;
-  const grp = req.group_name;
-  const passValidity = req.passValid;
-  const visaValidity = req.visaValid;
-  const startDate = req.from;
-  const endDate = req.to;
-  const reqName = req.requester_name;
-  const reqDate = req.req_date;
-  const normalizedStatus = normalizeDispatchStatus(getRawDispatchStatus(req));
-  const location = req.specific_loc;
-  const country = req.location;
-  const duration = req.duration;
-  const reqGrp = req.requester_group;
-  const modi = req.modified;
-
-  const empnum = req.emp_number;
-  const [last, given] = name.split(",");
-  const surname = last.toUpperCase();
-  const first = given.replace(/\s+/g, "");
-  formatStatus(normalizedStatus);
-  formatVisaPassport(visaValidity, passValidity);
-  $("#modalEmpName").text(name);
-  $("#modalGroup").text(grp);
-  $("#modalDateFrom").text(formatDate(startDate));
-  $("#modalDateTo").text(formatDate(endDate));
-  $("#modalReqName").text(reqName);
-  $("#modalReqDate").text(formatDate(reqDate));
-  $("#modalLoc").text(location);
-  $("#modalCountry").text(country);
-  $("#modalReqGrp").text(reqGrp);
-
-  $("#attachment").text(`${empnum}_${surname}${first}_DispatchRequest`);
-  $("#attachment2").text(`${empnum}_${surname}${first}_WorkHistory`);
-
-  if (!modi) {
-    $("#modalModiDate").text("");
-  } else {
-    var [date, time] = modi.split(" ");
-    $("#modalModiDate").text(formatDate(date) + " " + time);
-  }
-
-  if (duration > 1) {
-    $("#modalDuration").html(
-      `<span class="text-[16px] font-semibold" >${duration}</span>
-       <p>days in total</p>`
-    );
-  } else {
-    $("#modalDuration").html(
-      `<span class="text-[16px] font-semibold" >${duration}</span>
-       <p>day in total</p>`
-    );
-  }
-  if (normalizedStatus === "pending") {
-    $("#modifyFooter").addClass("d-none");
-  } else {
-    $("#modifyFooter").removeClass("d-none");
-  }
-  showRequestModal();
-}
-function formatDate(date) {
-  var [year, month, day] = date.split("-");
-  monthName = monthNames2[parseInt(month) - 1];
-
-  return day + " " + monthName + " " + year;
-}
 function formatStatus(normalizedStatus) {
   const statusLabels = {
     pending: "pending",
@@ -988,7 +1199,7 @@ function fillTable(sampleData) {
   if (sampleData.length != 0) {
     $.each(sampleData, function (index, item) {
       str = `
-    <tr req-id="${item.req_id}">
+    <tr class="dispatch-request-row" data-request-id="${item.req_id}">
       <td>${item.emp_name}</td>
       <td>${formatDate(item.req_date)}</td>
       <td>${formatDate(item.from)}</td>
@@ -1008,7 +1219,7 @@ function fillTable(sampleData) {
             : ` <span class="validity "><i class='bx bx-x text-[18px] font-semibold'></i></span>`
         }</td>
       <td>
-        <div class="openIcon " title="Open item">
+        <div class="openIcon view-dispatch-request" title="Open item" data-request-id="${item.req_id}">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"   width="144px" height="144px">
             <path d="M 41.470703 4.9863281 A 1.50015 1.50015 0 0 0 41.308594 5 L 27.5 5 A 1.50015 1.50015 0 1 0 27.5 8 L 37.878906 8 L 22.439453 23.439453 A 1.50015 1.50015 0 1 0 24.560547 25.560547 L 40 10.121094 L 40 20.5 A 1.50015 1.50015 0 1 0 43 20.5 L 43 6.6894531 A 1.50015 1.50015 0 0 0 41.470703 4.9863281 z M 12.5 8 C 8.3754991 8 5 11.375499 5 15.5 L 5 35.5 C 5 39.624501 8.3754991 43 12.5 43 L 32.5 43 C 36.624501 43 40 39.624501 40 35.5 L 40 25.5 A 1.50015 1.50015 0 1 0 37 25.5 L 37 35.5 C 37 38.003499 35.003499 40 32.5 40 L 12.5 40 C 9.9965009 40 8 38.003499 8 35.5 L 8 15.5 C 8 12.996501 9.9965009 11 12.5 11 L 22.5 11 A 1.50015 1.50015 0 1 0 22.5 8 L 12.5 8 z" fill="rgba(85, 85, 85, 0.5)"  stroke="rgba(85, 85, 85, 0.5)" stroke-width="1"/>
           </svg>
@@ -1227,5 +1438,810 @@ function logOut() {
       },
     });
   });
+}
+
+//#region CHANGE REQUEST WORKFLOW
+// TODO: Backend integration - set these URLs when PCSKHI change-request endpoints are available.
+const CHANGE_REQUEST_ENDPOINTS = {
+  dateChange: null,
+  cancellation: null,
+};
+
+function canRequestDispatchChange(request) {
+  return normalizeDispatchStatus(getRawDispatchStatus(request)) === "accepted";
+}
+
+function hasPendingDateChangeRequest(request) {
+  // BACKEND_INTEGRATION: return true when get_requests.php exposes a pending date-change flag.
+  // Example: return Boolean(request.pending_date_change_request);
+  return false;
+}
+
+function hasPendingCancellationRequest(request) {
+  // BACKEND_INTEGRATION: return true when get_requests.php exposes a pending cancellation flag.
+  // Example: return Boolean(request.pending_cancellation_request);
+  return false;
+}
+
+function updateChangeRequestActionsVisibility(request) {
+  const actionsEl = document.getElementById("changeRequestActions");
+  const dateChangeBtn = document.getElementById("btnRequestDateChange");
+  const cancellationBtn = document.getElementById("btnRequestCancellation");
+
+  if (!actionsEl || !dateChangeBtn || !cancellationBtn) {
+    return;
+  }
+
+  const eligible = canRequestDispatchChange(request);
+  const showDateChange = eligible && !hasPendingDateChangeRequest(request);
+  const showCancellation =
+    eligible && !hasPendingCancellationRequest(request);
+
+  if (!showDateChange && !showCancellation) {
+    actionsEl.classList.add("d-none");
+    return;
+  }
+
+  actionsEl.classList.remove("d-none");
+  dateChangeBtn.classList.toggle("d-none", !showDateChange);
+  cancellationBtn.classList.toggle("d-none", !showCancellation);
+
+  renderChangeRequestIcons(actionsEl);
+}
+
+function calculateInclusiveDays(startDate, endDate) {
+  if (!startDate || !endDate) {
+    return 0;
+  }
+
+  const start = new Date(`${startDate}T00:00:00`);
+  const end = new Date(`${endDate}T00:00:00`);
+
+  if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+    return 0;
+  }
+
+  const diffMs = end.getTime() - start.getTime();
+  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+  return diffDays + 1;
+}
+
+function formatNetDayChange(currentDays, proposedDays) {
+  const net = proposedDays - currentDays;
+
+  if (net > 0) {
+    return `+${net} days`;
+  }
+
+  if (net < 0) {
+    return `${net} days`;
+  }
+
+  return "0 days";
+}
+
+function formatLocationDisplay(request) {
+  const specific = request.specific_loc || "";
+  const country = request.location || "";
+
+  if (specific && country) {
+    return `${specific}, ${country}`;
+  }
+
+  return specific || country || "—";
+}
+
+function openChangeRequestModalFromRequest(changeRequestModalId, beforeShow) {
+  const requestModalElement = document.getElementById("openModal");
+  const changeRequestModalElement = document.getElementById(changeRequestModalId);
+
+  if (!requestModalElement || !changeRequestModalElement || !window.bootstrap) {
+    return;
+  }
+
+  const requestModal =
+    bootstrap.Modal.getOrCreateInstance(requestModalElement);
+  const changeRequestModal =
+    bootstrap.Modal.getOrCreateInstance(changeRequestModalElement);
+
+  const onRequestHidden = function () {
+    requestModalElement.removeEventListener("hidden.bs.modal", onRequestHidden);
+
+    if (typeof beforeShow === "function") {
+      beforeShow();
+    }
+
+    const onChangeRequestShown = function () {
+      changeRequestModalElement.removeEventListener(
+        "shown.bs.modal",
+        onChangeRequestShown
+      );
+      focusInitialModalControl(changeRequestModalElement);
+      renderChangeRequestIcons(changeRequestModalElement);
+    };
+
+    changeRequestModalElement.addEventListener(
+      "shown.bs.modal",
+      onChangeRequestShown
+    );
+    changeRequestModal.show();
+  };
+
+  requestModalElement.addEventListener("hidden.bs.modal", onRequestHidden);
+  requestModal.hide();
+}
+
+function returnToRequestModalFromChangeRequest(changeRequestModalId) {
+  if (isChangeRequestSubmitting) {
+    return;
+  }
+
+  const requestModalElement = document.getElementById("openModal");
+  const changeRequestModalElement = document.getElementById(changeRequestModalId);
+
+  if (!requestModalElement || !changeRequestModalElement || !window.bootstrap) {
+    return;
+  }
+
+  const requestModal =
+    bootstrap.Modal.getOrCreateInstance(requestModalElement);
+  const changeRequestModal =
+    bootstrap.Modal.getOrCreateInstance(changeRequestModalElement);
+
+  blurFocusedDescendant(changeRequestModalElement);
+
+  const onChangeRequestHidden = function () {
+    changeRequestModalElement.removeEventListener(
+      "hidden.bs.modal",
+      onChangeRequestHidden
+    );
+
+    const onRequestShown = function () {
+      requestModalElement.removeEventListener("shown.bs.modal", onRequestShown);
+
+      if (changeRequestTriggerElement instanceof HTMLElement) {
+        changeRequestTriggerElement.focus();
+      }
+    };
+
+    requestModalElement.addEventListener("shown.bs.modal", onRequestShown);
+    requestModal.show();
+  };
+
+  changeRequestModalElement.addEventListener(
+    "hidden.bs.modal",
+    onChangeRequestHidden
+  );
+  changeRequestModal.hide();
+}
+
+function renderChangeRequestIcons(container) {
+  if (!window.lucide || typeof window.lucide.createIcons !== "function") {
+    return;
+  }
+
+  window.lucide.createIcons({
+    attrs: {
+      width: 16,
+      height: 16,
+      "stroke-width": 2,
+    },
+  });
+}
+
+function resetDateChangeFormState() {
+  const form = document.getElementById("dateChangeRequestForm");
+
+  if (!form) {
+    return;
+  }
+
+  form.reset();
+  clearFieldValidation("dcProposedStartDate", "dcProposedStartDateError");
+  clearFieldValidation("dcProposedEndDate", "dcProposedEndDateError");
+  clearFieldValidation("dcReason", "dcReasonError");
+  hideFormLevelError("dateChangeFormError");
+  setDateChangeSubmitting(false);
+}
+
+function resetCancellationFormState() {
+  const form = document.getElementById("cancellationRequestForm");
+
+  if (!form) {
+    return;
+  }
+
+  form.reset();
+  clearFieldValidation("crReason", "crReasonError");
+  hideFormLevelError("cancellationFormError");
+  setCancellationSubmitting(false);
+}
+
+function clearFieldValidation(fieldId, errorId) {
+  const field = document.getElementById(fieldId);
+  const error = document.getElementById(errorId);
+
+  if (field) {
+    field.classList.remove("is-invalid");
+    field.setAttribute("aria-invalid", "false");
+  }
+
+  if (error) {
+    error.textContent = "";
+  }
+}
+
+function setFieldValidation(fieldId, errorId, message) {
+  const field = document.getElementById(fieldId);
+  const error = document.getElementById(errorId);
+
+  if (field) {
+    field.classList.add("is-invalid");
+    field.setAttribute("aria-invalid", "true");
+  }
+
+  if (error) {
+    error.textContent = message;
+  }
+}
+
+function hideFormLevelError(errorId) {
+  const errorEl = document.getElementById(errorId);
+
+  if (errorEl) {
+    errorEl.textContent = "";
+    errorEl.classList.add("d-none");
+  }
+}
+
+function showFormLevelError(errorId, message) {
+  const errorEl = document.getElementById(errorId);
+
+  if (errorEl) {
+    errorEl.textContent = message;
+    errorEl.classList.remove("d-none");
+  }
+}
+
+function populateDateChangeRequestForm(request) {
+  if (!request) {
+    return;
+  }
+
+  resetDateChangeFormState();
+
+  const currentDays =
+    request.duration || calculateInclusiveDays(request.from, request.to);
+
+  $("#dcEmpName").text(request.emp_name || "—");
+  $("#dcEmpNumber").text(request.emp_number ?? "—");
+  $("#dcGroupName").text(request.group_name || "—");
+  $("#dcRequestId").text(request.req_id ?? "—");
+  $("#dcCurrentStart").text(formatDate(request.from));
+  $("#dcCurrentEnd").text(formatDate(request.to));
+  $("#dcCurrentTotalDays").text(currentDays);
+  $("#dcLocation").text(formatLocationDisplay(request));
+  $("#dcRequestedBy").text(request.requester_name || "—");
+  $("#dcScheduleCurrent").text(
+    `${formatDate(request.from)} — ${formatDate(request.to)}`
+  );
+  $("#dcComparisonCurrentDays").text(currentDays);
+  $("#dcScheduleProposed").text("—");
+  $("#dcComparisonProposedDays").text("—");
+  resetNetChangeDisplay();
+
+  updateDateChangeScheduleComparison();
+}
+
+function populateCancellationRequestForm(request) {
+  if (!request) {
+    return;
+  }
+
+  resetCancellationFormState();
+
+  $("#crEmpName").text(request.emp_name || "—");
+  $("#crEmpNumber").text(request.emp_number ?? "—");
+  $("#crGroupName").text(request.group_name || "—");
+  $("#crRequestId").text(request.req_id ?? "—");
+  $("#crCurrentStart").text(formatDate(request.from));
+  $("#crCurrentEnd").text(formatDate(request.to));
+  $("#crLocation").text(formatLocationDisplay(request));
+  $("#crRequestedBy").text(request.requester_name || "—");
+}
+
+function updateDateChangeScheduleComparison() {
+  const request = selectedDispatchRequest;
+
+  if (!request) {
+    return;
+  }
+
+  const currentDays =
+    request.duration || calculateInclusiveDays(request.from, request.to);
+  const proposedStart = $("#dcProposedStartDate").val();
+  const proposedEnd = $("#dcProposedEndDate").val();
+
+  if (
+    !proposedStart ||
+    !proposedEnd ||
+    !isValidIsoDateString(proposedStart) ||
+    !isValidIsoDateString(proposedEnd) ||
+    proposedEnd < proposedStart
+  ) {
+    $("#dcScheduleProposed").text("—");
+    $("#dcComparisonProposedDays").text("—");
+    resetNetChangeDisplay();
+    return;
+  }
+
+  const proposedDays = calculateInclusiveDays(proposedStart, proposedEnd);
+
+  $("#dcScheduleProposed").text(
+    `${formatDate(proposedStart)} — ${formatDate(proposedEnd)}`
+  );
+  $("#dcComparisonProposedDays").text(proposedDays);
+  updateNetChangeDisplay(currentDays, proposedDays);
+}
+
+function resetNetChangeDisplay() {
+  $("#dcComparisonNetChange")
+    .removeClass("is-positive is-negative is-neutral")
+    .text("—");
+}
+
+function updateNetChangeDisplay(currentDays, proposedDays) {
+  const netEl = $("#dcComparisonNetChange");
+  const net = proposedDays - currentDays;
+
+  netEl
+    .removeClass("is-positive is-negative is-neutral")
+    .text(formatNetDayChange(currentDays, proposedDays));
+
+  if (net > 0) {
+    netEl.addClass("is-positive");
+  } else if (net < 0) {
+    netEl.addClass("is-negative");
+  } else {
+    netEl.addClass("is-neutral");
+  }
+}
+
+function isValidIsoDateString(value) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+    return false;
+  }
+
+  const [year, month, day] = value.split("-").map(Number);
+  const date = new Date(year, month - 1, day);
+
+  return (
+    date.getFullYear() === year &&
+    date.getMonth() === month - 1 &&
+    date.getDate() === day
+  );
+}
+
+function getDateChangeFormValues() {
+  return {
+    proposedStart: String($("#dcProposedStartDate").val() || "").trim(),
+    proposedEnd: String($("#dcProposedEndDate").val() || "").trim(),
+    reason: String($("#dcReason").val() || "").trim(),
+  };
+}
+
+function normalizeApprovedDateValue(value) {
+  if (value === null || value === undefined) {
+    return "";
+  }
+
+  return String(value).trim().slice(0, 10);
+}
+
+function validateDateChangeDateFields() {
+  let isValid = true;
+
+  clearFieldValidation("dcProposedStartDate", "dcProposedStartDateError");
+  clearFieldValidation("dcProposedEndDate", "dcProposedEndDateError");
+
+  const { proposedStart, proposedEnd } = getDateChangeFormValues();
+  const request = selectedDispatchRequest;
+  let startIsValid = false;
+  let endIsValid = false;
+
+  if (!proposedStart) {
+    setFieldValidation(
+      "dcProposedStartDate",
+      "dcProposedStartDateError",
+      "Proposed start date is required."
+    );
+    isValid = false;
+  } else if (!isValidIsoDateString(proposedStart)) {
+    setFieldValidation(
+      "dcProposedStartDate",
+      "dcProposedStartDateError",
+      "Enter a valid proposed start date."
+    );
+    isValid = false;
+  } else {
+    startIsValid = true;
+  }
+
+  if (!proposedEnd) {
+    setFieldValidation(
+      "dcProposedEndDate",
+      "dcProposedEndDateError",
+      "Proposed end date is required."
+    );
+    isValid = false;
+  } else if (!isValidIsoDateString(proposedEnd)) {
+    setFieldValidation(
+      "dcProposedEndDate",
+      "dcProposedEndDateError",
+      "Enter a valid proposed end date."
+    );
+    isValid = false;
+  } else {
+    endIsValid = true;
+  }
+
+  if (startIsValid && endIsValid) {
+    if (proposedEnd < proposedStart) {
+      setFieldValidation(
+        "dcProposedEndDate",
+        "dcProposedEndDateError",
+        "Proposed end date cannot be earlier than the proposed start date."
+      );
+      isValid = false;
+    } else if (
+      request &&
+      proposedStart === normalizeApprovedDateValue(request.from) &&
+      proposedEnd === normalizeApprovedDateValue(request.to)
+    ) {
+      setFieldValidation(
+        "dcProposedEndDate",
+        "dcProposedEndDateError",
+        "The proposed schedule must be different from the current approved schedule."
+      );
+      isValid = false;
+    }
+  }
+
+  return isValid;
+}
+
+function validateDateChangeReasonField() {
+  clearFieldValidation("dcReason", "dcReasonError");
+
+  const { reason } = getDateChangeFormValues();
+
+  if (!reason) {
+    setFieldValidation(
+      "dcReason",
+      "dcReasonError",
+      "Reason for date change is required."
+    );
+    return false;
+  }
+
+  return true;
+}
+
+function validateDateChangeForm() {
+  hideFormLevelError("dateChangeFormError");
+
+  const datesValid = validateDateChangeDateFields();
+  const reasonValid = validateDateChangeReasonField();
+  const { proposedStart, proposedEnd, reason } = getDateChangeFormValues();
+
+  return {
+    isValid: datesValid && reasonValid,
+    proposedStart,
+    proposedEnd,
+    reason,
+    remarks: "",
+  };
+}
+
+function validateCancellationForm() {
+  let isValid = true;
+
+  clearFieldValidation("crReason", "crReasonError");
+  hideFormLevelError("cancellationFormError");
+
+  const reason = String($("#crReason").val() || "").trim();
+
+  if (!reason) {
+    setFieldValidation(
+      "crReason",
+      "crReasonError",
+      "Cancellation reason is required."
+    );
+    const reasonField = document.getElementById("crReason");
+    if (reasonField instanceof HTMLElement) {
+      reasonField.focus();
+    }
+    isValid = false;
+  }
+
+  return {
+    isValid,
+    reason,
+  };
+}
+
+function buildDateChangePayload(request, formValues) {
+  return {
+    requestType: "date_change",
+    dispatchRequestId: request.req_id,
+    currentStartDate: request.from,
+    currentEndDate: request.to,
+    proposedStartDate: formValues.proposedStart,
+    proposedEndDate: formValues.proposedEnd,
+    reason: formValues.reason,
+    remarks: formValues.remarks,
+  };
+}
+
+function buildCancellationPayload(request, formValues) {
+  return {
+    requestType: "cancellation",
+    dispatchRequestId: request.req_id,
+    reason: formValues.reason,
+  };
+}
+
+function setDateChangeSubmitting(isSubmitting) {
+  isChangeRequestSubmitting = isSubmitting;
+  $("#btnSubmitDateChange").prop("disabled", isSubmitting);
+  $("#btnDateChangeBack").prop("disabled", isSubmitting);
+  $("#btnSubmitDateChangeSpinner").toggleClass("d-none", !isSubmitting);
+}
+
+function setCancellationSubmitting(isSubmitting) {
+  isChangeRequestSubmitting = isSubmitting;
+  $("#btnSubmitCancellation").prop("disabled", isSubmitting);
+  $("#btnCancellationBack").prop("disabled", isSubmitting);
+  $("#btnSubmitCancellationSpinner").toggleClass("d-none", !isSubmitting);
+}
+
+async function submitDateChangeRequest(payload) {
+  // Backend endpoint integration point
+  // TODO: POST to CHANGE_REQUEST_ENDPOINTS.dateChange when the PCSKHI endpoint is available.
+  if (!CHANGE_REQUEST_ENDPOINTS.dateChange) {
+    console.warn(
+      "[PCSKHI Change Requests] Date change API is not connected. Expected endpoint: CHANGE_REQUEST_ENDPOINTS.dateChange"
+    );
+    return {
+      isSuccess: false,
+      message:
+        "Change request submission is not available yet. Backend integration is pending.",
+    };
+  }
+
+  return new Promise((resolve, reject) => {
+    $.ajax({
+      type: "POST",
+      url: CHANGE_REQUEST_ENDPOINTS.dateChange,
+      data: JSON.stringify(payload),
+      contentType: "application/json",
+      dataType: "json",
+      success: function (response) {
+        resolve(response);
+      },
+      error: function (xhr) {
+        const message =
+          xhr.responseJSON && xhr.responseJSON.message
+            ? xhr.responseJSON.message
+            : "An error occurred while submitting the date change request.";
+        reject(new Error(message));
+      },
+    });
+  });
+}
+
+async function submitCancellationRequest(payload) {
+  // Backend endpoint integration point
+  // TODO: POST to CHANGE_REQUEST_ENDPOINTS.cancellation when the PCSKHI endpoint is available.
+  if (!CHANGE_REQUEST_ENDPOINTS.cancellation) {
+    console.warn(
+      "[PCSKHI Change Requests] Cancellation API is not connected. Expected endpoint: CHANGE_REQUEST_ENDPOINTS.cancellation"
+    );
+    return {
+      isSuccess: false,
+      message:
+        "Change request submission is not available yet. Backend integration is pending.",
+    };
+  }
+
+  return new Promise((resolve, reject) => {
+    $.ajax({
+      type: "POST",
+      url: CHANGE_REQUEST_ENDPOINTS.cancellation,
+      data: JSON.stringify(payload),
+      contentType: "application/json",
+      dataType: "json",
+      success: function (response) {
+        resolve(response);
+      },
+      error: function (xhr) {
+        const message =
+          xhr.responseJSON && xhr.responseJSON.message
+            ? xhr.responseJSON.message
+            : "An error occurred while submitting the cancellation request.";
+        reject(new Error(message));
+      },
+    });
+  });
+}
+
+async function handleDateChangeSubmit() {
+  if (isChangeRequestSubmitting || !selectedDispatchRequest) {
+    return;
+  }
+
+  const validation = validateDateChangeForm();
+
+  if (!validation.isValid) {
+    return;
+  }
+
+  const payload = buildDateChangePayload(selectedDispatchRequest, validation);
+
+  setDateChangeSubmitting(true);
+  hideFormLevelError("dateChangeFormError");
+
+  try {
+    const response = await submitDateChangeRequest(payload);
+
+    if (!response || !response.isSuccess) {
+      showFormLevelError(
+        "dateChangeFormError",
+        (response && response.message) ||
+          "Unable to submit the date change request."
+      );
+      return;
+    }
+
+    const changeRequestModalElement = document.getElementById(
+      "dateChangeRequestModal"
+    );
+
+    if (changeRequestModalElement && window.bootstrap) {
+      blurFocusedDescendant(changeRequestModalElement);
+      bootstrap.Modal.getOrCreateInstance(changeRequestModalElement).hide();
+    }
+
+    showToast("success", "Date change request submitted successfully.");
+    await refreshRequestsAfterChangeSubmission();
+  } catch (error) {
+    showFormLevelError(
+      "dateChangeFormError",
+      error.message || "Unable to submit the date change request."
+    );
+  } finally {
+    setDateChangeSubmitting(false);
+  }
+}
+
+async function handleCancellationSubmit() {
+  if (isChangeRequestSubmitting || !selectedDispatchRequest) {
+    return;
+  }
+
+  const validation = validateCancellationForm();
+
+  if (!validation.isValid) {
+    return;
+  }
+
+  const payload = buildCancellationPayload(
+    selectedDispatchRequest,
+    validation
+  );
+
+  setCancellationSubmitting(true);
+  hideFormLevelError("cancellationFormError");
+
+  try {
+    const response = await submitCancellationRequest(payload);
+
+    if (!response || !response.isSuccess) {
+      showFormLevelError(
+        "cancellationFormError",
+        (response && response.message) ||
+          "Unable to submit the cancellation request."
+      );
+      return;
+    }
+
+    const cancellationModalElement = document.getElementById(
+      "cancellationRequestModal"
+    );
+
+    if (cancellationModalElement && window.bootstrap) {
+      blurFocusedDescendant(cancellationModalElement);
+      bootstrap.Modal.getOrCreateInstance(cancellationModalElement).hide();
+    }
+
+    showToast("success", "Cancellation request submitted successfully.");
+    await refreshRequestsAfterChangeSubmission();
+  } catch (error) {
+    showFormLevelError(
+      "cancellationFormError",
+      error.message || "Unable to submit the cancellation request."
+    );
+  } finally {
+    setCancellationSubmitting(false);
+  }
+}
+
+async function refreshRequestsAfterChangeSubmission() {
+  try {
+    const reqs = await getRequests();
+
+    if (reqs && reqs.data) {
+      reqList = reqs.data;
+      allRequests = [...reqs.data];
+      searchFilter(allRequests, false);
+
+      if (selectedDispatchRequest) {
+        const refreshed = allRequests.find(
+          (item) => item.req_id === selectedDispatchRequest.req_id
+        );
+
+        if (refreshed) {
+          selectedDispatchRequest = refreshed;
+        }
+      }
+    }
+  } catch (error) {
+    console.warn(
+      "[PCSKHI Change Requests] Request list refresh failed after submission:",
+      error
+    );
+  }
+}
+
+function showToast(type, str) {
+  const toast = document.createElement("div");
+
+  if (type === "success") {
+    toast.classList.add("toasty", "success");
+    toast.innerHTML = `
+    <i class='bx bx-check text-xl text-[var(--tertiary)]'></i>
+  <div class="flex flex-col py-3">
+    <h5 class="text-md font-semibold leading-2">Success</h5>
+    <p class="text-gray-600 text-sm">${str}</p>
+    <span><i class='rmvToast bx bx-x absolute top-[10px] right-[10px] text-[16px] cursor-pointer' ></i></span>
+  </div>
+    `;
+  } else if (type === "error") {
+    toast.classList.add("toasty", "error");
+    toast.innerHTML = `
+    <i class='bx bx-x text-xl text-[var(--red-color)]'></i>
+  <div class="flex flex-col py-3">
+    <h5 class="text-md font-semibold leading-2">Error</h5>
+    <p class="text-gray-600 text-sm">${str}</p>
+    <span><i class='rmvToast bx bx-x absolute top-[10px] right-[10px] text-[16px] cursor-pointer' ></i></span>
+  </div>
+    `;
+  } else if (type === "warn") {
+    toast.classList.add("toasty", "warn");
+    toast.innerHTML = `
+    <i class='bx bx-info-circle text-lg text-[#ffaa33]'></i>
+    <div class="flex flex-col py-3">
+      <h5 class="text-md font-semibold leading-2">Warning</h5>
+      <p class="text-gray-600 text-sm">${str}</p>
+      <span><i class='rmvToast bx bx-x absolute top-[10px] right-[10px] text-[16px] cursor-pointer' ></i></span>
+    </div>
+      `;
+  }
+
+  $(".toastBox").append(toast);
+
+  setTimeout(() => {
+    toast.remove();
+  }, 8000);
 }
 //#endregion

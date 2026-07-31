@@ -168,6 +168,473 @@
             ></p>
           </div>
         </div>
+        <div
+          id="changeRequestActions"
+          class="modal-footer border-0 flex-column align-items-stretch gap-2 d-none"
+        >
+          <button
+            type="button"
+            id="btnRequestDateChange"
+            class="d-flex align-items-center justify-content-center gap-2 bg-[var(--dark)] hover:bg-[var(--dark-200)] text-[var(--white)] font-medium transition rounded-md px-3 py-2"
+          >
+            <i
+              data-lucide="calendar-days"
+              class="change-request-icon stroke-white"
+              aria-hidden="true"
+            ></i>
+            Request Date Change
+          </button>
+          <button
+            type="button"
+            id="btnRequestCancellation"
+            class="d-flex align-items-center justify-content-center gap-2 border border-[var(--dark)] text-[var(--dark)] hover:bg-[var(--gray)] font-medium transition rounded-md px-3 py-2"
+          >
+            <i
+              data-lucide="circle-x"
+              class="change-request-icon"
+              aria-hidden="true"
+            ></i>
+            Request Cancellation
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div
+    class="modal fade"
+    id="dateChangeRequestModal"
+    data-bs-backdrop="static"
+    data-bs-keyboard="false"
+    tabindex="-1"
+    aria-labelledby="dateChangeRequestModalTitle"
+    aria-hidden="true"
+  >
+    <div
+      class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg change-request-modal-dialog"
+    >
+      <div class="modal-content change-request-modal-content">
+        <div class="modal-header change-request-modal-header border-0">
+          <div>
+            <h1
+              class="change-request-modal-title"
+              id="dateChangeRequestModalTitle"
+            >
+              Date Change Request
+            </h1>
+            <p class="change-request-modal-subtitle">
+              Request a date adjustment for this accepted dispatch.
+            </p>
+          </div>
+          <button
+            type="button"
+            class="btn-close text-[14px] m-1 w-0 h-0 w-auto h-auto"
+            id="btnDateChangeClose"
+            aria-label="Close"
+          ></button>
+        </div>
+        <div class="modal-body change-request-modal-body">
+          <section aria-labelledby="dateChangeSummaryTitle">
+            <h2 class="change-request-section-title" id="dateChangeSummaryTitle">
+              Dispatch Summary
+            </h2>
+            <div class="change-request-summary-card" id="dateChangeReadOnlyInfo">
+              <div class="change-request-summary-grid">
+                <div class="change-request-summary-item">
+                  <span class="change-request-summary-label">Employee name</span>
+                  <span
+                    class="change-request-summary-value is-strong"
+                    id="dcEmpName"
+                  ></span>
+                </div>
+                <div class="change-request-summary-item">
+                  <span class="change-request-summary-label"
+                    >Current start date</span
+                  >
+                  <span class="change-request-summary-value" id="dcCurrentStart"></span>
+                </div>
+                <div class="change-request-summary-item">
+                  <span class="change-request-summary-label">Employee ID</span>
+                  <span class="change-request-summary-value" id="dcEmpNumber"></span>
+                </div>
+                <div class="change-request-summary-item">
+                  <span class="change-request-summary-label"
+                    >Current end date</span
+                  >
+                  <span class="change-request-summary-value" id="dcCurrentEnd"></span>
+                </div>
+                <div class="change-request-summary-item">
+                  <span class="change-request-summary-label">KDT group</span>
+                  <span class="change-request-summary-value" id="dcGroupName"></span>
+                </div>
+                <div class="change-request-summary-item">
+                  <span class="change-request-summary-label"
+                    >Current total days</span
+                  >
+                  <span
+                    class="change-request-summary-value"
+                    id="dcCurrentTotalDays"
+                  ></span>
+                </div>
+                <div class="change-request-summary-item">
+                  <span class="change-request-summary-label"
+                    >Dispatch request ID</span
+                  >
+                  <span class="change-request-summary-value" id="dcRequestId"></span>
+                </div>
+                <div class="change-request-summary-item">
+                  <span class="change-request-summary-label">Location</span>
+                  <span class="change-request-summary-value" id="dcLocation"></span>
+                </div>
+                <div class="change-request-summary-item">
+                  <span class="change-request-summary-label">Requested by</span>
+                  <span class="change-request-summary-value" id="dcRequestedBy"></span>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <form id="dateChangeRequestForm" class="change-request-form" novalidate>
+            <section aria-labelledby="dateChangeFormTitle">
+              <h2 class="change-request-section-title" id="dateChangeFormTitle">
+                Proposed Changes
+              </h2>
+              <div class="change-request-form-row">
+                <div class="change-request-field">
+                  <label for="dcProposedStartDate" class="change-request-label"
+                    >Proposed Start Date
+                    <span class="change-request-required">*</span></label
+                  >
+                  <input
+                    type="date"
+                    class="change-request-input"
+                    id="dcProposedStartDate"
+                    name="proposedStartDate"
+                    required
+                    aria-describedby="dcProposedStartDateError"
+                  />
+                  <div
+                    id="dcProposedStartDateError"
+                    class="invalid-feedback"
+                    role="alert"
+                  ></div>
+                </div>
+                <div class="change-request-field">
+                  <label for="dcProposedEndDate" class="change-request-label"
+                    >Proposed End Date
+                    <span class="change-request-required">*</span></label
+                  >
+                  <input
+                    type="date"
+                    class="change-request-input"
+                    id="dcProposedEndDate"
+                    name="proposedEndDate"
+                    required
+                    aria-describedby="dcProposedEndDateError"
+                  />
+                  <div
+                    id="dcProposedEndDateError"
+                    class="invalid-feedback"
+                    role="alert"
+                  ></div>
+                </div>
+              </div>
+              <div class="change-request-field">
+                <label for="dcReason" class="change-request-label"
+                  >Reason for Date Change
+                  <span class="change-request-required">*</span></label
+                >
+                <textarea
+                  class="change-request-textarea"
+                  id="dcReason"
+                  name="reason"
+                  rows="3"
+                  required
+                  aria-describedby="dcReasonError"
+                ></textarea>
+                <div id="dcReasonError" class="invalid-feedback" role="alert"></div>
+              </div>
+            </section>
+
+            <section
+              class="change-request-comparison"
+              aria-labelledby="dateChangeComparisonTitle"
+            >
+              <h2
+                class="change-request-section-title"
+                id="dateChangeComparisonTitle"
+              >
+                Schedule Comparison
+              </h2>
+              <div class="change-request-comparison-cards">
+                <div class="change-request-comparison-card">
+                  <p class="change-request-comparison-card-label">
+                    Current Approved Schedule
+                  </p>
+                  <p
+                    class="change-request-comparison-card-value"
+                    id="dcScheduleCurrent"
+                  ></p>
+                </div>
+                <div class="change-request-comparison-card">
+                  <p class="change-request-comparison-card-label">
+                    Proposed Schedule
+                  </p>
+                  <p
+                    class="change-request-comparison-card-value"
+                    id="dcScheduleProposed"
+                  >
+                    —
+                  </p>
+                </div>
+              </div>
+              <div class="change-request-comparison-metrics">
+                <div class="change-request-metric">
+                  <span class="change-request-metric-label"
+                    >Current total days</span
+                  >
+                  <span
+                    class="change-request-metric-value"
+                    id="dcComparisonCurrentDays"
+                  ></span>
+                </div>
+                <div class="change-request-metric">
+                  <span class="change-request-metric-label"
+                    >Proposed total days</span
+                  >
+                  <span
+                    class="change-request-metric-value"
+                    id="dcComparisonProposedDays"
+                  >
+                    —
+                  </span>
+                </div>
+                <div class="change-request-metric">
+                  <span class="change-request-metric-label"
+                    >Net change in days</span
+                  >
+                  <span
+                    class="change-request-metric-value change-request-net-change"
+                    id="dcComparisonNetChange"
+                  >
+                    —
+                  </span>
+                </div>
+              </div>
+            </section>
+
+            <div
+              id="dateChangeFormError"
+              class="alert alert-danger change-request-form-error d-none"
+              role="alert"
+            ></div>
+          </form>
+        </div>
+        <div class="modal-footer change-request-footer border-0">
+          <button
+            type="button"
+            id="btnDateChangeBack"
+            class="change-request-btn change-request-btn--secondary"
+          >
+            Back
+          </button>
+          <button
+            type="button"
+            id="btnSubmitDateChange"
+            class="change-request-btn change-request-btn--primary"
+          >
+            <span
+              id="btnSubmitDateChangeSpinner"
+              class="spinner-border spinner-border-sm d-none"
+              role="status"
+              aria-hidden="true"
+            ></span>
+            <i
+              data-lucide="send"
+              class="change-request-icon"
+              aria-hidden="true"
+            ></i>
+            Submit Date Change Request
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div
+    class="modal fade"
+    id="cancellationRequestModal"
+    data-bs-backdrop="static"
+    data-bs-keyboard="false"
+    tabindex="-1"
+    aria-labelledby="cancellationRequestModalTitle"
+    aria-hidden="true"
+  >
+    <div
+      class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg change-request-modal-dialog"
+    >
+      <div class="modal-content change-request-modal-content">
+        <div class="modal-header change-request-modal-header border-0">
+          <div>
+            <h1
+              class="change-request-modal-title"
+              id="cancellationRequestModalTitle"
+            >
+              Cancellation Request
+            </h1>
+            <p class="change-request-modal-subtitle">
+              Request cancellation of this accepted dispatch for KDT review.
+            </p>
+          </div>
+          <button
+            type="button"
+            class="btn-close text-[14px] m-1 w-0 h-0 w-auto h-auto"
+            id="btnCancellationClose"
+            aria-label="Close"
+          ></button>
+        </div>
+        <div class="modal-body change-request-modal-body">
+          <section aria-labelledby="cancellationSummaryTitle">
+            <h2
+              class="change-request-section-title"
+              id="cancellationSummaryTitle"
+            >
+              Dispatch Summary
+            </h2>
+            <div
+              class="change-request-summary-card"
+              id="cancellationReadOnlyInfo"
+            >
+              <div class="change-request-summary-grid">
+                <div class="change-request-summary-item">
+                  <span class="change-request-summary-label">Employee name</span>
+                  <span
+                    class="change-request-summary-value is-strong"
+                    id="crEmpName"
+                  ></span>
+                </div>
+                <div class="change-request-summary-item">
+                  <span class="change-request-summary-label"
+                    >Current start date</span
+                  >
+                  <span class="change-request-summary-value" id="crCurrentStart"></span>
+                </div>
+                <div class="change-request-summary-item">
+                  <span class="change-request-summary-label">Employee ID</span>
+                  <span class="change-request-summary-value" id="crEmpNumber"></span>
+                </div>
+                <div class="change-request-summary-item">
+                  <span class="change-request-summary-label"
+                    >Current end date</span
+                  >
+                  <span class="change-request-summary-value" id="crCurrentEnd"></span>
+                </div>
+                <div class="change-request-summary-item">
+                  <span class="change-request-summary-label">KDT group</span>
+                  <span class="change-request-summary-value" id="crGroupName"></span>
+                </div>
+                <div class="change-request-summary-item">
+                  <span class="change-request-summary-label"
+                    >Dispatch request ID</span
+                  >
+                  <span class="change-request-summary-value" id="crRequestId"></span>
+                </div>
+                <div class="change-request-summary-item">
+                  <span class="change-request-summary-label">Location</span>
+                  <span class="change-request-summary-value" id="crLocation"></span>
+                </div>
+                <div class="change-request-summary-item">
+                  <span class="change-request-summary-label">Requested by</span>
+                  <span class="change-request-summary-value" id="crRequestedBy"></span>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <div class="change-request-notice" role="status" id="cancellationNotice">
+            Submitting this request will not immediately cancel the dispatch.
+            The dispatch will remain active until KDT approves the cancellation
+            request.
+          </div>
+
+          <form
+            id="cancellationRequestForm"
+            class="change-request-form"
+            novalidate
+          >
+            <section aria-labelledby="cancellationFormTitle">
+              <h2
+                class="change-request-section-title"
+                id="cancellationFormTitle"
+              >
+                Cancellation Details
+              </h2>
+              <div class="change-request-field">
+                <label for="crReason" class="change-request-label"
+                  >Reason for Cancellation
+                  <span class="change-request-required">*</span></label
+                >
+                <textarea
+                  class="change-request-textarea"
+                  id="crReason"
+                  name="reason"
+                  rows="3"
+                  required
+                  aria-describedby="crReasonError"
+                ></textarea>
+                <div id="crReasonError" class="invalid-feedback" role="alert"></div>
+              </div>
+              <div class="change-request-field">
+                <label for="crRemarks" class="change-request-label"
+                  >Remarks</label
+                >
+                <textarea
+                  class="change-request-textarea"
+                  id="crRemarks"
+                  name="remarks"
+                  rows="2"
+                  aria-describedby="crRemarksHelp"
+                ></textarea>
+                <div id="crRemarksHelp" class="change-request-help-text">
+                  Optional
+                </div>
+              </div>
+            </section>
+
+            <div
+              id="cancellationFormError"
+              class="alert alert-danger change-request-form-error d-none"
+              role="alert"
+            ></div>
+          </form>
+        </div>
+        <div class="modal-footer change-request-footer border-0">
+          <button
+            type="button"
+            id="btnCancellationBack"
+            class="change-request-btn change-request-btn--secondary"
+          >
+            Back
+          </button>
+          <button
+            type="button"
+            id="btnSubmitCancellation"
+            class="change-request-btn change-request-btn--primary"
+          >
+            <span
+              id="btnSubmitCancellationSpinner"
+              class="spinner-border spinner-border-sm d-none"
+              role="status"
+              aria-hidden="true"
+            ></span>
+            <i
+              data-lucide="send"
+              class="change-request-icon"
+              aria-hidden="true"
+            ></i>
+            Submit Cancellation Request
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -1272,5 +1739,6 @@
         </button>
       </div> -->
     </div>
+    <div class="toastBox"></div>
   </body>
 </html>
