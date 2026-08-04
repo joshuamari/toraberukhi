@@ -1527,7 +1527,9 @@ function fillCards() {
   const counts = getDispatchStatusCounts(allRequests);
   const pending = counts.pending;
   const approved = counts.approved;
+  const declined = counts.declined;
   const cancelled = counts.cancelled;
+  const completed = counts.completed;
   const todayTotal = counts.todaytotal;
   const todayApproved = counts.todayaccept;
   const total = counts.total;
@@ -1540,13 +1542,15 @@ function fillCards() {
       `);
   }
   $("#cardPending").text(pending);
-  $("#cardAccepted").text(approved);
+  $("#cardApproved").text(approved);
   if (todayApproved != 0) {
-    $("#cardTodayAccepted").html(
+    $("#cardTodayApproved").html(
       `<small class="font-semibold" >+${todayApproved} today</small>`
     );
   }
+  $("#cardDeclined").text(declined);
   $("#cardCancelled").text(cancelled);
+  $("#cardCompleted").text(completed);
   if (todayTotal != 0) {
     $("#cardTodayTotal").html(
       `<small class="font-semibold" >+${todayTotal} today</small>`

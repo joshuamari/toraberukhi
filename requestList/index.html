@@ -1480,7 +1480,7 @@
           </div>
 
           <div class="w-100 pt-3 flex flex-col gap-3 relative">
-            <div class="lg:flex gap-2 lg:gap-4 w-100 grid grid-cols-2">
+            <div class="grid grid-cols-2 lg:grid-cols-3 gap-2 lg:gap-4 w-100">
               <span class="card active">
                 <div class="flex gap-2 items-center">
                   <span class="icon">
@@ -1504,29 +1504,39 @@
                     <i class="bx bx-check text-[16px] font-medium"></i
                   ></span>
 
-                  <h6 class="m-0 font-semibold">Total Approved Requests</h6>
+                  <h6 class="m-0 font-semibold">Approved Requests</h6>
                 </div>
                 <div
                   class="pt-6 flex gap-3 items-center justify-content-between w-100"
                 >
-                  <h2 class="text-[32px] font-bold" id="cardAccepted"></h2>
+                  <h2 class="text-[32px] font-bold" id="cardApproved"></h2>
                   <span
                     class="bg-[var(--secondary)] px-2 py-0 rounded-lg"
-                    id="cardTodayAccepted"
+                    id="cardTodayApproved"
                   ></span>
                 </div>
               </span>
               <span class="card">
                 <div class="flex gap-2 items-center">
-                  <span
-                    class="w-[25px] h-[25px] flex items-center justify-content-center rounded-md bg-[var(--dark)]"
-                  >
-                    <i
-                      class="bx bx-x text-[16px] font-medium text-[var(--white)]"
-                    ></i
-                  ></span>
+                  <span class="icon">
+                    <i class="bx bx-x-circle text-[16px] font-medium"></i>
+                  </span>
 
-                  <h6 class="m-0 font-semibold">Total Cancelled Requests</h6>
+                  <h6 class="m-0 font-semibold">Declined Requests</h6>
+                </div>
+                <div
+                  class="pt-6 flex gap-3 items-center justify-content-between w-100"
+                >
+                  <h2 class="text-[32px] font-bold" id="cardDeclined"></h2>
+                </div>
+              </span>
+              <span class="card">
+                <div class="flex gap-2 items-center">
+                  <span class="icon">
+                    <i class="bx bx-x text-[16px] font-medium"></i>
+                  </span>
+
+                  <h6 class="m-0 font-semibold">Cancelled Requests</h6>
                 </div>
                 <div
                   class="pt-6 flex gap-3 items-center justify-content-between w-100"
@@ -1536,13 +1546,23 @@
               </span>
               <span class="card">
                 <div class="flex gap-2 items-center">
-                  <span
-                    class="w-[25px] h-[25px] flex items-center justify-content-center rounded-md bg-[var(--dark)]"
-                  >
-                    <i
-                      class="bx bxs-file text-[16px] font-medium text-[var(--white)]"
-                    ></i
-                  ></span>
+                  <span class="icon">
+                    <i class="bx bx-check-double text-[16px] font-medium"></i>
+                  </span>
+
+                  <h6 class="m-0 font-semibold">Completed Requests</h6>
+                </div>
+                <div
+                  class="pt-6 flex gap-3 items-center justify-content-between w-100"
+                >
+                  <h2 class="text-[32px] font-bold" id="cardCompleted"></h2>
+                </div>
+              </span>
+              <span class="card">
+                <div class="flex gap-2 items-center">
+                  <span class="icon">
+                    <i class="bx bxs-file text-[16px] font-medium"></i>
+                  </span>
 
                   <h6 class="m-0 font-semibold">Total Requests</h6>
                 </div>
