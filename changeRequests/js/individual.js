@@ -1017,8 +1017,9 @@ function setDispatchRequestLink(elementId, request) {
 
 function populateDateChangeDetailsModal(request) {
   $("#dcDetailModalTitle").html(
-    `${request.request_id} ${getChangeRequestStatusBadgeHtml(request.status, true)}`
+    `Date Change Request ${getChangeRequestStatusBadgeHtml(request.status, true)}`
   );
+  setDetailValue("dcDetailRequestId", request.request_id);
   setDetailValue("dcDetailEmployee", request.employee_name);
   setDetailValue("dcDetailEmployeeId", request.employee_id);
   setDetailValue("dcDetailGroup", request.group_name);
@@ -1042,12 +1043,15 @@ function populateDateChangeDetailsModal(request) {
   if (withdrawSection) {
     withdrawSection.classList.toggle("d-none", request.status !== "pending");
   }
+
+  renderPaginationIcons();
 }
 
 function populateCancellationDetailsModal(request) {
   $("#crDetailModalTitle").html(
-    `<span class="cr-detail-request-id">${request.request_id}</span>${getChangeRequestStatusBadgeHtml(request.status, true)}`
+    `Cancellation Request ${getChangeRequestStatusBadgeHtml(request.status, true)}`
   );
+  setDetailValue("crDetailRequestId", request.request_id);
   setDetailValue("crDetailEmployee", request.employee_name);
   setDetailValue("crDetailEmployeeId", request.employee_id);
   setDetailValue("crDetailGroup", request.group_name);
@@ -1064,5 +1068,7 @@ function populateCancellationDetailsModal(request) {
   if (withdrawSection) {
     withdrawSection.classList.toggle("d-none", request.status !== "pending");
   }
+
+  renderPaginationIcons();
 }
 //#endregion
