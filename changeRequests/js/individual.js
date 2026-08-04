@@ -1,5 +1,5 @@
 //#region GLOBALS
-const USE_CHANGE_REQUEST_MOCKS = true;
+const USE_CHANGE_REQUEST_MOCKS = false;
 const REQUESTS_PER_PAGE = 10;
 
 const rootFolder = `//${document.location.hostname}`;
@@ -37,23 +37,62 @@ const cancellationState = {
 
 let dateChangeModalReturnTrigger = null;
 let cancellationModalReturnTrigger = null;
+let changeRequestsFetchPromise = null;
 //#endregion
 
 //#region ADAPTERS
-async function loadDateChangeRequests() {
-  if (USE_CHANGE_REQUEST_MOCKS) {
-    return [...window.mockDateChangeRequests];
+function fetchChangeRequestsFromApi() {
+  if (changeRequestsFetchPromise) {
+    return changeRequestsFetchPromise;
   }
 
-  throw new Error("Date Change Request API is not connected.");
+  changeRequestsFetchPromise = new Promise((resolve, reject) => {
+    $.ajax({
+      type: "GET",
+      url: "php/get_change_requests.php",
+      dataType: "json",
+      success: function (response) {
+        if (response?.isSuccess && response.data) {
+          resolve({
+            date_changes: Array.isArray(response.data.date_changes)
+              ? response.data.date_changes
+              : [],
+            cancellations: Array.isArray(response.data.cancellations)
+              ? response.data.cancellations
+              : [],
+          });
+          return;
+        }
+
+        reject(
+          response?.message || "Failed to load change requests from the server."
+        );
+      },
+      error: function () {
+        reject("Failed to load change requests from the server.");
+      },
+    });
+  });
+
+  return changeRequestsFetchPromise;
+}
+
+async function loadDateChangeRequests() {
+  if (USE_CHANGE_REQUEST_MOCKS) {
+    return [...(window.mockDateChangeRequests || [])];
+  }
+
+  const data = await fetchChangeRequestsFromApi();
+  return [...data.date_changes];
 }
 
 async function loadCancellationRequests() {
   if (USE_CHANGE_REQUEST_MOCKS) {
-    return [...window.mockCancellationRequests];
+    return [...(window.mockCancellationRequests || [])];
   }
 
-  throw new Error("Cancellation Request API is not connected.");
+  const data = await fetchChangeRequestsFromApi();
+  return [...data.cancellations];
 }
 
 function loadLiveDispatchRequests() {
@@ -251,6 +290,61 @@ $(document)
       openCancellationRequestById(requestId, event.currentTarget);
     }
   );
+
+$(document)
+  .off("click.withdrawChangeRequest", ".cr-detail-withdraw-btn")
+  .on("click.withdrawChangeRequest", ".cr-detail-withdraw-btn", function (event) {
+    event.preventDefault();
+
+    const button = event.currentTarget;
+    if (button.disabled) {
+      return;
+    }
+
+    const changeRequestId = button.dataset.changeRequestId;
+    const changeType = button.dataset.changeRequestType || "date_change";
+
+    if (!changeRequestId) {
+      alert("Missing change request ID.");
+      return;
+    }
+
+    if (
+      !window.confirm(
+        "Withdraw this pending request? This cannot be undone."
+      )
+    ) {
+      return;
+    }
+
+    button.disabled = true;
+
+    withdrawChangeRequest(changeRequestId)
+      .then(() => {
+        applyWithdrawnStatusLocally(changeRequestId, changeType);
+        changeRequestsFetchPromise = null;
+
+        if (changeType === "cancellation") {
+          applyCancellationFilters(false);
+          const { instance } = getBootstrapModal(
+            "cancellationRequestDetailsModal"
+          );
+          instance?.hide();
+        } else {
+          applyDateChangeFilters(false);
+          const { instance } = getBootstrapModal(
+            "dateChangeRequestDetailsModal"
+          );
+          instance?.hide();
+        }
+
+        alert("Request withdrawn successfully.");
+      })
+      .catch((error) => {
+        button.disabled = false;
+        alert(`${error}`);
+      });
+  });
 
 $(document).on(
   "click",
@@ -661,11 +755,98 @@ function formatDateRange(start, end) {
   return `${formatDate(start)} — ${formatDate(end)}`;
 }
 
+function canWithdrawChangeRequest(request) {
+  if (!request || request.status !== "pending") {
+    return false;
+  }
+
+  const loggedInUserId = Number(empDetails?.id);
+  const requestedById = Number(request.requested_by_id);
+
+  return (
+    Number.isFinite(loggedInUserId) &&
+    loggedInUserId > 0 &&
+    Number.isFinite(requestedById) &&
+    requestedById > 0 &&
+    loggedInUserId === requestedById
+  );
+}
+
+function updateWithdrawSection(sectionId, request) {
+  const withdrawSection = document.getElementById(sectionId);
+  if (!withdrawSection) {
+    return;
+  }
+
+  const isPending = request?.status === "pending";
+  withdrawSection.classList.toggle("d-none", !isPending);
+
+  if (!isPending) {
+    return;
+  }
+
+  const canWithdraw = canWithdrawChangeRequest(request);
+  const noteEl = withdrawSection.querySelector(".cr-detail-withdraw-note");
+  const buttonEl = withdrawSection.querySelector(".cr-detail-withdraw-btn");
+
+  if (noteEl) {
+    noteEl.textContent = canWithdraw
+      ? "You submitted this request. Withdrawing will cancel it."
+      : "Only the person who submitted this request can withdraw it.";
+  }
+
+  if (buttonEl) {
+    buttonEl.disabled = !canWithdraw;
+    buttonEl.dataset.changeRequestId = String(request.id || "");
+    buttonEl.dataset.changeRequestType =
+      sectionId === "dcDetailWithdrawSection" ? "date_change" : "cancellation";
+  }
+}
+
+function withdrawChangeRequest(changeRequestId) {
+  return new Promise((resolve, reject) => {
+    $.ajax({
+      type: "POST",
+      url: "php/withdraw_change_request.php",
+      dataType: "json",
+      data: {
+        change_request_id: changeRequestId,
+      },
+      success: function (response) {
+        if (response?.isSuccess) {
+          resolve(response);
+          return;
+        }
+
+        reject(response?.message || "Failed to withdraw request.");
+      },
+      error: function () {
+        reject("Failed to withdraw request.");
+      },
+    });
+  });
+}
+
+function applyWithdrawnStatusLocally(changeRequestId, changeType) {
+  const collection =
+    changeType === "cancellation"
+      ? allCancellationRequests
+      : allDateChangeRequests;
+  const request = collection.find(
+    (item) => String(item.id) === String(changeRequestId)
+  );
+
+  if (request) {
+    request.status = "withdrawn";
+  }
+}
+
 function getChangeRequestStatusBadgeHtml(status, large) {
   const statusConfig = {
     pending: { label: "Pending", className: "pending" },
     accepted: { label: "Accepted", className: "accepted" },
     rejected: { label: "Rejected", className: "rejected" },
+    withdrawn: { label: "Withdrawn", className: "withdrawn" },
   };
 
   const config = statusConfig[status] || {
@@ -1039,10 +1220,7 @@ function populateDateChangeDetailsModal(request) {
   setDetailValue("dcDetailRequestedBy", request.requested_by);
   setDetailValue("dcDetailDateRequested", formatDate(request.date_requested));
 
-  const withdrawSection = document.getElementById("dcDetailWithdrawSection");
-  if (withdrawSection) {
-    withdrawSection.classList.toggle("d-none", request.status !== "pending");
-  }
+  updateWithdrawSection("dcDetailWithdrawSection", request);
 
   renderPaginationIcons();
 }
@@ -1064,10 +1242,7 @@ function populateCancellationDetailsModal(request) {
   setDetailValue("crDetailRequestedBy", request.requested_by);
   setDetailValue("crDetailDateRequested", formatDate(request.date_requested));
 
-  const withdrawSection = document.getElementById("crDetailWithdrawSection");
-  if (withdrawSection) {
-    withdrawSection.classList.toggle("d-none", request.status !== "pending");
-  }
+  updateWithdrawSection("crDetailWithdrawSection", request);
 
   renderPaginationIcons();
 }
