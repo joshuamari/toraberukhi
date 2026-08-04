@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="en">
   <head>
     <title>トラベる - KDT</title>
@@ -1561,87 +1561,89 @@
               <div
                 class="flex lg:flex-row flex-col justify-content-between p-3 gap-2 lg:gap-0 border-b-[1px]"
               >
-                <div class="flex gap-3 w-100">
-                  <div
-                    class="tabs w-full lg:w-auto flex gap-2 items-center relative overflow-hidden bg-[var(--white)] border grid grid-cols-3 lg:grid-cols-6 px-[3px] rounded-lg transition"
-                    role="tablist"
-                    aria-label="tabs"
-                  >
+                <div class="flex gap-3 w-100 min-w-0">
+                  <div class="w-full overflow-x-auto lg:w-auto">
                     <div
-                      class="indicator absolute top-0 my-[0.25rem] bottom-0 left-0 rounded-md bg-[var(--secondary)]"
-                    ></div>
-                    <button
-                      role="tab"
-                      aria-selected="true"
-                      aria-controls="panel-1"
-                      id="tab-1"
-                      tabindex="0"
-                      class="relative block p-2 tab rounded-full flex gap-1 items-center justify-content-center"
+                      class="tabs relative flex min-w-max flex-nowrap items-center gap-2 overflow-hidden bg-[var(--white)] border px-[3px] rounded-lg transition lg:grid lg:min-w-0 lg:grid-cols-6"
+                      role="tablist"
+                      aria-label="tabs"
                     >
-                      <span class="text-[12px] text-[var(--gray-text)]"
-                        >All</span
+                      <div
+                        class="indicator absolute top-0 my-[0.25rem] left-0 rounded-md bg-[var(--secondary)]"
+                      ></div>
+                      <button
+                        role="tab"
+                        aria-selected="true"
+                        aria-controls="panel-1"
+                        id="tab-1"
+                        tabindex="0"
+                        class="relative h-10 min-w-24 shrink-0 block p-2 tab rounded-full flex gap-1 items-center justify-content-center lg:min-w-0"
                       >
-                    </button>
-                    <button
-                      role="tab"
-                      aria-selected="false"
-                      aria-controls="panel-2"
-                      id="tab-2"
-                      tabindex="-1"
-                      class="relative block p-2 tab rounded-full flex gap-1 items-center justify-content-center"
-                    >
-                      <span class="text-[12px] text-[var(--gray-text)]"
-                        >Pending</span
+                        <span class="text-[12px] text-[var(--gray-text)]"
+                          >All</span
+                        >
+                      </button>
+                      <button
+                        role="tab"
+                        aria-selected="false"
+                        aria-controls="panel-2"
+                        id="tab-2"
+                        tabindex="-1"
+                        class="relative h-10 min-w-24 shrink-0 block p-2 tab rounded-full flex gap-1 items-center justify-content-center lg:min-w-0"
                       >
-                    </button>
-                    <button
-                      role="tab"
-                      aria-selected="false"
-                      aria-controls="panel-3"
-                      id="tab-3"
-                      tabindex="-2"
-                      class="relative block p-2 tab rounded-full flex gap-1 items-center justify-content-center"
-                    >
-                      <span class="text-[12px] text-[var(--gray-text)]"
-                        >Approved</span
+                        <span class="text-[12px] text-[var(--gray-text)]"
+                          >Pending</span
+                        >
+                      </button>
+                      <button
+                        role="tab"
+                        aria-selected="false"
+                        aria-controls="panel-3"
+                        id="tab-3"
+                        tabindex="-2"
+                        class="relative h-10 min-w-24 shrink-0 block p-2 tab rounded-full flex gap-1 items-center justify-content-center lg:min-w-0"
                       >
-                    </button>
-                    <button
-                      role="tab"
-                      aria-selected="false"
-                      aria-controls="panel-4"
-                      id="tab-4"
-                      tabindex="-3"
-                      class="relative block p-2 tab rounded-full flex gap-1 items-center justify-content-center"
-                    >
-                      <span class="text-[12px] text-[var(--gray-text)]"
-                        >Declined</span
+                        <span class="text-[12px] text-[var(--gray-text)]"
+                          >Approved</span
+                        >
+                      </button>
+                      <button
+                        role="tab"
+                        aria-selected="false"
+                        aria-controls="panel-4"
+                        id="tab-4"
+                        tabindex="-3"
+                        class="relative h-10 min-w-24 shrink-0 block p-2 tab rounded-full flex gap-1 items-center justify-content-center lg:min-w-0"
                       >
-                    </button>
-                    <button
-                      role="tab"
-                      aria-selected="false"
-                      aria-controls="panel-5"
-                      id="tab-5"
-                      tabindex="-4"
-                      class="relative block p-2 tab rounded-full flex gap-1 items-center justify-content-center"
-                    >
-                      <span class="text-[12px] text-[var(--gray-text)]"
-                        >Cancelled</span
+                        <span class="text-[12px] text-[var(--gray-text)]"
+                          >Declined</span
+                        >
+                      </button>
+                      <button
+                        role="tab"
+                        aria-selected="false"
+                        aria-controls="panel-5"
+                        id="tab-5"
+                        tabindex="-4"
+                        class="relative h-10 min-w-24 shrink-0 block p-2 tab rounded-full flex gap-1 items-center justify-content-center lg:min-w-0"
                       >
-                    </button>
-                    <button
-                      role="tab"
-                      aria-selected="false"
-                      aria-controls="panel-6"
-                      id="tab-6"
-                      tabindex="-5"
-                      class="relative block p-2 tab rounded-full flex gap-1 items-center justify-content-center"
-                    >
-                      <span class="text-[12px] text-[var(--gray-text)]"
-                        >Completed</span
+                        <span class="text-[12px] text-[var(--gray-text)]"
+                          >Cancelled</span
+                        >
+                      </button>
+                      <button
+                        role="tab"
+                        aria-selected="false"
+                        aria-controls="panel-6"
+                        id="tab-6"
+                        tabindex="-5"
+                        class="relative h-10 min-w-24 shrink-0 block p-2 tab rounded-full flex gap-1 items-center justify-content-center lg:min-w-0"
                       >
-                    </button>
+                        <span class="text-[12px] text-[var(--gray-text)]"
+                          >Completed</span
+                        >
+                      </button>
+                    </div>
                   </div>
                 </div>
                 <div class="flex gap-2 items-center w-100">

@@ -1095,6 +1095,10 @@ video {
   height: 100vh;
 }
 
+.h-10 {
+  height: 2.5rem;
+}
+
 .max-h-\[400px\] {
   max-height: 400px;
 }
@@ -1242,6 +1246,19 @@ video {
 
 .min-w-full {
   min-width: 100%;
+}
+
+.min-w-0 {
+  min-width: 0px;
+}
+
+.min-w-24 {
+  min-width: 6rem;
+}
+
+.min-w-max {
+  min-width: -moz-max-content;
+  min-width: max-content;
 }
 
 .flex-shrink {
@@ -3678,6 +3695,10 @@ video {
     display: flex;
   }
 
+  .lg\:grid {
+    display: grid;
+  }
+
   .lg\:h-\[400px\] {
     height: 400px;
   }
@@ -3704,6 +3725,10 @@ video {
 
   .lg\:w-full {
     width: 100%;
+  }
+
+  .lg\:min-w-0 {
+    min-width: 0px;
   }
 
   .lg\:scale-\[1\] {

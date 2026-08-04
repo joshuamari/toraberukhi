@@ -103,6 +103,12 @@ tbody tr:hover td {
 }
 .indicator {
   transition: left 0.4s;
+  height: calc(100% - 0.5rem);
+  bottom: auto;
+}
+
+.tabs .tab {
+  white-space: nowrap;
 }
 .filters span {
   font-size: 12px;
