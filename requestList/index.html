@@ -1,4 +1,4 @@
-﻿<!doctype html>
+<!doctype html>
 <html lang="en">
   <head>
     <title>トラベる - KDT</title>
@@ -21,6 +21,7 @@
     <script src="../js/html2canvas.js"></script>
     <script src="../js/jquery.inview.min.js"></script>
     <script src="../node_modules/lucide/dist/umd/lucide.min.js"></script>
+    <script src="assets/js/dispatchActivity.mock.js"></script>
     <!-- <script src="../js/jquery.table2excel.js"></script> -->
     <!-- <script src="http://js.sentry-cdn.com/996e6a7f7f64d413dd43124ae5dece7e.min.js" crossorigin="anonymous"></script> -->
 
@@ -38,7 +39,7 @@
     aria-labelledby="openModalTitle"
     aria-hidden="true"
   >
-    <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
       <div class="modal-content">
         <div class="modal-header border-0">
           <h1 class="modal-title text-[18px]" id="openModalTitle"></h1>
@@ -49,128 +50,138 @@
             aria-label="Close"
           ></button>
         </div>
-        <div class="modal-body flex flex-col">
-          <div class="flex gap-3 items-start">
-            <div class="rounded-lg border-1 flex items-center">
-              <i
-                class="bx bxs-user text-[16px] text-[var(--gray-text)] p-1"
-              ></i>
-            </div>
-            <div class="w-100">
-              <p class="text-[var(--gray-text)] text-[12px] uppercase">
-                Employee Information
-              </p>
-              <div>
-                <div>
-                  <p class="font-semibold" id="modalEmpName"></p>
+        <div class="modal-body">
+          <div id="dispatchModalBodyLayout" class="dispatch-modal-body-layout">
+            <div class="dispatch-modal-details-column">
+              <div class="flex gap-3 items-start">
+                <div class="rounded-lg border-1 flex items-center">
+                  <i
+                    class="bx bxs-user text-[16px] text-[var(--gray-text)] p-1"
+                  ></i>
                 </div>
-                <div>
-                  <p class=" " id="modalGroup"></p>
-                </div>
-                <div class="flex gap-2" id="modalPassport"></div>
-                <div class="flex gap-2" id="modalVisa"></div>
-              </div>
-            </div>
-          </div>
-          <div class="flex gap-3 items-start mt-4">
-            <div class="rounded-lg border-1 flex items-center">
-              <i
-                class="bx bx-calendar text-[16px] text-[var(--gray-text)] p-1"
-              ></i>
-            </div>
-            <div class="">
-              <p class="text-[var(--gray-text)] text-[12px] uppercase">
-                Duration
-              </p>
-              <div>
-                <div class="flex items-center gap-2">
-                  <p id="modalDateFrom"></p>
-                  <span
-                    class="block w-[20px] h-[2px] bg-[var(--tertiary)] ounded-lg"
-                  ></span>
-                  <p id="modalDateTo"></p>
-                </div>
-                <div class="flex gap-1 items-center" id="modalDuration">
-                  <span class="text-[16px] font-semibold"></span>
-                  <p>days in total</p>
+                <div class="w-100">
+                  <p class="text-[var(--gray-text)] text-[12px] uppercase">
+                    Employee Information
+                  </p>
+                  <div>
+                    <div>
+                      <p class="font-semibold" id="modalEmpName"></p>
+                    </div>
+                    <div>
+                      <p class=" " id="modalGroup"></p>
+                    </div>
+                    <div class="flex gap-2" id="modalPassport"></div>
+                    <div class="flex gap-2" id="modalVisa"></div>
+                  </div>
                 </div>
               </div>
-            </div>
-          </div>
-          <div class="flex gap-3 items-start mt-4">
-            <div class="rounded-lg border-1 flex items-center">
-              <i class="bx bxs-map text-[16px] text-[var(--gray-text)] p-1"></i>
-            </div>
-            <div class="">
-              <p class="text-[var(--gray-text)] text-[12px] uppercase">
-                Location
-              </p>
-              <div>
-                <div class="flex items-center gap-2">
-                  <p class="font-semibold" id="modalLoc"></p>
-                  ,
-                  <p id="modalCountry"></p>
+              <div class="flex gap-3 items-start mt-4">
+                <div class="rounded-lg border-1 flex items-center">
+                  <i
+                    class="bx bx-calendar text-[16px] text-[var(--gray-text)] p-1"
+                  ></i>
+                </div>
+                <div class="">
+                  <p class="text-[var(--gray-text)] text-[12px] uppercase">
+                    Duration
+                  </p>
+                  <div>
+                    <div class="flex items-center gap-2">
+                      <p id="modalDateFrom"></p>
+                      <span
+                        class="block w-[20px] h-[2px] bg-[var(--tertiary)] ounded-lg"
+                      ></span>
+                      <p id="modalDateTo"></p>
+                    </div>
+                    <div class="flex gap-1 items-center" id="modalDuration">
+                      <span class="text-[16px] font-semibold"></span>
+                      <p>days in total</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="flex gap-3 items-start mt-4">
+                <div class="rounded-lg border-1 flex items-center">
+                  <i class="bx bxs-map text-[16px] text-[var(--gray-text)] p-1"></i>
+                </div>
+                <div class="">
+                  <p class="text-[var(--gray-text)] text-[12px] uppercase">
+                    Location
+                  </p>
+                  <div>
+                    <div class="flex items-center gap-2">
+                      <p class="font-semibold" id="modalLoc"></p>
+                      ,
+                      <p id="modalCountry"></p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="flex gap-3 items-start mt-4">
+                <div class="rounded-lg border-1 flex items-center">
+                  <i class="bx bxs-pin text-[16px] text-[var(--gray-text)] p-1"></i>
+                </div>
+                <div class="attachments">
+                  <p class="text-[var(--gray-text)] text-[12px] uppercase">
+                    Attachments
+                  </p>
+                  <p
+                    class="underline decoration-2 decoration-[var(--secondary)] text-[var(--dark)] hover:text-[var(--tertiary)] transition"
+                    id="attachment"
+                    role="button"
+                  ></p>
+                  <p
+                    class="underline decoration-2 decoration-[var(--secondary)] text-[var(--dark)] hover:text-[var(--tertiary)] transition"
+                    id="attachment2"
+                    role="button"
+                  ></p>
+                </div>
+              </div>
+              <div class="mt-4 p-3 rounded-md border-[1px] bg-[var(--white)]">
+                <div class="flex justify-content-between mb-2">
+                  <label for="" class="text-[var(--gray-text)]"
+                    >Requester's Name:</label
+                  >
+                  <p class="text-[var(--gray-text)]" id="modalReqName"></p>
+                </div>
+                <div class="flex justify-content-between mb-2">
+                  <label for="" class="text-[var(--gray-text)]"
+                    >Requester's Group:</label
+                  >
+                  <p class="text-[var(--gray-text)]" id="modalReqGrp"></p>
+                </div>
+                <div class="flex justify-content-between">
+                  <label for="" class="text-[var(--gray-text)]"
+                    >Date Requested:</label
+                  >
+                  <p class="text-[var(--gray-text)]" id="modalReqDate"></p>
                 </div>
               </div>
             </div>
-          </div>
-          <div class="flex gap-3 items-start mt-4">
-            <div class="rounded-lg border-1 flex items-center">
-              <i class="bx bxs-pin text-[16px] text-[var(--gray-text)] p-1"></i>
-            </div>
-            <div class="attachments">
-              <p class="text-[var(--gray-text)] text-[12px] uppercase">
-                Attachments
-              </p>
-              <p
-                class="underline decoration-2 decoration-[var(--secondary)] text-[var(--dark)] hover:text-[var(--tertiary)] transition"
-                id="attachment"
-                role="button"
-              ></p>
-              <p
-                class="underline decoration-2 decoration-[var(--secondary)] text-[var(--dark)] hover:text-[var(--tertiary)] transition"
-                id="attachment2"
-                role="button"
-              ></p>
-            </div>
-          </div>
-          <div class="mt-4 p-3 rounded-md border-[1px] bg-[var(--white)]">
-            <div class="flex justify-content-between mb-2">
-              <label for="" class="text-[var(--gray-text)]"
-                >Requester's Name:</label
-              >
-              <p class="text-[var(--gray-text)]" id="modalReqName"></p>
-            </div>
-            <div class="flex justify-content-between mb-2">
-              <label for="" class="text-[var(--gray-text)]"
-                >Requester's Group:</label
-              >
-              <p class="text-[var(--gray-text)]" id="modalReqGrp"></p>
-            </div>
-            <div class="flex justify-content-between">
-              <label for="" class="text-[var(--gray-text)]"
-                >Date Requested:</label
-              >
-              <p class="text-[var(--gray-text)]" id="modalReqDate"></p>
-            </div>
-          </div>
-          <div id="modifyFooter" class="flex gap-1 mt-2 justify-content-end">
-            <label
-              for=""
-              class="text-[12px] text-[var(--gray-text)] capitalize"
-              id="modiLabel"
-              >Modified:</label
+            <div
+              id="dispatchActivityHistory"
+              class="dispatch-activity-history d-none"
+              aria-labelledby="dispatchActivityHistoryTitle"
+              hidden
             >
-            <p class="text-[var(--gray-text)] text-[12px]">on</p>
-            <p
-              class="text-[var(--gray-text)] text-[12px]"
-              id="modalModiDate"
-            ></p>
+              <p
+                class="text-[var(--gray-text)] text-[12px] uppercase mb-3"
+                id="dispatchActivityHistoryTitle"
+              >
+                Activity History
+              </p>
+              <div class="dispatch-activity-scroll">
+                <div
+                  id="dispatchActivityTimeline"
+                  class="dispatch-activity-timeline"
+                ></div>
+              </div>
+            </div>
           </div>
         </div>
         <div
           id="changeRequestActions"
-          class="modal-footer border-0 flex-column align-items-stretch gap-2 d-none"
+          class="modal-footer  flex-column align-items-stretch gap-2 border-t d-none"
         >
           <button
             type="button"
@@ -223,7 +234,7 @@
               Date Change Request
             </h1>
             <p class="change-request-modal-subtitle">
-              Request a date adjustment for this accepted dispatch.
+              Request a date adjustment for this approved dispatch.
             </p>
           </div>
           <button
@@ -483,7 +494,7 @@
               Cancellation Request
             </h1>
             <p class="change-request-modal-subtitle">
-              Request cancellation of this accepted dispatch for KDT review.
+              Request cancellation of this approved dispatch for KDT review.
             </p>
           </div>
           <button
@@ -584,21 +595,7 @@
                 ></textarea>
                 <div id="crReasonError" class="invalid-feedback" role="alert"></div>
               </div>
-              <div class="change-request-field">
-                <label for="crRemarks" class="change-request-label"
-                  >Remarks</label
-                >
-                <textarea
-                  class="change-request-textarea"
-                  id="crRemarks"
-                  name="remarks"
-                  rows="2"
-                  aria-describedby="crRemarksHelp"
-                ></textarea>
-                <div id="crRemarksHelp" class="change-request-help-text">
-                  Optional
-                </div>
-              </div>
+             
             </section>
 
             <div
@@ -1372,6 +1369,29 @@
                   </div>
                 </li>
               </a>
+              <a href="../changeRequests/">
+                <li>
+                  <div class="d-flex align-items-center gap-2">
+                    <span
+                      class="inline-flex h-4 w-4 shrink-0 items-center justify-center"
+                      aria-hidden="true"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        class="block h-full w-full"
+                        fill="currentColor"
+                        viewBox="0 0 24 24"
+                        focusable="false"
+                      >
+                        <path
+                          d="M18.71 5.29a.996.996 0 0 0-1.41 0l-11 11a1 1 0 0 0-.29.71v3c0 .55.45 1 1 1h3c.27 0 .52-.11.71-.29l11-11a.996.996 0 0 0 0-1.41l-3-3ZM9.59 19H8v-1.59l7.5-7.5 1.59 1.59zm8.91-8.91L16.91 8.5 18 7.41 19.59 9zm-10.73.06C9.5 8.72 11 7.49 11 6c0-3.81-7.5-4-9-4v2c3.31 0 7 .83 7 2 0 .54-1.51 1.78-2.5 2.6-2.06 1.7-4.4 3.63-4.24 6.07.09 1.4 1 2.67 2.74 3.86V17c0-.3.07-.59.2-.85-.59-.56-.91-1.1-.94-1.61-.09-1.41 1.83-3 3.52-4.39Z"
+                        ></path>
+                      </svg>
+                    </span>
+                    <p>Change Requests</p>
+                  </div>
+                </li>
+              </a>
               <a href="../dashboard/"
                 ><li>
                   <div class="d-flex align-items-center gap-2">
@@ -1452,7 +1472,7 @@
               <div id="menu">
                 <i class="bx bx-menu-alt-left fs-3"></i>
               </div>
-              <h1 class="fw-semibold m-0">Requests from KHI</h1>
+              <h1 class="fw-semibold m-0">Requests to KDT</h1>
             </div>
             <p class="text-[12px]">
               Manage all of your dispatch requests sent to KDT.
@@ -1484,7 +1504,7 @@
                     <i class="bx bx-check text-[16px] font-medium"></i
                   ></span>
 
-                  <h6 class="m-0 font-semibold">Total Accepted Requests</h6>
+                  <h6 class="m-0 font-semibold">Total Approved Requests</h6>
                 </div>
                 <div
                   class="pt-6 flex gap-3 items-center justify-content-between w-100"
@@ -1543,7 +1563,7 @@
               >
                 <div class="flex gap-3 w-100">
                   <div
-                    class="tabs w-full lg:w-auto flex gap-2 items-center relative overflow-hidden bg-[var(--white)] border grid grid-cols-4 px-[3px] rounded-lg transition"
+                    class="tabs w-full lg:w-auto flex gap-2 items-center relative overflow-hidden bg-[var(--white)] border grid grid-cols-3 lg:grid-cols-6 px-[3px] rounded-lg transition"
                     role="tablist"
                     aria-label="tabs"
                   >
@@ -1583,7 +1603,7 @@
                       class="relative block p-2 tab rounded-full flex gap-1 items-center justify-content-center"
                     >
                       <span class="text-[12px] text-[var(--gray-text)]"
-                        >Accepted</span
+                        >Approved</span
                       >
                     </button>
                     <button
@@ -1595,7 +1615,31 @@
                       class="relative block p-2 tab rounded-full flex gap-1 items-center justify-content-center"
                     >
                       <span class="text-[12px] text-[var(--gray-text)]"
+                        >Declined</span
+                      >
+                    </button>
+                    <button
+                      role="tab"
+                      aria-selected="false"
+                      aria-controls="panel-5"
+                      id="tab-5"
+                      tabindex="-4"
+                      class="relative block p-2 tab rounded-full flex gap-1 items-center justify-content-center"
+                    >
+                      <span class="text-[12px] text-[var(--gray-text)]"
                         >Cancelled</span
+                      >
+                    </button>
+                    <button
+                      role="tab"
+                      aria-selected="false"
+                      aria-controls="panel-6"
+                      id="tab-6"
+                      tabindex="-5"
+                      class="relative block p-2 tab rounded-full flex gap-1 items-center justify-content-center"
+                    >
+                      <span class="text-[12px] text-[var(--gray-text)]"
+                        >Completed</span
                       >
                     </button>
                   </div>

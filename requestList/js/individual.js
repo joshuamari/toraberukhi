@@ -24,6 +24,7 @@
 // }
 //#region GLOBALS
 const rootFolder = `//${document.location.hostname}`;
+const USE_DISPATCH_ACTIVITY_MOCKS = true;
 const dispTableID = ["eList", "eListNon"];
 let empDetails = [];
 let groupList = [];
@@ -86,6 +87,12 @@ checkAccess()
             cardData = counts;
             fillCards();
             $(".tab")[0].click();
+
+            const deepLinkedRequestId = getDeepLinkedRequestId();
+            if (deepLinkedRequestId) {
+              openDispatchRequestFromDeepLink(deepLinkedRequestId);
+              clearDeepLinkRequestId();
+            }
           })
           .catch((error) => {
             alert(`${error}`);
@@ -448,19 +455,32 @@ function normalizeDispatchStatus(rawValue) {
     return "pending";
   }
 
-  const value = String(rawValue).trim().toLowerCase();
+  const status = String(rawValue).trim().toLowerCase();
 
-  const statusMap = {
+  if (!status) {
+    return "pending";
+  }
+
+  const map = {
     pending: "pending",
-    approved: "accepted",
-    accepted: "accepted",
+
+    accepted: "approved",
+    approved: "approved",
+
+    declined: "declined",
+    rejected: "declined",
+    denied: "declined",
+
     cancelled: "cancelled",
     canceled: "cancelled",
+
+    completed: "completed",
+
     "0": "cancelled",
-    "1": "accepted",
+    "1": "approved",
   };
 
-  const normalized = statusMap[value];
+  const normalized = map[status];
 
   if (!normalized) {
     console.warn("Unknown dispatch status:", rawValue);
@@ -473,8 +493,10 @@ function normalizeDispatchStatus(rawValue) {
 function getStatusBadgeHtml(normalizedStatus) {
   const statusConfig = {
     pending: { label: "Pending", className: "pending" },
-    accepted: { label: "Accepted", className: "accepted" },
+    approved: { label: "Approved", className: "approved" },
+    declined: { label: "Declined", className: "declined" },
     cancelled: { label: "Cancelled", className: "cancelled" },
+    completed: { label: "Completed", className: "completed" },
     unknown: { label: "Unknown", className: "" },
   };
 
@@ -488,8 +510,10 @@ function getStatusBadgeHtml(normalizedStatus) {
 function getDispatchStatusCounts(requests) {
   const counts = {
     pending: 0,
-    accepted: 0,
+    approved: 0,
+    declined: 0,
     cancelled: 0,
+    completed: 0,
     total: requests.length,
     todaytotal: 0,
     todayaccept: 0,
@@ -508,7 +532,7 @@ function getDispatchStatusCounts(requests) {
       counts.todaytotal += 1;
     }
 
-    if (status === "accepted" && request.modified) {
+    if (status === "approved" && request.modified) {
       const modifiedDate = String(request.modified).split(" ")[0];
       if (modifiedDate === today) {
         counts.todayaccept += 1;
@@ -549,6 +573,46 @@ function normalizeRequestId(value) {
   }
 
   return requestId;
+}
+
+function getDeepLinkedRequestId() {
+  const params = new URLSearchParams(window.location.search);
+  const requestId = params.get("request_id");
+
+  if (!requestId || !/^\d+$/.test(requestId)) {
+    return null;
+  }
+
+  return requestId;
+}
+
+function clearDeepLinkRequestId() {
+  const url = new URL(window.location.href);
+  url.searchParams.delete("request_id");
+  const nextUrl = `${url.pathname}${url.search}${url.hash}`;
+  window.history.replaceState({}, "", nextUrl);
+}
+
+function openDispatchRequestFromDeepLink(rawRequestId) {
+  let requestId;
+
+  try {
+    requestId = normalizeRequestId(rawRequestId);
+  } catch (error) {
+    showRequestLoadError(error.message);
+    return;
+  }
+
+  const $matchingRow = $(".dispatch-request-row").filter(function () {
+    return String($(this).data("request-id")) === String(requestId);
+  });
+
+  if ($matchingRow.length) {
+    $matchingRow.first().trigger("click");
+    return;
+  }
+
+  openDispatchRequestById(requestId);
 }
 
 function fetchDispatchRequest(requestId) {
@@ -599,12 +663,12 @@ function clearDispatchRequestModal() {
   $("#modalReqName, #modalReqDate, #modalLoc, #modalCountry, #modalReqGrp").text(
     ""
   );
-  $("#modalModiDate, #attachment, #attachment2").text("");
+  $("#attachment, #attachment2").text("");
   $("#modalPassport, #modalVisa").empty();
   $("#modalDuration").html(
     `<span class="text-[16px] font-semibold"></span><p>days in total</p>`
   );
-  $("#modifyFooter").addClass("d-none");
+  clearDispatchActivityTimeline();
   $("#changeRequestActions").addClass("d-none");
 }
 
@@ -706,6 +770,452 @@ async function openAttachmentForSelectedRequest(attachmentModalId, fillFn) {
   }
 }
 
+//#region DISPATCH ACTIVITY HISTORY
+const DISPATCH_ACTIVITY_EVENT_LABELS = {
+  dispatch_submitted: "Dispatch Request Submitted",
+  dispatch_approved: "Dispatch Approved",
+  dispatch_declined: "Dispatch Declined",
+  date_change_requested: "Date Change Request Submitted",
+  date_change_accepted: "Date Change Request Accepted",
+  date_change_rejected: "Date Change Request Rejected",
+  cancellation_requested: "Cancellation Request Submitted",
+  cancellation_accepted: "Cancellation Request Accepted",
+  cancellation_rejected: "Cancellation Request Rejected",
+  dispatch_cancelled: "Dispatch Cancelled",
+  dispatch_completed: "Dispatch Completed",
+};
+
+const DISPATCH_ACTIVITY_ACTOR_PREFIXES = {
+  dispatch_submitted: "Submitted by",
+  dispatch_approved: "Approved by",
+  dispatch_declined: "Declined by",
+  date_change_requested: "Requested by",
+  date_change_accepted: "Accepted by",
+  date_change_rejected: "Rejected by",
+  cancellation_requested: "Requested by",
+  cancellation_accepted: "Accepted by",
+  cancellation_rejected: "Rejected by",
+  dispatch_cancelled: "Cancelled by",
+  dispatch_completed: "Completed by",
+};
+
+const DISPATCH_ACTIVITY_VISIBLE_STATUSES = [
+  "approved",
+  "declined",
+  "cancelled",
+  "completed",
+];
+
+const DISPATCH_ACTIVITY_MINIMUM_EVENT_TYPES = {
+  approved: ["dispatch_submitted", "dispatch_approved"],
+  declined: ["dispatch_submitted", "dispatch_declined"],
+  cancelled: ["dispatch_submitted", "dispatch_approved"],
+  completed: [
+    "dispatch_submitted",
+    "dispatch_approved",
+    "dispatch_completed",
+  ],
+};
+
+const DISPATCH_ACTIVITY_MINIMUM_DESCRIPTIONS = {
+  dispatch_submitted: "The dispatch request was submitted.",
+  dispatch_approved: "The dispatch request was approved.",
+  dispatch_declined: "The dispatch request was declined.",
+  dispatch_cancelled: "The dispatch request was cancelled.",
+  dispatch_completed: "The dispatch was marked completed.",
+};
+
+function getDispatchActivity(dispatchRequest) {
+  const requestId = String(dispatchRequest?.req_id ?? "").trim();
+
+  if (!requestId) {
+    return [];
+  }
+
+  if (USE_DISPATCH_ACTIVITY_MOCKS && window.mockDispatchActivity) {
+    return [...(window.mockDispatchActivity[requestId] || [])];
+  }
+
+  return Array.isArray(dispatchRequest.activityLog)
+    ? [...dispatchRequest.activityLog]
+    : [];
+}
+
+function shouldShowDispatchActivity(normalizedStatus) {
+  return DISPATCH_ACTIVITY_VISIBLE_STATUSES.includes(normalizedStatus);
+}
+
+function getMinimumDispatchActivityEventTypes(normalizedStatus) {
+  return DISPATCH_ACTIVITY_MINIMUM_EVENT_TYPES[normalizedStatus] || [];
+}
+
+function normalizeActivityTimestampInput(value, fallbackTime) {
+  const raw = String(value || "").trim();
+
+  if (!raw) {
+    return "";
+  }
+
+  if (/^\d{4}-\d{2}-\d{2}$/.test(raw)) {
+    return `${raw}T${fallbackTime}`;
+  }
+
+  if (/^\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}(:\d{2})?$/.test(raw)) {
+    return raw.replace(" ", "T");
+  }
+
+  return raw;
+}
+
+function getDispatchSubmittedTimestamp(dispatchRequest) {
+  return normalizeActivityTimestampInput(
+    dispatchRequest?.req_date,
+    "09:15:00+08:00"
+  );
+}
+
+function getDispatchDecisionTimestamp(dispatchRequest) {
+  const modified = normalizeActivityTimestampInput(
+    dispatchRequest?.modified,
+    "14:10:00+08:00"
+  );
+
+  if (modified) {
+    return modified;
+  }
+
+  return normalizeActivityTimestampInput(
+    dispatchRequest?.req_date,
+    "14:10:00+08:00"
+  );
+}
+
+function createMinimumDispatchActivityEvent(dispatchRequest, eventType) {
+  const requestId = String(dispatchRequest?.req_id ?? "").trim() || "unknown";
+  const requesterName = String(dispatchRequest?.requester_name || "").trim();
+
+  if (eventType === "dispatch_submitted") {
+    return {
+      activityId: `MIN-${requestId}-dispatch_submitted`,
+      eventType: "dispatch_submitted",
+      occurredAt: getDispatchSubmittedTimestamp(dispatchRequest),
+      actorName: requesterName,
+      description: DISPATCH_ACTIVITY_MINIMUM_DESCRIPTIONS.dispatch_submitted,
+    };
+  }
+
+  const decisionTimestamp = getDispatchDecisionTimestamp(dispatchRequest);
+
+  if (eventType === "dispatch_approved") {
+    return {
+      activityId: `MIN-${requestId}-dispatch_approved`,
+      eventType: "dispatch_approved",
+      occurredAt: decisionTimestamp,
+      actorName: "KDT President",
+      description: DISPATCH_ACTIVITY_MINIMUM_DESCRIPTIONS.dispatch_approved,
+    };
+  }
+
+  if (eventType === "dispatch_declined") {
+    return {
+      activityId: `MIN-${requestId}-dispatch_declined`,
+      eventType: "dispatch_declined",
+      occurredAt: decisionTimestamp,
+      actorName: "KDT President",
+      description: DISPATCH_ACTIVITY_MINIMUM_DESCRIPTIONS.dispatch_declined,
+    };
+  }
+
+  if (eventType === "dispatch_completed") {
+    return {
+      activityId: `MIN-${requestId}-dispatch_completed`,
+      eventType: "dispatch_completed",
+      occurredAt: decisionTimestamp,
+      actorName: "KDT President",
+      description: DISPATCH_ACTIVITY_MINIMUM_DESCRIPTIONS.dispatch_completed,
+    };
+  }
+
+  return null;
+}
+
+function ensureMinimumDispatchActivity(
+  dispatchRequest,
+  normalizedStatus,
+  events
+) {
+  const requiredTypes = getMinimumDispatchActivityEventTypes(normalizedStatus);
+  const presentTypes = new Set(
+    (events || [])
+      .map((event) => event?.eventType)
+      .filter(Boolean)
+  );
+  const synthesized = [];
+
+  requiredTypes.forEach((eventType) => {
+    if (presentTypes.has(eventType)) {
+      return;
+    }
+
+    const minimumEvent = createMinimumDispatchActivityEvent(
+      dispatchRequest,
+      eventType
+    );
+
+    if (minimumEvent) {
+      synthesized.push(minimumEvent);
+    }
+  });
+
+  return [...(events || []), ...synthesized];
+}
+
+function resolveDispatchActivity(dispatchRequest) {
+  const normalizedStatus = normalizeDispatchStatus(
+    getRawDispatchStatus(dispatchRequest)
+  );
+
+  if (!shouldShowDispatchActivity(normalizedStatus)) {
+    return [];
+  }
+
+  const sourceEvents = getDispatchActivity(dispatchRequest);
+  return ensureMinimumDispatchActivity(
+    dispatchRequest,
+    normalizedStatus,
+    sourceEvents
+  );
+}
+
+function parseActivityTimestamp(value) {
+  if (!value) {
+    return null;
+  }
+
+  const normalized = String(value).trim().replace(" ", "T");
+  const date = new Date(normalized);
+
+  if (Number.isNaN(date.getTime())) {
+    return null;
+  }
+
+  return date;
+}
+
+function sortDispatchActivity(events) {
+  return [...events].sort((a, b) => {
+    const dateA = parseActivityTimestamp(a?.occurredAt);
+    const dateB = parseActivityTimestamp(b?.occurredAt);
+
+    if (!dateA && !dateB) {
+      console.warn("Invalid activity timestamps:", a?.occurredAt, b?.occurredAt);
+      return 0;
+    }
+
+    if (!dateA) {
+      console.warn("Invalid activity timestamp:", a?.occurredAt);
+      return 1;
+    }
+
+    if (!dateB) {
+      console.warn("Invalid activity timestamp:", b?.occurredAt);
+      return -1;
+    }
+
+    return dateA - dateB;
+  });
+}
+
+function formatActivityDateTime(occurredAt) {
+  const date = parseActivityTimestamp(occurredAt);
+
+  if (!date) {
+    return occurredAt || "—";
+  }
+
+  const day = String(date.getDate()).padStart(2, "0");
+  const month = monthNames2[date.getMonth()];
+  const year = date.getFullYear();
+  let hours = date.getHours();
+  const minutes = String(date.getMinutes()).padStart(2, "0");
+  const meridiem = hours >= 12 ? "PM" : "AM";
+  hours = hours % 12;
+  if (hours === 0) {
+    hours = 12;
+  }
+
+  return `${day} ${month} ${year}, ${hours}:${minutes} ${meridiem}`;
+}
+
+function getActivityEventLabel(eventType) {
+  return DISPATCH_ACTIVITY_EVENT_LABELS[eventType] || "Activity Event";
+}
+
+function getActivityActorText(event) {
+  const actorName = String(event?.actorName || "").trim();
+
+  if (!actorName) {
+    return "";
+  }
+
+  const prefix =
+    DISPATCH_ACTIVITY_ACTOR_PREFIXES[event.eventType] || "Updated by";
+  return `${prefix} ${actorName}`;
+}
+
+function buildChangeRequestDeepLinkUrl(event) {
+  const changeRequestId = event?.changeRequestId;
+  const changeRequestType = String(event?.changeRequestType || "")
+    .trim()
+    .toLowerCase();
+
+  if (
+    changeRequestId === null ||
+    changeRequestId === undefined ||
+    String(changeRequestId).trim() === "" ||
+    !changeRequestType
+  ) {
+    return null;
+  }
+
+  let typeParam = changeRequestType;
+
+  if (
+    changeRequestType === "datechange" ||
+    changeRequestType === "date-change"
+  ) {
+    typeParam = "date_change";
+  }
+
+  if (typeParam !== "cancellation" && typeParam !== "date_change") {
+    return null;
+  }
+
+  return `../changeRequests/?type=${encodeURIComponent(
+    typeParam
+  )}&openChangeRequestId=${encodeURIComponent(String(changeRequestId).trim())}`;
+}
+
+function escapeActivityHtml(value) {
+  return String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+function buildActivityEventMarkup(event) {
+  const eventType = event?.eventType || "";
+  const title = escapeActivityHtml(getActivityEventLabel(eventType));
+  const occurredAt = escapeActivityHtml(formatActivityDateTime(event?.occurredAt));
+  const actorText = getActivityActorText(event);
+  const description = String(event?.description || "").trim();
+  const reference = String(
+    event?.changeRequestReference || event?.changeRequestId || ""
+  ).trim();
+  const deepLinkUrl = buildChangeRequestDeepLinkUrl(event);
+
+  let actorMarkup = "";
+  if (actorText) {
+    actorMarkup = `<p class="dispatch-activity-actor">${escapeActivityHtml(
+      actorText
+    )}</p>`;
+  }
+
+  let descriptionMarkup = "";
+  if (description) {
+    descriptionMarkup = `<p class="dispatch-activity-description">${escapeActivityHtml(
+      description
+    )}</p>`;
+  }
+
+  let referenceMarkup = "";
+  if (reference && deepLinkUrl) {
+    const linkClass =
+      "underline decoration-2 decoration-[var(--secondary)] text-[var(--dark)] hover:text-[var(--tertiary)] transition";
+    referenceMarkup = `<p class="dispatch-activity-reference"><a href="${escapeActivityHtml(
+      deepLinkUrl
+    )}" target="_blank" rel="noopener noreferrer" class="${linkClass}">${escapeActivityHtml(
+      reference
+    )}</a></p>`;
+  } else if (reference) {
+    referenceMarkup = `<p class="dispatch-activity-reference">${escapeActivityHtml(
+      reference
+    )}</p>`;
+  }
+
+  return `
+    <div class="dispatch-activity-item">
+      <div class="dispatch-activity-rail" aria-hidden="true">
+        <span class="dispatch-activity-marker"></span>
+        <span class="dispatch-activity-line"></span>
+      </div>
+      <div class="dispatch-activity-content">
+        <p class="dispatch-activity-title">${title}</p>
+        <p class="dispatch-activity-meta">${occurredAt}</p>
+        ${actorMarkup}
+        ${descriptionMarkup}
+        ${referenceMarkup}
+      </div>
+    </div>
+  `;
+}
+
+function setDispatchModalActivityLayout(hasActivity) {
+  const modalDialog = document.querySelector("#openModal .modal-dialog");
+  const bodyLayout = document.getElementById("dispatchModalBodyLayout");
+  const activitySection = document.getElementById("dispatchActivityHistory");
+
+  if (modalDialog) {
+    modalDialog.classList.toggle(
+      "dispatch-modal-dialog--with-activity",
+      hasActivity
+    );
+  }
+
+  if (bodyLayout) {
+    bodyLayout.classList.toggle("has-activity", hasActivity);
+  }
+
+  if (activitySection) {
+    activitySection.classList.toggle("d-none", !hasActivity);
+    activitySection.hidden = !hasActivity;
+  }
+}
+
+function clearDispatchActivityTimeline() {
+  const $timeline = $("#dispatchActivityTimeline");
+
+  if ($timeline.length) {
+    $timeline.empty();
+  }
+
+  setDispatchModalActivityLayout(false);
+}
+
+function renderDispatchActivityHistory(dispatchRequest) {
+  const $timeline = $("#dispatchActivityTimeline");
+
+  if (!$timeline.length) {
+    setDispatchModalActivityLayout(false);
+    return;
+  }
+
+  const activityEvents = sortDispatchActivity(
+    resolveDispatchActivity(dispatchRequest)
+  );
+
+  if (!activityEvents.length) {
+    clearDispatchActivityTimeline();
+    return;
+  }
+
+  setDispatchModalActivityLayout(true);
+  $timeline.html(activityEvents.map(buildActivityEventMarkup).join(""));
+}
+//#endregion
+
 function populateDispatchRequestModal(req) {
   const name = req.emp_name;
   const grp = req.group_name;
@@ -720,7 +1230,6 @@ function populateDispatchRequestModal(req) {
   const country = req.location;
   const duration = req.duration;
   const reqGrp = req.requester_group;
-  const modi = req.modified;
 
   const empnum = req.emp_number;
   const [last, given] = name.split(",");
@@ -741,13 +1250,6 @@ function populateDispatchRequestModal(req) {
   $("#attachment").text(`${empnum}_${surname}${first}_DispatchRequest`);
   $("#attachment2").text(`${empnum}_${surname}${first}_WorkHistory`);
 
-  if (!modi) {
-    $("#modalModiDate").text("");
-  } else {
-    var [date, time] = modi.split(" ");
-    $("#modalModiDate").text(formatDate(date) + " " + time);
-  }
-
   if (duration > 1) {
     $("#modalDuration").html(
       `<span class="text-[16px] font-semibold" >${duration}</span>
@@ -759,11 +1261,7 @@ function populateDispatchRequestModal(req) {
        <p>day in total</p>`
     );
   }
-  if (normalizedStatus === "pending") {
-    $("#modifyFooter").addClass("d-none");
-  } else {
-    $("#modifyFooter").removeClass("d-none");
-  }
+  renderDispatchActivityHistory(req);
   updateChangeRequestActionsVisibility(req);
 }
 
@@ -1028,12 +1526,13 @@ function getCount() {
 function fillCards() {
   const counts = getDispatchStatusCounts(allRequests);
   const pending = counts.pending;
-  const accepted = counts.accepted;
+  const approved = counts.approved;
   const cancelled = counts.cancelled;
   const todayTotal = counts.todaytotal;
-  const todayAccept = counts.todayaccept;
+  const todayApproved = counts.todayaccept;
   const total = counts.total;
 
+  $("#tab-2 small").remove();
   if (pending != 0) {
     $("#tab-2").append(`
          <small
@@ -1041,10 +1540,10 @@ function fillCards() {
       `);
   }
   $("#cardPending").text(pending);
-  $("#cardAccepted").text(accepted);
-  if (todayAccept != 0) {
+  $("#cardAccepted").text(approved);
+  if (todayApproved != 0) {
     $("#cardTodayAccepted").html(
-      `<small class="font-semibold" >+${todayAccept} today</small>`
+      `<small class="font-semibold" >+${todayApproved} today</small>`
     );
   }
   $("#cardCancelled").text(cancelled);
@@ -1058,16 +1557,19 @@ function fillCards() {
 
 function formatStatus(normalizedStatus) {
   const statusLabels = {
-    pending: "pending",
-    accepted: "accepted",
-    cancelled: "cancelled",
-    unknown: "unknown",
+    pending: "Pending",
+    approved: "Approved",
+    declined: "Declined",
+    cancelled: "Cancelled",
+    completed: "Completed",
+    unknown: "Unknown",
   };
-  const statusString = statusLabels[normalizedStatus] || statusLabels.unknown;
+  const statusLabel = statusLabels[normalizedStatus] || statusLabels.unknown;
+  const statusClass =
+    normalizedStatus === "unknown" ? "unknown" : normalizedStatus;
   $("#openModalTitle").html(
-    `  Dispatch Request<span class="status lg ${statusString} ms-3">${statusString}</span>`
+    `  Dispatch Request<span class="status lg ${statusClass} ms-3">${statusLabel}</span>`
   );
-  $("#modiLabel").text(`${statusString}`);
 }
 function formatVisaPassport(visa, passport) {
   function updateModal(id, isValid) {
@@ -1249,8 +1751,10 @@ function searchFilter(req_list, resetPage = false) {
   const activeTabId = $("button").has("span.active").attr("id");
   const tabFilters = {
     "tab-2": "pending",
-    "tab-3": "accepted",
-    "tab-4": "cancelled",
+    "tab-3": "approved",
+    "tab-4": "declined",
+    "tab-5": "cancelled",
+    "tab-6": "completed",
   };
   const selectedStatus = tabFilters[activeTabId];
   const results = req_list.filter((emp) => {
@@ -1448,7 +1952,7 @@ const CHANGE_REQUEST_ENDPOINTS = {
 };
 
 function canRequestDispatchChange(request) {
-  return normalizeDispatchStatus(getRawDispatchStatus(request)) === "accepted";
+  return normalizeDispatchStatus(getRawDispatchStatus(request)) === "approved";
 }
 
 function hasPendingDateChangeRequest(request) {
@@ -1691,6 +2195,8 @@ function hideFormLevelError(errorId) {
   if (errorEl) {
     errorEl.textContent = "";
     errorEl.classList.add("d-none");
+    errorEl.classList.remove("alert-warning");
+    errorEl.classList.add("alert-danger");
   }
 }
 
@@ -1699,7 +2205,18 @@ function showFormLevelError(errorId, message) {
 
   if (errorEl) {
     errorEl.textContent = message;
-    errorEl.classList.remove("d-none");
+    errorEl.classList.remove("d-none", "alert-warning");
+    errorEl.classList.add("alert-danger");
+  }
+}
+
+function showFormLevelNotice(noticeId, message) {
+  const noticeEl = document.getElementById(noticeId);
+
+  if (noticeEl) {
+    noticeEl.textContent = message;
+    noticeEl.classList.remove("d-none", "alert-danger");
+    noticeEl.classList.add("alert-warning");
   }
 }
 
@@ -2088,6 +2605,15 @@ async function handleDateChangeSubmit() {
 
   const payload = buildDateChangePayload(selectedDispatchRequest, validation);
 
+  if (!CHANGE_REQUEST_ENDPOINTS.dateChange) {
+    console.log("Date Change Request payload:", payload);
+    showFormLevelNotice(
+      "dateChangeFormError",
+      "Backend integration is not available yet. The request was not submitted."
+    );
+    return;
+  }
+
   setDateChangeSubmitting(true);
   hideFormLevelError("dateChangeFormError");
 
@@ -2139,6 +2665,15 @@ async function handleCancellationSubmit() {
     selectedDispatchRequest,
     validation
   );
+
+  if (!CHANGE_REQUEST_ENDPOINTS.cancellation) {
+    console.log("Cancellation Request payload:", payload);
+    showFormLevelNotice(
+      "cancellationFormError",
+      "Backend integration is not available yet. The request was not submitted."
+    );
+    return;
+  }
 
   setCancellationSubmitting(true);
   hideFormLevelError("cancellationFormError");

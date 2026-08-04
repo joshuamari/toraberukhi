@@ -1,0 +1,613 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <title>Change Requests - PCSKHI</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta charset="UTF-8" />
+
+    <link rel="icon" href="../favicon.ico" type="image/x-icon" />
+
+    <link rel="stylesheet" href="../global.css" />
+    <link rel="stylesheet" href="../css/font-awesome.css" />
+    <link rel="stylesheet" href="../css/boxicons.css" />
+    <link rel="stylesheet" href="../css/bootstrap.min.css" />
+    <link rel="stylesheet" href="../requestList/css/index.css" />
+    <link rel="stylesheet" href="css/index.css" />
+    <link rel="stylesheet" href="../tailwindcss/output.css" />
+
+    <script src="../js/jquery.js"></script>
+    <script src="../js/bootstrap.min.js"></script>
+    <script src="../node_modules/lucide/dist/umd/lucide.min.js"></script>
+    <script src="assets/js/changeRequests.mock.js"></script>
+    <script defer src="js/individual.js"></script>
+  </head>
+
+  <!-- #region modals -->
+  <div
+    class="modal fade"
+    id="dateChangeRequestDetailsModal"
+    data-bs-backdrop="static"
+    data-bs-keyboard="false"
+    tabindex="-1"
+    aria-labelledby="dcDetailModalTitle"
+    aria-hidden="true"
+  >
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
+      <div class="modal-content">
+        <div class="modal-header border-0">
+          <h1 class="modal-title text-[18px] d-flex align-items-center gap-2 flex-wrap" id="dcDetailModalTitle"></h1>
+          <button
+            type="button"
+            class="btn-close text-[14px] m-1 w-0 h-0 w-auto h-auto"
+            data-bs-dismiss="modal"
+            aria-label="Close"
+          ></button>
+        </div>
+        <div class="modal-body">
+          <div class="change-request-detail-grid">
+            <div class="change-request-detail-item">
+              <span class="change-request-detail-label">Employee</span>
+              <span class="change-request-detail-value is-strong" id="dcDetailEmployee"></span>
+            </div>
+            <div class="change-request-detail-item">
+              <span class="change-request-detail-label">Employee ID</span>
+              <span class="change-request-detail-value" id="dcDetailEmployeeId"></span>
+            </div>
+            <div class="change-request-detail-item">
+              <span class="change-request-detail-label">KDT Group</span>
+              <span class="change-request-detail-value" id="dcDetailGroup"></span>
+            </div>
+            <div class="change-request-detail-item">
+              <span class="change-request-detail-label">Original Dispatch Request ID</span>
+              <span class="change-request-detail-value" id="dcDetailDispatchId"></span>
+            </div>
+            <div class="change-request-detail-item">
+              <span class="change-request-detail-label">Current Approved Dates</span>
+              <span class="change-request-detail-value" id="dcDetailCurrentDates"></span>
+            </div>
+            <div class="change-request-detail-item">
+              <span class="change-request-detail-label">Proposed Dates</span>
+              <span class="change-request-detail-value" id="dcDetailProposedDates"></span>
+            </div>
+            <div class="change-request-detail-item">
+              <span class="change-request-detail-label">Current Total Days</span>
+              <span class="change-request-detail-value" id="dcDetailCurrentDays"></span>
+            </div>
+            <div class="change-request-detail-item">
+              <span class="change-request-detail-label">Proposed Total Days</span>
+              <span class="change-request-detail-value" id="dcDetailProposedDays"></span>
+            </div>
+            <div class="change-request-detail-item">
+              <span class="change-request-detail-label">Net Change</span>
+              <span class="change-request-detail-value is-strong" id="dcDetailNetChange"></span>
+            </div>
+            <div class="change-request-detail-item">
+              <span class="change-request-detail-label">Requested By</span>
+              <span class="change-request-detail-value" id="dcDetailRequestedBy"></span>
+            </div>
+            <div class="change-request-detail-item">
+              <span class="change-request-detail-label">Date Requested</span>
+              <span class="change-request-detail-value" id="dcDetailDateRequested"></span>
+            </div>
+          </div>
+          <div class="change-request-detail-reason">
+            <span class="change-request-detail-label">Reason</span>
+            <p class="change-request-detail-value mt-2 mb-0" id="dcDetailReason"></p>
+          </div>
+          <div id="dcDetailWithdrawSection" class="mt-4 d-none">
+            <button type="button" class="change-request-withdraw-btn" disabled>
+              Withdraw Request
+            </button>
+            <p class="change-request-withdraw-note mb-0">
+              Backend integration required to withdraw this request.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div
+    class="modal fade"
+    id="cancellationRequestDetailsModal"
+    data-bs-backdrop="static"
+    data-bs-keyboard="false"
+    tabindex="-1"
+    aria-labelledby="crDetailModalTitle"
+    aria-hidden="true"
+  >
+    <div
+      class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg change-request-modal-dialog"
+    >
+      <div class="modal-content change-request-modal-content">
+        <div class="modal-header change-request-modal-header border-0">
+          <div class="d-flex flex-column gap-1 w-100 pe-3">
+            <h1
+              class="change-request-modal-title d-flex align-items-center gap-2 flex-wrap m-0"
+              id="crDetailModalTitle"
+            ></h1>
+            <p class="change-request-modal-subtitle mb-0">
+              Cancellation request submitted to KDT for review.
+            </p>
+          </div>
+          <button
+            type="button"
+            class="btn-close cr-detail-close-btn text-[14px] m-1 w-0 h-0 w-auto h-auto shadow-none focus:shadow-none focus:outline-none"
+            data-bs-dismiss="modal"
+            aria-label="Close"
+          ></button>
+        </div>
+        <div
+          class="modal-body change-request-modal-body cr-detail-modal-body"
+        >
+          <section aria-labelledby="crDetailEmployeeSectionTitle">
+            <h2
+              class="change-request-section-title"
+              id="crDetailEmployeeSectionTitle"
+            >
+              Employee &amp; Dispatch
+            </h2>
+            <div class="change-request-summary-card">
+              <div class="change-request-summary-grid">
+                <div class="change-request-summary-item">
+                  <span class="change-request-summary-label">Employee</span>
+                  <span
+                    class="change-request-summary-value is-strong"
+                    id="crDetailEmployee"
+                  ></span>
+                </div>
+                <div class="change-request-summary-item">
+                  <span class="change-request-summary-label">Employee ID</span>
+                  <span
+                    class="change-request-summary-value"
+                    id="crDetailEmployeeId"
+                  ></span>
+                </div>
+                <div class="change-request-summary-item">
+                  <span class="change-request-summary-label">KDT Group</span>
+                  <span
+                    class="change-request-summary-value"
+                    id="crDetailGroup"
+                  ></span>
+                </div>
+                <div class="change-request-summary-item">
+                  <span class="change-request-summary-label"
+                    >Original Dispatch Request ID</span
+                  >
+                  <span
+                    class="change-request-summary-value"
+                    id="crDetailDispatchId"
+                  ></span>
+                </div>
+                <div
+                  class="change-request-summary-item cr-detail-summary-item--full"
+                >
+                  <span class="change-request-summary-label"
+                    >Dispatch Dates</span
+                  >
+                  <span
+                    class="change-request-summary-value"
+                    id="crDetailDispatchDates"
+                  ></span>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section aria-labelledby="crDetailReasonSectionTitle">
+            <h2
+              class="change-request-section-title"
+              id="crDetailReasonSectionTitle"
+            >
+              Reason for Cancellation
+            </h2>
+            <div class="cr-detail-reason-card">
+              <div class="d-flex align-items-start gap-2 mb-2">
+                <span
+                  class="cr-detail-reason-icon"
+                  aria-hidden="true"
+                >
+                  <i
+                    data-lucide="message-square-text"
+                    class="change-request-icon"
+                  ></i>
+                </span>
+                <span class="change-request-summary-label mb-0"
+                  >Submitted reason</span
+                >
+              </div>
+              <p
+                class="change-request-summary-value mb-0 leading-relaxed"
+                id="crDetailReason"
+              ></p>
+            </div>
+          </section>
+
+          <section aria-labelledby="crDetailMetaSectionTitle">
+            <h2
+              class="change-request-section-title"
+              id="crDetailMetaSectionTitle"
+            >
+              Submission Details
+            </h2>
+            <div class="change-request-summary-card">
+              <div class="change-request-summary-grid">
+                <div class="change-request-summary-item">
+                  <span class="change-request-summary-label"
+                    >Requested By</span
+                  >
+                  <span
+                    class="change-request-summary-value"
+                    id="crDetailRequestedBy"
+                  ></span>
+                </div>
+                <div class="change-request-summary-item">
+                  <span class="change-request-summary-label"
+                    >Date Requested</span
+                  >
+                  <span
+                    class="change-request-summary-value"
+                    id="crDetailDateRequested"
+                  ></span>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+
+        <div
+          id="crDetailWithdrawSection"
+          class="modal-footer change-request-footer border-0 d-none"
+        >
+          <div class="cr-detail-withdraw-panel w-100">
+            <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
+              <div class="d-flex align-items-start gap-2">
+                <span class="cr-detail-withdraw-note-icon" aria-hidden="true">
+                  <i data-lucide="info" class="change-request-icon"></i>
+                </span>
+                <p class="cr-detail-withdraw-note mb-0">
+                  Backend integration required to withdraw this request.
+                </p>
+              </div>
+              <button
+                type="button"
+                class="cr-detail-withdraw-btn"
+                disabled
+              >
+                <i
+                  data-lucide="undo-2"
+                  class="change-request-icon"
+                  aria-hidden="true"
+                ></i>
+                Withdraw Request
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- #endregion -->
+
+  <body>
+    <div class="position-relative flex h-screen">
+      <div class="navigation">
+        <div class="title p-3 d-flex justify-content-between align-items-center">
+          <div class="w-full h-[36px] px-[.75rem]">
+            <img src="../images/pcs logo bold.png" alt="logo" class="h-full" />
+          </div>
+          <div id="closeNav" class="justify-content-center align-items-center m-0">
+            <i class="bx bx-x fs-3"></i>
+          </div>
+        </div>
+        <nav class="flex flex-col justify-content-between h-[calc(100%-63px)]">
+          <section>
+            <ul class="list-unstyled d-grid gap-2">
+              <a href="../">
+                <li>
+                  <div class="d-flex align-items-center gap-2">
+                    <i class="bx bxs-briefcase"></i>
+                    <p>Dispatch Request by KHI</p>
+                  </div>
+                </li>
+              </a>
+              <a href="../requestList/">
+                <li>
+                  <div class="d-flex align-items-center gap-2">
+                    <i class="bx bx-task text-[18px]"></i>
+                    <p>Request List</p>
+                  </div>
+                </li>
+              </a>
+              <a href="./">
+                <li class="active">
+                  <div class="d-flex align-items-center gap-2">
+                    <span
+                      class="inline-flex h-4 w-4 shrink-0 items-center justify-center"
+                      aria-hidden="true"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        class="block h-full w-full"
+                        fill="currentColor"
+                        viewBox="0 0 24 24"
+                        focusable="false"
+                      >
+                        <path
+                          d="M18.71 5.29a.996.996 0 0 0-1.41 0l-11 11a1 1 0 0 0-.29.71v3c0 .55.45 1 1 1h3c.27 0 .52-.11.71-.29l11-11a.996.996 0 0 0 0-1.41l-3-3ZM9.59 19H8v-1.59l7.5-7.5 1.59 1.59zm8.91-8.91L16.91 8.5 18 7.41 19.59 9zm-10.73.06C9.5 8.72 11 7.49 11 6c0-3.81-7.5-4-9-4v2c3.31 0 7 .83 7 2 0 .54-1.51 1.78-2.5 2.6-2.06 1.7-4.4 3.63-4.24 6.07.09 1.4 1 2.67 2.74 3.86V17c0-.3.07-.59.2-.85-.59-.56-.91-1.1-.94-1.61-.09-1.41 1.83-3 3.52-4.39Z"
+                        ></path>
+                      </svg>
+                    </span>
+                    <p>Change Requests</p>
+                  </div>
+                </li>
+              </a>
+              <a href="../dashboard/">
+                <li>
+                  <div class="d-flex align-items-center gap-2">
+                    <i class="bx bxs-dashboard"></i>
+                    <p>Dashboard</p>
+                  </div>
+                </li>
+              </a>
+              <a href="../report/">
+                <li>
+                  <div class="d-flex align-items-center gap-2">
+                    <i class="bx bxs-report"></i>
+                    <p>Report</p>
+                  </div>
+                </li>
+              </a>
+            </ul>
+          </section>
+          <section class="grid gap-2">
+            <li class="bg-[var(--main)] hover:bg-green-100">
+              <div class="flex gap-2 items-center">
+                <div
+                  class="bg-[var(--secondary)] rounded-full h-[45px] w-[45px] min-w-[45px] flex justify-content-center items-center"
+                  id="empInitials"
+                >
+                  BK
+                </div>
+                <div class="w-full">
+                  <div class="" id="empLabel"></div>
+                  <div class="text-uppercase text-[10px] text-gray-400" id="grpLabel"></div>
+                </div>
+              </div>
+            </li>
+            <a href="../admin/">
+              <li>
+                <div class="d-flex align-items-center gap-2">
+                  <i class="bx bxs-buildings"></i>
+                  <p>User Management</p>
+                </div>
+              </li>
+            </a>
+            <a href="../userManual/">
+              <li>
+                <div class="d-flex align-items-center gap-2">
+                  <i class="bx bxs-book"></i>
+                  <p>User Manual</p>
+                </div>
+              </li>
+            </a>
+            <a href="#">
+              <li id="logoutBtn">
+                <div class="d-flex align-items-center gap-2">
+                  <i class="bx bx-log-out"></i>
+                  <p>Logout</p>
+                </div>
+              </li>
+            </a>
+            <div class="relative">
+              <p class="absolute bottom-[-10px] text-[var(--gray-text)] text-xs">
+                ©2024 KDT.トラベる v1.0.0
+              </p>
+            </div>
+          </section>
+        </nav>
+      </div>
+
+      <div class="content h-screen">
+        <div class="flex flex-col overflow-auto p-[14px] md:p-8 h-full w-full">
+          <div class="pageTitle w-100 flex flex-col items-start gap-2">
+            <div class="gap-3 flex items-center">
+              <div id="menu">
+                <i class="bx bx-menu-alt-left fs-3"></i>
+              </div>
+              <h1 class="fw-semibold m-0">Change Requests</h1>
+            </div>
+            <p class="text-[12px]">
+              Track date-change and cancellation requests submitted to KDT.
+            </p>
+          </div>
+
+          <div class="w-100 pt-3 flex flex-col gap-4 relative">
+            <!-- Date Change Requests -->
+            <section aria-labelledby="dateChangeSectionTitle">
+              <h2 class="change-request-section-title mb-3" id="dateChangeSectionTitle">
+                Date Change Requests
+              </h2>
+              <div class="w-100 bg-white rounded-lg border flex flex-col">
+                <div class="selection flex gap-2 items-center justify-content-between border-b p-3">
+                  <div class="w-100">
+                    <div
+                      id="dcTabs"
+                      class="tabs relative bg-[var(--gray)] rounded-lg p-1 grid grid-cols-4"
+                      role="tablist"
+                    >
+                      <div class="indicator absolute top-0 my-[0.25rem] bottom-0 left-0 rounded-md bg-[var(--secondary)]"></div>
+                      <button role="tab" id="dc-tab-1" data-status="all" class="relative block p-2 tab rounded-full flex gap-1 items-center justify-content-center">
+                        <span class="text-[12px] text-[var(--gray-text)]">All</span>
+                      </button>
+                      <button role="tab" id="dc-tab-2" data-status="pending" class="relative block p-2 tab rounded-full flex gap-1 items-center justify-content-center">
+                        <span class="text-[12px] text-[var(--gray-text)]">Pending</span>
+                      </button>
+                      <button role="tab" id="dc-tab-3" data-status="accepted" class="relative block p-2 tab rounded-full flex gap-1 items-center justify-content-center">
+                        <span class="text-[12px] text-[var(--gray-text)]">Accepted</span>
+                      </button>
+                      <button role="tab" id="dc-tab-4" data-status="rejected" class="relative block p-2 tab rounded-full flex gap-1 items-center justify-content-center">
+                        <span class="text-[12px] text-[var(--gray-text)]">Rejected</span>
+                      </button>
+                    </div>
+                  </div>
+                  <div class="flex gap-2 items-center w-100">
+                    <div class="filters w-100 flex gap-2">
+                      <div class="flex gap-2 w-full justify-content-end">
+                        <div class="relative lg:w-auto w-full">
+                          <input type="search" class="input search" placeholder="Search here . . ." id="dcSearchbar" />
+                          <i class="bx bx-search absolute top-[8px] text-[18px] left-[8px] text-[var(--gray-text)]"></i>
+                        </div>
+                        <div class="relative">
+                          <input type="month" id="dcMonthSel" class="opacity-0 h-full w-full absolute cursor-pointer" />
+                          <div class="mobtn rounded-md border flex gap-1 pl-2 pr-1 py-2 items-center justify-content-center hover:bg-[var(--white)] dcMonthCont" role="button">
+                            <i class="bx bx-calendar"></i>
+                            <span id="dcMonthLabel">Requested Month</span>
+                            <i class="bx bx-chevron-down text-[18px] ml-3"></i>
+                          </div>
+                        </div>
+                        <div class="relative">
+                          <select id="dcGrpSel" class="opacity-0 h-full w-full absolute cursor-pointer"></select>
+                          <div class="grpbtn rounded-md border transition flex gap-1 pl-2 pr-1 py-2 items-center justify-content-center hover:bg-[var(--white)] dcGrpCont" role="button">
+                            <i class="bx bx-group"></i>
+                            <span id="dcLblGrp">All Groups</span>
+                            <i class="bx bx-chevron-down text-[18px] ml-3"></i>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="relative p-3 pt-0 mt-3 overflow-x-auto overflow-y-visible">
+                  <table class="min-w-full w-100">
+                    <thead>
+                      <tr>
+                        <th>Request ID</th>
+                        <th>Employee</th>
+                        <th>Current Dates</th>
+                        <th>Proposed Dates</th>
+                        <th>Net Change</th>
+                        <th>Date Requested</th>
+                        <th>Requested By</th>
+                        <th>Status</th>
+                        <th></th>
+                      </tr>
+                    </thead>
+                    <tbody id="dcTableBody"></tbody>
+                  </table>
+                </div>
+
+                <div id="dcPagination" class="request-pagination d-flex flex-column flex-lg-row justify-content-lg-between align-items-lg-center gap-3 border-t border-[#ebebeb] p-3">
+                  <p id="dcPaginationInfo" class="text-[12px] text-[var(--gray-text)] m-0">Showing 0 to 0 of 0 requests</p>
+                  <div class="d-flex flex-wrap align-items-center gap-2 justify-content-end">
+                    <button type="button" id="dcPaginationPrev" class="request-pagination__nav" disabled>
+                      <i data-lucide="chevron-left" class="request-pagination__icon" aria-hidden="true"></i>
+                      <span>Previous</span>
+                    </button>
+                    <div id="dcPaginationPages" class="d-flex align-items-center gap-1"></div>
+                    <button type="button" id="dcPaginationNext" class="request-pagination__nav" disabled>
+                      <span>Next</span>
+                      <i data-lucide="chevron-right" class="request-pagination__icon" aria-hidden="true"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <!-- Cancellation Requests -->
+            <section aria-labelledby="cancellationSectionTitle">
+              <h2 class="change-request-section-title mb-3" id="cancellationSectionTitle">
+                Cancellation Requests
+              </h2>
+              <div class="w-100 bg-white rounded-lg border flex flex-col">
+                <div class="selection flex gap-2 items-center justify-content-between border-b p-3">
+                  <div class="w-100">
+                    <div
+                      id="crTabs"
+                      class="tabs relative bg-[var(--gray)] rounded-lg p-1 grid grid-cols-4"
+                      role="tablist"
+                    >
+                      <div class="indicator absolute top-0 my-[0.25rem] bottom-0 left-0 rounded-md bg-[var(--secondary)]"></div>
+                      <button role="tab" id="cr-tab-1" data-status="all" class="relative block p-2 tab rounded-full flex gap-1 items-center justify-content-center">
+                        <span class="text-[12px] text-[var(--gray-text)]">All</span>
+                      </button>
+                      <button role="tab" id="cr-tab-2" data-status="pending" class="relative block p-2 tab rounded-full flex gap-1 items-center justify-content-center">
+                        <span class="text-[12px] text-[var(--gray-text)]">Pending</span>
+                      </button>
+                      <button role="tab" id="cr-tab-3" data-status="accepted" class="relative block p-2 tab rounded-full flex gap-1 items-center justify-content-center">
+                        <span class="text-[12px] text-[var(--gray-text)]">Accepted</span>
+                      </button>
+                      <button role="tab" id="cr-tab-4" data-status="rejected" class="relative block p-2 tab rounded-full flex gap-1 items-center justify-content-center">
+                        <span class="text-[12px] text-[var(--gray-text)]">Rejected</span>
+                      </button>
+                    </div>
+                  </div>
+                  <div class="flex gap-2 items-center w-100">
+                    <div class="filters w-100 flex gap-2">
+                      <div class="flex gap-2 w-full justify-content-end">
+                        <div class="relative lg:w-auto w-full">
+                          <input type="search" class="input search" placeholder="Search here . . ." id="crSearchbar" />
+                          <i class="bx bx-search absolute top-[8px] text-[18px] left-[8px] text-[var(--gray-text)]"></i>
+                        </div>
+                        <div class="relative">
+                          <input type="month" id="crMonthSel" class="opacity-0 h-full w-full absolute cursor-pointer" />
+                          <div class="mobtn rounded-md border flex gap-1 pl-2 pr-1 py-2 items-center justify-content-center hover:bg-[var(--white)] crMonthCont" role="button">
+                            <i class="bx bx-calendar"></i>
+                            <span id="crMonthLabel">Requested Month</span>
+                            <i class="bx bx-chevron-down text-[18px] ml-3"></i>
+                          </div>
+                        </div>
+                        <div class="relative">
+                          <select id="crGrpSel" class="opacity-0 h-full w-full absolute cursor-pointer"></select>
+                          <div class="grpbtn rounded-md border transition flex gap-1 pl-2 pr-1 py-2 items-center justify-content-center hover:bg-[var(--white)] crGrpCont" role="button">
+                            <i class="bx bx-group"></i>
+                            <span id="crLblGrp">All Groups</span>
+                            <i class="bx bx-chevron-down text-[18px] ml-3"></i>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="relative p-3 pt-0 mt-3 overflow-x-auto overflow-y-visible">
+                  <table class="min-w-full w-100">
+                    <thead>
+                      <tr>
+                        <th>Request ID</th>
+                        <th>Employee</th>
+                        <th>Dispatch Dates</th>
+                        <th>Reason</th>
+                        <th>Date Requested</th>
+                        <th>Requested By</th>
+                        <th>Status</th>
+                        <th></th>
+                      </tr>
+                    </thead>
+                    <tbody id="crTableBody"></tbody>
+                  </table>
+                </div>
+
+                <div id="crPagination" class="request-pagination d-flex flex-column flex-lg-row justify-content-lg-between align-items-lg-center gap-3 border-t border-[#ebebeb] p-3">
+                  <p id="crPaginationInfo" class="text-[12px] text-[var(--gray-text)] m-0">Showing 0 to 0 of 0 requests</p>
+                  <div class="d-flex flex-wrap align-items-center gap-2 justify-content-end">
+                    <button type="button" id="crPaginationPrev" class="request-pagination__nav" disabled>
+                      <i data-lucide="chevron-left" class="request-pagination__icon" aria-hidden="true"></i>
+                      <span>Previous</span>
+                    </button>
+                    <div id="crPaginationPages" class="d-flex align-items-center gap-1"></div>
+                    <button type="button" id="crPaginationNext" class="request-pagination__nav" disabled>
+                      <span>Next</span>
+                      <i data-lucide="chevron-right" class="request-pagination__icon" aria-hidden="true"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </section>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
