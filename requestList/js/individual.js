@@ -988,14 +988,14 @@ function createMinimumDispatchActivityEvent(dispatchRequest, eventType) {
     const completedTimestamp =
       normalizeActivityTimestampInput(
         dispatchRequest?.to,
-        "18:00:00+08:00"
+        "17:00:00+08:00"
       ) || decisionTimestamp;
 
     return {
       activityId: `MIN-${requestId}-dispatch_completed`,
       eventType: "dispatch_completed",
       occurredAt: completedTimestamp,
-      actorName: "System",
+      actorName: "",
       description: DISPATCH_ACTIVITY_MINIMUM_DESCRIPTIONS.dispatch_completed,
     };
   }
