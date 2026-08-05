@@ -29,4 +29,6 @@ require_once __DIR__ . '/services/LoginService.php';
 
 require_once __DIR__ . '/services/DashboardService.php';
 require_once __DIR__ . '/services/ReportService.php';
+require_once __DIR__ . '/services/AppSettingsService.php';
+require_once __DIR__ . '/services/RequestListService.php';
 $appConfig = getAppConfig();

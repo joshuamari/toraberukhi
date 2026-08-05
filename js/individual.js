@@ -67,12 +67,15 @@ checkAccess()
                 getLocations(),
                 getInviteTypes(),
                 getReqDepts(),
+                getHeader(),
               ])
-                .then(([emps, locs, invs, depts]) => {
+                .then(([emps, locs, invs, depts, header]) => {
                   fillEmployees(emps);
                   fillLocations(locs);
                   fillInvitations(invs);
                   fillReqDepts(depts);
+                  renderHeader(header);
+                  renderSalutation(header);
                 })
                 .catch((error) => {
                   alert(`${error}`);
@@ -1066,6 +1069,63 @@ function getGroups() {
       },
     });
   });
+}
+function getHeader() {
+  return new Promise((resolve, reject) => {
+    $.ajax({
+      type: "GET",
+      url: "requestList/api/get_header.php",
+      dataType: "json",
+      success: function (response) {
+        if (!response || !response.success) {
+          reject(
+            (response && response.message) || "Failed to load header data."
+          );
+          return;
+        }
+        resolve(response.data);
+      },
+      error: function (xhr, status, error) {
+        if (xhr.status === 404) {
+          reject("Not Found Error: The requested resource was not found.");
+        } else if (xhr.status === 500) {
+          reject("Internal Server Error: There was a server error.");
+        } else {
+          reject("An unspecified error occurred while loading header data.");
+        }
+      },
+    });
+  });
+}
+function renderHeader(data) {
+  const pres = data?.president;
+  const co = data?.care_of;
+
+  if (!pres?.name) {
+    $("#requestHeader").empty();
+    return;
+  }
+
+  $("#requestHeader").html(`
+    <p class="font-semibold font-['Arial']">
+      ${pres.prefix} ${pres.name} (President)
+    </p>
+    ${
+      co?.name
+        ? `<p class="font-semibold font-['Arial']">(c/o ${co.prefix} ${co.name})</p>`
+        : ""
+    }
+  `);
+}
+function renderSalutation(data) {
+  const pres = data?.president;
+  let salutation = "Dear Sir,";
+
+  if (pres?.prefix === "Ms.") {
+    salutation = "Dear Madam,";
+  }
+
+  $("#requestSalutation").text(salutation);
 }
 function fillGroups(grps) {
   const groupIDS = grps.map((obj) => obj.id);

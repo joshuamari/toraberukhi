@@ -24,7 +24,7 @@
 // }
 //#region GLOBALS
 const rootFolder = `//${document.location.hostname}`;
-const USE_DISPATCH_ACTIVITY_MOCKS = true;
+const USE_DISPATCH_ACTIVITY_MOCKS = false;
 const dispTableID = ["eList", "eListNon"];
 let empDetails = [];
 let groupList = [];
@@ -78,14 +78,16 @@ checkAccess()
       empDetails = emp.data;
       $(document).ready(function () {
         fillEmployeeDetails();
-        Promise.all([getGroups(), getRequests(), getCount()])
-          .then(([grps, reqs, counts]) => {
+        Promise.all([getGroups(), getRequests(), getCount(), getHeader()])
+          .then(([grps, reqs, counts, header]) => {
             groupList = grps;
             fillGroups(groupList);
             reqList = reqs["data"];
             allRequests = [...reqs["data"]];
             cardData = counts;
             fillCards();
+            renderHeader(header);
+            renderSalutation(header);
             $(".tab")[0].click();
 
             const deepLinkedRequestId = getDeepLinkedRequestId();
@@ -490,6 +492,48 @@ function normalizeDispatchStatus(rawValue) {
   return normalized;
 }
 
+function getTodayDateString() {
+  try {
+    return new Intl.DateTimeFormat("en-CA", {
+      timeZone: "Asia/Manila",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    }).format(new Date());
+  } catch (e) {
+    const now = new Date();
+    const y = now.getFullYear();
+    const m = String(now.getMonth() + 1).padStart(2, "0");
+    const d = String(now.getDate()).padStart(2, "0");
+    return `${y}-${m}-${d}`;
+  }
+}
+
+function getDispatchEndDateString(request) {
+  const end = String(request?.to || "").trim();
+  if (!end) {
+    return "";
+  }
+  return end.slice(0, 10);
+}
+
+function isDispatchPeriodPast(request) {
+  const endDate = getDispatchEndDateString(request);
+  if (!endDate) {
+    return false;
+  }
+  return endDate < getTodayDateString();
+}
+
+/** Approved requests whose dispatch end date is already past count as completed. */
+function getEffectiveDispatchStatus(request) {
+  const base = normalizeDispatchStatus(getRawDispatchStatus(request));
+  if (base === "approved" && isDispatchPeriodPast(request)) {
+    return "completed";
+  }
+  return base;
+}
+
 function getStatusBadgeHtml(normalizedStatus) {
   const statusConfig = {
     pending: { label: "Pending", className: "pending" },
@@ -519,10 +563,10 @@ function getDispatchStatusCounts(requests) {
     todayaccept: 0,
   };
 
-  const today = new Date().toISOString().slice(0, 10);
+  const today = getTodayDateString();
 
   requests.forEach((request) => {
-    const status = normalizeDispatchStatus(getRawDispatchStatus(request));
+    const status = getEffectiveDispatchStatus(request);
 
     if (Object.prototype.hasOwnProperty.call(counts, status)) {
       counts[status] += 1;
@@ -809,7 +853,7 @@ const DISPATCH_ACTIVITY_VISIBLE_STATUSES = [
 const DISPATCH_ACTIVITY_MINIMUM_EVENT_TYPES = {
   approved: ["dispatch_submitted", "dispatch_approved"],
   declined: ["dispatch_submitted", "dispatch_declined"],
-  cancelled: ["dispatch_submitted", "dispatch_approved"],
+  cancelled: ["dispatch_submitted"],
   completed: [
     "dispatch_submitted",
     "dispatch_approved",
@@ -817,12 +861,26 @@ const DISPATCH_ACTIVITY_MINIMUM_EVENT_TYPES = {
   ],
 };
 
+const DISPATCH_ACTIVITY_EVENT_SORT_ORDER = {
+  dispatch_submitted: 10,
+  dispatch_approved: 20,
+  dispatch_declined: 20,
+  date_change_requested: 30,
+  date_change_accepted: 40,
+  date_change_rejected: 40,
+  cancellation_requested: 50,
+  cancellation_accepted: 60,
+  cancellation_rejected: 60,
+  dispatch_cancelled: 70,
+  dispatch_completed: 80,
+};
+
 const DISPATCH_ACTIVITY_MINIMUM_DESCRIPTIONS = {
   dispatch_submitted: "The dispatch request was submitted.",
   dispatch_approved: "The dispatch request was approved.",
   dispatch_declined: "The dispatch request was declined.",
   dispatch_cancelled: "The dispatch request was cancelled.",
-  dispatch_completed: "The dispatch was marked completed.",
+  dispatch_completed: "The dispatch period has ended.",
 };
 
 function getDispatchActivity(dispatchRequest) {
@@ -927,11 +985,17 @@ function createMinimumDispatchActivityEvent(dispatchRequest, eventType) {
   }
 
   if (eventType === "dispatch_completed") {
+    const completedTimestamp =
+      normalizeActivityTimestampInput(
+        dispatchRequest?.to,
+        "18:00:00+08:00"
+      ) || decisionTimestamp;
+
     return {
       activityId: `MIN-${requestId}-dispatch_completed`,
       eventType: "dispatch_completed",
-      occurredAt: decisionTimestamp,
-      actorName: "KDT President",
+      occurredAt: completedTimestamp,
+      actorName: "System",
       description: DISPATCH_ACTIVITY_MINIMUM_DESCRIPTIONS.dispatch_completed,
     };
   }
@@ -944,12 +1008,28 @@ function ensureMinimumDispatchActivity(
   normalizedStatus,
   events
 ) {
-  const requiredTypes = getMinimumDispatchActivityEventTypes(normalizedStatus);
+  const requiredTypes = [
+    ...getMinimumDispatchActivityEventTypes(normalizedStatus),
+  ];
   const presentTypes = new Set(
     (events || [])
       .map((event) => event?.eventType)
       .filter(Boolean)
   );
+
+  if (normalizedStatus === "cancelled") {
+    const hasDecisionEvent = [
+      "dispatch_approved",
+      "dispatch_declined",
+      "dispatch_cancelled",
+      "cancellation_accepted",
+    ].some((eventType) => presentTypes.has(eventType));
+
+    if (!hasDecisionEvent) {
+      requiredTypes.push("dispatch_approved");
+    }
+  }
+
   const synthesized = [];
 
   requiredTypes.forEach((eventType) => {
@@ -963,6 +1043,7 @@ function ensureMinimumDispatchActivity(
     );
 
     if (minimumEvent) {
+      presentTypes.add(eventType);
       synthesized.push(minimumEvent);
     }
   });
@@ -971,9 +1052,7 @@ function ensureMinimumDispatchActivity(
 }
 
 function resolveDispatchActivity(dispatchRequest) {
-  const normalizedStatus = normalizeDispatchStatus(
-    getRawDispatchStatus(dispatchRequest)
-  );
+  const normalizedStatus = getEffectiveDispatchStatus(dispatchRequest);
 
   if (!shouldShowDispatchActivity(normalizedStatus)) {
     return [];
@@ -1002,6 +1081,10 @@ function parseActivityTimestamp(value) {
   return date;
 }
 
+function getActivityEventSortOrder(eventType) {
+  return DISPATCH_ACTIVITY_EVENT_SORT_ORDER[eventType] || 100;
+}
+
 function sortDispatchActivity(events) {
   return [...events].sort((a, b) => {
     const dateA = parseActivityTimestamp(a?.occurredAt);
@@ -1009,7 +1092,10 @@ function sortDispatchActivity(events) {
 
     if (!dateA && !dateB) {
       console.warn("Invalid activity timestamps:", a?.occurredAt, b?.occurredAt);
-      return 0;
+      return (
+        getActivityEventSortOrder(a?.eventType) -
+        getActivityEventSortOrder(b?.eventType)
+      );
     }
 
     if (!dateA) {
@@ -1022,7 +1108,15 @@ function sortDispatchActivity(events) {
       return -1;
     }
 
-    return dateA - dateB;
+    const timeDiff = dateA - dateB;
+    if (timeDiff !== 0) {
+      return timeDiff;
+    }
+
+    return (
+      getActivityEventSortOrder(a?.eventType) -
+      getActivityEventSortOrder(b?.eventType)
+    );
   });
 }
 
@@ -1225,7 +1319,7 @@ function populateDispatchRequestModal(req) {
   const endDate = req.to;
   const reqName = req.requester_name;
   const reqDate = req.req_date;
-  const normalizedStatus = normalizeDispatchStatus(getRawDispatchStatus(req));
+  const normalizedStatus = getEffectiveDispatchStatus(req);
   const location = req.specific_loc;
   const country = req.location;
   const duration = req.duration;
@@ -1711,9 +1805,7 @@ function fillTable(sampleData) {
       <td>${formatDate(item.from)}</td>
       <td>${formatDate(item.to)}</td>
       <td>${item.requester_name}</td>
-      <td>${getStatusBadgeHtml(
-        normalizeDispatchStatus(getRawDispatchStatus(item))
-      )}</td>
+      <td>${getStatusBadgeHtml(getEffectiveDispatchStatus(item))}</td>
       <td>${
         item.passValid === true
           ? `  <span class="validity "><i class='bx bx-check text-[18px]   font-semibold'></i></span>`
@@ -1770,9 +1862,7 @@ function searchFilter(req_list, resetPage = false) {
 
     const dateMatch = dateFilter ? emp.req_date.startsWith(dateFilter) : true;
 
-    const normalizedStatus = normalizeDispatchStatus(
-      getRawDispatchStatus(emp)
-    );
+    const normalizedStatus = getEffectiveDispatchStatus(emp);
     const statusMatch =
       selectedStatus === undefined || normalizedStatus === selectedStatus;
 
@@ -1809,6 +1899,63 @@ function getGroups() {
       },
     });
   });
+}
+function getHeader() {
+  return new Promise((resolve, reject) => {
+    $.ajax({
+      type: "GET",
+      url: "api/get_header.php",
+      dataType: "json",
+      success: function (response) {
+        if (!response || !response.success) {
+          reject(
+            (response && response.message) || "Failed to load header data."
+          );
+          return;
+        }
+        resolve(response.data);
+      },
+      error: function (xhr, status, error) {
+        if (xhr.status === 404) {
+          reject("Not Found Error: The requested resource was not found.");
+        } else if (xhr.status === 500) {
+          reject("Internal Server Error: There was a server error.");
+        } else {
+          reject("An unspecified error occurred while loading header data.");
+        }
+      },
+    });
+  });
+}
+function renderHeader(data) {
+  const pres = data?.president;
+  const co = data?.care_of;
+
+  if (!pres?.name) {
+    $("#requestHeader").empty();
+    return;
+  }
+
+  $("#requestHeader").html(`
+    <p class="font-semibold font-['Arial']">
+      ${pres.prefix} ${pres.name} (President)
+    </p>
+    ${
+      co?.name
+        ? `<p class="font-semibold font-['Arial']">(c/o ${co.prefix} ${co.name})</p>`
+        : ""
+    }
+  `);
+}
+function renderSalutation(data) {
+  const pres = data?.president;
+  let salutation = "Dear Sir,";
+
+  if (pres?.prefix === "Ms.") {
+    salutation = "Dear Madam,";
+  }
+
+  $("#requestSalutation").text(salutation);
 }
 function fillGroups(grps) {
   const groupIDS = grps.map((obj) => obj.id);
@@ -1956,7 +2103,7 @@ const CHANGE_REQUEST_ENDPOINTS = {
 };
 
 function canRequestDispatchChange(request) {
-  return normalizeDispatchStatus(getRawDispatchStatus(request)) === "approved";
+  return getEffectiveDispatchStatus(request) === "approved";
 }
 
 function hasPendingDateChangeRequest(request) {
