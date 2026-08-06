@@ -118,6 +118,77 @@ $(document).on("click", "#closeNav", function () {
   $("body").removeClass("overflow-hidden");
 });
 
+function isStatusGuideOpen() {
+  const popover = document.getElementById("statusGuidePopover");
+  return Boolean(popover && !popover.classList.contains("d-none"));
+}
+
+function setStatusGuideOpen(isOpen) {
+  const button = document.getElementById("dispatch-status-guide-trigger");
+  const popover = document.getElementById("statusGuidePopover");
+
+  if (!button || !popover) {
+    return;
+  }
+
+  button.setAttribute("aria-expanded", isOpen ? "true" : "false");
+  popover.classList.toggle("d-none", !isOpen);
+  popover.hidden = !isOpen;
+}
+
+function toggleStatusGuide(forceOpen) {
+  const shouldOpen =
+    typeof forceOpen === "boolean" ? forceOpen : !isStatusGuideOpen();
+  setStatusGuideOpen(shouldOpen);
+
+  if (shouldOpen) {
+    renderStatusGuideIcons();
+  }
+}
+
+function renderStatusGuideIcons() {
+  if (!window.lucide || typeof window.lucide.createIcons !== "function") {
+    return;
+  }
+
+  window.lucide.createIcons({
+    attrs: {
+      width: 14,
+      height: 14,
+      "stroke-width": 2,
+    },
+  });
+}
+
+$(document).on("click", "#dispatch-status-guide-trigger", function (event) {
+  event.preventDefault();
+  event.stopPropagation();
+  toggleStatusGuide();
+});
+
+$(document).on("click", function (event) {
+  if (!isStatusGuideOpen()) {
+    return;
+  }
+
+  const wrap = document.getElementById("request-status-group");
+  if (wrap && wrap.contains(event.target)) {
+    return;
+  }
+
+  setStatusGuideOpen(false);
+});
+
+$(document).on("keydown", function (event) {
+  if (event.key === "Escape" && isStatusGuideOpen()) {
+    setStatusGuideOpen(false);
+  }
+});
+
+$(document).ready(function () {
+  renderStatusGuideIcons();
+});
+
 $(document).on("change", "#grpSel", function () {
   var sel = $("#grpSel option:selected").text();
   var grp = $(this).val().split(",").length;
@@ -448,6 +519,22 @@ function showRequestModal() {
   bootstrap.Modal.getOrCreateInstance(requestModalElement).show();
 }
 
+/** User-facing request reference only. Does not change real IDs. */
+function formatRequestReference(requestId, prefix = "REQ") {
+  const digits = String(requestId ?? "").replace(/\D/g, "");
+
+  if (!digits) {
+    return "";
+  }
+
+  const normalizedPrefix = String(prefix ?? "REQ").trim().toUpperCase() || "REQ";
+  return `${normalizedPrefix}-${digits.padStart(5, "0")}`;
+}
+
+function formatDispatchRequestReference(requestId) {
+  return formatRequestReference(requestId, "REQ");
+}
+
 function getRawDispatchStatus(request) {
   return request.status;
 }
@@ -703,6 +790,7 @@ function fetchDispatchRequest(requestId) {
 
 function clearDispatchRequestModal() {
   $("#openModalTitle").html("Dispatch Request");
+  $("#openModalRequestId").text("");
   $("#modalEmpName, #modalGroup, #modalDateFrom, #modalDateTo").text("");
   $("#modalReqName, #modalReqDate, #modalLoc, #modalCountry, #modalReqGrp").text(
     ""
@@ -1330,6 +1418,9 @@ function populateDispatchRequestModal(req) {
   const surname = last.toUpperCase();
   const first = given.replace(/\s+/g, "");
   formatStatus(normalizedStatus);
+  $("#openModalRequestId").text(
+    formatRequestReference(req.req_id, "REQ") || "—"
+  );
   formatVisaPassport(visaValidity, passValidity);
   $("#modalEmpName").text(name);
   $("#modalGroup").text(grp);
@@ -1467,6 +1558,22 @@ function formatDate(date) {
   monthName = monthNames2[parseInt(month) - 1];
 
   return day + " " + monthName + " " + year;
+}
+
+function formatDateRange(start, end) {
+  if (!start && !end) {
+    return "—";
+  }
+
+  if (!start) {
+    return formatDate(end);
+  }
+
+  if (!end) {
+    return formatDate(start);
+  }
+
+  return `${formatDate(start)} — ${formatDate(end)}`;
 }
 
 function formatName(name) {
@@ -1798,13 +1905,14 @@ function fillTable(sampleData) {
   var str = "";
   if (sampleData.length != 0) {
     $.each(sampleData, function (index, item) {
+      const requestReference =
+        formatRequestReference(item.req_id, "REQ") || "—";
       str = `
     <tr class="dispatch-request-row" data-request-id="${item.req_id}">
+      <td class="whitespace-nowrap">${requestReference}</td>
       <td>${item.emp_name}</td>
       <td>${formatDate(item.req_date)}</td>
-      <td>${formatDate(item.from)}</td>
-      <td>${formatDate(item.to)}</td>
-      <td>${item.requester_name}</td>
+      <td class="whitespace-nowrap">${formatDateRange(item.from, item.to)}</td>
       <td>${getStatusBadgeHtml(getEffectiveDispatchStatus(item))}</td>
       <td>${
         item.passValid === true
@@ -1828,7 +1936,7 @@ function fillTable(sampleData) {
       $("#tableBody").append(str);
     });
   } else {
-    str = `<td colspan="12" class="h-[280px]"><div class="flex items-center justify-center flex-col gap-3 py-20"><img src="../images/empty.png"   class="w-[150px] h-auto opacity-[0.75] pt-20" alt="empty">
+    str = `<td colspan="8" class="h-[280px]"><div class="flex items-center justify-center flex-col gap-3 py-20"><img src="../images/empty.png"   class="w-[150px] h-auto opacity-[0.75] pt-20" alt="empty">
     <h5 class="font-semibold text-[16px] text-[var(--gray-text)]">No item found</h5>
     <p class="text-[var(--gray-text)] pb-20">Try adjusting your search or filter to find what you're looking for.</p>
     </div></td>`;
@@ -2103,7 +2211,10 @@ const CHANGE_REQUEST_ENDPOINTS = {
 };
 
 function canRequestDispatchChange(request) {
-  return getEffectiveDispatchStatus(request) === "approved";
+  // Only an active approved dispatch may initiate date-change / cancellation.
+  // pending, declined, cancelled, and completed are read-only.
+  const normalizedStatus = getEffectiveDispatchStatus(request);
+  return normalizedStatus === "approved";
 }
 
 function hasPendingDateChangeRequest(request) {
@@ -2134,6 +2245,8 @@ function updateChangeRequestActionsVisibility(request) {
 
   if (!showDateChange && !showCancellation) {
     actionsEl.classList.add("d-none");
+    dateChangeBtn.classList.add("d-none");
+    cancellationBtn.classList.add("d-none");
     return;
   }
 
@@ -2384,7 +2497,9 @@ function populateDateChangeRequestForm(request) {
   $("#dcEmpName").text(request.emp_name || "—");
   $("#dcEmpNumber").text(request.emp_number ?? "—");
   $("#dcGroupName").text(request.group_name || "—");
-  $("#dcRequestId").text(request.req_id ?? "—");
+  $("#dcRequestId").text(
+    formatRequestReference(request.req_id, "REQ") || "—"
+  );
   $("#dcCurrentStart").text(formatDate(request.from));
   $("#dcCurrentEnd").text(formatDate(request.to));
   $("#dcCurrentTotalDays").text(currentDays);
@@ -2411,7 +2526,9 @@ function populateCancellationRequestForm(request) {
   $("#crEmpName").text(request.emp_name || "—");
   $("#crEmpNumber").text(request.emp_number ?? "—");
   $("#crGroupName").text(request.group_name || "—");
-  $("#crRequestId").text(request.req_id ?? "—");
+  $("#crRequestId").text(
+    formatRequestReference(request.req_id, "REQ") || "—"
+  );
   $("#crCurrentStart").text(formatDate(request.from));
   $("#crCurrentEnd").text(formatDate(request.to));
   $("#crLocation").text(formatLocationDisplay(request));

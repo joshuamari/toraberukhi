@@ -960,7 +960,7 @@ function renderDateChangeTableBody(pageItems) {
   if (pageItems.length === 0) {
     $tbody.append(`
       <tr>
-        <td colspan="9" class="h-[280px]">
+        <td colspan="7" class="h-[280px]">
           <div class="flex items-center justify-center flex-col gap-3 py-20">
             <img src="../images/empty.png" class="w-[150px] h-auto opacity-[0.75] pt-20" alt="empty">
             <h5 class="font-semibold text-[16px] text-[var(--gray-text)]">No requests found</h5>
@@ -979,9 +979,7 @@ function renderDateChangeTableBody(pageItems) {
         <td>${item.employee_name}</td>
         <td>${formatDateRange(item.current_start, item.current_end)}</td>
         <td>${formatDateRange(item.proposed_start, item.proposed_end)}</td>
-        <td>${item.net_change}</td>
         <td>${formatDate(item.date_requested)}</td>
-        <td>${item.requested_by}</td>
         <td>${getChangeRequestStatusBadgeHtml(item.status)}</td>
         <td>${getOpenIconMarkup(item.id, "view-date-change-request")}</td>
       </tr>
@@ -996,7 +994,7 @@ function renderCancellationTableBody(pageItems) {
   if (pageItems.length === 0) {
     $tbody.append(`
       <tr>
-        <td colspan="8" class="h-[280px]">
+        <td colspan="6" class="h-[280px]">
           <div class="flex items-center justify-center flex-col gap-3 py-20">
             <img src="../images/empty.png" class="w-[150px] h-auto opacity-[0.75] pt-20" alt="empty">
             <h5 class="font-semibold text-[16px] text-[var(--gray-text)]">No requests found</h5>
@@ -1014,9 +1012,7 @@ function renderCancellationTableBody(pageItems) {
         <td>${item.request_id}</td>
         <td>${item.employee_name}</td>
         <td>${formatDateRange(item.dispatch_start, item.dispatch_end)}</td>
-        <td>${item.reason}</td>
         <td>${formatDate(item.date_requested)}</td>
-        <td>${item.requested_by}</td>
         <td>${getChangeRequestStatusBadgeHtml(item.status)}</td>
         <td>${getOpenIconMarkup(item.id, "view-cancellation-request")}</td>
       </tr>
@@ -1177,6 +1173,22 @@ function getDispatchRequestListId(request) {
   return request.dispatch_request_id ?? request.req_id ?? null;
 }
 
+/** User-facing request reference only. Does not change real IDs. */
+function formatRequestReference(requestId, prefix = "REQ") {
+  const digits = String(requestId ?? "").replace(/\D/g, "");
+
+  if (!digits) {
+    return "";
+  }
+
+  const normalizedPrefix = String(prefix ?? "REQ").trim().toUpperCase() || "REQ";
+  return `${normalizedPrefix}-${digits.padStart(5, "0")}`;
+}
+
+function formatDispatchRequestReference(requestId) {
+  return formatRequestReference(requestId, "REQ");
+}
+
 function setDispatchRequestLink(elementId, request) {
   const el = document.getElementById(elementId);
 
@@ -1184,8 +1196,11 @@ function setDispatchRequestLink(elementId, request) {
     return;
   }
 
-  const displayId = request.original_dispatch_request_id || "—";
   const dispatchRequestId = getDispatchRequestListId(request);
+  const displayId =
+    formatRequestReference(dispatchRequestId, "REQ") ||
+    formatRequestReference(request.original_dispatch_request_id, "REQ") ||
+    "—";
 
   if (!dispatchRequestId) {
     el.textContent = displayId;

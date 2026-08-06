@@ -1,6 +1,131 @@
+/* Change Requests toolbar — layout via IDs/classes + scoped CSS */
+.change-request-toolbar {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  border-bottom: 1px solid #ebebeb;
+  box-sizing: border-box;
+}
+
+.change-request-status-group {
+  width: 100%;
+  min-width: 0;
+}
+
+.change-request-status-filter,
 #dcTabs,
 #crTabs {
+  position: relative;
+  display: grid;
+  width: 100%;
   grid-template-columns: repeat(5, minmax(0, 1fr));
+  align-items: center;
+  gap: 0;
+  padding: 0.25rem;
+  border-radius: 0.5rem;
+  background-color: var(--gray);
+  overflow: hidden;
+}
+
+.change-request-status-filter .tab,
+#dcTabs .tab,
+#crTabs .tab {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-width: 0;
+  height: 2.5rem;
+  padding: 0.5rem;
+  border: 0;
+  border-radius: 9999px;
+  background: transparent;
+  cursor: pointer;
+}
+
+.change-request-status-filter .tab span,
+#dcTabs .tab span,
+#crTabs .tab span {
+  display: block;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 12px;
+  color: var(--gray-text);
+}
+
+.change-request-additional-filters {
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.5rem;
+}
+
+.change-request-search-wrap {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.change-request-search-wrap .input.search {
+  width: 100%;
+}
+
+.change-request-additional-filters > .relative.shrink-0 {
+  flex: 0 0 auto;
+}
+
+@media (min-width: 1280px) {
+  .change-request-toolbar {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .change-request-status-group {
+    width: auto;
+    flex: 0 0 auto;
+  }
+
+  .change-request-status-filter,
+  #dcTabs,
+  #crTabs {
+    display: inline-grid;
+    width: auto;
+    max-width: none;
+  }
+
+  .change-request-status-filter .tab,
+  #dcTabs .tab,
+  #crTabs .tab {
+    width: auto;
+    min-width: 4.5rem;
+    padding: 0.5rem 0.875rem;
+  }
+
+  .change-request-additional-filters {
+    width: auto;
+    flex: 0 0 auto;
+    margin-left: auto;
+    justify-content: flex-end;
+  }
+
+  .change-request-search-wrap {
+    flex: 0 1 auto;
+    width: auto;
+  }
+
+  .change-request-search-wrap .input.search {
+    width: auto;
+  }
 }
 
 .change-request-section-title {

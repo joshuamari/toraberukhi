@@ -556,54 +556,51 @@
                 Date Change Requests
               </h2>
               <div class="w-100 bg-white rounded-lg border flex flex-col">
-                <div class="selection flex gap-2 items-center justify-content-between border-b p-3">
-                  <div class="w-100">
+                <div id="dc-request-toolbar" class="change-request-toolbar">
+                  <div id="dc-status-group" class="change-request-status-group">
                     <div
                       id="dcTabs"
-                      class="tabs relative bg-[var(--gray)] rounded-lg p-1 grid"
+                      class="tabs change-request-status-filter"
                       role="tablist"
                     >
                       <div class="indicator absolute top-0 my-[0.25rem] bottom-0 left-0 rounded-md bg-[var(--secondary)]"></div>
-                      <button role="tab" id="dc-tab-1" data-status="all" class="relative block p-2 tab rounded-full flex gap-1 items-center justify-content-center">
-                        <span class="text-[12px] text-[var(--gray-text)]">All</span>
+                      <button role="tab" id="dc-tab-1" data-status="all" class="tab">
+                        <span>All</span>
                       </button>
-                      <button role="tab" id="dc-tab-2" data-status="pending" class="relative block p-2 tab rounded-full flex gap-1 items-center justify-content-center">
-                        <span class="text-[12px] text-[var(--gray-text)]">Pending</span>
+                      <button role="tab" id="dc-tab-2" data-status="pending" class="tab">
+                        <span>Pending</span>
                       </button>
-                      <button role="tab" id="dc-tab-3" data-status="accepted" class="relative block p-2 tab rounded-full flex gap-1 items-center justify-content-center">
-                        <span class="text-[12px] text-[var(--gray-text)]">Accepted</span>
+                      <button role="tab" id="dc-tab-3" data-status="accepted" class="tab">
+                        <span>Accepted</span>
                       </button>
-                      <button role="tab" id="dc-tab-4" data-status="rejected" class="relative block p-2 tab rounded-full flex gap-1 items-center justify-content-center">
-                        <span class="text-[12px] text-[var(--gray-text)]">Rejected</span>
+                      <button role="tab" id="dc-tab-4" data-status="rejected" class="tab">
+                        <span>Rejected</span>
                       </button>
-                      <button role="tab" id="dc-tab-5" data-status="withdrawn" class="relative block p-2 tab rounded-full flex gap-1 items-center justify-content-center">
-                        <span class="text-[12px] text-[var(--gray-text)]">Withdrawn</span>
+                      <button role="tab" id="dc-tab-5" data-status="withdrawn" class="tab">
+                        <span>Withdrawn</span>
                       </button>
                     </div>
                   </div>
-                  <div class="flex gap-2 items-center w-100">
-                    <div class="filters w-100 flex gap-2">
-                      <div class="flex gap-2 w-full justify-content-end">
-                        <div class="relative lg:w-auto w-full">
-                          <input type="search" class="input search" placeholder="Search here . . ." id="dcSearchbar" />
-                          <i class="bx bx-search absolute top-[8px] text-[18px] left-[8px] text-[var(--gray-text)]"></i>
-                        </div>
-                        <div class="relative">
-                          <input type="month" id="dcMonthSel" class="opacity-0 h-full w-full absolute cursor-pointer" />
-                          <div class="mobtn rounded-md border flex gap-1 pl-2 pr-1 py-2 items-center justify-content-center hover:bg-[var(--white)] dcMonthCont" role="button">
-                            <i class="bx bx-calendar"></i>
-                            <span id="dcMonthLabel">Requested Month</span>
-                            <i class="bx bx-chevron-down text-[18px] ml-3"></i>
-                          </div>
-                        </div>
-                        <div class="relative">
-                          <select id="dcGrpSel" class="opacity-0 h-full w-full absolute cursor-pointer"></select>
-                          <div class="grpbtn rounded-md border transition flex gap-1 pl-2 pr-1 py-2 items-center justify-content-center hover:bg-[var(--white)] dcGrpCont" role="button">
-                            <i class="bx bx-group"></i>
-                            <span id="dcLblGrp">All Groups</span>
-                            <i class="bx bx-chevron-down text-[18px] ml-3"></i>
-                          </div>
-                        </div>
+
+                  <div id="dc-additional-filters" class="change-request-additional-filters filters">
+                    <div class="change-request-search-wrap relative">
+                      <input type="search" class="input search" placeholder="Search here . . ." id="dcSearchbar" />
+                      <i class="bx bx-search absolute top-[8px] text-[18px] left-[8px] text-[var(--gray-text)]"></i>
+                    </div>
+                    <div class="relative shrink-0">
+                      <input type="month" id="dcMonthSel" class="opacity-0 h-full w-full absolute cursor-pointer" />
+                      <div class="mobtn rounded-md border flex gap-1 pl-2 pr-1 py-2 items-center justify-content-center hover:bg-[var(--white)] dcMonthCont" role="button">
+                        <i class="bx bx-calendar"></i>
+                        <span id="dcMonthLabel">Requested Month</span>
+                        <i class="bx bx-chevron-down text-[18px] ml-3"></i>
+                      </div>
+                    </div>
+                    <div class="relative shrink-0">
+                      <select id="dcGrpSel" class="opacity-0 h-full w-full absolute cursor-pointer"></select>
+                      <div class="grpbtn rounded-md border transition flex gap-1 pl-2 pr-1 py-2 items-center justify-content-center hover:bg-[var(--white)] dcGrpCont" role="button">
+                        <i class="bx bx-group"></i>
+                        <span id="dcLblGrp">All Groups</span>
+                        <i class="bx bx-chevron-down text-[18px] ml-3"></i>
                       </div>
                     </div>
                   </div>
@@ -617,9 +614,7 @@
                         <th>Employee</th>
                         <th>Current Dates</th>
                         <th>Proposed Dates</th>
-                        <th>Net Change</th>
                         <th>Date Requested</th>
-                        <th>Requested By</th>
                         <th>Status</th>
                         <th></th>
                       </tr>
@@ -651,54 +646,51 @@
                 Cancellation Requests
               </h2>
               <div class="w-100 bg-white rounded-lg border flex flex-col">
-                <div class="selection flex gap-2 items-center justify-content-between border-b p-3">
-                  <div class="w-100">
+                <div id="cr-request-toolbar" class="change-request-toolbar">
+                  <div id="cr-status-group" class="change-request-status-group">
                     <div
                       id="crTabs"
-                      class="tabs relative bg-[var(--gray)] rounded-lg p-1 grid"
+                      class="tabs change-request-status-filter"
                       role="tablist"
                     >
                       <div class="indicator absolute top-0 my-[0.25rem] bottom-0 left-0 rounded-md bg-[var(--secondary)]"></div>
-                      <button role="tab" id="cr-tab-1" data-status="all" class="relative block p-2 tab rounded-full flex gap-1 items-center justify-content-center">
-                        <span class="text-[12px] text-[var(--gray-text)]">All</span>
+                      <button role="tab" id="cr-tab-1" data-status="all" class="tab">
+                        <span>All</span>
                       </button>
-                      <button role="tab" id="cr-tab-2" data-status="pending" class="relative block p-2 tab rounded-full flex gap-1 items-center justify-content-center">
-                        <span class="text-[12px] text-[var(--gray-text)]">Pending</span>
+                      <button role="tab" id="cr-tab-2" data-status="pending" class="tab">
+                        <span>Pending</span>
                       </button>
-                      <button role="tab" id="cr-tab-3" data-status="accepted" class="relative block p-2 tab rounded-full flex gap-1 items-center justify-content-center">
-                        <span class="text-[12px] text-[var(--gray-text)]">Accepted</span>
+                      <button role="tab" id="cr-tab-3" data-status="accepted" class="tab">
+                        <span>Accepted</span>
                       </button>
-                      <button role="tab" id="cr-tab-4" data-status="rejected" class="relative block p-2 tab rounded-full flex gap-1 items-center justify-content-center">
-                        <span class="text-[12px] text-[var(--gray-text)]">Rejected</span>
+                      <button role="tab" id="cr-tab-4" data-status="rejected" class="tab">
+                        <span>Rejected</span>
                       </button>
-                      <button role="tab" id="cr-tab-5" data-status="withdrawn" class="relative block p-2 tab rounded-full flex gap-1 items-center justify-content-center">
-                        <span class="text-[12px] text-[var(--gray-text)]">Withdrawn</span>
+                      <button role="tab" id="cr-tab-5" data-status="withdrawn" class="tab">
+                        <span>Withdrawn</span>
                       </button>
                     </div>
                   </div>
-                  <div class="flex gap-2 items-center w-100">
-                    <div class="filters w-100 flex gap-2">
-                      <div class="flex gap-2 w-full justify-content-end">
-                        <div class="relative lg:w-auto w-full">
-                          <input type="search" class="input search" placeholder="Search here . . ." id="crSearchbar" />
-                          <i class="bx bx-search absolute top-[8px] text-[18px] left-[8px] text-[var(--gray-text)]"></i>
-                        </div>
-                        <div class="relative">
-                          <input type="month" id="crMonthSel" class="opacity-0 h-full w-full absolute cursor-pointer" />
-                          <div class="mobtn rounded-md border flex gap-1 pl-2 pr-1 py-2 items-center justify-content-center hover:bg-[var(--white)] crMonthCont" role="button">
-                            <i class="bx bx-calendar"></i>
-                            <span id="crMonthLabel">Requested Month</span>
-                            <i class="bx bx-chevron-down text-[18px] ml-3"></i>
-                          </div>
-                        </div>
-                        <div class="relative">
-                          <select id="crGrpSel" class="opacity-0 h-full w-full absolute cursor-pointer"></select>
-                          <div class="grpbtn rounded-md border transition flex gap-1 pl-2 pr-1 py-2 items-center justify-content-center hover:bg-[var(--white)] crGrpCont" role="button">
-                            <i class="bx bx-group"></i>
-                            <span id="crLblGrp">All Groups</span>
-                            <i class="bx bx-chevron-down text-[18px] ml-3"></i>
-                          </div>
-                        </div>
+
+                  <div id="cr-additional-filters" class="change-request-additional-filters filters">
+                    <div class="change-request-search-wrap relative">
+                      <input type="search" class="input search" placeholder="Search here . . ." id="crSearchbar" />
+                      <i class="bx bx-search absolute top-[8px] text-[18px] left-[8px] text-[var(--gray-text)]"></i>
+                    </div>
+                    <div class="relative shrink-0">
+                      <input type="month" id="crMonthSel" class="opacity-0 h-full w-full absolute cursor-pointer" />
+                      <div class="mobtn rounded-md border flex gap-1 pl-2 pr-1 py-2 items-center justify-content-center hover:bg-[var(--white)] crMonthCont" role="button">
+                        <i class="bx bx-calendar"></i>
+                        <span id="crMonthLabel">Requested Month</span>
+                        <i class="bx bx-chevron-down text-[18px] ml-3"></i>
+                      </div>
+                    </div>
+                    <div class="relative shrink-0">
+                      <select id="crGrpSel" class="opacity-0 h-full w-full absolute cursor-pointer"></select>
+                      <div class="grpbtn rounded-md border transition flex gap-1 pl-2 pr-1 py-2 items-center justify-content-center hover:bg-[var(--white)] crGrpCont" role="button">
+                        <i class="bx bx-group"></i>
+                        <span id="crLblGrp">All Groups</span>
+                        <i class="bx bx-chevron-down text-[18px] ml-3"></i>
                       </div>
                     </div>
                   </div>
@@ -711,9 +703,7 @@
                         <th>Request ID</th>
                         <th>Employee</th>
                         <th>Dispatch Dates</th>
-                        <th>Reason</th>
                         <th>Date Requested</th>
-                        <th>Requested By</th>
                         <th>Status</th>
                         <th></th>
                       </tr>
