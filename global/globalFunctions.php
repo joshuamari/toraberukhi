@@ -363,60 +363,173 @@ function getLocationName($id)
     $name = $nameStmt->fetchColumn();
     return $name;
 }
-function emailRequest($details)
+/**
+ * When true, notification emails are redirected to developer inboxes only.
+ * PROD recipient lists are still computed and appended in the email body for verification.
+ * Set to false before production go-live.
+ */
+define('DISPATCH_EMAIL_TEST_MODE', true);
+
+/**
+ * Developer employee IDs.
+ * - TEST mode: emails are redirected To these developers only
+ * - PROD mode: these developers are BCC'd so delivery can be verified
+ */
+define('DISPATCH_EMAIL_DEV_IDS', [464, 487, 510]);
+
+function getDispatchEmailDevEmails(): array
 {
-    // $protocol = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') ? "https" : "http";
-    // $host = $_SERVER['HTTP_HOST'];
-    // $link = $protocol . "://" . $host;
+    global $connnew;
+    $ids = DISPATCH_EMAIL_DEV_IDS;
+    if (empty($ids)) {
+        return [];
+    }
+
+    $placeholders = implode(',', array_fill(0, count($ids), '?'));
+    $stmt = $connnew->prepare(
+        "SELECT `email` FROM `employee_list` WHERE `id` IN ($placeholders)"
+    );
+    $stmt->execute(array_values($ids));
+    $emails = array_column($stmt->fetchAll(PDO::FETCH_ASSOC), 'email');
+
+    return array_values(array_unique(array_filter(array_map('trim', $emails))));
+}
+
+/**
+ * Build To / CC / BCC recipients used by dispatch notification emails.
+ * To: President; CC: KHI PIC, KHI admins, KDT managers, system admins.
+ * BCC (PROD): developers, for delivery verification.
+ *
+ * In TEST mode, actual delivery is redirected to developer emails, while
+ * prod_to / prod_cc retain the real recipient lists for inspection.
+ *
+ * @return array{to: string[], cc: string[], bcc: string[], prod_to: string[], prod_cc: string[], test_mode: bool, presdata: array, khidetails: array, link: string}
+ */
+function buildDispatchEmailRecipients(array $details): array
+{
     $link = "https://kdt-ph.kdts.net";
-    $headers = "MIME-Version: 1.0" . "\r\n";
-    $headers .= "Content-type:text/html;charset=UTF-8" . "\r\n";
-    $headers .= "From: kdt_toraberu@global.kawasaki.com" . "\r\n";
-    $subject = 'Dispatch Request Notification';
     $khidetails = getKHIUserDetails($details['requester_id']);
     $presdata = getPresDetails();
-    $group = $details['dept_id'] == 15 ? 21 : $details['emp_group'];
-    #region TESTING
-    #region systesting
-    // $CCarray = array('medrano_c-kdt@global.kawasaki.com', 'hernandez-kdt@global.kawasaki.com', 'reyes_d-kdt@global.kawasaki.com', 'cabiso-kdt@global.kawasaki.com', 'coquia-kdt@global.kawasaki.com');
-    // $emails = array("coquia-kdt@global.kawasaki.com", "medrano_c-kdt@global.kawasaki.com");
-    #endregion
+    $group = ((int)($details['dept_id'] ?? 0) === 15)
+        ? 21
+        : (int)($details['emp_group'] ?? 0);
+    $devEmails = getDispatchEmailDevEmails();
 
-    #region kdttesting
-    // $CCarray = array('tan-g1@global.kawasaki.com', 'becina-kdt@global.kawasaki.com', 'lazaro-kdt@global.kawasaki.com', 'soriano-kdt@global.kawasaki.com', 'magno-kdt@global.kawasaki.com', 'medrano_c-kdt@global.kawasaki.com', 'hernandez-kdt@global.kawasaki.com', 'reyes_d-kdt@global.kawasaki.com', 'cabiso-kdt@global.kawasaki.com', 'coquia-kdt@global.kawasaki.com');
-    // $emails = array("takenaka_yu@global.kawasaki.com");
-    #endregion
-
-    #region prekhitesting
-    // $admins = array("sangalang_m-kdt@global.kawasaki.com"); //COMMENT PAG PROD
-    // $khipic = getKHIPICEmail($details['emp_group']);
-    // $khiAdmins = getKHIAdminEmails();
-    // $kdtManagers = array("lazaro-kdt@global.kawasaki.com"); //COMMENT PAG PROD
-    // $CCarray = array_unique(array_merge($khipic, $khiAdmins, $kdtManagers)); //UNCOMMENT PAG PROD
-    // $emails = $admins; //UNCOMMENT PAG PROD
-    // $emails[] = "hernandez-kdt@global.kawasaki.com"; //UNCOMMENT PAG PROD
-    #endregion
-    #endregion
-
-    #region PROD
+    #region PROD recipient resolution (always computed)
     $admins = getAdminEmails();
     $khipic = getKHIPICEmail($group);
     $khiAdmins = getKHIAdminEmails();
     $kdtManagers = getGroupManagersEmail($group);
-    $CCarray = array_unique(array_merge($khipic, $khiAdmins, $kdtManagers, $admins)); //UNCOMMENT PAG PROD
-    $emails[] = $presdata['email']; //UNCOMMENT PAG PROD
+    $prodCc = array_values(array_unique(array_filter(array_merge($khipic, $khiAdmins, $kdtManagers, $admins))));
+    $prodTo = [];
+    if (!empty($presdata['email'])) {
+        $prodTo[] = $presdata['email'];
+    }
     #endregion
-    $CC = implode(",", $CCarray);
-    $email_to = implode(",", $emails);
-    $headers .= "CC: " . $CC;
+
+    $to = $prodTo;
+    $cc = $prodCc;
+    $bcc = [];
+    $testMode = defined('DISPATCH_EMAIL_TEST_MODE') && DISPATCH_EMAIL_TEST_MODE;
+
+    if ($testMode) {
+        $to = $devEmails;
+        $cc = [];
+        $bcc = [];
+    } else {
+        // PROD: BCC developers so we can confirm the mail was sent.
+        $visible = array_map('strtolower', array_merge($to, $cc));
+        $bcc = array_values(array_filter(
+            $devEmails,
+            static fn($email) => !in_array(strtolower((string)$email), $visible, true)
+        ));
+    }
+
+    return [
+        "to" => array_values(array_filter($to)),
+        "cc" => array_values(array_filter($cc)),
+        "bcc" => array_values(array_filter($bcc)),
+        "prod_to" => $prodTo,
+        "prod_cc" => $prodCc,
+        "test_mode" => $testMode,
+        "presdata" => $presdata,
+        "khidetails" => is_array($khidetails) ? $khidetails : [],
+        "link" => $link,
+    ];
+}
+
+function buildDispatchEmailTestRecipientFooter(array $recipients): string
+{
+    if (empty($recipients['test_mode'])) {
+        return '';
+    }
+
+    $escapeList = static function (array $emails): string {
+        if (empty($emails)) {
+            return '<em>(none)</em>';
+        }
+        return htmlspecialchars(implode(', ', $emails), ENT_QUOTES, 'UTF-8');
+    };
+
+    $actualTo = $escapeList($recipients['to'] ?? []);
+    $prodTo = $escapeList($recipients['prod_to'] ?? []);
+    $prodCc = $escapeList($recipients['prod_cc'] ?? []);
+
+    return "
+        <hr style='margin-top: 28px; border: none; border-top: 1px solid #ccc;'>
+        <div style='margin-top: 12px; padding: 12px; background: #fff8e1; border: 1px solid #f0c36d; font-size: 12px; color: #333;'>
+            <p style='margin: 0 0 8px 0;'><strong>[TEST MODE]</strong> This email was redirected to developers only. Real recipients were NOT notified.</p>
+            <p style='margin: 0 0 4px 0;'><strong>Actually sent To:</strong> {$actualTo}</p>
+            <p style='margin: 0 0 4px 0;'><strong>PROD would To:</strong> {$prodTo}</p>
+            <p style='margin: 0;'><strong>PROD would CC:</strong> {$prodCc}</p>
+        </div>
+    ";
+}
+
+function sendDispatchNotificationEmail(string $subject, string $msg, array $recipients): bool
+{
+    $emailTo = implode(",", $recipients["to"] ?? []);
+    if ($emailTo === "") {
+        return false;
+    }
+
+    if (!empty($recipients['test_mode'])) {
+        $subject = '[TEST] ' . $subject;
+        $msg .= buildDispatchEmailTestRecipientFooter($recipients);
+    }
+
+    $headers = "MIME-Version: 1.0" . "\r\n";
+    $headers .= "Content-type:text/html;charset=UTF-8" . "\r\n";
+    $headers .= "From: kdt_toraberu@global.kawasaki.com" . "\r\n";
+
+    $cc = implode(",", $recipients["cc"] ?? []);
+    if ($cc !== "") {
+        $headers .= "CC: " . $cc . "\r\n";
+    }
+
+    $bcc = implode(",", $recipients["bcc"] ?? []);
+    if ($bcc !== "") {
+        $headers .= "Bcc: " . $bcc . "\r\n";
+    }
+
+    return mail($emailTo, $subject, $msg, $headers);
+}
+
+function emailRequest($details)
+{
+    $recipients = buildDispatchEmailRecipients($details);
+    $presdata = $recipients["presdata"];
+    $khidetails = $recipients["khidetails"];
+    $link = $recipients["link"];
+    $subject = 'Dispatch Request Notification';
     $msg = "
                 <html>
                 <head>
                 <title>Dispatch Request</title>
                 </head>
                 <body>
-        <p>Dear President " . $presdata['surname'] . "-san,</p>
-        <p>A new request has been submitted by " . ucwords(strtolower($khidetails['surname'])) . "-san.</p>
+        <p>Dear President " . ($presdata['surname'] ?? '') . "-san,</p>
+        <p>A new request has been submitted by " . ucwords(strtolower((string)($khidetails['surname'] ?? ''))) . "-san.</p>
         <p>Details:</p>
         <p>Employee: " . getName($details['emp_number']) . "</p>
         <p>Date From: " . $details['dispatch_from'] . "</p>
@@ -439,14 +552,162 @@ function emailRequest($details)
                 </body>
                 </html>
             ";
-    if (mail($email_to, $subject, $msg, $headers)) {
-        return TRUE;
+
+    return sendDispatchNotificationEmail($subject, $msg, $recipients);
+}
+
+function emailDateChangeRequest(array $details, array $changeData): bool
+{
+    $recipients = buildDispatchEmailRecipients($details);
+    $presdata = $recipients["presdata"];
+    $khidetails = $recipients["khidetails"];
+    $link = $recipients["link"];
+    $subject = 'Dispatch Date Change Request Notification';
+    $originalFrom = $changeData['original_start_date'] ?? $details['dispatch_from'];
+    $originalTo = $changeData['original_end_date'] ?? $details['dispatch_to'];
+    $proposedFrom = $changeData['requested_start_date'] ?? '';
+    $proposedTo = $changeData['requested_end_date'] ?? '';
+    $reason = htmlspecialchars((string)($changeData['reason'] ?? ''), ENT_QUOTES, 'UTF-8');
+    $msg = "
+                <html>
+                <head>
+                <title>Dispatch Date Change Request</title>
+                </head>
+                <body>
+        <p>Dear President " . ($presdata['surname'] ?? '') . "-san,</p>
+        <p>A date change request has been submitted by " . ucwords(strtolower((string)($khidetails['surname'] ?? ''))) . "-san.</p>
+        <p>Details:</p>
+        <p>Employee: " . getName($details['emp_number']) . "</p>
+        <p>Current Date From: " . $originalFrom . "</p>
+        <p>Current Date To: " . $originalTo . "</p>
+        <p>Proposed Date From: " . $proposedFrom . "</p>
+        <p>Proposed Date To: " . $proposedTo . "</p>
+        <p>Location: " . getLocationName($details['location_id']) . "</p>
+        <p>Reason: " . $reason . "</p>
+        <br>
+        <p>For <strong>KDT</strong>, take action for next procedure:</p>
+        <ul>
+            <li><a href='$link/PCS/changeRequests/'>Change Request List</a></li>
+        </ul>
+        <p>For <strong>KHI</strong>, track the request status:</p>
+        <ul>
+            <li><a href='$link/PCSKHI/changeRequests/'>Track Change Request Status</a></li>
+        </ul>
+        <p>If you have any questions or need further assistance, please do not hesitate to contact us.</p>
+        <p>Best regards,</p>
+        <p>トラベる<br>KHI Design & Technical Service, Inc.</p>
+         <p style='margin-top: 20px; font-size: 12px; color: #999;'>Please do not reply to this email as it is system generated.</p>
+                </body>
+                </html>
+            ";
+
+    return sendDispatchNotificationEmail($subject, $msg, $recipients);
+}
+
+function emailCancellationRequest(array $details, array $changeData = []): bool
+{
+    $recipients = buildDispatchEmailRecipients($details);
+    $presdata = $recipients["presdata"];
+    $khidetails = $recipients["khidetails"];
+    $link = $recipients["link"];
+    $subject = 'Dispatch Cancellation Request Notification';
+    $reason = htmlspecialchars((string)($changeData['reason'] ?? ''), ENT_QUOTES, 'UTF-8');
+    $msg = "
+                <html>
+                <head>
+                <title>Dispatch Cancellation Request</title>
+                </head>
+                <body>
+        <p>Dear President " . ($presdata['surname'] ?? '') . "-san,</p>
+        <p>A cancellation request has been submitted by " . ucwords(strtolower((string)($khidetails['surname'] ?? ''))) . "-san.</p>
+        <p>Details:</p>
+        <p>Employee: " . getName($details['emp_number']) . "</p>
+        <p>Date From: " . $details['dispatch_from'] . "</p>
+        <p>Date To: " . $details['dispatch_to'] . "</p>
+        <p>Location: " . getLocationName($details['location_id']) . "</p>
+        <p>Reason: " . $reason . "</p>
+        <br>
+        <p>For <strong>KDT</strong>, take action for next procedure:</p>
+        <ul>
+            <li><a href='$link/PCS/changeRequests/'>Change Request List</a></li>
+        </ul>
+        <p>For <strong>KHI</strong>, track the request status:</p>
+        <ul>
+            <li><a href='$link/PCSKHI/changeRequests/'>Track Change Request Status</a></li>
+        </ul>
+        <p>If you have any questions or need further assistance, please do not hesitate to contact us.</p>
+        <p>Best regards,</p>
+        <p>トラベる<br>KHI Design & Technical Service, Inc.</p>
+         <p style='margin-top: 20px; font-size: 12px; color: #999;'>Please do not reply to this email as it is system generated.</p>
+                </body>
+                </html>
+            ";
+
+    return sendDispatchNotificationEmail($subject, $msg, $recipients);
+}
+
+function emailChangeRequestWithdrawn(array $details, array $changeData): bool
+{
+    $recipients = buildDispatchEmailRecipients($details);
+    $presdata = $recipients["presdata"];
+    $khidetails = $recipients["khidetails"];
+    $link = $recipients["link"];
+
+    $changeType = strtolower(trim((string)($changeData['change_type'] ?? '')));
+    $isCancellation = $changeType === 'cancellation';
+    $typeLabel = $isCancellation ? 'cancellation' : 'date change';
+    $typeTitle = $isCancellation ? 'Cancellation' : 'Date Change';
+    $subject = "Dispatch {$typeTitle} Request Withdrawn";
+    $reason = htmlspecialchars((string)($changeData['reason'] ?? ''), ENT_QUOTES, 'UTF-8');
+
+    $extraDetails = '';
+    if ($isCancellation) {
+        $extraDetails = "
+        <p>Date From: " . $details['dispatch_from'] . "</p>
+        <p>Date To: " . $details['dispatch_to'] . "</p>";
     } else {
-        return FALSE;
+        $originalFrom = $changeData['original_start_date'] ?? $details['dispatch_from'];
+        $originalTo = $changeData['original_end_date'] ?? $details['dispatch_to'];
+        $proposedFrom = $changeData['requested_start_date'] ?? '';
+        $proposedTo = $changeData['requested_end_date'] ?? '';
+        $extraDetails = "
+        <p>Current Date From: " . $originalFrom . "</p>
+        <p>Current Date To: " . $originalTo . "</p>
+        <p>Proposed Date From: " . $proposedFrom . "</p>
+        <p>Proposed Date To: " . $proposedTo . "</p>";
     }
 
-    // return true;
-    //baguhin yung $CCarray pag prod na.
+    $msg = "
+                <html>
+                <head>
+                <title>Dispatch {$typeTitle} Request Withdrawn</title>
+                </head>
+                <body>
+        <p>Dear President " . ($presdata['surname'] ?? '') . "-san,</p>
+        <p>A {$typeLabel} request has been withdrawn by " . ucwords(strtolower((string)($khidetails['surname'] ?? ''))) . "-san.</p>
+        <p>Details:</p>
+        <p>Employee: " . getName($details['emp_number']) . "</p>
+        {$extraDetails}
+        <p>Location: " . getLocationName($details['location_id']) . "</p>
+        <p>Reason: " . $reason . "</p>
+        <br>
+        <p>For <strong>KDT</strong>, review the request list:</p>
+        <ul>
+            <li><a href='$link/PCS/changeRequests/'>Change Request List</a></li>
+        </ul>
+        <p>For <strong>KHI</strong>, track the request status:</p>
+        <ul>
+            <li><a href='$link/PCSKHI/changeRequests/'>Track Change Request Status</a></li>
+        </ul>
+        <p>If you have any questions or need further assistance, please do not hesitate to contact us.</p>
+        <p>Best regards,</p>
+        <p>トラベる<br>KHI Design & Technical Service, Inc.</p>
+         <p style='margin-top: 20px; font-size: 12px; color: #999;'>Please do not reply to this email as it is system generated.</p>
+                </body>
+                </html>
+            ";
+
+    return sendDispatchNotificationEmail($subject, $msg, $recipients);
 }
 function countDays($start, $end)
 {

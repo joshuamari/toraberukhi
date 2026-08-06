@@ -2204,10 +2204,9 @@ function logOut() {
 }
 
 //#region CHANGE REQUEST WORKFLOW
-// TODO: Backend integration - set these URLs when PCSKHI change-request endpoints are available.
 const CHANGE_REQUEST_ENDPOINTS = {
-  dateChange: null,
-  cancellation: null,
+  dateChange: "../changeRequests/php/create_change_request.php",
+  cancellation: "../changeRequests/php/create_change_request.php",
 };
 
 function canRequestDispatchChange(request) {
@@ -2791,19 +2790,6 @@ function setCancellationSubmitting(isSubmitting) {
 }
 
 async function submitDateChangeRequest(payload) {
-  // Backend endpoint integration point
-  // TODO: POST to CHANGE_REQUEST_ENDPOINTS.dateChange when the PCSKHI endpoint is available.
-  if (!CHANGE_REQUEST_ENDPOINTS.dateChange) {
-    console.warn(
-      "[PCSKHI Change Requests] Date change API is not connected. Expected endpoint: CHANGE_REQUEST_ENDPOINTS.dateChange"
-    );
-    return {
-      isSuccess: false,
-      message:
-        "Change request submission is not available yet. Backend integration is pending.",
-    };
-  }
-
   return new Promise((resolve, reject) => {
     $.ajax({
       type: "POST",
@@ -2826,19 +2812,6 @@ async function submitDateChangeRequest(payload) {
 }
 
 async function submitCancellationRequest(payload) {
-  // Backend endpoint integration point
-  // TODO: POST to CHANGE_REQUEST_ENDPOINTS.cancellation when the PCSKHI endpoint is available.
-  if (!CHANGE_REQUEST_ENDPOINTS.cancellation) {
-    console.warn(
-      "[PCSKHI Change Requests] Cancellation API is not connected. Expected endpoint: CHANGE_REQUEST_ENDPOINTS.cancellation"
-    );
-    return {
-      isSuccess: false,
-      message:
-        "Change request submission is not available yet. Backend integration is pending.",
-    };
-  }
-
   return new Promise((resolve, reject) => {
     $.ajax({
       type: "POST",
@@ -2872,15 +2845,6 @@ async function handleDateChangeSubmit() {
   }
 
   const payload = buildDateChangePayload(selectedDispatchRequest, validation);
-
-  if (!CHANGE_REQUEST_ENDPOINTS.dateChange) {
-    console.log("Date Change Request payload:", payload);
-    showFormLevelNotice(
-      "dateChangeFormError",
-      "Backend integration is not available yet. The request was not submitted."
-    );
-    return;
-  }
 
   setDateChangeSubmitting(true);
   hideFormLevelError("dateChangeFormError");
@@ -2933,15 +2897,6 @@ async function handleCancellationSubmit() {
     selectedDispatchRequest,
     validation
   );
-
-  if (!CHANGE_REQUEST_ENDPOINTS.cancellation) {
-    console.log("Cancellation Request payload:", payload);
-    showFormLevelNotice(
-      "cancellationFormError",
-      "Backend integration is not available yet. The request was not submitted."
-    );
-    return;
-  }
 
   setCancellationSubmitting(true);
   hideFormLevelError("cancellationFormError");

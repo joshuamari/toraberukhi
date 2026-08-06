@@ -40,7 +40,17 @@ if ($changeRequestId <= 0) {
 
 #region main function
 try {
-    $selectQ = "SELECT `change_request_id`, `status`, `requested_by`
+    $selectQ = "SELECT
+            `change_request_id`,
+            `request_id`,
+            `change_type`,
+            `status`,
+            `requested_by`,
+            `reason`,
+            `original_start_date`,
+            `original_end_date`,
+            `requested_start_date`,
+            `requested_end_date`
         FROM `pcosdb`.request_change_list
         WHERE `change_request_id` = :changeRequestId
         LIMIT 1";
@@ -79,6 +89,16 @@ try {
     ]);
 
     if ($updateStmt->rowCount() > 0) {
+        $details = getRequestDetails((int)$row["request_id"]);
+        emailChangeRequestWithdrawn($details, [
+            "change_type" => (string)$row["change_type"],
+            "reason" => (string)($row["reason"] ?? ""),
+            "original_start_date" => $row["original_start_date"] ?? null,
+            "original_end_date" => $row["original_end_date"] ?? null,
+            "requested_start_date" => $row["requested_start_date"] ?? null,
+            "requested_end_date" => $row["requested_end_date"] ?? null,
+        ]);
+
         $result["isSuccess"] = true;
         $result["message"] = "Request withdrawn successfully";
     } else {
