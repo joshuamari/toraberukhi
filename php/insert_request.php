@@ -177,7 +177,7 @@ try {
   if ($insertStmt->rowCount() > 0) {
     $id = $connpcs->lastInsertId();
     $details = getRequestDetails($id);
-    if (true) {
+    if (emailRequest($details)) {
       $result["isSuccess"] = true;
       $result["message"] = "Adding Dispatch Request successfully";
     }

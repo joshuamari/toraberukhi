@@ -437,7 +437,7 @@ $(document).on("click", ".btn-edit", function () {
   var trID = parseInt($(this).closest("tr").attr("d-id"));
   getEditDetails(trID);
   $("#editentryDateP, #editentryDateJ").prop("disabled", false);
-  $("#editEntry").modal("show");
+  showBootstrapModal("editEntry");
   $("#btn-saveEntry").attr("e-id", trID);
 });
 $(document).on("click", ".add-work", function () {
@@ -445,7 +445,7 @@ $(document).on("click", ".add-work", function () {
     "#addcompanyName, #addStartMonthYear, #addEndMonthYear, #addcompanyBusiness, #addbusinessContent, #addworkLocation"
   ).prop("disabled", false);
   const empID = $("#empSel").find("option:selected").attr("emp-id");
-  $("#addNewWork").modal("show");
+  showBootstrapModal("addNewWork");
 });
 $(document).on("click", "#btn-addWorkEntry", function () {
   addWorkHistory()
@@ -479,7 +479,7 @@ $(document).on("click", ".btn-edit-work", function () {
   $(
     "#edit-companyName, #edit-StartMonthYear, #edit-EndMonthYear, #edit-companyBusiness, #edit-businessContent, #edit-workLocation"
   ).prop("disabled", false);
-  $("#editWorkHistory").modal("show");
+  showBootstrapModal("editWorkHistory");
   $("#btn-updateWorkEntry").attr("e-wh-id", WHtrID);
 });
 $(document).on("click", "#btnExport", function () {
@@ -582,12 +582,12 @@ $(document).on("click", ".sentry-error-embed-wrapper", function () {
   isSentryModalOpen = false;
 });
 $(document).on("click", "#btnNext", function () {
-  $("#attachmentModal").modal("hide");
+  hideBootstrapModal("attachmentModal");
   fillAttachment2(wHistory);
 });
 $(document).on("click", "#btnBack", function () {
-  $("#attachmentModal2").modal("hide");
-  $("#attachmentModal").modal("show");
+  hideBootstrapModal("attachmentModal2");
+  showBootstrapModal("attachmentModal");
 });
 $(document).on("click", "#btnSend", function () {
   $("#btnSend").prop("disabled", true);
@@ -628,12 +628,12 @@ $(document).on("click", "#btnSend", function () {
             alert(`${error}`);
           });
       }
-      $("#attachmentModal2").modal("hide");
+      hideBootstrapModal("attachmentModal2");
       $("#btnSend").prop("disabled", false);
       toggleLoadingAnimation(false);
     })
     .catch((error) => {
-      $("#attachmentModal").modal("hide");
+      hideBootstrapModal("attachmentModal");
       $("#btnSend").prop("disabled", false);
       toggleLoadingAnimation(false);
       alert(`${error}`);
@@ -690,6 +690,33 @@ $(document).on("click", ".toggle.small", function () {
 //#endregion
 
 //#region FUNCTIONS
+function getBootstrapModal(elementId) {
+  const element = document.getElementById(elementId);
+
+  if (!element || !window.bootstrap) {
+    return { element: null, instance: null };
+  }
+
+  return {
+    element,
+    instance: bootstrap.Modal.getOrCreateInstance(element),
+  };
+}
+
+function showBootstrapModal(elementId) {
+  const { instance } = getBootstrapModal(elementId);
+  if (instance) {
+    instance.show();
+  }
+}
+
+function hideBootstrapModal(elementId) {
+  const { instance } = getBootstrapModal(elementId);
+  if (instance) {
+    instance.hide();
+  }
+}
+
 function openReport() {
   if (!isSentryModalOpen) {
     const eventId = Sentry.captureException(new Error("Error report"));
@@ -879,7 +906,7 @@ function fillAttachment() {
   var month;
   var str = year + "-" + month + "-" + day;
   $("#printDate").text(formatDate(str));
-  $("#attachmentModal").modal("show");
+  showBootstrapModal("attachmentModal");
 }
 function formatDate(date) {
   var [year, month, day] = date.split("-");
@@ -975,7 +1002,7 @@ function fillAttachment2(wList) {
   $("#printPICName").text(picName);
   $("#printPICNumber").text(deptChargeTel);
 
-  $("#attachmentModal2").modal("show");
+  showBootstrapModal("attachmentModal2");
 }
 
 function insertIconCountry(id) {
@@ -2556,8 +2583,10 @@ function arrangeName(nme) {
 }
 function toggleLoadingAnimation(show) {
   if (show) {
-    $("#appendHere").append(`
-        <div class="bottom-0 xl:top-0 right-0 xl:right-[20px] backdrop-blur-sm bg-gray/30 h-[calc(100%-280px)] xl:h-full  justify-center items-center flex-col pb-5 absolute w-full lg:w-full xl:w-[calc(100%-460px)]   flex" id="loadingAnimation">
+    $("#loadingAnimation").remove();
+    // Append to body with fixed + high z-index so it stacks above Bootstrap modals (z-index 1055)
+    $("body").append(`
+        <div class="fixed inset-0 backdrop-blur-sm bg-gray/30 justify-center items-center flex-col pb-5 flex" id="loadingAnimation" style="z-index: 2000;">
             <div class="relative">
                 <div class="grayscale-[70%] w-[400px]">
                     <img src="images/Frame 1.gif" alt="loader" class="w-full" />

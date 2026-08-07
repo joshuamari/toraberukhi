@@ -422,13 +422,29 @@ try {
             $status = $req['request_status'];
             $output['status'] = $status;
             $output['modified'] = $req['date_modified'];
+            $requestChanges = $changesByRequestId[$requestId] ?? [];
+            $pendingDateChange = false;
+            $pendingCancellation = false;
+            foreach ($requestChanges as $changeRow) {
+                if (strtolower(trim((string)($changeRow['status'] ?? ''))) !== 'pending') {
+                    continue;
+                }
+                $rowChangeType = strtolower(trim((string)($changeRow['change_type'] ?? '')));
+                if ($rowChangeType === 'date_change') {
+                    $pendingDateChange = true;
+                } elseif ($rowChangeType === 'cancellation') {
+                    $pendingCancellation = true;
+                }
+            }
+            $output['pending_date_change_request'] = $pendingDateChange;
+            $output['pending_cancellation_request'] = $pendingCancellation;
             $output['activityLog'] = buildRequestActivityLog(
                 $requestId,
                 $req['date_requested'] ?? null,
                 $status,
                 $req['date_modified'] ?? null,
                 $requesterName,
-                $changesByRequestId[$requestId] ?? []
+                $requestChanges
             );
             $result['data'][] = $output;
         }

@@ -137,18 +137,15 @@ try {
     $pendingQ = "SELECT change_request_id
         FROM `request_change_list`
         WHERE `request_id` = :request_id
-          AND `change_type` = :change_type
           AND LOWER(`status`) = 'pending'
         LIMIT 1";
     $pendingStmt = $connpcs->prepare($pendingQ);
     $pendingStmt->execute([
         ":request_id" => $requestId,
-        ":change_type" => $changeType,
     ]);
 
     if ($pendingStmt->rowCount() > 0) {
-        $label = $changeType === 'cancellation' ? 'cancellation' : 'date change';
-        $result["message"] = "A pending {$label} request already exists for this dispatch";
+        $result["message"] = "A pending change request already exists for this dispatch";
         die(json_encode($result));
     }
 

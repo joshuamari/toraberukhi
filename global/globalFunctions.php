@@ -221,7 +221,18 @@ function getPresDetails()
 {
     global $connnew;
     $presData = [];
-    $dataQ = "SELECT `id`,`email`,`surname` FROM `employee_list` WHERE `designation`=29 AND `resignation_date` < CURRENT_DATE()";
+    // Active president only (designation 29). Do not use resigned records.
+    $dataQ = "
+        SELECT `id`, `email`, `surname`
+        FROM `employee_list`
+        WHERE `designation` = 29
+          AND (
+                `resignation_date` IS NULL
+                OR `resignation_date` = '0000-00-00'
+                OR `resignation_date` > CURDATE()
+              )
+        LIMIT 1
+    ";
     $dataStmt = $connnew->query($dataQ);
     if ($dataStmt->rowCount() > 0) {
         $presData = $dataStmt->fetch();

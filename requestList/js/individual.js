@@ -2217,41 +2217,70 @@ function canRequestDispatchChange(request) {
 }
 
 function hasPendingDateChangeRequest(request) {
-  // BACKEND_INTEGRATION: return true when get_requests.php exposes a pending date-change flag.
-  // Example: return Boolean(request.pending_date_change_request);
-  return false;
+  return Boolean(request?.pending_date_change_request);
 }
 
 function hasPendingCancellationRequest(request) {
-  // BACKEND_INTEGRATION: return true when get_requests.php exposes a pending cancellation flag.
-  // Example: return Boolean(request.pending_cancellation_request);
-  return false;
+  return Boolean(request?.pending_cancellation_request);
+}
+
+function hasPendingChangeRequest(request) {
+  return (
+    hasPendingDateChangeRequest(request) ||
+    hasPendingCancellationRequest(request)
+  );
 }
 
 function updateChangeRequestActionsVisibility(request) {
   const actionsEl = document.getElementById("changeRequestActions");
   const dateChangeBtn = document.getElementById("btnRequestDateChange");
   const cancellationBtn = document.getElementById("btnRequestCancellation");
+  const pendingNoteEl = document.getElementById("changeRequestPendingNote");
 
   if (!actionsEl || !dateChangeBtn || !cancellationBtn) {
     return;
   }
 
   const eligible = canRequestDispatchChange(request);
-  const showDateChange = eligible && !hasPendingDateChangeRequest(request);
-  const showCancellation =
-    eligible && !hasPendingCancellationRequest(request);
+  const hasPending = hasPendingChangeRequest(request);
+  const disableReason = hasPending
+    ? "A change request is already pending review for this dispatch."
+    : "";
 
-  if (!showDateChange && !showCancellation) {
+  if (!eligible) {
     actionsEl.classList.add("d-none");
-    dateChangeBtn.classList.add("d-none");
-    cancellationBtn.classList.add("d-none");
+    dateChangeBtn.disabled = false;
+    cancellationBtn.disabled = false;
+    dateChangeBtn.removeAttribute("title");
+    cancellationBtn.removeAttribute("title");
+    dateChangeBtn.removeAttribute("aria-disabled");
+    cancellationBtn.removeAttribute("aria-disabled");
+    if (pendingNoteEl) {
+      pendingNoteEl.classList.add("d-none");
+    }
     return;
   }
 
   actionsEl.classList.remove("d-none");
-  dateChangeBtn.classList.toggle("d-none", !showDateChange);
-  cancellationBtn.classList.toggle("d-none", !showCancellation);
+  dateChangeBtn.classList.remove("d-none");
+  cancellationBtn.classList.remove("d-none");
+
+  dateChangeBtn.disabled = hasPending;
+  cancellationBtn.disabled = hasPending;
+  dateChangeBtn.setAttribute("aria-disabled", hasPending ? "true" : "false");
+  cancellationBtn.setAttribute("aria-disabled", hasPending ? "true" : "false");
+
+  if (hasPending) {
+    dateChangeBtn.setAttribute("title", disableReason);
+    cancellationBtn.setAttribute("title", disableReason);
+  } else {
+    dateChangeBtn.removeAttribute("title");
+    cancellationBtn.removeAttribute("title");
+  }
+
+  if (pendingNoteEl) {
+    pendingNoteEl.classList.toggle("d-none", !hasPending);
+  }
 
   renderChangeRequestIcons(actionsEl);
 }
@@ -2950,6 +2979,8 @@ async function refreshRequestsAfterChangeSubmission() {
 
         if (refreshed) {
           selectedDispatchRequest = refreshed;
+          renderDispatchActivityHistory(refreshed);
+          updateChangeRequestActionsVisibility(refreshed);
         }
       }
     }
