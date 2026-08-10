@@ -208,6 +208,8 @@ try {
 
     $details = getRequestDetails($requestId);
     $changeData = [
+        "change_request_id" => $changeRequestId,
+        "display_id" => $displayId,
         "original_start_date" => $originalStart,
         "original_end_date" => $originalEnd,
         "requested_start_date" => $requestedStart,

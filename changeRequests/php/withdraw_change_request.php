@@ -50,7 +50,8 @@ try {
             `original_start_date`,
             `original_end_date`,
             `requested_start_date`,
-            `requested_end_date`
+            `requested_end_date`,
+            `requested_at`
         FROM `pcosdb`.request_change_list
         WHERE `change_request_id` = :changeRequestId
         LIMIT 1";
@@ -90,8 +91,18 @@ try {
 
     if ($updateStmt->rowCount() > 0) {
         $details = getRequestDetails((int)$row["request_id"]);
+        $changeType = (string)$row["change_type"];
+        $changeRequestIdValue = (int)$row["change_request_id"];
+        $requestedAt = (string)($row["requested_at"] ?? '');
+        $year = date('Y', strtotime($requestedAt) ?: time());
+        $paddedId = str_pad((string)$changeRequestIdValue, 3, '0', STR_PAD_LEFT);
+        $prefix = strtolower(trim($changeType)) === 'cancellation' ? 'CR' : 'DCR';
+        $displayId = "{$prefix}-{$year}-{$paddedId}";
+
         emailChangeRequestWithdrawn($details, [
-            "change_type" => (string)$row["change_type"],
+            "change_type" => $changeType,
+            "change_request_id" => $changeRequestIdValue,
+            "display_id" => $displayId,
             "reason" => (string)($row["reason"] ?? ""),
             "original_start_date" => $row["original_start_date"] ?? null,
             "original_end_date" => $row["original_end_date"] ?? null,
