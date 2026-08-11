@@ -230,141 +230,154 @@
                   </article>
                 </div>
 
-                <div class="dashboard-middle-grid" aria-label="Dashboard charts">
-                  <article class="dashboard-card dashboard-area-trend">
-                    <div class="dashboard-card-header dashboard-group-card-header">
-                      <div class="dashboard-group-header-top">
-                        <h3>Request Submission Trend</h3>
-                        <select
-                          id="submissionTrendYearSel"
-                          class="select dashboard-group-year-select"
-                          aria-label="Request submission trend year"
-                        ></select>
-                      </div>
+                <div
+                  class="dashboard-activity-charts"
+                  aria-label="Recent activity and charts"
+                >
+                  <section
+                    class="dashboard-card dashboard-activity-card dashboard-activity-charts__activity"
+                    aria-labelledby="recentActivityTitle"
+                  >
+                    <div class="dashboard-card-header">
+                      <h3 id="recentActivityTitle">Recent Request Activity</h3>
                       <p>
-                        Number of requests submitted each month for
-                        <span id="trendYearValue"></span>.
+                        Latest dispatch and change requests submitted through
+                        PCSKHI.
                       </p>
                     </div>
-                    <div class="dashboard-chart-wrap">
-                      <canvas
-                        id="submissionTrendChart"
-                        aria-label="Request submission trend chart"
-                      ></canvas>
+                    <div class="dashboard-activity-table-wrap">
+                      <table class="dashboard-activity-table">
+                        <thead>
+                          <tr>
+                            <th>Request ID</th>
+                            <th>Type</th>
+                            <th>Employee</th>
+                            <th>Date requested</th>
+                            <th>Dispatch dates</th>
+                            <th>Status</th>
+                          </tr>
+                        </thead>
+                        <tbody id="activityTableBody"></tbody>
+                      </table>
                     </div>
-                    <p
-                      class="dashboard-card-insight"
-                      id="submissionTrendInsight"
-                    ></p>
-                  </article>
-
-                  <article class="dashboard-card dashboard-area-status">
-                    <div class="dashboard-card-header dashboard-group-card-header">
-                      <div class="dashboard-group-header-top">
-                        <h3>Request Status Overview</h3>
-                        <select
-                          id="statusOverviewYearSel"
-                          class="select dashboard-group-year-select"
-                          aria-label="Request status overview year"
-                        ></select>
-                      </div>
-                      <p>
-                        Status of requests submitted in
-                        <span id="statusYearValue"></span>.
+                    <div
+                      id="activityPagination"
+                      data-pagination="activity"
+                      class="request-pagination table-pagination table-pagination--pcs dashboard-activity-pagination d-flex flex-column flex-lg-row justify-content-lg-between align-items-lg-center gap-3"
+                    >
+                      <p
+                        data-role="count"
+                        class="table-pagination__count text-[12px] text-[var(--gray-text)] m-0"
+                      >
+                        Showing 0 to 0 of 0 activities
                       </p>
-                    </div>
-                    <div class="dashboard-donut-wrap">
-                      <div class="dashboard-donut-canvas">
-                        <canvas
-                          id="statusDonutChart"
-                          aria-label="Request status overview chart"
-                        ></canvas>
-                        <div class="dashboard-donut-center">
-                          <strong id="statusDonutTotal">0</strong>
-                          <span>Total</span>
+                      <div
+                        class="table-pagination__controls d-flex flex-wrap align-items-center gap-2 justify-content-end"
+                      >
+                        <div
+                          class="table-pagination__nav-wrap d-flex align-items-center gap-1"
+                        >
+                          <button
+                            type="button"
+                            data-role="prev"
+                            class="request-pagination__nav table-pagination__nav"
+                            aria-label="Previous page"
+                          >
+                            <i
+                              class="bx bx-chevron-left text-[16px]"
+                              aria-hidden="true"
+                            ></i>
+                            <span>Previous</span>
+                          </button>
+                          <div
+                            data-role="pages"
+                            class="table-pagination__pages d-flex align-items-center gap-1"
+                          ></div>
+                          <button
+                            type="button"
+                            data-role="next"
+                            class="request-pagination__nav table-pagination__nav"
+                            aria-label="Next page"
+                          >
+                            <span>Next</span>
+                            <i
+                              class="bx bx-chevron-right text-[16px]"
+                              aria-hidden="true"
+                            ></i>
+                          </button>
                         </div>
                       </div>
-                      <div
-                        class="dashboard-donut-legend"
-                        id="statusDonutLegend"
-                      ></div>
                     </div>
-                    <p
-                      class="dashboard-card-insight"
-                      id="statusDonutInsight"
-                    ></p>
-                  </article>
-                </div>
-              </div>
-            </section>
+                  </section>
 
-            <section
-              class="dashboard-card dashboard-activity-card"
-              aria-labelledby="recentActivityTitle"
-            >
-              <div class="dashboard-card-header">
-                <h3 id="recentActivityTitle">Recent Request Activity</h3>
-                <p>
-                  Latest dispatch and change requests submitted through PCSKHI.
-                </p>
-              </div>
-              <div class="dashboard-activity-table-wrap">
-                <table class="dashboard-activity-table">
-                  <thead>
-                    <tr>
-                      <th>Request ID</th>
-                      <th>Type</th>
-                      <th>Employee</th>
-                      <th>Date requested</th>
-                      <th>Dispatch dates</th>
-                      <th>Status</th>
-                    </tr>
-                  </thead>
-                  <tbody id="activityTableBody"></tbody>
-                </table>
-              </div>
-              <div
-                id="activityPagination"
-                data-pagination="activity"
-                class="request-pagination table-pagination table-pagination--pcs dashboard-activity-pagination d-flex flex-column flex-lg-row justify-content-lg-between align-items-lg-center gap-3"
-              >
-                <p
-                  data-role="count"
-                  class="table-pagination__count text-[12px] text-[var(--gray-text)] m-0"
-                >
-                  Showing 0 to 0 of 0 activities
-                </p>
-                <div
-                  class="table-pagination__controls d-flex flex-wrap align-items-center gap-2 justify-content-end"
-                >
-                  <div
-                    class="table-pagination__nav-wrap d-flex align-items-center gap-1"
-                  >
-                    <button
-                      type="button"
-                      data-role="prev"
-                      class="request-pagination__nav table-pagination__nav"
-                      aria-label="Previous page"
-                    >
-                      <i class="bx bx-chevron-left text-[16px]" aria-hidden="true"></i>
-                      <span>Previous</span>
-                    </button>
-                    <div
-                      data-role="pages"
-                      class="table-pagination__pages d-flex align-items-center gap-1"
-                    ></div>
-                    <button
-                      type="button"
-                      data-role="next"
-                      class="request-pagination__nav table-pagination__nav"
-                      aria-label="Next page"
-                    >
-                      <span>Next</span>
-                      <i
-                        class="bx bx-chevron-right text-[16px]"
-                        aria-hidden="true"
-                      ></i>
-                    </button>
+                  <div class="dashboard-charts-column">
+                    <article class="dashboard-card dashboard-area-trend">
+                      <div
+                        class="dashboard-card-header dashboard-group-card-header"
+                      >
+                        <div class="dashboard-group-header-top">
+                          <h3>Request Submission Trend</h3>
+                          <select
+                            id="submissionTrendYearSel"
+                            class="select dashboard-group-year-select"
+                            aria-label="Request submission trend year"
+                          ></select>
+                        </div>
+                        <p>
+                          Number of requests submitted each month for
+                          <span id="trendYearValue"></span>.
+                        </p>
+                      </div>
+                      <div class="dashboard-chart-wrap">
+                        <canvas
+                          id="submissionTrendChart"
+                          aria-label="Request submission trend chart"
+                        ></canvas>
+                      </div>
+                      <p
+                        class="dashboard-card-insight"
+                        id="submissionTrendInsight"
+                      ></p>
+                    </article>
+
+                    <article class="dashboard-card dashboard-area-status">
+                      <div
+                        class="dashboard-card-header dashboard-group-card-header"
+                      >
+                        <div class="dashboard-group-header-top">
+                          <h3>Request Status Overview</h3>
+                          <select
+                            id="statusOverviewYearSel"
+                            class="select dashboard-group-year-select"
+                            aria-label="Request status overview year"
+                          ></select>
+                        </div>
+                        <p>
+                          Status of requests submitted in
+                          <span id="statusYearValue"></span>.
+                        </p>
+                      </div>
+                      <div class="dashboard-donut-wrap">
+                        <div class="dashboard-donut-canvas">
+                          <canvas
+                            id="statusDonutChart"
+                            aria-label="Request status overview chart"
+                          ></canvas>
+                          <div class="dashboard-donut-center">
+                            <strong id="statusDonutTotal">0</strong>
+                            <span>Total</span>
+                          </div>
+                        </div>
+                        <div
+                          class="dashboard-donut-legend"
+                          id="statusDonutLegend"
+                        ></div>
+                      </div>
+                      <p
+                        class="dashboard-card-insight"
+                        id="statusDonutInsight"
+                      ></p>
+                    </article>
                   </div>
                 </div>
               </div>
