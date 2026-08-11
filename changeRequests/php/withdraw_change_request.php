@@ -93,11 +93,9 @@ try {
         $details = getRequestDetails((int)$row["request_id"]);
         $changeType = (string)$row["change_type"];
         $changeRequestIdValue = (int)$row["change_request_id"];
-        $requestedAt = (string)($row["requested_at"] ?? '');
-        $year = date('Y', strtotime($requestedAt) ?: time());
-        $paddedId = str_pad((string)$changeRequestIdValue, 3, '0', STR_PAD_LEFT);
+        $paddedId = str_pad((string)$changeRequestIdValue, 5, '0', STR_PAD_LEFT);
         $prefix = strtolower(trim($changeType)) === 'cancellation' ? 'CR' : 'DCR';
-        $displayId = "{$prefix}-{$year}-{$paddedId}";
+        $displayId = "{$prefix}-{$paddedId}";
 
         emailChangeRequestWithdrawn($details, [
             "change_type" => $changeType,

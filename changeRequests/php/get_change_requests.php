@@ -76,13 +76,12 @@ function formatNetChangeDays(int $currentDays, int $proposedDays): string
     return "{$diff} days";
 }
 
-function formatChangeRequestDisplayId(string $changeType, int $changeRequestId, string $requestedAt): string
+function formatChangeRequestDisplayId(string $changeType, int $changeRequestId): string
 {
-    $year = date("Y", strtotime($requestedAt));
-    $paddedId = str_pad((string)$changeRequestId, 3, "0", STR_PAD_LEFT);
+    $paddedId = str_pad((string)$changeRequestId, 5, "0", STR_PAD_LEFT);
     $prefix = $changeType === "cancellation" ? "CR" : "DCR";
 
-    return "{$prefix}-{$year}-{$paddedId}";
+    return "{$prefix}-{$paddedId}";
 }
 #endregion
 
@@ -128,8 +127,7 @@ try {
             $status = mapChangeRequestStatus($row["status"] ?? null);
             $displayId = formatChangeRequestDisplayId(
                 $changeType,
-                $changeRequestId,
-                $requestedAt
+                $changeRequestId
             );
 
             $base = [
@@ -139,7 +137,7 @@ try {
                 "employee_id" => (string)$row["emp_number"],
                 "group_id" => (int)$row["group_id"],
                 "group_name" => $row["group_name"] ?? "",
-                "original_dispatch_request_id" => "REQ-" . $dispatchRequestId,
+                "original_dispatch_request_id" => "REQ-" . str_pad((string)$dispatchRequestId, 5, "0", STR_PAD_LEFT),
                 "dispatch_request_id" => $dispatchRequestId,
                 "reason" => $row["reason"] ?? "",
                 "date_requested" => date("Y-m-d", strtotime($requestedAt)),

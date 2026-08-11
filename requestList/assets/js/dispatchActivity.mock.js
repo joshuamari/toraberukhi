@@ -29,8 +29,8 @@ window.mockDispatchActivity = {
       actorName: "Sakai, Eichi",
       description: "A date-change request was submitted.",
       changeRequestType: "date_change",
-      changeRequestId: "DCR-2026-015",
-      changeRequestReference: "DCR-2026-015",
+      changeRequestId: "DCR-00015",
+      changeRequestReference: "DCR-00015",
     },
     {
       activityId: "ACT-232-004",
@@ -39,8 +39,8 @@ window.mockDispatchActivity = {
       actorName: "KDT President",
       description: "The proposed dispatch dates were accepted.",
       changeRequestType: "date_change",
-      changeRequestId: "DCR-2026-015",
-      changeRequestReference: "DCR-2026-015",
+      changeRequestId: "DCR-00015",
+      changeRequestReference: "DCR-00015",
     },
   ],
 };

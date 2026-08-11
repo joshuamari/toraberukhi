@@ -831,7 +831,7 @@ function buildDateChangeRequestSubmittedEmailHtml(array $details, array $changeD
     $changeRequestId = (int)($changeData['change_request_id'] ?? 0);
     $changeDisplayId = trim((string)($changeData['display_id'] ?? ''));
     if ($changeDisplayId === '' && $changeRequestId > 0) {
-        $changeDisplayId = 'DCR-' . date('Y') . '-' . str_pad((string)$changeRequestId, 3, '0', STR_PAD_LEFT);
+        $changeDisplayId = 'DCR-' . str_pad((string)$changeRequestId, 5, '0', STR_PAD_LEFT);
     }
     $changeDisplayIdEscaped = $escape($changeDisplayId);
 
@@ -1108,7 +1108,7 @@ function buildCancellationRequestSubmittedEmailHtml(array $details, array $chang
     $changeRequestId = (int)($changeData['change_request_id'] ?? 0);
     $changeDisplayId = trim((string)($changeData['display_id'] ?? ''));
     if ($changeDisplayId === '' && $changeRequestId > 0) {
-        $changeDisplayId = 'CR-' . date('Y') . '-' . str_pad((string)$changeRequestId, 3, '0', STR_PAD_LEFT);
+        $changeDisplayId = 'CR-' . str_pad((string)$changeRequestId, 5, '0', STR_PAD_LEFT);
     }
     $changeDisplayIdEscaped = $escape($changeDisplayId);
 
@@ -1361,7 +1361,7 @@ function buildDateChangeRequestWithdrawnEmailHtml(array $details, array $changeD
     $changeRequestId = (int)($changeData['change_request_id'] ?? 0);
     $changeDisplayId = trim((string)($changeData['display_id'] ?? ''));
     if ($changeDisplayId === '' && $changeRequestId > 0) {
-        $changeDisplayId = 'DCR-' . date('Y') . '-' . str_pad((string)$changeRequestId, 3, '0', STR_PAD_LEFT);
+        $changeDisplayId = 'DCR-' . str_pad((string)$changeRequestId, 5, '0', STR_PAD_LEFT);
     }
     $changeDisplayIdEscaped = $escape($changeDisplayId);
 
@@ -1635,7 +1635,7 @@ function buildCancellationRequestWithdrawnEmailHtml(array $details, array $chang
     $changeRequestId = (int)($changeData['change_request_id'] ?? 0);
     $changeDisplayId = trim((string)($changeData['display_id'] ?? ''));
     if ($changeDisplayId === '' && $changeRequestId > 0) {
-        $changeDisplayId = 'CR-' . date('Y') . '-' . str_pad((string)$changeRequestId, 3, '0', STR_PAD_LEFT);
+        $changeDisplayId = 'CR-' . str_pad((string)$changeRequestId, 5, '0', STR_PAD_LEFT);
     }
     $changeDisplayIdEscaped = $escape($changeDisplayId);
 

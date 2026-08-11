@@ -201,10 +201,9 @@ try {
     ]);
 
     $changeRequestId = (int)$connpcs->lastInsertId();
-    $year = date('Y', strtotime($currentDatetime) ?: time());
-    $paddedId = str_pad((string)$changeRequestId, 3, '0', STR_PAD_LEFT);
+    $paddedId = str_pad((string)$changeRequestId, 5, '0', STR_PAD_LEFT);
     $prefix = $changeType === 'cancellation' ? 'CR' : 'DCR';
-    $displayId = "{$prefix}-{$year}-{$paddedId}";
+    $displayId = "{$prefix}-{$paddedId}";
 
     $details = getRequestDetails($requestId);
     $changeData = [

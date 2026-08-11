@@ -50,13 +50,12 @@ function formatActivityDisplayDate(?string $date): string
     return date("d M Y", $ts);
 }
 
-function formatChangeRequestDisplayId(string $changeType, int $changeRequestId, string $requestedAt): string
+function formatChangeRequestDisplayId(string $changeType, int $changeRequestId): string
 {
-    $year = date("Y", strtotime($requestedAt) ?: time());
-    $paddedId = str_pad((string)$changeRequestId, 3, "0", STR_PAD_LEFT);
+    $paddedId = str_pad((string)$changeRequestId, 5, "0", STR_PAD_LEFT);
     $prefix = $changeType === "cancellation" ? "CR" : "DCR";
 
-    return "{$prefix}-{$year}-{$paddedId}";
+    return "{$prefix}-{$paddedId}";
 }
 
 function normalizeChangeRequestStatus(?string $status): string
@@ -154,8 +153,7 @@ function buildRequestActivityLog(
         $requestedByName = trim((string)($change["requested_by_name"] ?? ""));
         $displayId = formatChangeRequestDisplayId(
             $changeType,
-            $changeRequestId,
-            $requestedAtRaw
+            $changeRequestId
         );
         $requestedAt = formatActivityTimestamp($requestedAtRaw);
         $decisionAt = formatActivityTimestamp($decisionAtRaw);
