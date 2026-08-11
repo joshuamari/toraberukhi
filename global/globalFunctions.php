@@ -679,9 +679,6 @@ function buildDispatchRequestSubmittedEmailHtml(array $details, array $recipient
 
                         <table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"border-collapse:collapse;width:100%;margin-top:36px;\">
                             <tr>
-                                <td align=\"center\" style=\"padding:0 0 14px 0;font-size:10px;line-height:15px;color:#878787;\">Open the request using your application.</td>
-                            </tr>
-                            <tr>
                                 <td>
                                     <table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"border-collapse:collapse;width:100%;\">
                                         <tr>
@@ -739,7 +736,7 @@ function buildDispatchRequestSubmittedEmailHtml(array $details, array $recipient
                             <tr>
                                 <td>
                                     <img src=\"{$logoUrl}\" alt=\"トラべる\" width=\"84\" style=\"display:block;width:84px;max-width:100%;height:auto;border:0;\">
-                                    <div style=\"margin-top:9px;font-size:9px;line-height:12px;color:#7D7D7D;\">KDT Design &amp; Technical Service, Inc.</div>
+                                    <div style=\"margin-top:9px;font-size:9px;line-height:12px;color:#7D7D7D;\">KHI Design &amp; Technical Service, Inc.</div>
                                 </td>
                             </tr>
                         </table>
@@ -982,9 +979,6 @@ function buildDateChangeRequestSubmittedEmailHtml(array $details, array $changeD
 
                         <table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"border-collapse:collapse;width:100%;margin-top:30px;\">
                             <tr>
-                                <td align=\"center\" style=\"padding:0 0 14px 0;font-size:11px;line-height:15px;color:#878787;\">Open the request using your application.</td>
-                            </tr>
-                            <tr>
                                 <td>
                                     <table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"border-collapse:collapse;width:100%;\">
                                         <tr>
@@ -1042,7 +1036,7 @@ function buildDateChangeRequestSubmittedEmailHtml(array $details, array $changeD
                             <tr>
                                 <td>
                                     <img src=\"{$logoUrl}\" alt=\"トラべる\" width=\"84\" style=\"display:block;width:84px;max-width:100%;height:auto;border:0;\">
-                                    <div style=\"margin-top:9px;font-size:11px;line-height:14px;color:#7D7D7D;\">KDT Design &amp; Technical Service, Inc.</div>
+                                    <div style=\"margin-top:9px;font-size:11px;line-height:14px;color:#7D7D7D;\">KHI Design &amp; Technical Service, Inc.</div>
                                 </td>
                             </tr>
                         </table>
@@ -1210,9 +1204,6 @@ function buildCancellationRequestSubmittedEmailHtml(array $details, array $chang
 
                         <table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"border-collapse:collapse;width:100%;margin-top:30px;\">
                             <tr>
-                                <td align=\"center\" style=\"padding:0 0 14px 0;font-size:11px;line-height:15px;color:#878787;\">Open the request using your application.</td>
-                            </tr>
-                            <tr>
                                 <td>
                                     <table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"border-collapse:collapse;width:100%;\">
                                         <tr>
@@ -1270,7 +1261,7 @@ function buildCancellationRequestSubmittedEmailHtml(array $details, array $chang
                             <tr>
                                 <td>
                                     <img src=\"{$logoUrl}\" alt=\"トラべる\" width=\"84\" style=\"display:block;width:84px;max-width:100%;height:auto;border:0;\">
-                                    <div style=\"margin-top:9px;font-size:11px;line-height:14px;color:#7D7D7D;\">KDT Design &amp; Technical Service, Inc.</div>
+                                    <div style=\"margin-top:9px;font-size:11px;line-height:14px;color:#7D7D7D;\">KHI Design &amp; Technical Service, Inc.</div>
                                 </td>
                             </tr>
                         </table>
@@ -1517,9 +1508,6 @@ function buildDateChangeRequestWithdrawnEmailHtml(array $details, array $changeD
 
                         <table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"border-collapse:collapse;width:100%;margin-top:30px;\">
                             <tr>
-                                <td align=\"center\" style=\"padding:0 0 14px 0;font-size:11px;line-height:15px;color:#878787;\">Open the request using your application.</td>
-                            </tr>
-                            <tr>
                                 <td>
                                     <table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"border-collapse:collapse;width:100%;\">
                                         <tr>
@@ -1577,7 +1565,7 @@ function buildDateChangeRequestWithdrawnEmailHtml(array $details, array $changeD
                             <tr>
                                 <td>
                                     <img src=\"{$logoUrl}\" alt=\"トラべる\" width=\"84\" style=\"display:block;width:84px;max-width:100%;height:auto;border:0;\">
-                                    <div style=\"margin-top:9px;font-size:11px;line-height:14px;color:#7D7D7D;\">KDT Design &amp; Technical Service, Inc.</div>
+                                    <div style=\"margin-top:9px;font-size:11px;line-height:14px;color:#7D7D7D;\">KHI Design &amp; Technical Service, Inc.</div>
                                 </td>
                             </tr>
                         </table>
@@ -1739,9 +1727,6 @@ function buildCancellationRequestWithdrawnEmailHtml(array $details, array $chang
 
                         <table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"border-collapse:collapse;width:100%;margin-top:30px;\">
                             <tr>
-                                <td align=\"center\" style=\"padding:0 0 14px 0;font-size:11px;line-height:15px;color:#878787;\">Open the request using your application.</td>
-                            </tr>
-                            <tr>
                                 <td>
                                     <table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"border-collapse:collapse;width:100%;\">
                                         <tr>
@@ -1799,7 +1784,7 @@ function buildCancellationRequestWithdrawnEmailHtml(array $details, array $chang
                             <tr>
                                 <td>
                                     <img src=\"{$logoUrl}\" alt=\"トラべる\" width=\"84\" style=\"display:block;width:84px;max-width:100%;height:auto;border:0;\">
-                                    <div style=\"margin-top:9px;font-size:11px;line-height:14px;color:#7D7D7D;\">KDT Design &amp; Technical Service, Inc.</div>
+                                    <div style=\"margin-top:9px;font-size:11px;line-height:14px;color:#7D7D7D;\">KHI Design &amp; Technical Service, Inc.</div>
                                 </td>
                             </tr>
                         </table>
