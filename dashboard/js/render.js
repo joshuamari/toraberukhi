@@ -114,6 +114,25 @@ function refreshSubmissionTrendChart() {
   renderSubmissionTrendChart(dataset);
 }
 
+function refreshStatusOverviewChart(hasRequestData) {
+  const year = dashboardStatusOverviewYear || getCurrentYear();
+  $("#statusYearValue").text(String(year));
+
+  if (hasRequestData) {
+    renderStatusDonut(getDispatchStatusCounts(dashboardRequestList, year));
+    return;
+  }
+
+  renderStatusDonut({
+    pending: 0,
+    approved: 0,
+    completed: 0,
+    declined: 0,
+    cancelled: 0,
+    total: 0,
+  });
+}
+
 function renderStatusDonut(counts) {
   const canvas = document.getElementById("statusDonutChart");
 
@@ -211,22 +230,15 @@ function renderDashboard(year, options) {
   );
   refreshSubmissionTrendChart();
 
-  if (opts.hasRequestData) {
-    renderStatusDonut(getDispatchStatusCounts(dashboardRequestList));
-    dashboardUpcomingItems = buildUpcomingDispatchItems(dashboardRequestList);
-  } else {
-    renderStatusDonut({
-      pending: 0,
-      approved: 0,
-      completed: 0,
-      declined: 0,
-      cancelled: 0,
-      total: 0,
-    });
-    dashboardUpcomingItems = [];
-  }
-
-  fillUpcomingDispatchesList();
+  dashboardStatusOverviewYear = resolveDashboardSelectedYear(
+    dashboardStatusOverviewYear,
+    availableYears,
+  );
+  fillStatusOverviewYearSelector(
+    availableYears,
+    dashboardStatusOverviewYear,
+  );
+  refreshStatusOverviewChart(!!opts.hasRequestData);
 
   dashboardActivityItems = buildActivityFeed(
     opts.hasRequestData ? dashboardRequestList : [],
@@ -240,5 +252,12 @@ function renderDashboard(year, options) {
     totalItems: dashboardActivityItems.length,
   };
 
+  latestDispatchPaginationState = {
+    currentPage: 1,
+    itemsPerPage: LATEST_DISPATCH_PAGE_SIZE,
+    totalItems: dashboardDispatchList.length,
+  };
+
+  fillLatestDispatchTablePage();
   fillActivityTablePage();
 }

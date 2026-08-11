@@ -21,18 +21,21 @@ async function loadDashboardData() {
   try {
     const currentYear = getCurrentYear();
 
-    const [requestRes, groupsRes, changeRes] = await Promise.all([
+    const [requestRes, changeRes, dispatchRes] = await Promise.all([
       softLoad(getRequestListData()),
-      softLoad(getRequestListGroups()),
       softLoad(getChangeRequestData()),
+      softLoad(getDispatchlist()),
     ]);
 
     if (!requestRes.ok) {
       throw requestRes.error || { message: "Failed to load request list." };
     }
 
+    if (!dispatchRes.ok) {
+      throw dispatchRes.error || { message: "Failed to load dispatch list." };
+    }
+
     const hasRequestData = requestRes.ok;
-    const hasGroupData = groupsRes.ok;
     const hasChangeData = changeRes.ok;
 
     dashboardRequestList = hasRequestData
@@ -40,10 +43,8 @@ async function loadDashboardData() {
         ? requestRes.data
         : []
       : [];
-    dashboardGroupList = hasGroupData
-      ? Array.isArray(groupsRes.data)
-        ? groupsRes.data
-        : []
+    dashboardDispatchList = Array.isArray(dispatchRes.data)
+      ? dispatchRes.data
       : [];
 
     if (hasChangeData) {
@@ -59,10 +60,9 @@ async function loadDashboardData() {
       dashboardDateChanges = [];
     }
 
-    if (!hasChangeData || !hasGroupData) {
+    if (!hasChangeData) {
       console.warn("Some dashboard sections could not be loaded.", {
         requests: hasRequestData,
-        groups: hasGroupData,
         changes: hasChangeData,
       });
     }
@@ -70,7 +70,6 @@ async function loadDashboardData() {
     renderDashboard(currentYear, {
       hasChangeData,
       hasRequestData,
-      hasGroupData,
     });
   } catch (error) {
     if (error?.code === "SESSION_EXPIRED" || error?.code === 401) {

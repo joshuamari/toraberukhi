@@ -173,7 +173,7 @@
                 <h1 class="fw-semibold m-0">Dashboard</h1>
               </div>
               <p class="dashboard-page-subtitle">
-                Track requests you submitted and upcoming approved dispatches.
+                Track requests you submitted through PCSKHI.
               </p>
             </header>
 
@@ -259,9 +259,19 @@
                   </article>
 
                   <article class="dashboard-card dashboard-area-status">
-                    <div class="dashboard-card-header">
-                      <h3>Request Status Overview</h3>
-                      <p>Current status of requests submitted through PCSKHI.</p>
+                    <div class="dashboard-card-header dashboard-group-card-header">
+                      <div class="dashboard-group-header-top">
+                        <h3>Request Status Overview</h3>
+                        <select
+                          id="statusOverviewYearSel"
+                          class="select dashboard-group-year-select"
+                          aria-label="Request status overview year"
+                        ></select>
+                      </div>
+                      <p>
+                        Status of requests submitted in
+                        <span id="statusYearValue"></span>.
+                      </p>
                     </div>
                     <div class="dashboard-donut-wrap">
                       <div class="dashboard-donut-canvas">
@@ -286,28 +296,6 @@
                   </article>
                 </div>
               </div>
-
-              <aside
-                class="dashboard-card dashboard-area-upcoming"
-                aria-label="Upcoming dispatches"
-              >
-                <div class="dashboard-card-header">
-                  <h3>Upcoming Dispatches</h3>
-                  <p>Approved requests with upcoming dispatch dates.</p>
-                </div>
-                <div
-                  class="dashboard-upcoming-list"
-                  id="upcomingDispatchesList"
-                ></div>
-                <a
-                  href="../requestList/?status=approved"
-                  class="dashboard-upcoming-view-all"
-                  id="upcomingViewAllLink"
-                >
-                  View all upcoming dispatches
-                  <i class="bx bx-right-arrow-alt" aria-hidden="true"></i>
-                </a>
-              </aside>
             </section>
 
             <section
@@ -345,6 +333,75 @@
                   class="table-pagination__count text-[12px] text-[var(--gray-text)] m-0"
                 >
                   Showing 0 to 0 of 0 activities
+                </p>
+                <div
+                  class="table-pagination__controls d-flex flex-wrap align-items-center gap-2 justify-content-end"
+                >
+                  <div
+                    class="table-pagination__nav-wrap d-flex align-items-center gap-1"
+                  >
+                    <button
+                      type="button"
+                      data-role="prev"
+                      class="request-pagination__nav table-pagination__nav"
+                      aria-label="Previous page"
+                    >
+                      <i class="bx bx-chevron-left text-[16px]" aria-hidden="true"></i>
+                      <span>Previous</span>
+                    </button>
+                    <div
+                      data-role="pages"
+                      class="table-pagination__pages d-flex align-items-center gap-1"
+                    ></div>
+                    <button
+                      type="button"
+                      data-role="next"
+                      class="request-pagination__nav table-pagination__nav"
+                      aria-label="Next page"
+                    >
+                      <span>Next</span>
+                      <i
+                        class="bx bx-chevron-right text-[16px]"
+                        aria-hidden="true"
+                      ></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <section
+              class="dashboard-card dashboard-activity-card"
+              aria-labelledby="latestDispatchListTitle"
+            >
+              <div class="dashboard-card-header">
+                <h3 id="latestDispatchListTitle">Latest Dispatch List</h3>
+                <p>Approved dispatch schedules currently active.</p>
+              </div>
+              <div class="dashboard-activity-table-wrap">
+                <table class="dashboard-activity-table">
+                  <thead>
+                    <tr>
+                      <th>Request ID</th>
+                      <th>Name</th>
+                      <th>Location</th>
+                      <th>Dispatch Dates</th>
+                      <th>Documents</th>
+                    </tr>
+                  </thead>
+                  <tbody id="latestDispatchTableBody"></tbody>
+                </table>
+              </div>
+              <div
+                id="latestDispatchPagination"
+                data-pagination="latestDispatch"
+                class="request-pagination table-pagination table-pagination--pcs dashboard-activity-pagination d-flex flex-column flex-lg-row justify-content-lg-between align-items-lg-center gap-3"
+              >
+                <p
+                  data-role="count"
+                  class="table-pagination__count text-[12px] text-[var(--gray-text)] m-0"
+                >
+                  Showing 0 to 0 of 0 dispatches
                 </p>
                 <div
                   class="table-pagination__controls d-flex flex-wrap align-items-center gap-2 justify-content-end"

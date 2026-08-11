@@ -69,25 +69,6 @@ function getRequestListData() {
   ).then((response) => (Array.isArray(response?.data) ? response.data : []));
 }
 
-function getRequestListGroups() {
-  return new Promise((resolve, reject) => {
-    $.ajax({
-      type: "GET",
-      url: "../requestList/php/get_groups.php",
-      dataType: "json",
-      success: function (response) {
-        resolve(Array.isArray(response) ? response : []);
-      },
-      error: function (xhr) {
-        reject({
-          message: ajaxJsonErrorMessage(xhr, "Failed to load groups."),
-          code: xhr.status || null,
-        });
-      },
-    });
-  });
-}
-
 function getChangeRequestData() {
   return getLegacyJson(
     "../changeRequests/php/get_change_requests.php",
@@ -99,6 +80,13 @@ function getChangeRequestData() {
       date_changes: Array.isArray(data.date_changes) ? data.date_changes : [],
     };
   });
+}
+
+function getDispatchlist() {
+  return getJson(
+    "api/get_dispatch_list.php",
+    "Failed to load dispatch list.",
+  );
 }
 
 function logOut() {

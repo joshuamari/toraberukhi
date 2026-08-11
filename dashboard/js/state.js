@@ -6,25 +6,27 @@ const state = {
 };
 
 let dashboardRequestList = [];
-let dashboardGroupList = [];
 let dashboardCancellations = [];
 let dashboardDateChanges = [];
-let dashboardUpcomingItems = [];
 let dashboardActivityItems = [];
+let dashboardDispatchList = [];
 
 let submissionTrendChartInstance = null;
 let statusChartInstance = null;
 let dashboardSubmissionTrendYear = null;
+let dashboardStatusOverviewYear = null;
 
 const ACTIVITY_PAGE_SIZE = 10;
-/*
- * Compact row ~72px + 8px gap. Stretched desktop panel (beside charts/summary)
- * typically leaves ~500–560px after header/footer → ~7 items without overflow.
- */
-const UPCOMING_PREVIEW_LIMIT = 7;
 let activityPaginationState = {
   currentPage: 1,
   itemsPerPage: ACTIVITY_PAGE_SIZE,
+  totalItems: 0,
+};
+
+const LATEST_DISPATCH_PAGE_SIZE = 10;
+let latestDispatchPaginationState = {
+  currentPage: 1,
+  itemsPerPage: LATEST_DISPATCH_PAGE_SIZE,
   totalItems: 0,
 };
 

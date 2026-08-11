@@ -225,17 +225,24 @@ function getChangeRequestStatusBadgeHtml(rawStatus) {
   return `<span class="status pending">Pending</span>`;
 }
 
-function getDispatchStatusCounts(requests) {
+function getDispatchStatusCounts(requests, year) {
+  const source = (requests || []).filter((request) => {
+    if (year == null) {
+      return true;
+    }
+    return getDateYear(request.req_date) === year;
+  });
+
   const counts = {
     pending: 0,
     approved: 0,
     declined: 0,
     cancelled: 0,
     completed: 0,
-    total: Array.isArray(requests) ? requests.length : 0,
+    total: source.length,
   };
 
-  (requests || []).forEach((request) => {
+  source.forEach((request) => {
     const status = resolveDispatchDisplayStatus(request);
     if (Object.prototype.hasOwnProperty.call(counts, status)) {
       counts[status] += 1;
@@ -302,179 +309,6 @@ function getApprovedUpcomingRequests(requests) {
   return (requests || []).filter(
     (request) => resolveDispatchDisplayStatus(request) === "approved",
   );
-}
-
-function resolveGroupAbbreviation(groupId, groupName) {
-  const id = String(groupId ?? "");
-  if (id) {
-    const match = (dashboardGroupList || []).find(
-      (group) => String(group.id) === id,
-    );
-    if (match) {
-      return match.abbr || match.abbreviation || match.name || "—";
-    }
-  }
-
-  if (groupName) {
-    return String(groupName);
-  }
-
-  return "—";
-}
-
-function getCalendarWeekBounds(todayStr) {
-  const today = new Date(`${todayStr}T00:00:00`);
-  const day = today.getDay(); // 0 = Sunday
-  const mondayOffset = day === 0 ? -6 : 1 - day;
-
-  const weekStart = new Date(today);
-  weekStart.setDate(today.getDate() + mondayOffset);
-
-  const weekEnd = new Date(weekStart);
-  weekEnd.setDate(weekStart.getDate() + 6);
-
-  const toDateString = (date) => {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, "0");
-    const dayNum = String(date.getDate()).padStart(2, "0");
-    return `${year}-${month}-${dayNum}`;
-  };
-
-  return {
-    start: toDateString(weekStart),
-    end: toDateString(weekEnd),
-  };
-}
-
-/**
- * Classify an approved dispatch for the Upcoming Dispatches preview.
- * Priority: this-week (0) → upcoming (1) → in-progress (2)
- */
-function classifyUpcomingDispatchTiming(request) {
-  const today = getLocalTodayDateString();
-  const start = getDispatchStartDateString(request);
-  const end = getDispatchEndDateString(request);
-  const week = getCalendarWeekBounds(today);
-
-  // IN PROGRESS: start <= today <= end
-  if (start && end && start <= today && end >= today) {
-    return {
-      key: "in-progress",
-      label: "In Progress",
-      className: "in-progress",
-      priority: 2,
-      start,
-      end,
-    };
-  }
-
-  // Future start required for This Week / Upcoming
-  if (start && start > today) {
-    // THIS WEEK: future start within the current calendar week
-    if (start >= week.start && start <= week.end) {
-      return {
-        key: "this-week",
-        label: "This Week",
-        className: "this-week",
-        priority: 0,
-        start,
-        end,
-      };
-    }
-
-    // UPCOMING: future start after the current week
-    return {
-      key: "upcoming",
-      label: "Upcoming",
-      className: "upcoming",
-      priority: 1,
-      start,
-      end,
-    };
-  }
-
-  // Not eligible for the preview (ended / missing dates)
-  return null;
-}
-
-function formatUpcomingDateRange(startDate, endDate) {
-  const start = startDate ? formatDate(startDate) : "";
-  const end = endDate ? formatDate(endDate) : "";
-
-  if (!start && !end) {
-    return "—";
-  }
-
-  if (start && end) {
-    return `${start} – ${end}`;
-  }
-
-  return start || end;
-}
-
-function compareUpcomingPreviewItems(a, b) {
-  if (a.timing.priority !== b.timing.priority) {
-    return a.timing.priority - b.timing.priority;
-  }
-
-  // THIS WEEK / UPCOMING: nearest start date first
-  if (a.timing.key === "this-week" || a.timing.key === "upcoming") {
-    const startDiff = String(a.timing.start || "").localeCompare(
-      String(b.timing.start || ""),
-    );
-    if (startDiff !== 0) {
-      return startDiff;
-    }
-  }
-
-  // IN PROGRESS: nearest end date first
-  if (a.timing.key === "in-progress") {
-    const endDiff = String(a.timing.end || "").localeCompare(
-      String(b.timing.end || ""),
-    );
-    if (endDiff !== 0) {
-      return endDiff;
-    }
-  }
-
-  return Number(a.id) - Number(b.id);
-}
-
-/**
- * Classify all eligible approved dispatches, sort by timing priority,
- * then take the top 5 for the compact dashboard preview.
- */
-function buildUpcomingDispatchItems(requests) {
-  const classified = getApprovedUpcomingRequests(requests)
-    .map((request) => {
-      const timing = classifyUpcomingDispatchTiming(request);
-      if (!timing) {
-        return null;
-      }
-
-      return {
-        id: request.req_id,
-        empName: request.emp_name || "—",
-        groupLabel: resolveGroupAbbreviation(
-          request.group_id,
-          request.group_name,
-        ),
-        from: request.from,
-        to: request.to,
-        datesLabel: formatUpcomingDateRange(request.from, request.to),
-        timingLabel: timing.label,
-        timingClass: timing.className,
-        timing,
-      };
-    })
-    .filter(Boolean);
-
-  classified.sort(compareUpcomingPreviewItems);
-
-  return classified.slice(0, UPCOMING_PREVIEW_LIMIT).map((item) => {
-    const { timing, ...previewItem } = item;
-    return previewItem;
-  });
 }
 
 function collectSubmissionDates(requests, cancellations, dateChanges) {
@@ -604,6 +438,79 @@ function formatDispatchRequestId(reqId) {
   return `REQ-${String(reqId).padStart(5, "0")}`;
 }
 
+function getDocumentReadinessHtml(item) {
+  const badges = [];
+
+  if (Object.prototype.hasOwnProperty.call(item, "passValid")) {
+    badges.push(
+      item.passValid
+        ? `<span class="doc-badge is-ok">Passport OK</span>`
+        : `<span class="doc-badge is-missing">Missing Passport</span>`,
+    );
+  } else if (item.passportStatus) {
+    badges.push(documentStatusBadge("Passport", item.passportStatus));
+  }
+
+  if (Object.prototype.hasOwnProperty.call(item, "visaValid")) {
+    badges.push(
+      item.visaValid
+        ? `<span class="doc-badge is-ok">Visa OK</span>`
+        : `<span class="doc-badge is-missing">Missing Visa</span>`,
+    );
+  } else if (item.visaStatus) {
+    badges.push(documentStatusBadge("Visa", item.visaStatus));
+  }
+
+  badges.push(getReentryReadinessBadge(item));
+
+  if (!badges.length) {
+    return "—";
+  }
+
+  return `<div class="doc-readiness">${badges.join("")}</div>`;
+}
+
+function getReentryReadinessBadge(item) {
+  const status =
+    item && item.reentryStatus != null && item.reentryStatus !== ""
+      ? String(item.reentryStatus)
+      : "missing";
+
+  if (status === "valid" || status === "valid_expiring") {
+    return `<span class="doc-badge is-ok">Re-entry OK</span>`;
+  }
+
+  if (status === "on_process") {
+    return `<span class="doc-badge is-process">Re-entry On Process</span>`;
+  }
+
+  if (status === "invalid") {
+    return `<span class="doc-badge is-missing">Re-entry Expired</span>`;
+  }
+
+  return `<span class="doc-badge is-missing">Missing Re-entry</span>`;
+}
+
+function documentStatusBadge(label, status, isReentry) {
+  if (isReentry) {
+    return getReentryReadinessBadge({ reentryStatus: status });
+  }
+
+  if (status === "valid") {
+    return `<span class="doc-badge is-ok">${label} OK</span>`;
+  }
+
+  if (status === "valid_expiring") {
+    return `<span class="doc-badge is-expiring">${label} Expiring</span>`;
+  }
+
+  if (status === "on_process") {
+    return `<span class="doc-badge is-process">${label} On Process</span>`;
+  }
+
+  return `<span class="doc-badge is-missing">Missing ${label}</span>`;
+}
+
 function buildActivityFeed(requests, cancellations, dateChanges) {
   const items = [];
 
@@ -679,8 +586,4 @@ function getActivityHref(item) {
   }
 
   return "#";
-}
-
-function getUpcomingHref(item) {
-  return `../requestList/?request_id=${encodeURIComponent(item.id)}`;
 }

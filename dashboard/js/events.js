@@ -27,33 +27,6 @@ function bindEvents() {
     window.location.href = getActivityHref(item);
   });
 
-  $(document).on("click", ".dashboard-upcoming-row[data-request-id]", function () {
-    const id = $(this).data("request-id");
-    if (id === undefined || id === null || id === "") {
-      return;
-    }
-
-    window.location.href = getUpcomingHref({ id });
-  });
-
-  $(document).on(
-    "keydown",
-    ".dashboard-upcoming-row[data-request-id]",
-    function (event) {
-      if (event.key !== "Enter" && event.key !== " ") {
-        return;
-      }
-
-      const id = $(this).data("request-id");
-      if (id === undefined || id === null || id === "") {
-        return;
-      }
-
-      event.preventDefault();
-      window.location.href = getUpcomingHref({ id });
-    },
-  );
-
   $(document).on("click", "#activityPagination [data-role='prev']", function () {
     if ($(this).prop("disabled")) {
       return;
@@ -76,6 +49,53 @@ function bindEvents() {
     setActivityPage(page);
   });
 
+  $(document).on(
+    "click",
+    "#latestDispatchTableBody tr[data-request-id]",
+    function () {
+      const requestId = $(this).data("request-id");
+      if (requestId === undefined || requestId === null || requestId === "") {
+        return;
+      }
+
+      window.location.href = `../requestList/?request_id=${encodeURIComponent(requestId)}`;
+    },
+  );
+
+  $(document).on(
+    "click",
+    "#latestDispatchPagination [data-role='prev']",
+    function () {
+      if ($(this).prop("disabled")) {
+        return;
+      }
+      setLatestDispatchPage(latestDispatchPaginationState.currentPage - 1);
+    },
+  );
+
+  $(document).on(
+    "click",
+    "#latestDispatchPagination [data-role='next']",
+    function () {
+      if ($(this).prop("disabled")) {
+        return;
+      }
+      setLatestDispatchPage(latestDispatchPaginationState.currentPage + 1);
+    },
+  );
+
+  $(document).on(
+    "click",
+    "#latestDispatchPagination [data-page]",
+    function () {
+      const page = Number($(this).attr("data-page"));
+      if (!Number.isFinite(page)) {
+        return;
+      }
+      setLatestDispatchPage(page);
+    },
+  );
+
   $(document).on("change", "#submissionTrendYearSel", function () {
     const year = Number($(this).val());
     if (!Number.isFinite(year)) {
@@ -83,5 +103,14 @@ function bindEvents() {
     }
     dashboardSubmissionTrendYear = year;
     refreshSubmissionTrendChart();
+  });
+
+  $(document).on("change", "#statusOverviewYearSel", function () {
+    const year = Number($(this).val());
+    if (!Number.isFinite(year)) {
+      return;
+    }
+    dashboardStatusOverviewYear = year;
+    refreshStatusOverviewChart(true);
   });
 }

@@ -45,48 +45,6 @@ function fillSummaryCards(year, options) {
   $("#completedYearValue").text(String(year));
 }
 
-function fillUpcomingDispatchesList() {
-  const $list = $("#upcomingDispatchesList");
-  const $viewAll = $("#upcomingViewAllLink");
-  $list.empty();
-
-  if (!dashboardUpcomingItems.length) {
-    $list.html(`<p class="dashboard-upcoming-empty">No upcoming dispatches.</p>`);
-    $viewAll.removeClass("is-hidden");
-    return;
-  }
-
-  $viewAll.removeClass("is-hidden");
-
-  dashboardUpcomingItems.forEach((item) => {
-    const $row = $(`
-      <div class="dashboard-upcoming-row" role="button" tabindex="0" data-request-id="${item.id}">
-        <span class="upcoming-icon" aria-hidden="true">
-          <i class="bx bxs-user"></i>
-        </span>
-        <div class="upcoming-body">
-          <div class="upcoming-top">
-            <p class="upcoming-name"></p>
-            <span class="upcoming-timing-badge"></span>
-          </div>
-          <span class="upcoming-group-badge"></span>
-          <p class="upcoming-dates"></p>
-        </div>
-      </div>
-    `);
-
-    $row.find(".upcoming-name").text(item.empName || "—");
-    $row.find(".upcoming-group-badge").text(item.groupLabel || "—");
-    $row.find(".upcoming-dates").text(item.datesLabel || "—");
-    $row
-      .find(".upcoming-timing-badge")
-      .addClass(item.timingClass || "upcoming")
-      .text(item.timingLabel || "Upcoming");
-
-    $list.append($row);
-  });
-}
-
 function fillActivityTablePage() {
   const $body = $("#activityTableBody");
   $body.empty();
@@ -157,6 +115,78 @@ function setActivityPage(page) {
   fillActivityTablePage();
 }
 
+function fillLatestDispatchTablePage() {
+  const $body = $("#latestDispatchTableBody");
+  $body.empty();
+
+  const pagination = renderPaginationBar(
+    $("#latestDispatchPagination"),
+    latestDispatchPaginationState,
+    "dispatches",
+  );
+
+  latestDispatchPaginationState.currentPage = pagination.currentPage;
+
+  const pageItems = dashboardDispatchList.slice(
+    pagination.startIndex,
+    pagination.endIndex,
+  );
+
+  if (!pageItems.length) {
+    $body.append(`
+      <tr>
+        <td colspan="5">
+          <div class="py-4 text-center text-[var(--gray-text)]">
+            No approved dispatches found.
+          </div>
+        </td>
+      </tr>
+    `);
+    return;
+  }
+
+  pageItems.forEach((item) => {
+    const requestId = item.requestId;
+    const displayId =
+      requestId != null && requestId !== ""
+        ? formatDispatchRequestId(requestId)
+        : "—";
+    const hasRequestId = requestId != null && requestId !== "";
+
+    const $row = $(`
+      <tr ${hasRequestId ? `data-request-id="${requestId}"` : 'class="is-static"'}>
+        <td>
+          <span class="activity-id-badge dispatch"></span>
+        </td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+      </tr>
+    `);
+
+    $row.find(".activity-id-badge").text(displayId);
+    $row.children().eq(1).text(item.name || "—");
+    $row.children().eq(2).text(item.location || "—");
+    $row
+      .children()
+      .eq(3)
+      .text(formatDispatchDateRange(item.from, item.to));
+    $row.children().eq(4).html(getDocumentReadinessHtml(item));
+
+    if (!hasRequestId) {
+      $row.find("td").css("cursor", "default");
+    }
+
+    $body.append($row);
+  });
+}
+
+function setLatestDispatchPage(page) {
+  latestDispatchPaginationState.currentPage = page;
+  fillLatestDispatchTablePage();
+}
+
 function fillDashboardYearSelector(selector, years, selectedYear) {
   const $sel = $(selector);
   if (!$sel.length) {
@@ -173,6 +203,10 @@ function fillDashboardYearSelector(selector, years, selectedYear) {
 
 function fillSubmissionTrendYearSelector(years, selectedYear) {
   fillDashboardYearSelector("#submissionTrendYearSel", years, selectedYear);
+}
+
+function fillStatusOverviewYearSelector(years, selectedYear) {
+  fillDashboardYearSelector("#statusOverviewYearSel", years, selectedYear);
 }
 
 function resolveDashboardSelectedYear(selectedYear, availableYears) {
