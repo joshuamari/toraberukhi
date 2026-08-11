@@ -3,13 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Date Change Request Submitted — Preview</title>
+    <title>Cancellation Request Submitted — Preview</title>
 </head>
 
 <body style="margin:0; padding:0; background-color:#F9F9F9; font-family:Arial, Helvetica, sans-serif; color:#000000;">
 
 <!--
   DEVELOPMENT / UI PREVIEW ONLY
+
+  Sample data below is hardcoded for visual review.
+  The real sent email uses dynamic values from emailCancellationRequest()
+  / buildCancellationRequestSubmittedEmailHtml().
+
+  CTA hrefs are placeholders (#). Production email uses Toraberu/PCSKHI deep links.
 -->
 
 <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0"
@@ -40,7 +46,7 @@
                         <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
                             <tr>
                                 <td style="font-size:32px; line-height:34px; font-weight:700; color:#000000; padding:0;">
-                                    Date Change<br>
+                                    Cancellation<br>
                                     Request Submitted
                                 </td>
                             </tr>
@@ -55,23 +61,18 @@
                                 </td>
                             </tr>
                             <tr>
-                                <td style="font-size:13px; line-height:20px; color:#000000; padding-bottom:14px;">
-                                    <strong>Coquia-san</strong> has submitted a request to change the approved dispatch dates shown below.
-                                </td>
-                            </tr>
-                            <tr>
                                 <td style="font-size:13px; line-height:20px; color:#000000;">
-                                    Please review the proposed schedule and approve or decline the request.
+                                    A dispatch cancellation request has been submitted by <strong>Coquia-san</strong>.
                                 </td>
                             </tr>
                         </table>
 
-                        <!-- DATE CHANGE REQUEST SUMMARY -->
+                        <!-- CANCELLATION REQUEST SUMMARY -->
                         <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0"
                                style="width:100%; margin-top:28px; background-color:#F9F9F9; border:1px solid #E9E9E9; border-radius:14px; border-collapse:separate;">
                             <tr>
                                 <td colspan="2" style="padding:18px 16px 10px 16px; font-size:14px; line-height:18px; font-weight:700; color:#000000; border-bottom:1px solid #E9E9E9;">
-                                    Date Change Request Summary
+                                    Cancellation Request Summary
                                 </td>
                             </tr>
                             <tr>
@@ -86,9 +87,9 @@
                             </tr>
                             <tr>
                                 <td width="50%" valign="top" style="width:50%; padding:14px 14px 14px 16px; border-right:1px solid #E9E9E9; border-bottom:1px solid #E9E9E9;">
-                                    <div style="font-size:10px; line-height:12px; letter-spacing:0.04em; text-transform:uppercase; color:#959595; margin:0 0 6px 0;">DATE CHANGE REQUEST ID</div>
+                                    <div style="font-size:10px; line-height:12px; letter-spacing:0.04em; text-transform:uppercase; color:#959595; margin:0 0 6px 0;">CANCELLATION REQUEST ID</div>
                                     <div style="line-height:1.45;">
-                                        <span style="display:inline-block; padding:4px 10px; background-color:#4F39F6; color:#FFFFFF; border-radius:6px; font-size:12px; font-weight:700; line-height:1.3;">DC-00001</span>
+                                        <span style="display:inline-block; padding:4px 10px; background-color:#DF55A2; color:#000000; border-radius:6px; font-size:12px; font-weight:700; line-height:1.3;">CR-00002</span>
                                     </div>
                                 </td>
                                 <td width="50%" valign="top" style="width:50%; padding:14px 16px 14px 14px; border-bottom:1px solid #E9E9E9;">
@@ -105,73 +106,19 @@
                                 </td>
                                 <td width="50%" valign="top" style="width:50%; padding:14px 16px 16px 14px;">
                                     <div style="font-size:10px; line-height:12px; letter-spacing:0.04em; text-transform:uppercase; color:#959595; margin:0 0 6px 0;">DISPATCH DATES</div>
-                                    <div style="font-size:13px; line-height:18px; font-weight:700; color:#000000;">05 Oct 2026 — 16 Oct 2026</div>
+                                    <div style="font-size:13px; line-height:18px; font-weight:700; color:#000000;">02 Nov 2026 — 13 Nov 2026</div>
                                 </td>
                             </tr>
                         </table>
 
-                        <!-- SCHEDULE COMPARISON -->
-                        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0"
-                               style="width:100%; margin-top:18px; background-color:#F9F9F9; border:1px solid #E9E9E9; border-radius:14px; border-collapse:separate;">
-                            <tr>
-                                <td style="padding:18px 16px 12px 16px; font-size:14px; line-height:18px; font-weight:700; color:#000000;">
-                                    Schedule Comparison
-                                </td>
-                            </tr>
-                            <tr>
-                                <td style="padding:0 12px 14px 12px;">
-                                    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="width:100%; border-collapse:collapse;">
-                                        <tr>
-                                            <td width="44%" valign="middle" style="width:44%;">
-                                                <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0"
-                                                       style="width:100%; background-color:#FFFFFF; border:1px solid #E9E9E9; border-radius:10px; border-collapse:separate;">
-                                                    <tr>
-                                                        <td style="padding:12px 12px 14px 12px;">
-                                                            <div style="font-size:10px; line-height:12px; letter-spacing:0.04em; text-transform:uppercase; color:#9E9E9E; margin:0 0 8px 0;">CURRENT</div>
-                                                            <div style="font-size:12px; line-height:17px; font-weight:700; color:#000000; margin:0 0 8px 0;">05 Oct 2026 - 16 Oct 2026</div>
-                                                            <div style="font-size:12px; line-height:16px; font-weight:700; color:#38B365;">12 days</div>
-                                                        </td>
-                                                    </tr>
-                                                </table>
-                                            </td>
-                                            <td width="12%" align="center" valign="middle" style="width:12%; padding:0 4px; font-size:22px; line-height:22px; font-weight:700; color:#2EAD5C;">→</td>
-                                            <td width="44%" valign="middle" style="width:44%;">
-                                                <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0"
-                                                       style="width:100%; background-color:#FFFFFF; border:1px solid #E9E9E9; border-radius:10px; border-collapse:separate;">
-                                                    <tr>
-                                                        <td style="padding:12px 12px 14px 12px;">
-                                                            <div style="font-size:10px; line-height:12px; letter-spacing:0.04em; text-transform:uppercase; color:#9E9E9E; margin:0 0 8px 0;">PROPOSED</div>
-                                                            <div style="font-size:12px; line-height:17px; font-weight:700; color:#000000; margin:0 0 8px 0;">12 Oct 2026 - 23 Oct 2026</div>
-                                                            <div style="font-size:12px; line-height:16px; font-weight:700; color:#38B365;">12 days</div>
-                                                        </td>
-                                                    </tr>
-                                                </table>
-                                            </td>
-                                        </tr>
-                                    </table>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td style="padding:0 16px 16px 16px;">
-                                    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0"
-                                           style="width:100%; border-collapse:collapse; border-top:1px solid #E9E9E9;">
-                                        <tr>
-                                            <td style="padding:12px 0 0 0; font-size:10px; line-height:12px; letter-spacing:0.04em; text-transform:uppercase; color:#959595;">NET CHANGE</td>
-                                            <td align="right" style="padding:12px 0 0 0; font-size:14px; line-height:16px; font-weight:700; color:#38B365;">0</td>
-                                        </tr>
-                                    </table>
-                                </td>
-                            </tr>
-                        </table>
-
-                        <!-- REASON -->
+                        <!-- REASON FOR CANCELLATION -->
                         <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0"
                                style="width:100%; margin-top:18px; background-color:#F9F9F9; border:1px solid #E9E9E9; border-radius:12px; border-collapse:separate;">
                             <tr>
                                 <td style="padding:14px 16px;">
-                                    <div style="font-size:10px; line-height:12px; letter-spacing:0.04em; text-transform:uppercase; color:#9E9E9E; margin:0 0 8px 0;">REASON FOR DATE CHANGE</div>
-                                    <div style="font-size:13px; line-height:20px; color:#000000;">
-                                        Project schedule was moved by one week due to client requirements.
+                                    <div style="font-size:10px; line-height:12px; letter-spacing:0.04em; text-transform:uppercase; color:#9E9E9E; margin:0 0 8px 0;">REASON FOR CANCELLATION</div>
+                                    <div style="font-size:13px; line-height:20px; font-weight:700; color:#000000;">
+                                        Project postponed due to client scheduling change.
                                     </div>
                                 </td>
                             </tr>
@@ -194,10 +141,9 @@
                                                 <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
                                                     <tr>
                                                         <td align="center" bgcolor="#000000" style="background-color:#000000; border-radius:8px;">
-                                                            <!-- Preview placeholder — production uses Toraberu deep link -->
                                                             <a href="#"
                                                                style="display:block; padding:12px 10px; font-size:12px; line-height:16px; font-weight:700; color:#FFFFFF; text-decoration:none; text-align:center;">
-                                                                View Date Change Request
+                                                                View Cancellation Request
                                                                 <span style="display:inline-block; padding-left:8px; font-size:16px; vertical-align:middle;">→</span>
                                                             </a>
                                                         </td>
@@ -209,7 +155,6 @@
                                                 <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
                                                     <tr>
                                                         <td align="center" bgcolor="#4ADE80" style="background-color:#4ADE80; border-radius:8px;">
-                                                            <!-- Preview placeholder — production uses PCSKHI deep link -->
                                                             <a href="#"
                                                                style="display:block; padding:12px 10px; font-size:12px; line-height:16px; font-weight:700; color:#000000; text-decoration:none; text-align:center;">
                                                                 View Request Status
