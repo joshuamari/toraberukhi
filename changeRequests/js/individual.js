@@ -317,7 +317,7 @@ $(document)
       return;
     }
 
-    button.disabled = true;
+    setWithdrawButtonLoading(button, true);
 
     withdrawChangeRequest(changeRequestId)
       .then(() => {
@@ -341,7 +341,7 @@ $(document)
         alert("Request withdrawn successfully.");
       })
       .catch((error) => {
-        button.disabled = false;
+        setWithdrawButtonLoading(button, false);
         alert(`${error}`);
       });
   });
@@ -796,10 +796,29 @@ function updateWithdrawSection(sectionId, request) {
   }
 
   if (buttonEl) {
+    setWithdrawButtonLoading(buttonEl, false);
     buttonEl.disabled = !canWithdraw;
     buttonEl.dataset.changeRequestId = String(request.id || "");
     buttonEl.dataset.changeRequestType =
       sectionId === "dcDetailWithdrawSection" ? "date_change" : "cancellation";
+  }
+}
+
+function setWithdrawButtonLoading(button, isLoading) {
+  if (!button) {
+    return;
+  }
+
+  const spinner = button.querySelector(".cr-detail-withdraw-spinner");
+  const icon = button.querySelector(".cr-detail-withdraw-icon");
+  const label = button.querySelector(".cr-detail-withdraw-label");
+
+  button.disabled = isLoading;
+  spinner?.classList.toggle("d-none", !isLoading);
+  icon?.classList.toggle("d-none", isLoading);
+
+  if (label) {
+    label.textContent = isLoading ? "Withdrawing..." : "Withdraw Request";
   }
 }
 
