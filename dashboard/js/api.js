@@ -17,7 +17,7 @@ function getJson(url, fallbackMessage) {
       },
       error: function (xhr) {
         reject({
-          message: fallbackMessage,
+          message: ajaxJsonErrorMessage(xhr, fallbackMessage),
           code: xhr.status || null,
         });
       },
@@ -25,22 +25,21 @@ function getJson(url, fallbackMessage) {
   });
 }
 
-function postJson(url, data, fallbackMessage) {
+function getLegacyJson(url, fallbackMessage) {
   return new Promise((resolve, reject) => {
     $.ajax({
-      type: "POST",
+      type: "GET",
       url: url,
-      data: data,
       dataType: "json",
       success: function (response) {
-        if (!response.success) {
+        if (response && response.isSuccess === false) {
           reject({
             message: response.message || fallbackMessage,
-            code: response.code || null,
+            code: null,
           });
           return;
         }
-        resolve(response.data);
+        resolve(response);
       },
       error: function (xhr) {
         reject({
@@ -51,44 +50,57 @@ function postJson(url, data, fallbackMessage) {
     });
   });
 }
+
+function softLoad(promise) {
+  return promise.then(
+    (data) => ({ ok: true, data }),
+    (error) => ({ ok: false, error }),
+  );
+}
+
 function checkAccess() {
-  return getJson(
-    "../api/session.php",
-    "Failed to verify user session."
-  );
+  return getJson("../api/session.php", "Failed to verify user session.");
 }
 
-function getDispatchList() {
-  return getJson(
-    "api/get_dispatch_list.php",
-    "Failed to fetch dispatch list."
-  );
+function getRequestListData() {
+  return getLegacyJson(
+    "../requestList/php/get_requests.php",
+    "Failed to load request list.",
+  ).then((response) => (Array.isArray(response?.data) ? response.data : []));
 }
 
-function getExpiringPassport() {
-  return getJson(
-    "api/get_expiring_passport.php",
-    "Failed to fetch passport details."
-  );
+function getRequestListGroups() {
+  return new Promise((resolve, reject) => {
+    $.ajax({
+      type: "GET",
+      url: "../requestList/php/get_groups.php",
+      dataType: "json",
+      success: function (response) {
+        resolve(Array.isArray(response) ? response : []);
+      },
+      error: function (xhr) {
+        reject({
+          message: ajaxJsonErrorMessage(xhr, "Failed to load groups."),
+          code: xhr.status || null,
+        });
+      },
+    });
+  });
 }
 
-function getExpiringVisa() {
-  return getJson(
-    "api/get_expiring_visa.php",
-    "Failed to fetch visa details."
-  );
-}
-
-function getGraphData() {
-  return getJson(
-    "api/get_summary.php",
-    "Failed to fetch graph data."
-  );
+function getChangeRequestData() {
+  return getLegacyJson(
+    "../changeRequests/php/get_change_requests.php",
+    "Failed to load change requests.",
+  ).then((response) => {
+    const data = response?.data || {};
+    return {
+      cancellations: Array.isArray(data.cancellations) ? data.cancellations : [],
+      date_changes: Array.isArray(data.date_changes) ? data.date_changes : [],
+    };
+  });
 }
 
 function logOut() {
-  return getJson(
-    "../api/logout.php",
-    "Failed to log out."
-  );
+  return getJson("../api/logout.php", "Failed to log out.");
 }

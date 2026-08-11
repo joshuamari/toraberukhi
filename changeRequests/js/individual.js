@@ -1221,13 +1221,20 @@ function setDispatchRequestLink(elementId, request) {
     formatRequestReference(request.original_dispatch_request_id, "REQ") ||
     "—";
 
-  if (!dispatchRequestId) {
+  if (displayId === "—") {
     el.textContent = displayId;
     return;
   }
 
+  const badgeHtml = `<span class="activity-id-badge dispatch">${displayId}</span>`;
+
+  if (!dispatchRequestId) {
+    el.innerHTML = badgeHtml;
+    return;
+  }
+
   const url = buildRequestListDispatchUrl(dispatchRequestId);
-  el.innerHTML = `<a href="${url}" data-original-dispatch-link data-request-id="${dispatchRequestId}" target="_blank" rel="noopener noreferrer" class="inline-block cursor-pointer underline decoration-2 decoration-[var(--secondary)] text-[var(--dark)] hover:text-[var(--tertiary)] transition font-semibold">${displayId}</a>`;
+  el.innerHTML = `<a href="${url}" data-original-dispatch-link data-request-id="${dispatchRequestId}" target="_blank" rel="noopener noreferrer" class="activity-id-badge dispatch">${displayId}</a>`;
 }
 
 function populateDateChangeDetailsModal(request) {

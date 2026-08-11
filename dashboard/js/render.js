@@ -11,140 +11,71 @@ function renderEmployeeDetails(empDetails) {
   $("#grpLabel").html(grpName);
 }
 
-function renderDispatchList(dlist) {
-  const tableBody = $("#dlist");
-  tableBody.empty();
-
-  if (!dlist || dlist.length === 0) {
-    tableBody.append(
-      "<tr><td colspan='7' class='text-center'>No data found</td></tr>"
-    );
-    return;
+function destroyChart(instance) {
+  if (instance) {
+    instance.destroy();
   }
-
-  function getStatusBadge(status) {
-    switch (status) {
-      case "valid":
-        return {
-          className: "bg-success",
-          label: "Valid",
-        };
-      case "valid_expiring":
-        return {
-          className: "bg-info",
-          label: "Valid",
-        };
-      case "on_process":
-        return {
-          className: "bg-warning text-dark",
-          label: "On Process",
-        };
-      default:
-        return {
-          className: "bg-danger",
-          label: "Invalid",
-        };
-    }
-  }
-
-  $.each(dlist, function (_, item) {
-    const passportBadge = getStatusBadge(item.passportStatus);
-    const visaBadge = getStatusBadge(item.visaStatus);
-    const reentryBadge = getStatusBadge(item.reentryStatus);
-
-    const row = $("<tr>");
-    row.append(`<td>${capitalizeWords(item.name)}</td>`);
-    row.append(`<td>${item.location}</td>`);
-    row.append(`<td>${item.from}</td>`);
-    row.append(`<td>${item.to}</td>`);
-    row.append(
-      `<td><span class="badge ${passportBadge.className}">${passportBadge.label}</span></td>`
-    );
-    row.append(
-      `<td><span class="badge ${visaBadge.className}">${visaBadge.label}</span></td>`
-    );
-    row.append(
-      `<td><span class="badge ${reentryBadge.className}">${reentryBadge.label}</span></td>`
-    );
-
-    tableBody.append(row);
-  });
+  return null;
 }
 
-function renderPassportList(eplist) {
-  const tableBody = $("#eplist");
-  tableBody.empty();
-
-  if (!eplist || eplist.length === 0) {
-    tableBody.append(
-      "<tr><td colspan='2' class='text-center'>No expiring passports</td></tr>"
-    );
-    return;
-  }
-
-  $.each(eplist, function (_, item) {
-    const untilText = formatDays(item.until);
-    const isShort = item.until < 300 ? "short" : "";
-    const row = $(`<tr class="rowEmp" emp-id="${item.id}">`);
-    row.append(`<td>${capitalizeWords(item.name)}</td>`);
-    row.append(`<td class="expire ${isShort}">${untilText}</td>`);
-    tableBody.append(row);
-  });
-}
-
-function renderVisaList(evlist) {
-  const tableBody = $("#evlist");
-  tableBody.empty();
-
-  if (!evlist || evlist.length === 0) {
-    tableBody.append(
-      "<tr><td colspan='2' class='text-center'>No expiring visa</td></tr>"
-    );
-    return;
-  }
-
-  $.each(evlist, function (_, item) {
-    const untilText = formatDays(item.until);
-    const isShort = item.until < 210 ? "short" : "";
-    const row = $(`<tr class="rowEmp" emp-id="${item.id}">`);
-    row.append(`<td>${capitalizeWords(item.name)}</td>`);
-    row.append(`<td class="expire ${isShort}">${untilText}</td>`);
-    tableBody.append(row);
-  });
-}
-
-let dispatchChartInstance = null;
-
-function renderDispatchGraph(dData) {
+function renderSubmissionTrendChart(dData) {
   const months = dData.map((data) => data.month);
-  const rates = dData.map((data) => data.rate);
+  const rates = dData.map((data) => Number(data.rate) || 0);
+  const canvas = document.getElementById("submissionTrendChart");
 
-  const canvas = document.getElementById("dispatchChart");
-  if (!canvas) return;
-
-  const ctx = canvas.getContext("2d");
-
-  if (dispatchChartInstance) {
-    dispatchChartInstance.destroy();
+  if (!canvas) {
+    return;
   }
 
-  dispatchChartInstance = new Chart(ctx, {
+  submissionTrendChartInstance = destroyChart(submissionTrendChartInstance);
+
+  submissionTrendChartInstance = new Chart(canvas.getContext("2d"), {
     type: "line",
     data: {
       labels: months,
       datasets: [
         {
+          label: "Requests submitted",
           data: rates,
-          backgroundColor: "#dcfce7",
-          borderColor: "#22c55e",
-          borderWidth: 1,
+          borderColor: "#212121",
+          backgroundColor: "#212121",
+          borderWidth: 2,
+          pointRadius: 3,
+          pointHoverRadius: 4,
+          pointBackgroundColor: "#212121",
+          tension: 0.25,
+          fill: false,
         },
       ],
     },
     options: {
+      responsive: true,
+      maintainAspectRatio: false,
       scales: {
         y: {
           beginAtZero: true,
+          ticks: {
+            precision: 0,
+            color: "#8d8d8d",
+            font: { size: 11 },
+          },
+          grid: {
+            color: "#efefef",
+            drawBorder: false,
+          },
+        },
+        x: {
+          ticks: {
+            color: "#8d8d8d",
+            font: { size: 11 },
+            maxRotation: 0,
+            autoSkip: true,
+            maxTicksLimit: 12,
+          },
+          grid: {
+            display: false,
+            drawBorder: false,
+          },
         },
       },
       plugins: {
@@ -155,17 +86,159 @@ function renderDispatchGraph(dData) {
           callbacks: {
             label: function (tooltipItem) {
               const value = tooltipItem.raw;
-              return `${value} ${
-                value > 1 ? "dispatch members" : "dispatch member"
-              }`;
+              return (
+                value +
+                " " +
+                (value === 1 ? "request submitted" : "requests submitted")
+              );
             },
           },
         },
       },
     },
   });
+
+  $("#submissionTrendInsight").text(computeSubmissionTrendInsight(dData));
 }
 
-function renderCurrentYear(year) {
-  $(".crrntYear").text(`(${year})`);
+function refreshSubmissionTrendChart() {
+  const year = dashboardSubmissionTrendYear || getCurrentYear();
+  $("#trendYearValue").text(String(year));
+
+  const dataset = buildSubmissionTrendDataset(
+    dashboardRequestList,
+    dashboardCancellations,
+    dashboardDateChanges,
+    year,
+  );
+  renderSubmissionTrendChart(dataset);
+}
+
+function renderStatusDonut(counts) {
+  const canvas = document.getElementById("statusDonutChart");
+
+  if (!canvas) {
+    return;
+  }
+
+  statusChartInstance = destroyChart(statusChartInstance);
+
+  const segments = [
+    { key: "pending", label: "Pending", value: counts.pending },
+    { key: "approved", label: "Approved", value: counts.approved },
+    { key: "completed", label: "Completed", value: counts.completed },
+    { key: "declined", label: "Declined", value: counts.declined },
+    { key: "cancelled", label: "Cancelled", value: counts.cancelled },
+  ].filter((item) => item.value > 0);
+
+  $("#statusDonutTotal").text(String(counts.total || 0));
+
+  const $legend = $("#statusDonutLegend");
+  $legend.empty();
+
+  if (!segments.length) {
+    $("#statusDonutInsight").text("No dispatch request status data available.");
+    return;
+  }
+
+  segments.forEach((segment) => {
+    $legend.append(`
+      <span class="dashboard-donut-legend-item">
+        <span class="dashboard-donut-legend-swatch" style="background:${STATUS_CHART_COLORS[segment.key]}"></span>
+        ${segment.label} (${segment.value})
+      </span>
+    `);
+  });
+
+  statusChartInstance = new Chart(canvas.getContext("2d"), {
+    type: "doughnut",
+    data: {
+      labels: segments.map((item) => item.label),
+      datasets: [
+        {
+          data: segments.map((item) => item.value),
+          backgroundColor: segments.map(
+            (item) => STATUS_CHART_COLORS[item.key],
+          ),
+          borderWidth: 0,
+          hoverOffset: 4,
+        },
+      ],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: true,
+      aspectRatio: 1,
+      cutout: "68%",
+      plugins: {
+        legend: {
+          display: false,
+        },
+        tooltip: {
+          callbacks: {
+            label: function (tooltipItem) {
+              const value = tooltipItem.raw;
+              const total = counts.total || 1;
+              const pct = Math.round((value / total) * 100);
+              return `${tooltipItem.label}: ${value} (${pct}%)`;
+            },
+          },
+        },
+      },
+    },
+  });
+
+  $("#statusDonutInsight").text(computeStatusInsight(counts));
+}
+
+function renderDashboard(year, options) {
+  const opts = options || {};
+  fillSummaryCards(year, opts);
+
+  const availableYears = getAvailableSubmissionYears(
+    opts.hasRequestData ? dashboardRequestList : [],
+    opts.hasChangeData ? dashboardCancellations : [],
+    opts.hasChangeData ? dashboardDateChanges : [],
+  );
+
+  dashboardSubmissionTrendYear = resolveDashboardSelectedYear(
+    dashboardSubmissionTrendYear,
+    availableYears,
+  );
+  fillSubmissionTrendYearSelector(
+    availableYears,
+    dashboardSubmissionTrendYear,
+  );
+  refreshSubmissionTrendChart();
+
+  if (opts.hasRequestData) {
+    renderStatusDonut(getDispatchStatusCounts(dashboardRequestList));
+    dashboardUpcomingItems = buildUpcomingDispatchItems(dashboardRequestList);
+  } else {
+    renderStatusDonut({
+      pending: 0,
+      approved: 0,
+      completed: 0,
+      declined: 0,
+      cancelled: 0,
+      total: 0,
+    });
+    dashboardUpcomingItems = [];
+  }
+
+  fillUpcomingDispatchesList();
+
+  dashboardActivityItems = buildActivityFeed(
+    opts.hasRequestData ? dashboardRequestList : [],
+    opts.hasChangeData ? dashboardCancellations : [],
+    opts.hasChangeData ? dashboardDateChanges : [],
+  );
+
+  activityPaginationState = {
+    currentPage: 1,
+    itemsPerPage: ACTIVITY_PAGE_SIZE,
+    totalItems: dashboardActivityItems.length,
+  };
+
+  fillActivityTablePage();
 }

@@ -24,7 +24,7 @@ function getDashboardMemberIds(PDO $connpcs, PDO $connnew, int $userId): array
         return array_map('intval', array_column($stmt->fetchAll(PDO::FETCH_ASSOC), 'id'));
     }
 
-    $groups = getUserGroups($connpcs, $userId);
+    $groups = getAccessibleGroups($connpcs, $userId);
     $groupIds = array_column($groups, 'id');
 
     if (empty($groupIds)) {
@@ -189,9 +189,16 @@ function getDashboardDispatchList(PDO $connpcs, PDO $connnew, int $userId): arra
     return $dispatchList;
 }
 
-function getDashboardSummary(PDO $connpcs): array
+function getDashboardSummary(PDO $connpcs, ?int $year = null): array
 {
-    $year = (int) date('Y');
+    $currentYear = (int) date('Y');
+    $year = $year === null ? $currentYear : (int) $year;
+
+    // Never allow future years; invalid values fall back to the current year.
+    if ($year > $currentYear || $year < 1) {
+        $year = $currentYear;
+    }
+
     $summary = [];
 
     for ($month = 1; $month <= 12; $month++) {

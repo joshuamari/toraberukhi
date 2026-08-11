@@ -5,7 +5,8 @@ require_once __DIR__ . '/../../bootstrap.php';
 try {
     requireCurrentUserId();
 
-    $data = getDashboardSummary($connpcs);
+    $year = isset($_GET['year']) ? (int) $_GET['year'] : (int) date('Y');
+    $data = getDashboardSummary($connpcs, $year);
 
     jsonSuccess($data, 'Dashboard summary loaded successfully.');
 } catch (RuntimeException $e) {

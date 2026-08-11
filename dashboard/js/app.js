@@ -8,7 +8,7 @@ async function initPage() {
     await loadDashboardData();
     bindEvents();
   } catch (error) {
-    if (error?.code === "SESSION_EXPIRED") {
+    if (error?.code === "SESSION_EXPIRED" || error?.code === 401) {
       window.location.href = `${rootFolder}/PCSKHI/Login`;
       return;
     }
@@ -21,40 +21,64 @@ async function loadDashboardData() {
   try {
     const currentYear = getCurrentYear();
 
-    const [dispatchList, expiringPassport, expiringVisa, graphData] =
-      await Promise.all([
-        getDispatchList(),
-        getExpiringPassport(),
-        getExpiringVisa(),
-        getGraphData(),
-      ]);
+    const [requestRes, groupsRes, changeRes] = await Promise.all([
+      softLoad(getRequestListData()),
+      softLoad(getRequestListGroups()),
+      softLoad(getChangeRequestData()),
+    ]);
 
-    renderDispatchList(dispatchList);
-    renderPassportList(expiringPassport);
-    renderVisaList(expiringVisa);
-    renderDispatchGraph(graphData);
-    renderCurrentYear(currentYear);
+    if (!requestRes.ok) {
+      throw requestRes.error || { message: "Failed to load request list." };
+    }
+
+    const hasRequestData = requestRes.ok;
+    const hasGroupData = groupsRes.ok;
+    const hasChangeData = changeRes.ok;
+
+    dashboardRequestList = hasRequestData
+      ? Array.isArray(requestRes.data)
+        ? requestRes.data
+        : []
+      : [];
+    dashboardGroupList = hasGroupData
+      ? Array.isArray(groupsRes.data)
+        ? groupsRes.data
+        : []
+      : [];
+
+    if (hasChangeData) {
+      const changeData = changeRes.data || {};
+      dashboardCancellations = Array.isArray(changeData.cancellations)
+        ? changeData.cancellations
+        : [];
+      dashboardDateChanges = Array.isArray(changeData.date_changes)
+        ? changeData.date_changes
+        : [];
+    } else {
+      dashboardCancellations = [];
+      dashboardDateChanges = [];
+    }
+
+    if (!hasChangeData || !hasGroupData) {
+      console.warn("Some dashboard sections could not be loaded.", {
+        requests: hasRequestData,
+        groups: hasGroupData,
+        changes: hasChangeData,
+      });
+    }
+
+    renderDashboard(currentYear, {
+      hasChangeData,
+      hasRequestData,
+      hasGroupData,
+    });
   } catch (error) {
-    if (error?.code === "SESSION_EXPIRED") {
+    if (error?.code === "SESSION_EXPIRED" || error?.code === 401) {
       window.location.href = `${rootFolder}/PCSKHI/Login`;
       return;
     }
 
     alert(error?.message || "Failed to load dashboard data.");
-  }
-}
-
-async function loadDispatchList() {
-  try {
-    const dispatchList = await getDispatchList();
-    renderDispatchList(dispatchList);
-  } catch (error) {
-    if (error?.code === "SESSION_EXPIRED") {
-      window.location.href = `${rootFolder}/PCSKHI/Login`;
-      return;
-    }
-
-    alert(error?.message || "Failed to load dispatch list.");
   }
 }
 

@@ -71,6 +71,8 @@ let selectedDispatchRequest = null;
 let pendingChangeRequestType = null;
 let changeRequestTriggerElement = null;
 let isChangeRequestSubmitting = false;
+/** null = All statuses; otherwise pending|approved|declined|cancelled|completed */
+let currentStatusFilter = null;
 //#endregion
 checkAccess()
   .then((emp) => {
@@ -88,7 +90,7 @@ checkAccess()
             fillCards();
             renderHeader(header);
             renderSalutation(header);
-            $(".tab")[0].click();
+            applyInitialStatusTab();
 
             const deepLinkedRequestId = getDeepLinkedRequestId();
             if (deepLinkedRequestId) {
@@ -243,18 +245,10 @@ $(document).on("click", "#removeMonth", function () {
   $("#monthSel").val("");
   searchFilter(allRequests, true);
 });
-$(document).on("click", ".tab", function () {
-  var indicator = document.querySelector(".indicator");
-  var $this = $(this);
-  var rect = $this[0].getBoundingClientRect(); // Convert jQuery object to DOM element
-  var parentRect = $this.parent()[0].getBoundingClientRect(); // Convert parent jQuery object to DOM element
-
-  indicator.style.width = rect.width + "px";
-  indicator.style.left = rect.left - parentRect.left + "px";
-  $(".tab span").removeClass("font-semibold text-[var(--dark)] active");
-  $(this).find("span").addClass("font-semibold text-[var(--dark)] active");
-
-  searchFilter(allRequests, true);
+$(document).on("click", "#dispatch-status-filter .tab", function (event) {
+  event.preventDefault();
+  const status = getStatusParamFromTabId(this.id) || "all";
+  setStatusFilter(status, { syncUrl: true, resetPage: true });
 });
 $(document)
   .off("click.dispatchRequestRow", ".dispatch-request-row")
@@ -722,6 +716,131 @@ function clearDeepLinkRequestId() {
   url.searchParams.delete("request_id");
   const nextUrl = `${url.pathname}${url.search}${url.hash}`;
   window.history.replaceState({}, "", nextUrl);
+}
+
+function getDeepLinkedStatusFilter() {
+  const params = new URLSearchParams(window.location.search);
+  if (!params.has("status")) {
+    return null;
+  }
+
+  return normalizeRequestedStatus(params.get("status"));
+}
+
+function normalizeRequestedStatus(rawStatus) {
+  const status = String(rawStatus || "")
+    .trim()
+    .toLowerCase();
+
+  if (!status || status === "all") {
+    return "all";
+  }
+
+  const allowed = [
+    "pending",
+    "approved",
+    "declined",
+    "cancelled",
+    "completed",
+  ];
+
+  return allowed.includes(status) ? status : "all";
+}
+
+function getStatusTabIdFromParam(status) {
+  const map = {
+    pending: "tab-2",
+    approved: "tab-3",
+    declined: "tab-4",
+    cancelled: "tab-5",
+    completed: "tab-6",
+  };
+
+  return map[String(status || "").toLowerCase()] || "tab-1";
+}
+
+function getStatusParamFromTabId(tabId) {
+  const map = {
+    "tab-2": "pending",
+    "tab-3": "approved",
+    "tab-4": "declined",
+    "tab-5": "cancelled",
+    "tab-6": "completed",
+  };
+
+  return map[tabId] || null;
+}
+
+function syncStatusFilterToUrl(tabId) {
+  const url = new URL(window.location.href);
+  const status = getStatusParamFromTabId(tabId);
+
+  if (status) {
+    url.searchParams.set("status", status);
+  } else {
+    url.searchParams.delete("status");
+  }
+
+  window.history.replaceState(
+    {},
+    "",
+    `${url.pathname}${url.search}${url.hash}`,
+  );
+}
+
+function activateStatusTabVisual(tabId) {
+  const $tabsRoot = $("#dispatch-status-filter");
+  const $tab = $tabsRoot.find(`#${tabId}`);
+
+  if (!$tab.length) {
+    return;
+  }
+
+  const indicator = $tabsRoot.find(".indicator").get(0);
+  if (indicator) {
+    const rect = $tab[0].getBoundingClientRect();
+    const parentRect = $tabsRoot[0].getBoundingClientRect();
+    indicator.style.width = `${rect.width}px`;
+    indicator.style.left = `${rect.left - parentRect.left}px`;
+  }
+
+  $tabsRoot
+    .find(".tab span")
+    .removeClass("font-semibold text-[var(--dark)] active");
+  $tab.find("span").first().addClass("font-semibold text-[var(--dark)] active");
+
+  $tabsRoot.find(".tab").attr("aria-selected", "false").attr("tabindex", "-1");
+  $tab.attr("aria-selected", "true").attr("tabindex", "0");
+}
+
+/**
+ * Single source of truth for Request List status filtering.
+ * Used by tab clicks and URL ?status= initialization.
+ */
+function setStatusFilter(rawStatus, options) {
+  const opts = options || {};
+  const syncUrl = opts.syncUrl !== false;
+  const resetPage = opts.resetPage !== false;
+  const status = normalizeRequestedStatus(rawStatus);
+
+  currentStatusFilter = status === "all" ? null : status;
+
+  const tabId = getStatusTabIdFromParam(status);
+  activateStatusTabVisual(tabId);
+
+  if (syncUrl) {
+    syncStatusFilterToUrl(tabId);
+  }
+
+  searchFilter(allRequests, resetPage);
+}
+
+function applyInitialStatusTab() {
+  const requestedStatus = getDeepLinkedStatusFilter();
+  setStatusFilter(requestedStatus == null ? "all" : requestedStatus, {
+    syncUrl: true,
+    resetPage: true,
+  });
 }
 
 function openDispatchRequestFromDeepLink(rawRequestId) {
@@ -1958,15 +2077,8 @@ function searchFilter(req_list, resetPage = false) {
   const keyword = $("#searchbar").val().toLowerCase().trim();
   const grps = $("#grpSel").val().split(",").map(Number);
   const dateFilter = $("#monthSel").val();
-  const activeTabId = $("button").has("span.active").attr("id");
-  const tabFilters = {
-    "tab-2": "pending",
-    "tab-3": "approved",
-    "tab-4": "declined",
-    "tab-5": "cancelled",
-    "tab-6": "completed",
-  };
-  const selectedStatus = tabFilters[activeTabId];
+  // Use the shared status filter state — not fragile DOM class detection.
+  const selectedStatus = currentStatusFilter;
   const results = req_list.filter((emp) => {
     const searchMatch =
       emp.emp_name.toLowerCase().includes(keyword) ||
@@ -1978,7 +2090,7 @@ function searchFilter(req_list, resetPage = false) {
 
     const normalizedStatus = getEffectiveDispatchStatus(emp);
     const statusMatch =
-      selectedStatus === undefined || normalizedStatus === selectedStatus;
+      selectedStatus == null || normalizedStatus === selectedStatus;
 
     return searchMatch && groupMatch && statusMatch && dateMatch;
   });
