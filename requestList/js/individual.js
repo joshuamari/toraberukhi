@@ -58,6 +58,9 @@ let monthNames2 = [
 ];
 let reqList = [];
 let allRequests = [];
+/** Live API rows kept aside while the first-visit tour shows sample data. */
+let realRequestsCache = [];
+let isRequestListTourMode = false;
 let cardData = [];
 let requestCurrentPage = 1;
 let filteredRequests = [];
@@ -74,6 +77,184 @@ let isChangeRequestSubmitting = false;
 /** null = All statuses; otherwise pending|approved|declined|cancelled|completed */
 let currentStatusFilter = null;
 //#endregion
+
+function getTourApprovedRequestId() {
+  return (
+    (window.mockRequestListTour &&
+      window.mockRequestListTour.approvedRequestId) ||
+    90001
+  );
+}
+
+function buildTourMockRequests() {
+  const mocks =
+    (window.mockRequestListTour && window.mockRequestListTour.requests) || [];
+  if (!mocks.length) {
+    return [];
+  }
+
+  const fallbackGroup = groupList[0] || {};
+  const fallbackGroupId = fallbackGroup.id != null ? fallbackGroup.id : 1;
+  const fallbackGroupName = fallbackGroup.name || "Systems Group";
+
+  return mocks.map(function (item) {
+    return Object.assign({}, item, {
+      group_id: fallbackGroupId,
+      group_name: item.group_name || fallbackGroupName,
+    });
+  });
+}
+
+function applyRequestListDataset(requests, resetPage) {
+  allRequests = Array.isArray(requests) ? [...requests] : [];
+  reqList = [...allRequests];
+  fillCards();
+  searchFilter(allRequests, resetPage !== false);
+}
+
+function enterRequestListTourMode() {
+  isRequestListTourMode = true;
+  document.body.classList.add("pcs-tour-request-list-mode");
+  currentStatusFilter = null;
+  $("#searchbar").val("");
+  $("#monthSel").val("");
+  if ($("#grpSel option").length) {
+    $("#grpSel").val($("#grpSel option:first").val());
+  }
+  applyRequestListDataset(buildTourMockRequests(), true);
+}
+
+function hideRequestDetailModalForTour() {
+  const requestModalElement = document.getElementById("openModal");
+  if (!requestModalElement || !window.bootstrap) {
+    return Promise.resolve();
+  }
+
+  if (!requestModalElement.classList.contains("show")) {
+    selectedDispatchRequest = null;
+    clearDispatchRequestModal();
+    return Promise.resolve();
+  }
+
+  return new Promise(function (resolve) {
+    const onHidden = function () {
+      requestModalElement.removeEventListener("hidden.bs.modal", onHidden);
+      selectedDispatchRequest = null;
+      clearDispatchRequestModal();
+      resolve();
+    };
+    requestModalElement.addEventListener("hidden.bs.modal", onHidden);
+    bootstrap.Modal.getOrCreateInstance(requestModalElement).hide();
+  });
+}
+
+function exitRequestListTourMode() {
+  const finish = function () {
+    isRequestListTourMode = false;
+    document.body.classList.remove("pcs-tour-request-list-mode");
+    applyRequestListDataset(realRequestsCache, true);
+    applyInitialStatusTab();
+  };
+
+  hideRequestDetailModalForTour().then(finish).catch(finish);
+}
+
+function openTourApprovedSampleRequest() {
+  const requestId = getTourApprovedRequestId();
+  const modal = document.getElementById("openModal");
+
+  return new Promise(function (resolve) {
+    const finish = function () {
+      resolve();
+    };
+
+    if (!modal) {
+      openDispatchRequestById(requestId).then(finish).catch(finish);
+      return;
+    }
+
+    if (
+      modal.classList.contains("show") &&
+      selectedDispatchRequest &&
+      String(selectedDispatchRequest.req_id) === String(requestId)
+    ) {
+      finish();
+      return;
+    }
+
+    const onShown = function () {
+      modal.removeEventListener("shown.bs.modal", onShown);
+      finish();
+    };
+    modal.addEventListener("shown.bs.modal", onShown);
+    openDispatchRequestById(requestId).catch(function () {
+      modal.removeEventListener("shown.bs.modal", onShown);
+      finish();
+    });
+  });
+}
+
+function markAbsorbedRequestListToursDone() {
+  if (!window.PcsKhiTour || !window.PcsKhiTour.keys) {
+    return;
+  }
+  try {
+    const activityKey = window.PcsKhiTour.keys.requestActivity;
+    const approvedKey = window.PcsKhiTour.keys.approvedModal;
+    if (activityKey) {
+      window.localStorage.setItem(activityKey, "done");
+    }
+    if (approvedKey) {
+      window.localStorage.setItem(approvedKey, "done");
+    }
+  } catch (e) {
+    /* ignore */
+  }
+}
+
+function startRequestListGuidedTour(force) {
+  if (!window.PcsKhiTour) {
+    exitRequestListTourMode();
+    return false;
+  }
+
+  enterRequestListTourMode();
+
+  const started = window.PcsKhiTour.start("requestList", {
+    force: !!force,
+    onDestroyed: function () {
+      markAbsorbedRequestListToursDone();
+      exitRequestListTourMode();
+    },
+  });
+
+  if (!started) {
+    exitRequestListTourMode();
+  }
+
+  return started;
+}
+
+function bindRequestListTourReplay() {
+  const btn = document.querySelector("#tourReplayBtn");
+  if (!btn) {
+    return;
+  }
+  btn.addEventListener("click", function (e) {
+    e.preventDefault();
+    startRequestListGuidedTour(true);
+  });
+}
+
+window.PcsKhiRequestListTour = {
+  isActiveMode: function () {
+    return isRequestListTourMode;
+  },
+  approvedRequestId: getTourApprovedRequestId(),
+  openApprovedSample: openTourApprovedSampleRequest,
+  closeSampleModal: hideRequestDetailModalForTour,
+};
+
 checkAccess()
   .then((emp) => {
     if (emp.isSuccess) {
@@ -84,25 +265,38 @@ checkAccess()
           .then(([grps, reqs, counts, header]) => {
             groupList = grps;
             fillGroups(groupList);
-            reqList = reqs["data"];
-            allRequests = [...reqs["data"]];
+            realRequestsCache = Array.isArray(reqs["data"])
+              ? [...reqs["data"]]
+              : [];
+            reqList = [...realRequestsCache];
+            allRequests = [...realRequestsCache];
             cardData = counts;
-            fillCards();
             renderHeader(header);
             renderSalutation(header);
-            applyInitialStatusTab();
 
             const deepLinkedRequestId = getDeepLinkedRequestId();
+            const shouldRunFirstVisitTour =
+              window.PcsKhiTour &&
+              !window.PcsKhiTour.isDone("requestList") &&
+              !deepLinkedRequestId;
+
+            if (shouldRunFirstVisitTour) {
+              enterRequestListTourMode();
+            } else {
+              fillCards();
+              applyInitialStatusTab();
+            }
+
             if (deepLinkedRequestId) {
               openDispatchRequestFromDeepLink(deepLinkedRequestId);
               clearDeepLinkRequestId();
             }
 
             if (window.PcsKhiTour) {
-              window.PcsKhiTour.bindReplay("#tourReplayBtn", "requestList");
-              if (!deepLinkedRequestId) {
+              bindRequestListTourReplay();
+              if (shouldRunFirstVisitTour) {
                 window.setTimeout(function () {
-                  window.PcsKhiTour.maybeStart("requestList");
+                  startRequestListGuidedTour(false);
                 }, 400);
               }
             }
@@ -129,10 +323,6 @@ $(document).on("click", "#closeNav", function () {
   $("body").removeClass("overflow-hidden");
 });
 
-$(document).on("shown.bs.modal", "#openModal", function () {
-  maybeStartRequestDetailTours();
-});
-
 $(document).on("hidden.bs.modal", "#openModal", function () {
   if (
     window.PcsKhiTour &&
@@ -140,6 +330,10 @@ $(document).on("hidden.bs.modal", "#openModal", function () {
     window.PcsKhiTour.isActive() &&
     typeof window.PcsKhiTour.stop === "function"
   ) {
+    // Keep the continuous request-list tour alive while it controls the modal.
+    if (isRequestListTourMode) {
+      return;
+    }
     window.PcsKhiTour.stop();
   }
 });
@@ -2056,10 +2250,15 @@ function fillTable(sampleData) {
     $.each(sampleData, function (index, item) {
       const requestReference =
         formatRequestReference(item.req_id, "REQ") || "—";
-      const openTourAttr =
-        index === 0 ? ' data-tour="requestList-open"' : "";
+      const openTourAttr = item.is_tour_open_target
+        ? ' data-tour="requestList-open"'
+        : !sampleData.some(function (row) {
+            return row.is_tour_open_target;
+          }) && index === 0
+          ? ' data-tour="requestList-open"'
+          : "";
       str = `
-    <tr class="dispatch-request-row" data-request-id="${item.req_id}">
+    <tr class="dispatch-request-row" data-request-id="${item.req_id}"${openTourAttr}>
       <td class="whitespace-nowrap">${requestReference}</td>
       <td>${item.emp_name}</td>
       <td>${formatDate(item.req_date)}</td>
@@ -2076,7 +2275,7 @@ function fillTable(sampleData) {
             : ` <span class="validity "><i class='bx bx-x text-[18px] font-semibold'></i></span>`
         }</td>
       <td>
-        <div class="openIcon view-dispatch-request" title="Open item" data-request-id="${item.req_id}"${openTourAttr}>
+        <div class="openIcon view-dispatch-request" title="Open item" data-request-id="${item.req_id}">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"   width="144px" height="144px">
             <path d="M 41.470703 4.9863281 A 1.50015 1.50015 0 0 0 41.308594 5 L 27.5 5 A 1.50015 1.50015 0 1 0 27.5 8 L 37.878906 8 L 22.439453 23.439453 A 1.50015 1.50015 0 1 0 24.560547 25.560547 L 40 10.121094 L 40 20.5 A 1.50015 1.50015 0 1 0 43 20.5 L 43 6.6894531 A 1.50015 1.50015 0 0 0 41.470703 4.9863281 z M 12.5 8 C 8.3754991 8 5 11.375499 5 15.5 L 5 35.5 C 5 39.624501 8.3754991 43 12.5 43 L 32.5 43 C 36.624501 43 40 39.624501 40 35.5 L 40 25.5 A 1.50015 1.50015 0 1 0 37 25.5 L 37 35.5 C 37 38.003499 35.003499 40 32.5 40 L 12.5 40 C 9.9965009 40 8 38.003499 8 35.5 L 8 15.5 C 8 12.996501 9.9965009 11 12.5 11 L 22.5 11 A 1.50015 1.50015 0 1 0 22.5 8 L 12.5 8 z" fill="rgba(85, 85, 85, 0.5)"  stroke="rgba(85, 85, 85, 0.5)" stroke-width="1"/>
           </svg>
@@ -2380,75 +2579,12 @@ function isChangeRequestActionsVisible() {
 }
 
 function maybeStartApprovedRequestActionsTour() {
-  if (!window.PcsKhiTour || !isRequestDetailModalOpen()) {
-    return false;
-  }
-
-  if (
-    typeof window.PcsKhiTour.isActive === "function" &&
-    window.PcsKhiTour.isActive()
-  ) {
-    return false;
-  }
-
-  if (!canRequestDispatchChange(selectedDispatchRequest)) {
-    return false;
-  }
-
-  if (!isChangeRequestActionsVisible()) {
-    return false;
-  }
-
-  return window.PcsKhiTour.maybeStart("approvedModal", { visibleOnly: true });
+  // Absorbed into the main Request List tour (sample data).
+  return false;
 }
 
 function maybeStartRequestDetailTours() {
-  if (!window.PcsKhiTour) {
-    return;
-  }
-
-  if (
-    typeof window.PcsKhiTour.isActive === "function" &&
-    window.PcsKhiTour.isActive()
-  ) {
-    return;
-  }
-
-  window.setTimeout(function () {
-    if (!isRequestDetailModalOpen()) {
-      return;
-    }
-
-    if (
-      typeof window.PcsKhiTour.isActive === "function" &&
-      window.PcsKhiTour.isActive()
-    ) {
-      return;
-    }
-
-    const continueToApproved = function () {
-      window.setTimeout(function () {
-        if (!isRequestDetailModalOpen()) {
-          return;
-        }
-        maybeStartApprovedRequestActionsTour();
-      }, 350);
-    };
-
-    if (isActivityHistoryVisible()) {
-      const activityStarted = window.PcsKhiTour.start("requestActivity", {
-        force: false,
-        visibleOnly: true,
-        onDestroyed: continueToApproved,
-      });
-      if (!activityStarted) {
-        continueToApproved();
-      }
-      return;
-    }
-
-    continueToApproved();
-  }, 400);
+  // Absorbed into the main Request List tour (sample data).
 }
 
 function hasPendingDateChangeRequest(request) {
@@ -3199,11 +3335,16 @@ async function handleCancellationSubmit() {
 }
 
 async function refreshRequestsAfterChangeSubmission() {
+  if (isRequestListTourMode) {
+    return;
+  }
+
   try {
     const reqs = await getRequests();
 
     if (reqs && reqs.data) {
-      reqList = reqs.data;
+      realRequestsCache = [...reqs.data];
+      reqList = [...reqs.data];
       allRequests = [...reqs.data];
       searchFilter(allRequests, false);
 

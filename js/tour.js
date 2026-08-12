@@ -1,17 +1,17 @@
 /**
  * Product tour helpers for トラベる (Driver.js + localStorage).
- * Tours: Dispatch Request, Request List, Change Requests,
- * request-detail modal (activity + approved actions),
- * change-request detail modal (pending withdraw).
+ * Tours: Dispatch Request, Request List (sample data + detail actions),
+ * Change Requests (sample data + withdraw), change-request withdraw (legacy key).
+ * Request List / Change Requests absorb former modal-only follow-up tours.
  * Copy format: Japanese primary, English underneath.
  */
 (function (window) {
   const STORAGE_KEYS = {
     dispatch: "pcsKhi_tour_dispatch_v2",
-    requestList: "pcsKhi_tour_requestList_v1",
+    requestList: "pcsKhi_tour_requestList_v2",
     requestActivity: "pcsKhi_tour_requestActivity_v1",
     approvedModal: "pcsKhi_tour_approvedModal_v1",
-    changeRequests: "pcsKhi_tour_changeRequests_v2",
+    changeRequests: "pcsKhi_tour_changeRequests_v3",
     changeRequestWithdraw: "pcsKhi_tour_changeRequestWithdraw_v1",
   };
 
@@ -376,6 +376,46 @@
     ];
   }
 
+  function getRequestListTourHooks() {
+    return window.PcsKhiRequestListTour || null;
+  }
+
+  function openRequestListTourSampleModal() {
+    const hooks = getRequestListTourHooks();
+    if (hooks && typeof hooks.openApprovedSample === "function") {
+      return Promise.resolve(hooks.openApprovedSample());
+    }
+    return Promise.resolve();
+  }
+
+  function closeRequestListTourSampleModal() {
+    const hooks = getRequestListTourHooks();
+    if (hooks && typeof hooks.closeSampleModal === "function") {
+      return Promise.resolve(hooks.closeSampleModal());
+    }
+    return Promise.resolve();
+  }
+
+  function advanceRequestListTourAfterModalOpen(driverObj) {
+    openRequestListTourSampleModal().then(function () {
+      window.setTimeout(function () {
+        if (driverObj && typeof driverObj.moveNext === "function") {
+          driverObj.moveNext();
+        }
+      }, 350);
+    });
+  }
+
+  function retreatRequestListTourAfterModalClose(driverObj) {
+    closeRequestListTourSampleModal().then(function () {
+      window.setTimeout(function () {
+        if (driverObj && typeof driverObj.movePrevious === "function") {
+          driverObj.movePrevious();
+        }
+      }, 250);
+    });
+  }
+
   function getRequestListSteps() {
     return [
       {
@@ -383,8 +423,8 @@
         popover: {
           title: bilingual("申請一覧", "Request List"),
           description: bilingual(
-            "KDTへ送った派遣申請をここで確認・管理します。このガイドで主な操作を案内します。",
-            "Track and manage dispatch requests you sent to KDT. This short guide covers the main parts of this page."
+            "KDTへ送った派遣申請をここで確認・管理します。まずはサンプルデータで主な操作を案内します。完了後に実際のデータが表示されます。",
+            "Track and manage dispatch requests you sent to KDT. This guide uses sample data first. Your real requests appear when you finish."
           ),
           side: "bottom",
           align: "start",
@@ -464,29 +504,96 @@
         },
       },
       {
-        element: "[data-tour='requestList-open']",
-        popover: {
-          title: bilingual("詳細を開く", "Open details"),
-          description: bilingual(
-            "行または開くアイコンをクリックすると、申請内容・添付・Activity History を確認できます。",
-            "Click a row or the open icon to view details, attachments, and Activity History."
-          ),
-          side: "left",
-          align: "start",
-        },
-      },
-      {
         element: "[data-tour='nav-change-requests']",
         popover: {
           title: bilingual("変更申請", "Change Requests"),
           description: bilingual(
-            "日付変更やキャンセルの申請状況は Change Requests で追跡できます。ガイドはいつでも「ガイド」ボタンから再生できます。",
-            "Track date-change and cancellation requests in Change Requests. Replay this guide anytime with the Guide button."
+            "日付変更やキャンセルの申請状況は Change Requests で追跡できます。",
+            "Track date-change and cancellation requests in Change Requests."
           ),
           side: "right",
           align: "start",
         },
         onHighlightStarted: openNavForTour,
+      },
+      {
+        element: "[data-tour='requestList-open']",
+        popover: {
+          title: bilingual("詳細を開く", "Open details"),
+          description: bilingual(
+            "行または開くアイコンで申請詳細を開けます。次へ進むと、サンプルの承認済み申請を開いて続きを案内します。",
+            "Open a row to see details. Next opens a sample approved request so we can walk through the rest."
+          ),
+          side: "bottom",
+          align: "start",
+          onNextClick: function (element, step, options) {
+            const driverObj =
+              (options && options.driver) || activeDriver;
+            restoreNavAfterTour();
+            advanceRequestListTourAfterModalOpen(driverObj);
+          },
+        },
+        onHighlightStarted: function (element) {
+          restoreNavAfterTour();
+          preparePageStep(element);
+        },
+      },
+      {
+        element: "[data-tour='requestList-activity-history']",
+        popover: {
+          title: bilingual("履歴", "Activity History"),
+          description: bilingual(
+            "申請の提出・承認・変更など、これまでの経緯を時系列で確認できます。どのステータスでも表示されます。",
+            "See the timeline of this request—submission, approval, changes, and more. Available for every status."
+          ),
+          side: "left",
+          align: "start",
+          onPrevClick: function (element, step, options) {
+            const driverObj =
+              (options && options.driver) || activeDriver;
+            retreatRequestListTourAfterModalClose(driverObj);
+          },
+        },
+        onHighlightStarted: prepareModalStep,
+      },
+      {
+        element: "[data-tour='requestList-change-actions']",
+        popover: {
+          title: bilingual("変更申請", "Change requests"),
+          description: bilingual(
+            "承認済みの派遣について、ここから日付変更またはキャンセルをKDTへ申請できます。",
+            "For an approved dispatch, you can request a date change or cancellation to KDT from here."
+          ),
+          side: "top",
+          align: "center",
+        },
+        onHighlightStarted: prepareModalStep,
+      },
+      {
+        element: "[data-tour='requestList-date-change']",
+        popover: {
+          title: bilingual("日付変更を申請", "Request date change"),
+          description: bilingual(
+            "派遣期間を変更したい場合に使います。提案日程と理由を入力して送信します。",
+            "Use this when you need to adjust the dispatch period. Enter proposed dates and a reason, then submit."
+          ),
+          side: "top",
+          align: "center",
+        },
+        onHighlightStarted: prepareModalStep,
+      },
+      {
+        element: "[data-tour='requestList-cancellation']",
+        popover: {
+          title: bilingual("キャンセルを申請", "Request cancellation"),
+          description: bilingual(
+            "派遣自体を取り消したい場合に使います。進捗は Change Requests で確認できます。ガイドはいつでも「ガイド」ボタンから再生できます。完了すると実際のデータが表示されます。",
+            "Use this to cancel the dispatch. Track progress under Change Requests. Replay anytime with Guide. Done shows your real requests."
+          ),
+          side: "top",
+          align: "center",
+        },
+        onHighlightStarted: prepareModalStep,
       },
     ];
   }
@@ -553,6 +660,66 @@
     ];
   }
 
+  function getChangeRequestsTourHooks() {
+    return window.PcsKhiChangeRequestsTour || null;
+  }
+
+  function openChangeRequestsTourDateSample() {
+    const hooks = getChangeRequestsTourHooks();
+    if (hooks && typeof hooks.openDateChangeSample === "function") {
+      return Promise.resolve(hooks.openDateChangeSample());
+    }
+    return Promise.resolve();
+  }
+
+  function closeChangeRequestsTourSampleModal() {
+    const hooks = getChangeRequestsTourHooks();
+    if (hooks && typeof hooks.closeSampleModal === "function") {
+      return Promise.resolve(hooks.closeSampleModal());
+    }
+    return Promise.resolve();
+  }
+
+  function advanceChangeRequestsTourAfterModalOpen(driverObj) {
+    openChangeRequestsTourDateSample().then(function () {
+      window.setTimeout(function () {
+        if (driverObj && typeof driverObj.moveNext === "function") {
+          driverObj.moveNext();
+        }
+      }, 350);
+    });
+  }
+
+  function retreatChangeRequestsTourAfterModalClose(driverObj) {
+    closeChangeRequestsTourSampleModal().then(function () {
+      window.setTimeout(function () {
+        if (driverObj && typeof driverObj.movePrevious === "function") {
+          driverObj.movePrevious();
+        }
+      }, 250);
+    });
+  }
+
+  function advanceChangeRequestsTourAfterModalClose(driverObj) {
+    closeChangeRequestsTourSampleModal().then(function () {
+      window.setTimeout(function () {
+        if (driverObj && typeof driverObj.moveNext === "function") {
+          driverObj.moveNext();
+        }
+      }, 250);
+    });
+  }
+
+  function reopenChangeRequestsTourDateSampleThenPrev(driverObj) {
+    openChangeRequestsTourDateSample().then(function () {
+      window.setTimeout(function () {
+        if (driverObj && typeof driverObj.movePrevious === "function") {
+          driverObj.movePrevious();
+        }
+      }, 350);
+    });
+  }
+
   function getChangeRequestsSteps() {
     return [
       {
@@ -560,8 +727,8 @@
         popover: {
           title: bilingual("変更申請", "Change Requests"),
           description: bilingual(
-            "KDTへ送った日付変更・キャンセル申請の進捗をここで確認します。新規の作成は Request List の承認済み申請から行います。",
-            "Track date-change and cancellation requests you sent to KDT. Create new ones from an approved request in Request List."
+            "KDTへ送った日付変更・キャンセル申請の進捗をここで確認します。まずはサンプルデータで主な操作を案内します。完了後に実際のデータが表示されます。",
+            "Track date-change and cancellation requests you sent to KDT. This guide uses sample data first. Your real requests appear when you finish."
           ),
           side: "bottom",
           align: "start",
@@ -637,13 +804,60 @@
         popover: {
           title: bilingual("詳細を開く", "Open details"),
           description: bilingual(
-            "行または開くアイコンをクリックすると内容を確認できます。保留中で自分が申請した場合は、詳細から取下げもできます。",
-            "Click a row or the open icon to view details. If it is pending and you submitted it, you can also withdraw from the detail view."
+            "行または開くアイコンで内容を確認できます。次へ進むと、サンプルの保留中申請を開いて取下げ操作を案内します。",
+            "Open a row to view details. Next opens a sample pending request so we can show withdraw."
           ),
-          side: "left",
+          side: "bottom",
           align: "start",
+          onNextClick: function (element, step, options) {
+            const driverObj =
+              (options && options.driver) || activeDriver;
+            restoreNavAfterTour();
+            advanceChangeRequestsTourAfterModalOpen(driverObj);
+          },
         },
-        onHighlightStarted: preparePageStep,
+        onHighlightStarted: function (element) {
+          restoreNavAfterTour();
+          preparePageStep(element);
+        },
+      },
+      {
+        element:
+          "#dateChangeRequestDetailsModal [data-tour='changeRequests-withdraw']",
+        popover: {
+          title: bilingual("取下げ", "Withdraw"),
+          description: bilingual(
+            "保留中の変更申請は、KDTが対応する前であれば取下げできます。申請した本人のみ操作できます。",
+            "While a change request is pending, you can withdraw it before KDT acts. Only the person who submitted it can do this."
+          ),
+          side: "top",
+          align: "center",
+          onPrevClick: function (element, step, options) {
+            const driverObj =
+              (options && options.driver) || activeDriver;
+            retreatChangeRequestsTourAfterModalClose(driverObj);
+          },
+        },
+        onHighlightStarted: prepareModalStep,
+      },
+      {
+        element:
+          "#dateChangeRequestDetailsModal [data-tour='changeRequests-withdraw-btn']",
+        popover: {
+          title: bilingual("申請を取下げ", "Withdraw request"),
+          description: bilingual(
+            "自分が申請した保留中の案件では「Withdraw Request」から取り消せます。取下げ後は元に戻せません。",
+            'If you submitted this pending request, use "Withdraw Request" to cancel it. Withdrawal cannot be undone.'
+          ),
+          side: "top",
+          align: "center",
+          onNextClick: function (element, step, options) {
+            const driverObj =
+              (options && options.driver) || activeDriver;
+            advanceChangeRequestsTourAfterModalClose(driverObj);
+          },
+        },
+        onHighlightStarted: prepareModalStep,
       },
       {
         element: "[data-tour='changeRequests-cancel-section']",
@@ -655,6 +869,11 @@
           ),
           side: "bottom",
           align: "start",
+          onPrevClick: function (element, step, options) {
+            const driverObj =
+              (options && options.driver) || activeDriver;
+            reopenChangeRequestsTourDateSampleThenPrev(driverObj);
+          },
         },
         onHighlightStarted: prepareChangeRequestsCancelStep,
         onHighlighted: refreshChangeRequestsCancelStep,
@@ -706,10 +925,10 @@
         popover: {
           title: bilingual("詳細を開く", "Open details"),
           description: bilingual(
-            "行または開くアイコンをクリックすると内容を確認できます。保留中で自分が申請した場合は、詳細から取下げもできます。",
-            "Click a row or the open icon to view details. If it is pending and you submitted it, you can also withdraw from the detail view."
+            "行または開くアイコンで内容を確認できます。保留中で自分が申請した場合は、詳細から取下げもできます（日付変更と同じ操作です）。",
+            "Open a row to view details. If it is pending and you submitted it, you can withdraw from the detail view—same as date change."
           ),
-          side: "left",
+          side: "bottom",
           align: "start",
         },
         onHighlightStarted: preparePageStep,
@@ -720,8 +939,8 @@
         popover: {
           title: bilingual("新規の変更申請", "Create a change request"),
           description: bilingual(
-            "日付変更やキャンセルの新規申請は Request List で承認済み申請を開き、詳細から行います。ガイドはいつでも「ガイド」ボタンから再生できます。",
-            "To submit a new date change or cancellation, open an approved request in Request List. Replay this guide anytime with the Guide button."
+            "日付変更やキャンセルの新規申請は Request List で承認済み申請を開き、詳細から行います。ガイドはいつでも「ガイド」ボタンから再生できます。完了すると実際のデータが表示されます。",
+            "To submit a new date change or cancellation, open an approved request in Request List. Replay anytime with Guide. Done shows your real requests."
           ),
           side: "right",
           align: "start",
@@ -817,6 +1036,10 @@
       showProgress: true,
       animate: true,
       allowClose: true,
+      // Keep X / Esc; do not dismiss when clicking the overlay.
+      overlayClickBehavior: "noop",
+      // Block clicks on highlighted page elements; only tour controls work.
+      disableActiveInteraction: true,
       smoothScroll: true,
       overlayOpacity: 0.55,
       stagePadding: 6,
@@ -879,6 +1102,10 @@
     start: startTour,
     maybeStart: maybeStartTour,
     isActive: isTourActive,
+    isDone: function (name) {
+      const key = STORAGE_KEYS[name];
+      return key ? isDone(key) : true;
+    },
     stop: stopTour,
     bindReplay: bindReplayButton,
   };

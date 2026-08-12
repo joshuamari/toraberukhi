@@ -24,6 +24,9 @@ let groupList = [];
 
 const allDateChangeRequests = [];
 const allCancellationRequests = [];
+let realDateChangeRequestsCache = [];
+let realCancellationRequestsCache = [];
+let isChangeRequestsTourMode = false;
 
 const dateChangeState = {
   filteredRequests: [],
@@ -139,6 +142,212 @@ function bindDispatchRequestIds(requests, dispatchRequests) {
     };
   });
 }
+
+function getTourDateChangeOpenId() {
+  return (
+    (window.mockChangeRequestsTour &&
+      window.mockChangeRequestsTour.dateChangeOpenId) ||
+    "TOUR-DCR-001"
+  );
+}
+
+function getTourCancellationOpenId() {
+  return (
+    (window.mockChangeRequestsTour &&
+      window.mockChangeRequestsTour.cancellationOpenId) ||
+    "TOUR-CR-001"
+  );
+}
+
+function buildTourMockChangeRequests() {
+  const tour = window.mockChangeRequestsTour || {};
+  const fallbackGroup = groupList[0] || {};
+  const fallbackGroupId = fallbackGroup.id != null ? fallbackGroup.id : 1;
+  const fallbackGroupName = fallbackGroup.name || "Systems Group";
+  const loggedInUserId = Number(empDetails?.id) || 0;
+  const requesterName = [empDetails?.surname, empDetails?.firstname]
+    .filter(Boolean)
+    .join(", ");
+
+  const stamp = function (item) {
+    return Object.assign({}, item, {
+      group_id: fallbackGroupId,
+      group_name: item.group_name || fallbackGroupName,
+      requested_by_id:
+        item.status === "pending" && loggedInUserId > 0
+          ? loggedInUserId
+          : item.requested_by_id,
+      requested_by:
+        item.status === "pending" && requesterName
+          ? requesterName
+          : item.requested_by,
+    });
+  };
+
+  return {
+    dateChanges: (tour.dateChanges || []).map(stamp),
+    cancellations: (tour.cancellations || []).map(stamp),
+  };
+}
+
+function applyChangeRequestsDataset(dateChanges, cancellations, resetPage) {
+  allDateChangeRequests.length = 0;
+  allDateChangeRequests.push(...(dateChanges || []));
+
+  allCancellationRequests.length = 0;
+  allCancellationRequests.push(...(cancellations || []));
+
+  initSectionTabs("dateChange");
+  initSectionTabs("cancellation");
+  applyDateChangeFilters(resetPage !== false);
+  applyCancellationFilters(resetPage !== false);
+}
+
+function resetChangeRequestFiltersForTour() {
+  $("#dcSearchbar, #crSearchbar").val("");
+  $("#dcMonthSel, #crMonthSel").val("");
+  if ($("#dcGrpSel option").length) {
+    $("#dcGrpSel").val($("#dcGrpSel option:first").val());
+  }
+  if ($("#crGrpSel option").length) {
+    $("#crGrpSel").val($("#crGrpSel option:first").val());
+  }
+}
+
+function enterChangeRequestsTourMode() {
+  isChangeRequestsTourMode = true;
+  document.body.classList.add("pcs-tour-change-requests-mode");
+  resetChangeRequestFiltersForTour();
+  const mocks = buildTourMockChangeRequests();
+  applyChangeRequestsDataset(mocks.dateChanges, mocks.cancellations, true);
+}
+
+function hideChangeRequestModalsForTour() {
+  const modalIds = [
+    "dateChangeRequestDetailsModal",
+    "cancellationRequestDetailsModal",
+  ];
+
+  const hideOne = function (modalId) {
+    const el = document.getElementById(modalId);
+    if (!el || !window.bootstrap || !el.classList.contains("show")) {
+      return Promise.resolve();
+    }
+
+    return new Promise(function (resolve) {
+      const onHidden = function () {
+        el.removeEventListener("hidden.bs.modal", onHidden);
+        resolve();
+      };
+      el.addEventListener("hidden.bs.modal", onHidden);
+      bootstrap.Modal.getOrCreateInstance(el).hide();
+    });
+  };
+
+  return Promise.all(modalIds.map(hideOne));
+}
+
+function exitChangeRequestsTourMode() {
+  const finish = function () {
+    isChangeRequestsTourMode = false;
+    document.body.classList.remove("pcs-tour-change-requests-mode");
+    applyChangeRequestsDataset(
+      realDateChangeRequestsCache,
+      realCancellationRequestsCache,
+      true
+    );
+  };
+
+  hideChangeRequestModalsForTour().then(finish).catch(finish);
+}
+
+function openTourDateChangeSampleRequest() {
+  const requestId = getTourDateChangeOpenId();
+  const modal = document.getElementById("dateChangeRequestDetailsModal");
+
+  return new Promise(function (resolve) {
+    if (!modal) {
+      openDateChangeRequestById(requestId, null);
+      resolve();
+      return;
+    }
+
+    if (modal.classList.contains("show")) {
+      openDateChangeRequestById(requestId, null);
+      resolve();
+      return;
+    }
+
+    const onShown = function () {
+      modal.removeEventListener("shown.bs.modal", onShown);
+      resolve();
+    };
+    modal.addEventListener("shown.bs.modal", onShown);
+    const opened = openDateChangeRequestById(requestId, null);
+    if (!opened) {
+      modal.removeEventListener("shown.bs.modal", onShown);
+      resolve();
+    }
+  });
+}
+
+function markAbsorbedChangeRequestToursDone() {
+  if (!window.PcsKhiTour || !window.PcsKhiTour.keys) {
+    return;
+  }
+  try {
+    const withdrawKey = window.PcsKhiTour.keys.changeRequestWithdraw;
+    if (withdrawKey) {
+      window.localStorage.setItem(withdrawKey, "done");
+    }
+  } catch (e) {
+    /* ignore */
+  }
+}
+
+function startChangeRequestsGuidedTour(force) {
+  if (!window.PcsKhiTour) {
+    exitChangeRequestsTourMode();
+    return false;
+  }
+
+  enterChangeRequestsTourMode();
+
+  const started = window.PcsKhiTour.start("changeRequests", {
+    force: !!force,
+    onDestroyed: function () {
+      markAbsorbedChangeRequestToursDone();
+      exitChangeRequestsTourMode();
+    },
+  });
+
+  if (!started) {
+    exitChangeRequestsTourMode();
+  }
+
+  return started;
+}
+
+function bindChangeRequestsTourReplay() {
+  const btn = document.querySelector("#tourReplayBtn");
+  if (!btn) {
+    return;
+  }
+  btn.addEventListener("click", function (e) {
+    e.preventDefault();
+    startChangeRequestsGuidedTour(true);
+  });
+}
+
+window.PcsKhiChangeRequestsTour = {
+  isActiveMode: function () {
+    return isChangeRequestsTourMode;
+  },
+  dateChangeOpenId: getTourDateChangeOpenId(),
+  cancellationOpenId: getTourCancellationOpenId(),
+  openDateChangeSample: openTourDateChangeSampleRequest,
+  closeSampleModal: hideChangeRequestModalsForTour,
+};
 //#endregion
 
 checkAccess()
@@ -181,24 +390,27 @@ checkAccess()
             fillGroups("dcGrpSel");
             fillGroups("crGrpSel");
 
-            allDateChangeRequests.length = 0;
-            allDateChangeRequests.push(...dateChanges);
+            realDateChangeRequestsCache = [...dateChanges];
+            realCancellationRequestsCache = [...cancellations];
 
-            allCancellationRequests.length = 0;
-            allCancellationRequests.push(...cancellations);
+            const deepLinkParams = getDeepLinkedChangeRequestParams();
+            const shouldRunFirstVisitTour =
+              window.PcsKhiTour &&
+              !window.PcsKhiTour.isDone("changeRequests") &&
+              !deepLinkParams;
 
-            initSectionTabs("dateChange");
-            initSectionTabs("cancellation");
-
-            applyDateChangeFilters(true);
-            applyCancellationFilters(true);
-            const deepLinkedOpened = openChangeRequestFromDeepLink();
+            if (shouldRunFirstVisitTour) {
+              enterChangeRequestsTourMode();
+            } else {
+              applyChangeRequestsDataset(dateChanges, cancellations, true);
+              openChangeRequestFromDeepLink();
+            }
 
             if (window.PcsKhiTour) {
-              window.PcsKhiTour.bindReplay("#tourReplayBtn", "changeRequests");
-              if (!deepLinkedOpened) {
+              bindChangeRequestsTourReplay();
+              if (shouldRunFirstVisitTour) {
                 window.setTimeout(function () {
-                  window.PcsKhiTour.maybeStart("changeRequests");
+                  startChangeRequestsGuidedTour(false);
                 }, 400);
               }
             }
@@ -387,10 +599,11 @@ const dateChangeDetailsModalElement = document.getElementById(
 if (dateChangeDetailsModalElement) {
   dateChangeDetailsModalElement.addEventListener("shown.bs.modal", function () {
     focusInitialModalControl(dateChangeDetailsModalElement);
-    maybeStartPendingWithdrawTour();
   });
   dateChangeDetailsModalElement.addEventListener("hidden.bs.modal", function () {
-    stopActiveChangeRequestTour();
+    if (!(isChangeRequestsTourMode && window.PcsKhiTour?.isActive?.())) {
+      stopActiveChangeRequestTour();
+    }
     if (dateChangeModalReturnTrigger) {
       dateChangeModalReturnTrigger.focus();
       dateChangeModalReturnTrigger = null;
@@ -405,10 +618,11 @@ if (cancellationDetailsModalElement) {
   cancellationDetailsModalElement.addEventListener("shown.bs.modal", function () {
     renderPaginationIcons();
     focusInitialModalControl(cancellationDetailsModalElement);
-    maybeStartPendingWithdrawTour();
   });
   cancellationDetailsModalElement.addEventListener("hidden.bs.modal", function () {
-    stopActiveChangeRequestTour();
+    if (!(isChangeRequestsTourMode && window.PcsKhiTour?.isActive?.())) {
+      stopActiveChangeRequestTour();
+    }
     if (cancellationModalReturnTrigger) {
       cancellationModalReturnTrigger.focus();
       cancellationModalReturnTrigger = null;
@@ -773,6 +987,10 @@ function canWithdrawChangeRequest(request) {
     return false;
   }
 
+  if (isChangeRequestsTourMode) {
+    return true;
+  }
+
   const loggedInUserId = Number(empDetails?.id);
   const requestedById = Number(request.requested_by_id);
 
@@ -821,47 +1039,8 @@ function stopActiveChangeRequestTour() {
 }
 
 function maybeStartPendingWithdrawTour() {
-  if (!window.PcsKhiTour) {
-    return false;
-  }
-
-  if (
-    typeof window.PcsKhiTour.isActive === "function" &&
-    window.PcsKhiTour.isActive()
-  ) {
-    return false;
-  }
-
-  if (!isChangeRequestDetailModalOpen()) {
-    return false;
-  }
-
-  if (!isPendingWithdrawSectionVisible()) {
-    return false;
-  }
-
-  window.setTimeout(function () {
-    if (!isChangeRequestDetailModalOpen()) {
-      return;
-    }
-
-    if (
-      typeof window.PcsKhiTour.isActive === "function" &&
-      window.PcsKhiTour.isActive()
-    ) {
-      return;
-    }
-
-    if (!isPendingWithdrawSectionVisible()) {
-      return;
-    }
-
-    window.PcsKhiTour.maybeStart("changeRequestWithdraw", {
-      visibleOnly: true,
-    });
-  }, 400);
-
-  return true;
+  // Absorbed into the main Change Requests tour (sample data).
+  return false;
 }
 
 function updateWithdrawSection(sectionId, request) {
@@ -1056,9 +1235,8 @@ function renderSectionPagination(section) {
   renderPaginationIcons();
 }
 
-function getOpenIconMarkup(requestId, viewClass, tourAttr) {
-  const tourMarkup = tourAttr ? ` ${tourAttr}` : "";
-  return `<div class="openIcon ${viewClass}" title="Open item" data-request-id="${requestId}"${tourMarkup}>
+function getOpenIconMarkup(requestId, viewClass) {
+  return `<div class="openIcon ${viewClass}" title="Open item" data-request-id="${requestId}">
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="144px" height="144px">
       <path d="M 41.470703 4.9863281 A 1.50015 1.50015 0 0 0 41.308594 5 L 27.5 5 A 1.50015 1.50015 0 1 0 27.5 8 L 37.878906 8 L 22.439453 23.439453 A 1.50015 1.50015 0 1 0 24.560547 25.560547 L 40 10.121094 L 40 20.5 A 1.50015 1.50015 0 1 0 43 20.5 L 43 6.6894531 A 1.50015 1.50015 0 0 0 41.470703 4.9863281 z M 12.5 8 C 8.3754991 8 5 11.375499 5 15.5 L 5 35.5 C 5 39.624501 8.3754991 43 12.5 43 L 32.5 43 C 36.624501 43 40 39.624501 40 35.5 L 40 25.5 A 1.50015 1.50015 0 1 0 37 25.5 L 37 35.5 C 37 38.003499 35.003499 40 32.5 40 L 12.5 40 C 9.9965009 40 8 38.003499 8 35.5 L 8 15.5 C 8 12.996501 9.9965009 11 12.5 11 L 22.5 11 A 1.50015 1.50015 0 1 0 22.5 8 L 12.5 8 z" fill="rgba(85, 85, 85, 0.5)" stroke="rgba(85, 85, 85, 0.5)" stroke-width="1"/>
     </svg>
@@ -1085,21 +1263,22 @@ function renderDateChangeTableBody(pageItems) {
   }
 
   pageItems.forEach((item, index) => {
-    const openTourAttr =
-      index === 0 ? 'data-tour="changeRequests-open"' : "";
+    const openTourAttr = item.is_tour_open_target
+      ? ' data-tour="changeRequests-open"'
+      : !pageItems.some(function (row) {
+          return row.is_tour_open_target;
+        }) && index === 0
+        ? ' data-tour="changeRequests-open"'
+        : "";
     $tbody.append(`
-      <tr class="date-change-request-row change-request-row" data-request-id="${item.id}">
+      <tr class="date-change-request-row change-request-row" data-request-id="${item.id}"${openTourAttr}>
         <td>${item.request_id}</td>
         <td>${item.employee_name}</td>
         <td>${formatDateRange(item.current_start, item.current_end)}</td>
         <td>${formatDateRange(item.proposed_start, item.proposed_end)}</td>
         <td>${formatDate(item.date_requested)}</td>
         <td>${getChangeRequestStatusBadgeHtml(item.status)}</td>
-        <td>${getOpenIconMarkup(
-          item.id,
-          "view-date-change-request",
-          openTourAttr
-        )}</td>
+        <td>${getOpenIconMarkup(item.id, "view-date-change-request")}</td>
       </tr>
     `);
   });
@@ -1125,20 +1304,21 @@ function renderCancellationTableBody(pageItems) {
   }
 
   pageItems.forEach((item, index) => {
-    const openTourAttr =
-      index === 0 ? 'data-tour="changeRequests-cancel-open"' : "";
+    const openTourAttr = item.is_tour_open_target
+      ? ' data-tour="changeRequests-cancel-open"'
+      : !pageItems.some(function (row) {
+          return row.is_tour_open_target;
+        }) && index === 0
+        ? ' data-tour="changeRequests-cancel-open"'
+        : "";
     $tbody.append(`
-      <tr class="cancellation-request-row change-request-row" data-request-id="${item.id}">
+      <tr class="cancellation-request-row change-request-row" data-request-id="${item.id}"${openTourAttr}>
         <td>${item.request_id}</td>
         <td>${item.employee_name}</td>
         <td>${formatDateRange(item.dispatch_start, item.dispatch_end)}</td>
         <td>${formatDate(item.date_requested)}</td>
         <td>${getChangeRequestStatusBadgeHtml(item.status)}</td>
-        <td>${getOpenIconMarkup(
-          item.id,
-          "view-cancellation-request",
-          openTourAttr
-        )}</td>
+        <td>${getOpenIconMarkup(item.id, "view-cancellation-request")}</td>
       </tr>
     `);
   });
