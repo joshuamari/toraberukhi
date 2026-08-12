@@ -1,6 +1,7 @@
 /**
  * Product tour helpers for トラベる (Driver.js + localStorage).
  * v1: Dispatch Request first-run + replay.
+ * Copy format: Japanese primary, English underneath.
  */
 (function (window) {
   const STORAGE_KEYS = {
@@ -11,6 +12,25 @@
 
   let activeDriver = null;
   let openedNavForTour = false;
+
+  function escapeHtml(text) {
+    return String(text)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;");
+  }
+
+  /** Japanese on top, English under. */
+  function bilingual(ja, en) {
+    return (
+      '<span class="pcs-tour-ja" lang="ja">' +
+      escapeHtml(ja) +
+      '</span><span class="pcs-tour-en">' +
+      escapeHtml(en) +
+      "</span>"
+    );
+  }
 
   function getDriverFactory() {
     return window.driver && window.driver.js && window.driver.js.driver;
@@ -90,9 +110,11 @@
       {
         element: "[data-tour='dispatch-welcome']",
         popover: {
-          title: "Welcome to トラベる",
-          description:
-            "This is where you create a dispatch request for KDT. A short guide will point out the main parts of this page.",
+          title: bilingual("トラベるへようこそ", "Welcome to トラベる"),
+          description: bilingual(
+            "ここからKDTへの派遣申請を作成します。このガイドでページの主な部分を案内します。",
+            "This is where you create a dispatch request for KDT. A short guide will point out the main parts of this page."
+          ),
           side: "bottom",
           align: "start",
         },
@@ -100,9 +122,11 @@
       {
         element: "[data-tour='nav-main']",
         popover: {
-          title: "Main menu",
-          description:
-            "Sidebar: create requests here, track them in Request List, manage Change Requests, Dashboard for an overview, User Management to add other KHI members, and User Manuals.",
+          title: bilingual("メインメニュー", "Main menu"),
+          description: bilingual(
+            "サイドバー：ここで申請作成、Request Listで追跡、Change Requestsの管理、Dashboardで概要、User Managementで他のKHIメンバー追加、User Manuals。",
+            "Sidebar: create requests here, track them in Request List, manage Change Requests, Dashboard for an overview, User Management to add other KHI members, and User Manuals."
+          ),
           side: "right",
           align: "start",
         },
@@ -111,9 +135,11 @@
       {
         element: "[data-tour='requester-info']",
         popover: {
-          title: "Requester information",
-          description:
-            "Start with your company, department, name, and contact details.",
+          title: bilingual("依頼者情報", "Requester information"),
+          description: bilingual(
+            "会社、部署、氏名、連絡先から入力してください。",
+            "Start with your company, department, name, and contact details."
+          ),
           side: "right",
           align: "start",
         },
@@ -122,9 +148,11 @@
       {
         element: "[data-tour='employee-info']",
         popover: {
-          title: "Dispatch employee",
-          description:
-            "Choose the employee group and the person who will be dispatched.",
+          title: bilingual("派遣社員", "Dispatch employee"),
+          description: bilingual(
+            "社員グループと派遣する社員を選択してください。",
+            "Choose the employee group and the person who will be dispatched."
+          ),
           side: "right",
           align: "start",
         },
@@ -133,9 +161,11 @@
       {
         element: "[data-tour='dispatch-schedule']",
         popover: {
-          title: "Schedule and place",
-          description:
-            "Set the travel dates, place of service, and specific location. Scroll the form for the next fields.",
+          title: bilingual("日程と場所", "Schedule and place"),
+          description: bilingual(
+            "渡航日、勤務地、具体的な場所を入力してください。続きの項目はフォームをスクロールしてください。",
+            "Set the travel dates, place of service, and specific location. Scroll the form for the next fields."
+          ),
           side: "right",
           align: "start",
         },
@@ -144,9 +174,11 @@
       {
         element: "[data-tour='dispatch-trip-details']",
         popover: {
-          title: "Trip details",
-          description:
-            "Fill invitation, work order, project name, and the training toggle if needed.",
+          title: bilingual("出張詳細", "Trip details"),
+          description: bilingual(
+            "招請、ワークオーダー、プロジェクト名、必要なら研修トグルを入力してください。",
+            "Fill invitation, work order, project name, and the training toggle if needed."
+          ),
           side: "right",
           align: "start",
         },
@@ -155,8 +187,11 @@
       {
         element: "[data-tour='dispatch-copy']",
         popover: {
-          title: "Copy",
-          description: "Confirm the copy-to contact names and numbers.",
+          title: bilingual("写し", "Copy"),
+          description: bilingual(
+            "写し先の氏名と電話番号を確認してください。",
+            "Confirm the copy-to contact names and numbers."
+          ),
           side: "right",
           align: "start",
         },
@@ -165,9 +200,11 @@
       {
         element: "[data-tour='dispatch-work-history']",
         popover: {
-          title: "Work history",
-          description:
-            "Review the work history on the right (it appears after you select an employee). If it looks correct, toggle on Work History Completed to proceed.",
+          title: bilingual("職歴", "Work history"),
+          description: bilingual(
+            "右側の職歴を確認してください（社員を選択すると表示されます）。問題なければ「Work History Completed」のトグルをオンにして進みます。",
+            "Review the work history on the right (it appears after you select an employee). If it looks correct, toggle on Work History Completed to proceed."
+          ),
           side: "right",
           align: "start",
         },
@@ -176,9 +213,11 @@
       {
         element: "[data-tour='dispatch-continue']",
         popover: {
-          title: "Continue",
-          description:
-            'When the form is ready, click "Click to Continue" to review the dispatch form and submit your request.',
+          title: bilingual("続ける", "Continue"),
+          description: bilingual(
+            "入力が終わったら「Click to Continue」をクリックし、派遣票を確認して申請してください。",
+            'When the form is ready, click "Click to Continue" to review the dispatch form and submit your request.'
+          ),
           side: "top",
           align: "end",
         },
@@ -187,9 +226,11 @@
       {
         element: "[data-tour='nav-request-list']",
         popover: {
-          title: "Track your requests",
-          description:
-            "After submitting, open Request List to check status. You can replay this guide anytime with the Guide button.",
+          title: bilingual("申請の確認", "Track your requests"),
+          description: bilingual(
+            "送信後は Request List でステータスを確認できます。ガイドはいつでも「ガイド」ボタンから再生できます。",
+            "After submitting, open Request List to check status. You can replay this guide anytime with the Guide button."
+          ),
           side: "right",
           align: "start",
         },
@@ -247,10 +288,10 @@
       stagePadding: 6,
       stageRadius: 8,
       popoverClass: "pcs-tour-popover",
-      nextBtnText: "Next",
-      prevBtnText: "Back",
-      doneBtnText: "Done",
-      progressText: "{{current}} of {{total}}",
+      nextBtnText: bilingual("次へ", "Next"),
+      prevBtnText: bilingual("戻る", "Back"),
+      doneBtnText: bilingual("完了", "Done"),
+      progressText: "{{current}} / {{total}}",
       steps: steps,
       onDestroyed: function () {
         markDone(key);
