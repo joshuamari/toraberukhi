@@ -97,6 +97,15 @@ checkAccess()
               openDispatchRequestFromDeepLink(deepLinkedRequestId);
               clearDeepLinkRequestId();
             }
+
+            if (window.PcsKhiTour) {
+              window.PcsKhiTour.bindReplay("#tourReplayBtn", "requestList");
+              if (!deepLinkedRequestId) {
+                window.setTimeout(function () {
+                  window.PcsKhiTour.maybeStart("requestList");
+                }, 400);
+              }
+            }
           })
           .catch((error) => {
             alert(`${error}`);
@@ -118,6 +127,21 @@ $(document).on("click", "#menu", function () {
 $(document).on("click", "#closeNav", function () {
   $(".navigation").removeClass("open");
   $("body").removeClass("overflow-hidden");
+});
+
+$(document).on("shown.bs.modal", "#openModal", function () {
+  maybeStartRequestDetailTours();
+});
+
+$(document).on("hidden.bs.modal", "#openModal", function () {
+  if (
+    window.PcsKhiTour &&
+    typeof window.PcsKhiTour.isActive === "function" &&
+    window.PcsKhiTour.isActive() &&
+    typeof window.PcsKhiTour.stop === "function"
+  ) {
+    window.PcsKhiTour.stop();
+  }
 });
 
 function isStatusGuideOpen() {
@@ -2032,6 +2056,8 @@ function fillTable(sampleData) {
     $.each(sampleData, function (index, item) {
       const requestReference =
         formatRequestReference(item.req_id, "REQ") || "—";
+      const openTourAttr =
+        index === 0 ? ' data-tour="requestList-open"' : "";
       str = `
     <tr class="dispatch-request-row" data-request-id="${item.req_id}">
       <td class="whitespace-nowrap">${requestReference}</td>
@@ -2050,7 +2076,7 @@ function fillTable(sampleData) {
             : ` <span class="validity "><i class='bx bx-x text-[18px] font-semibold'></i></span>`
         }</td>
       <td>
-        <div class="openIcon view-dispatch-request" title="Open item" data-request-id="${item.req_id}">
+        <div class="openIcon view-dispatch-request" title="Open item" data-request-id="${item.req_id}"${openTourAttr}>
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"   width="144px" height="144px">
             <path d="M 41.470703 4.9863281 A 1.50015 1.50015 0 0 0 41.308594 5 L 27.5 5 A 1.50015 1.50015 0 1 0 27.5 8 L 37.878906 8 L 22.439453 23.439453 A 1.50015 1.50015 0 1 0 24.560547 25.560547 L 40 10.121094 L 40 20.5 A 1.50015 1.50015 0 1 0 43 20.5 L 43 6.6894531 A 1.50015 1.50015 0 0 0 41.470703 4.9863281 z M 12.5 8 C 8.3754991 8 5 11.375499 5 15.5 L 5 35.5 C 5 39.624501 8.3754991 43 12.5 43 L 32.5 43 C 36.624501 43 40 39.624501 40 35.5 L 40 25.5 A 1.50015 1.50015 0 1 0 37 25.5 L 37 35.5 C 37 38.003499 35.003499 40 32.5 40 L 12.5 40 C 9.9965009 40 8 38.003499 8 35.5 L 8 15.5 C 8 12.996501 9.9965009 11 12.5 11 L 22.5 11 A 1.50015 1.50015 0 1 0 22.5 8 L 12.5 8 z" fill="rgba(85, 85, 85, 0.5)"  stroke="rgba(85, 85, 85, 0.5)" stroke-width="1"/>
           </svg>
@@ -2332,6 +2358,97 @@ function canRequestDispatchChange(request) {
   // pending, declined, cancelled, and completed are read-only.
   const normalizedStatus = getEffectiveDispatchStatus(request);
   return normalizedStatus === "approved";
+}
+
+function isRequestDetailModalOpen() {
+  const modalEl = document.getElementById("openModal");
+  return Boolean(modalEl && modalEl.classList.contains("show"));
+}
+
+function isActivityHistoryVisible() {
+  const activitySection = document.getElementById("dispatchActivityHistory");
+  return Boolean(
+    activitySection &&
+      !activitySection.hidden &&
+      !activitySection.classList.contains("d-none")
+  );
+}
+
+function isChangeRequestActionsVisible() {
+  const actionsEl = document.getElementById("changeRequestActions");
+  return Boolean(actionsEl && !actionsEl.classList.contains("d-none"));
+}
+
+function maybeStartApprovedRequestActionsTour() {
+  if (!window.PcsKhiTour || !isRequestDetailModalOpen()) {
+    return false;
+  }
+
+  if (
+    typeof window.PcsKhiTour.isActive === "function" &&
+    window.PcsKhiTour.isActive()
+  ) {
+    return false;
+  }
+
+  if (!canRequestDispatchChange(selectedDispatchRequest)) {
+    return false;
+  }
+
+  if (!isChangeRequestActionsVisible()) {
+    return false;
+  }
+
+  return window.PcsKhiTour.maybeStart("approvedModal", { visibleOnly: true });
+}
+
+function maybeStartRequestDetailTours() {
+  if (!window.PcsKhiTour) {
+    return;
+  }
+
+  if (
+    typeof window.PcsKhiTour.isActive === "function" &&
+    window.PcsKhiTour.isActive()
+  ) {
+    return;
+  }
+
+  window.setTimeout(function () {
+    if (!isRequestDetailModalOpen()) {
+      return;
+    }
+
+    if (
+      typeof window.PcsKhiTour.isActive === "function" &&
+      window.PcsKhiTour.isActive()
+    ) {
+      return;
+    }
+
+    const continueToApproved = function () {
+      window.setTimeout(function () {
+        if (!isRequestDetailModalOpen()) {
+          return;
+        }
+        maybeStartApprovedRequestActionsTour();
+      }, 350);
+    };
+
+    if (isActivityHistoryVisible()) {
+      const activityStarted = window.PcsKhiTour.start("requestActivity", {
+        force: false,
+        visibleOnly: true,
+        onDestroyed: continueToApproved,
+      });
+      if (!activityStarted) {
+        continueToApproved();
+      }
+      return;
+    }
+
+    continueToApproved();
+  }, 400);
 }
 
 function hasPendingDateChangeRequest(request) {
