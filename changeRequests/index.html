@@ -14,10 +14,14 @@
     <link rel="stylesheet" href="../requestList/css/index.css" />
     <link rel="stylesheet" href="css/index.css" />
     <link rel="stylesheet" href="../tailwindcss/output.css" />
+    <link rel="stylesheet" href="../css/vendor/driver.css" />
+    <link rel="stylesheet" href="../css/tour.css" />
 
     <script src="../js/jquery.js"></script>
     <script src="../js/bootstrap.min.js"></script>
     <script src="../node_modules/lucide/dist/umd/lucide.min.js"></script>
+    <script src="../js/vendor/driver.js.iife.js"></script>
+    <script src="../js/tour.js"></script>
     <script defer src="js/individual.js"></script>
   </head>
 
@@ -208,6 +212,7 @@
         <div
           id="dcDetailWithdrawSection"
           class="modal-footer change-request-footer border-0 d-none"
+          data-tour="changeRequests-withdraw"
         >
           <div class="cr-detail-withdraw-panel w-100">
             <div
@@ -221,7 +226,12 @@
                   Only the person who submitted this request can withdraw it.
                 </p>
               </div>
-              <button type="button" class="cr-detail-withdraw-btn" disabled>
+              <button
+                type="button"
+                class="cr-detail-withdraw-btn"
+                data-tour="changeRequests-withdraw-btn"
+                disabled
+              >
                 <span
                   class="cr-detail-withdraw-spinner spinner-border spinner-border-sm d-none"
                   role="status"
@@ -396,6 +406,7 @@
         <div
           id="crDetailWithdrawSection"
           class="modal-footer change-request-footer border-0 d-none"
+          data-tour="changeRequests-withdraw"
         >
           <div class="cr-detail-withdraw-panel w-100">
             <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
@@ -410,6 +421,7 @@
               <button
                 type="button"
                 class="cr-detail-withdraw-btn"
+                data-tour="changeRequests-withdraw-btn"
                 disabled
               >
                 <span
@@ -434,7 +446,7 @@
 
   <body>
     <div class="position-relative flex h-screen">
-      <div class="navigation">
+      <div class="navigation" data-tour="nav-main">
         <div class="title p-3 d-flex justify-content-between align-items-center">
           <div class="w-full h-[36px] px-[.75rem]">
             <img src="../images/pcs logo bold.png" alt="logo" class="h-full" />
@@ -454,7 +466,7 @@
                   </div>
                 </li>
               </a>
-              <a href="../requestList/">
+              <a href="../requestList/" data-tour="nav-request-list">
                 <li>
                   <div class="d-flex align-items-center gap-2">
                     <i class="bx bx-task text-[18px]"></i>
@@ -551,14 +563,29 @@
         </nav>
       </div>
 
-      <div class="content h-screen">
-        <div class="flex flex-col overflow-auto p-[14px] md:p-8 h-full w-full">
+      <div class="content h-screen min-h-0">
+        <div class="flex flex-col overflow-auto min-h-0 p-[14px] md:p-8 h-full w-full">
           <div class="pageTitle w-100 flex flex-col items-start gap-2">
-            <div class="gap-3 flex items-center">
+            <div class="gap-3 flex items-center w-100">
               <div id="menu">
                 <i class="bx bx-menu-alt-left fs-3"></i>
               </div>
-              <h1 class="fw-semibold m-0">Change Requests</h1>
+              <h1 class="fw-semibold m-0" data-tour="changeRequests-welcome">
+                Change Requests
+              </h1>
+              <button
+                type="button"
+                id="tourReplayBtn"
+                class="pcs-tour-replay"
+                aria-label="ガイドを再生 / Replay page guide"
+                title="ガイド / Guide"
+              >
+                <i class="bx bx-help-circle" aria-hidden="true"></i>
+                <span class="pcs-tour-replay-label">
+                  <span class="pcs-tour-replay-ja" lang="ja">ガイド</span>
+                  <span class="pcs-tour-replay-en">Guide</span>
+                </span>
+              </button>
             </div>
             <p class="text-[12px]">
               Track date-change and cancellation requests submitted to KDT.
@@ -567,7 +594,10 @@
 
           <div class="w-100 pt-3 flex flex-col gap-4 relative">
             <!-- Date Change Requests -->
-            <section aria-labelledby="dateChangeSectionTitle">
+            <section
+              aria-labelledby="dateChangeSectionTitle"
+              data-tour="changeRequests-date-section"
+            >
               <h2 class="change-request-section-title mb-3" id="dateChangeSectionTitle">
                 Date Change Requests
               </h2>
@@ -578,6 +608,7 @@
                       id="dcTabs"
                       class="tabs change-request-status-filter"
                       role="tablist"
+                      data-tour="changeRequests-date-tabs"
                     >
                       <div class="indicator absolute top-0 my-[0.25rem] bottom-0 left-0 rounded-md bg-[var(--secondary)]"></div>
                       <button role="tab" id="dc-tab-1" data-status="all" class="tab">
@@ -598,7 +629,11 @@
                     </div>
                   </div>
 
-                  <div id="dc-additional-filters" class="change-request-additional-filters filters">
+                  <div
+                    id="dc-additional-filters"
+                    class="change-request-additional-filters filters"
+                    data-tour="changeRequests-date-filters"
+                  >
                     <div class="change-request-search-wrap relative">
                       <input type="search" class="input search" placeholder="Search here . . ." id="dcSearchbar" />
                       <i class="bx bx-search absolute top-[8px] text-[18px] left-[8px] text-[var(--gray-text)]"></i>
@@ -622,7 +657,10 @@
                   </div>
                 </div>
 
-                <div class="relative p-3 pt-0 mt-3 overflow-x-auto overflow-y-visible">
+                <div
+                  class="relative p-3 pt-0 mt-3 overflow-x-auto overflow-y-visible"
+                  data-tour="changeRequests-date-table"
+                >
                   <table class="min-w-full w-100">
                     <thead>
                       <tr>
@@ -658,7 +696,11 @@
 
             <!-- Cancellation Requests -->
             <section aria-labelledby="cancellationSectionTitle">
-              <h2 class="change-request-section-title mb-3" id="cancellationSectionTitle">
+              <h2
+                class="change-request-section-title mb-3"
+                id="cancellationSectionTitle"
+                data-tour="changeRequests-cancel-section"
+              >
                 Cancellation Requests
               </h2>
               <div class="w-100 bg-white rounded-lg border flex flex-col">
@@ -668,6 +710,7 @@
                       id="crTabs"
                       class="tabs change-request-status-filter"
                       role="tablist"
+                      data-tour="changeRequests-cancel-tabs"
                     >
                       <div class="indicator absolute top-0 my-[0.25rem] bottom-0 left-0 rounded-md bg-[var(--secondary)]"></div>
                       <button role="tab" id="cr-tab-1" data-status="all" class="tab">
@@ -688,7 +731,11 @@
                     </div>
                   </div>
 
-                  <div id="cr-additional-filters" class="change-request-additional-filters filters">
+                  <div
+                    id="cr-additional-filters"
+                    class="change-request-additional-filters filters"
+                    data-tour="changeRequests-cancel-filters"
+                  >
                     <div class="change-request-search-wrap relative">
                       <input type="search" class="input search" placeholder="Search here . . ." id="crSearchbar" />
                       <i class="bx bx-search absolute top-[8px] text-[18px] left-[8px] text-[var(--gray-text)]"></i>
@@ -712,7 +759,10 @@
                   </div>
                 </div>
 
-                <div class="relative p-3 pt-0 mt-3 overflow-x-auto overflow-y-visible">
+                <div
+                  class="relative p-3 pt-0 mt-3 overflow-x-auto overflow-y-visible"
+                  data-tour="changeRequests-cancel-table"
+                >
                   <table class="min-w-full w-100">
                     <thead>
                       <tr>

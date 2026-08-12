@@ -1,6 +1,8 @@
 /**
  * Product tour helpers for トラベる (Driver.js + localStorage).
- * Tours: Dispatch Request, Request List, request-detail modal (activity + approved actions).
+ * Tours: Dispatch Request, Request List, Change Requests,
+ * request-detail modal (activity + approved actions),
+ * change-request detail modal (pending withdraw).
  * Copy format: Japanese primary, English underneath.
  */
 (function (window) {
@@ -9,7 +11,8 @@
     requestList: "pcsKhi_tour_requestList_v1",
     requestActivity: "pcsKhi_tour_requestActivity_v1",
     approvedModal: "pcsKhi_tour_approvedModal_v1",
-    changeRequests: "pcsKhi_tour_changeRequests_v1",
+    changeRequests: "pcsKhi_tour_changeRequests_v2",
+    changeRequestWithdraw: "pcsKhi_tour_changeRequestWithdraw_v1",
   };
 
   let activeDriver = null;
@@ -93,6 +96,77 @@
     scroller.scrollTop += elRect.top - scrollerRect.top - 12;
   }
 
+  function findPageScroller(el) {
+    if (!el) return null;
+    let node = el.parentElement;
+    while (node && node !== document.body && node !== document.documentElement) {
+      const style = window.getComputedStyle(node);
+      const overflowY = style.overflowY;
+      if (
+        (overflowY === "auto" || overflowY === "scroll") &&
+        node.scrollHeight > node.clientHeight + 1
+      ) {
+        return node;
+      }
+      node = node.parentElement;
+    }
+    return null;
+  }
+
+  function getContentScroller() {
+    const content = document.querySelector(".content");
+    if (!content) return null;
+    const nested = content.querySelector(":scope > .overflow-auto");
+    if (nested) return nested;
+    if (content.scrollHeight > content.clientHeight + 1) return content;
+    return findPageScroller(content);
+  }
+
+  /** Scroll list/page targets inside .content overflow containers (not the window). */
+  function scrollPageTourTarget(element) {
+    if (!element) return;
+    const scroller = getContentScroller() || findPageScroller(element);
+    if (!scroller) {
+      element.scrollIntoView({
+        block: "start",
+        inline: "nearest",
+        behavior: "auto",
+      });
+      return;
+    }
+    const elRect = element.getBoundingClientRect();
+    const scrollerRect = scroller.getBoundingClientRect();
+    const nextTop = scroller.scrollTop + (elRect.top - scrollerRect.top) - 12;
+    scroller.scrollTop = Math.max(0, nextTop);
+  }
+
+  function preparePageStep(element) {
+    scrollPageTourTarget(element);
+  }
+
+  function prepareChangeRequestsCancelStep(element) {
+    // Pin the section title to the top of the content pane so the table is visible.
+    const scrollTarget =
+      document.getElementById("cancellationSectionTitle") ||
+      document.querySelector("[data-tour='changeRequests-cancel-section']") ||
+      element;
+    scrollPageTourTarget(scrollTarget);
+  }
+
+  function refreshChangeRequestsCancelStep(element) {
+    prepareChangeRequestsCancelStep(element);
+    if (activeDriver && typeof activeDriver.refresh === "function") {
+      activeDriver.refresh();
+    }
+  }
+
+  function refreshPageStep(element) {
+    scrollPageTourTarget(element);
+    if (activeDriver && typeof activeDriver.refresh === "function") {
+      activeDriver.refresh();
+    }
+  }
+
   function prepareFormStep(element) {
     setFormStepMode(true);
     scrollTourTargetIntoView(element);
@@ -102,20 +176,49 @@
     setFormStepMode(false);
   }
 
-  function elementExists(selector) {
-    if (!selector) return true;
-    return !!document.querySelector(selector);
+  function resolveTourElement(element) {
+    if (!element) return null;
+    if (typeof element === "function") {
+      try {
+        return element() || null;
+      } catch (e) {
+        return null;
+      }
+    }
+    if (typeof element === "string") {
+      return document.querySelector(element);
+    }
+    return element;
   }
 
-  function elementVisible(selector) {
-    if (!selector) return true;
-    const el = document.querySelector(selector);
+  function elementExists(element) {
+    if (!element) return true;
+    return !!resolveTourElement(element);
+  }
+
+  function elementVisible(element) {
+    if (!element) return true;
+    const el = resolveTourElement(element);
     if (!el) return false;
     if (el.hidden) return false;
     if (el.classList.contains("d-none")) return false;
     if (el.closest(".d-none,[hidden]")) return false;
     const style = window.getComputedStyle(el);
     return style.display !== "none" && style.visibility !== "hidden";
+  }
+
+  function getOpenChangeRequestModal() {
+    return (
+      document.querySelector("#dateChangeRequestDetailsModal.show") ||
+      document.querySelector("#cancellationRequestDetailsModal.show") ||
+      null
+    );
+  }
+
+  function getOpenChangeRequestTourTarget(attr) {
+    const modal = getOpenChangeRequestModal();
+    if (!modal) return null;
+    return modal.querySelector("[data-tour='" + attr + "']");
   }
 
   function scrollModalTourTarget(element) {
@@ -450,11 +553,226 @@
     ];
   }
 
+  function getChangeRequestsSteps() {
+    return [
+      {
+        element: "[data-tour='changeRequests-welcome']",
+        popover: {
+          title: bilingual("変更申請", "Change Requests"),
+          description: bilingual(
+            "KDTへ送った日付変更・キャンセル申請の進捗をここで確認します。新規の作成は Request List の承認済み申請から行います。",
+            "Track date-change and cancellation requests you sent to KDT. Create new ones from an approved request in Request List."
+          ),
+          side: "bottom",
+          align: "start",
+        },
+      },
+      {
+        element: "[data-tour='nav-main']",
+        popover: {
+          title: bilingual("メインメニュー", "Main menu"),
+          description: bilingual(
+            "サイドバーから派遣申請の作成、申請一覧、変更申請、Dashboard、User Management、User Manualsへ移動できます。",
+            "Use the sidebar to create dispatch requests, open Request List, manage Change Requests, view the Dashboard, User Management, and User Manuals."
+          ),
+          side: "right",
+          align: "start",
+        },
+        onHighlightStarted: openNavForTour,
+      },
+      {
+        element: "[data-tour='changeRequests-date-section']",
+        popover: {
+          title: bilingual("日付変更申請", "Date change requests"),
+          description: bilingual(
+            "派遣期間の変更申請はここに一覧表示されます。ステータスや検索で絞り込めます。",
+            "Date-change requests appear in this section. Filter by status or search to narrow the list."
+          ),
+          side: "bottom",
+          align: "start",
+        },
+        onHighlightStarted: preparePageStep,
+      },
+      {
+        element: "[data-tour='changeRequests-date-tabs']",
+        popover: {
+          title: bilingual("ステータス絞り込み", "Filter by status"),
+          description: bilingual(
+            "すべて／保留／承認／却下／取下げで一覧を切り替えます。",
+            "Switch between All, Pending, Accepted, Rejected, and Withdrawn."
+          ),
+          side: "bottom",
+          align: "start",
+        },
+        onHighlightStarted: preparePageStep,
+      },
+      {
+        element: "[data-tour='changeRequests-date-filters']",
+        popover: {
+          title: bilingual("検索とフィルタ", "Search and filters"),
+          description: bilingual(
+            "キーワード、申請月、グループでさらに絞り込めます。",
+            "Narrow further with keyword search, requested month, and employee group."
+          ),
+          side: "bottom",
+          align: "end",
+        },
+        onHighlightStarted: preparePageStep,
+      },
+      {
+        element: "[data-tour='changeRequests-date-table']",
+        popover: {
+          title: bilingual("日付変更テーブル", "Date-change table"),
+          description: bilingual(
+            "各行に申請ID、社員、現行日程、提案日程、申請日、ステータスが表示されます。",
+            "Each row shows request ID, employee, current and proposed dates, date requested, and status."
+          ),
+          side: "top",
+          align: "start",
+        },
+        onHighlightStarted: preparePageStep,
+      },
+      {
+        element: "[data-tour='changeRequests-open']",
+        popover: {
+          title: bilingual("詳細を開く", "Open details"),
+          description: bilingual(
+            "行または開くアイコンをクリックすると内容を確認できます。保留中で自分が申請した場合は、詳細から取下げもできます。",
+            "Click a row or the open icon to view details. If it is pending and you submitted it, you can also withdraw from the detail view."
+          ),
+          side: "left",
+          align: "start",
+        },
+        onHighlightStarted: preparePageStep,
+      },
+      {
+        element: "[data-tour='changeRequests-cancel-section']",
+        popover: {
+          title: bilingual("キャンセル申請", "Cancellation requests"),
+          description: bilingual(
+            "派遣キャンセル申請はここに一覧表示されます。ステータスや検索で絞り込めます。",
+            "Cancellation requests appear in this section. Filter by status or search to narrow the list."
+          ),
+          side: "bottom",
+          align: "start",
+        },
+        onHighlightStarted: prepareChangeRequestsCancelStep,
+        onHighlighted: refreshChangeRequestsCancelStep,
+      },
+      {
+        element: "[data-tour='changeRequests-cancel-tabs']",
+        popover: {
+          title: bilingual("ステータス絞り込み", "Filter by status"),
+          description: bilingual(
+            "すべて／保留／承認／却下／取下げで一覧を切り替えます。",
+            "Switch between All, Pending, Accepted, Rejected, and Withdrawn."
+          ),
+          side: "bottom",
+          align: "start",
+        },
+        onHighlightStarted: preparePageStep,
+        onHighlighted: refreshPageStep,
+      },
+      {
+        element: "[data-tour='changeRequests-cancel-filters']",
+        popover: {
+          title: bilingual("検索とフィルタ", "Search and filters"),
+          description: bilingual(
+            "キーワード、申請月、グループでさらに絞り込めます。",
+            "Narrow further with keyword search, requested month, and employee group."
+          ),
+          side: "bottom",
+          align: "end",
+        },
+        onHighlightStarted: preparePageStep,
+        onHighlighted: refreshPageStep,
+      },
+      {
+        element: "[data-tour='changeRequests-cancel-table']",
+        popover: {
+          title: bilingual("キャンセルテーブル", "Cancellation table"),
+          description: bilingual(
+            "各行に申請ID、社員、派遣期間、申請日、ステータスが表示されます。",
+            "Each row shows request ID, employee, dispatch dates, date requested, and status."
+          ),
+          side: "top",
+          align: "start",
+        },
+        onHighlightStarted: preparePageStep,
+        onHighlighted: refreshPageStep,
+      },
+      {
+        element: "[data-tour='changeRequests-cancel-open']",
+        popover: {
+          title: bilingual("詳細を開く", "Open details"),
+          description: bilingual(
+            "行または開くアイコンをクリックすると内容を確認できます。保留中で自分が申請した場合は、詳細から取下げもできます。",
+            "Click a row or the open icon to view details. If it is pending and you submitted it, you can also withdraw from the detail view."
+          ),
+          side: "left",
+          align: "start",
+        },
+        onHighlightStarted: preparePageStep,
+        onHighlighted: refreshPageStep,
+      },
+      {
+        element: "[data-tour='nav-request-list']",
+        popover: {
+          title: bilingual("新規の変更申請", "Create a change request"),
+          description: bilingual(
+            "日付変更やキャンセルの新規申請は Request List で承認済み申請を開き、詳細から行います。ガイドはいつでも「ガイド」ボタンから再生できます。",
+            "To submit a new date change or cancellation, open an approved request in Request List. Replay this guide anytime with the Guide button."
+          ),
+          side: "right",
+          align: "start",
+        },
+        onHighlightStarted: openNavForTour,
+      },
+    ];
+  }
+
+  function getChangeRequestWithdrawSteps() {
+    return [
+      {
+        element: function () {
+          return getOpenChangeRequestTourTarget("changeRequests-withdraw");
+        },
+        popover: {
+          title: bilingual("新機能：取下げ", "New: withdraw"),
+          description: bilingual(
+            "保留中の変更申請は、KDTが対応する前であれば取下げできます。申請した本人のみ操作できます。",
+            "While a change request is pending, you can withdraw it before KDT acts. Only the person who submitted it can do this."
+          ),
+          side: "top",
+          align: "center",
+        },
+        onHighlightStarted: prepareModalStep,
+      },
+      {
+        element: function () {
+          return getOpenChangeRequestTourTarget("changeRequests-withdraw-btn");
+        },
+        popover: {
+          title: bilingual("申請を取下げ", "Withdraw request"),
+          description: bilingual(
+            "自分が申請した保留中の案件では「Withdraw Request」から取り消せます。取下げ後は元に戻せません。",
+            'If you submitted this pending request, use "Withdraw Request" to cancel it. Withdrawal cannot be undone.'
+          ),
+          side: "top",
+          align: "center",
+        },
+        onHighlightStarted: prepareModalStep,
+      },
+    ];
+  }
+
   const TOUR_BUILDERS = {
     dispatch: getDispatchSteps,
     requestList: getRequestListSteps,
     requestActivity: getRequestActivitySteps,
     approvedModal: getApprovedModalSteps,
+    changeRequests: getChangeRequestsSteps,
+    changeRequestWithdraw: getChangeRequestWithdrawSteps,
   };
 
   function startTour(name, options) {
