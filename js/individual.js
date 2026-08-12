@@ -83,6 +83,13 @@ checkAccess()
             });
           })
           .catch(() => {});
+
+        if (window.PcsKhiTour) {
+          window.PcsKhiTour.bindReplay("#tourReplayBtn", "dispatch");
+          window.setTimeout(function () {
+            window.PcsKhiTour.maybeStart("dispatch");
+          }, 400);
+        }
       });
     } else {
       alert(emp.message);

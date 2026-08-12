@@ -2973,10 +2973,6 @@ video {
   color: var(--red-color);
 }
 
-.text-\[var\(--secondary\)\] {
-  color: var(--secondary);
-}
-
 .text-\[var\(--tertiary\)\] {
   color: var(--tertiary);
 }

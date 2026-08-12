@@ -1,0 +1,112 @@
+/* トラベる product tour (Driver.js theme) */
+
+.pcs-tour-popover.driver-popover {
+  background: #fff;
+  color: #333;
+  border: 1px solid var(--gray, #e5e7eb);
+  border-radius: 10px;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.14);
+  max-width: 320px;
+  font-family: "Poppins", sans-serif;
+}
+
+.pcs-tour-popover .driver-popover-title {
+  font-family: "Poppins", sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  color: #222;
+}
+
+.pcs-tour-popover .driver-popover-description {
+  font-family: "Poppins", sans-serif;
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1.45;
+  color: #555;
+}
+
+.pcs-tour-popover .driver-popover-progress-text {
+  font-family: "Poppins", sans-serif;
+  font-size: 12px;
+  color: #888;
+}
+
+.pcs-tour-popover .driver-popover-navigation-btns button {
+  font-family: "Poppins", sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  padding: 5px 10px;
+}
+
+.pcs-tour-popover .driver-popover-next-btn,
+.pcs-tour-popover .driver-popover-done-btn {
+  background: var(--tertiary, #22c55e) !important;
+  border-color: var(--tertiary, #22c55e) !important;
+  color: #fff !important;
+  text-shadow: none;
+}
+
+.pcs-tour-popover .driver-popover-next-btn:hover,
+.pcs-tour-popover .driver-popover-done-btn:hover,
+.pcs-tour-popover .driver-popover-next-btn:focus,
+.pcs-tour-popover .driver-popover-done-btn:focus {
+  background: #16a34a !important;
+  border-color: #16a34a !important;
+  color: #fff !important;
+}
+
+.pcs-tour-popover .driver-popover-prev-btn {
+  background: #fff !important;
+  color: #333 !important;
+}
+
+.pcs-tour-popover .driver-popover-close-btn {
+  color: #bbb;
+}
+
+.pcs-tour-popover .driver-popover-close-btn:hover,
+.pcs-tour-popover .driver-popover-close-btn:focus {
+  color: #333;
+}
+
+.pcs-tour-replay {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-left: auto;
+  border: 1px solid #ccc;
+  background: #fff;
+  color: #333;
+  border-radius: 8px;
+  padding: 0.35rem 0.7rem;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.2;
+  cursor: pointer;
+  transition: border-color 0.2s ease, color 0.2s ease, background-color 0.2s ease;
+}
+
+.pcs-tour-replay i {
+  font-size: 16px;
+  color: var(--tertiary, #22c55e);
+  line-height: 1;
+}
+
+.pcs-tour-replay:hover {
+  border-color: var(--tertiary, #22c55e);
+  color: var(--tertiary, #22c55e);
+  background: var(--main, #dcfce7);
+}
+
+.pcs-tour-replay:focus-visible {
+  outline: 2px solid var(--secondary, #4ade80);
+  outline-offset: 2px;
+}
+
+/* Keep sticky Clear/Continue from clipping scrollable form highlights */
+body.pcs-tour-form-step .sticky-buttons {
+  opacity: 0;
+  pointer-events: none;
+}
