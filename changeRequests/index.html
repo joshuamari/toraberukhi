@@ -217,7 +217,7 @@
         >
           <div class="cr-detail-withdraw-panel w-100">
             <div
-              class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3"
+              class="cr-detail-withdraw-default d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3"
             >
               <div class="d-flex align-items-start gap-2">
                 <span class="cr-detail-withdraw-note-icon" aria-hidden="true">
@@ -233,11 +233,6 @@
                 data-tour="changeRequests-withdraw-btn"
                 disabled
               >
-                <span
-                  class="cr-detail-withdraw-spinner spinner-border spinner-border-sm d-none"
-                  role="status"
-                  aria-hidden="true"
-                ></span>
                 <i
                   data-lucide="undo-2"
                   class="change-request-icon cr-detail-withdraw-icon"
@@ -245,6 +240,63 @@
                 ></i>
                 <span class="cr-detail-withdraw-label">Withdraw Request</span>
               </button>
+            </div>
+            <div
+              class="cr-detail-withdraw-confirm d-none"
+              role="alertdialog"
+              aria-labelledby="dcWithdrawConfirmTitle"
+              aria-describedby="dcWithdrawConfirmCopy"
+            >
+              <div
+                class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3"
+              >
+                <div class="d-flex align-items-start gap-2">
+                  <span
+                    class="cr-detail-withdraw-confirm-icon"
+                    aria-hidden="true"
+                  >
+                    <i data-lucide="alert-triangle" class="change-request-icon"></i>
+                  </span>
+                  <div>
+                    <p
+                      class="cr-detail-withdraw-confirm-title mb-0"
+                      id="dcWithdrawConfirmTitle"
+                    >
+                      Withdraw this request?
+                    </p>
+                    <p
+                      class="cr-detail-withdraw-confirm-copy mb-0"
+                      id="dcWithdrawConfirmCopy"
+                    >
+                      This cannot be undone. The pending request will be cancelled.
+                    </p>
+                  </div>
+                </div>
+                <div class="d-flex align-items-center gap-2 flex-shrink-0">
+                  <button
+                    type="button"
+                    class="cr-detail-withdraw-keep-btn"
+                  >
+                    Keep request
+                  </button>
+                  <button
+                    type="button"
+                    class="cr-detail-withdraw-confirm-btn"
+                  >
+                    <span
+                      class="cr-detail-withdraw-spinner spinner-border spinner-border-sm d-none"
+                      role="status"
+                      aria-hidden="true"
+                    ></span>
+                    <i
+                      data-lucide="undo-2"
+                      class="change-request-icon cr-detail-withdraw-icon"
+                      aria-hidden="true"
+                    ></i>
+                    <span class="cr-detail-withdraw-label">Withdraw</span>
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -410,7 +462,9 @@
           data-tour="changeRequests-withdraw"
         >
           <div class="cr-detail-withdraw-panel w-100">
-            <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
+            <div
+              class="cr-detail-withdraw-default d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3"
+            >
               <div class="d-flex align-items-start gap-2">
                 <span class="cr-detail-withdraw-note-icon" aria-hidden="true">
                   <i data-lucide="info" class="change-request-icon"></i>
@@ -425,11 +479,6 @@
                 data-tour="changeRequests-withdraw-btn"
                 disabled
               >
-                <span
-                  class="cr-detail-withdraw-spinner spinner-border spinner-border-sm d-none"
-                  role="status"
-                  aria-hidden="true"
-                ></span>
                 <i
                   data-lucide="undo-2"
                   class="change-request-icon cr-detail-withdraw-icon"
@@ -437,6 +486,63 @@
                 ></i>
                 <span class="cr-detail-withdraw-label">Withdraw Request</span>
               </button>
+            </div>
+            <div
+              class="cr-detail-withdraw-confirm d-none"
+              role="alertdialog"
+              aria-labelledby="crWithdrawConfirmTitle"
+              aria-describedby="crWithdrawConfirmCopy"
+            >
+              <div
+                class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3"
+              >
+                <div class="d-flex align-items-start gap-2">
+                  <span
+                    class="cr-detail-withdraw-confirm-icon"
+                    aria-hidden="true"
+                  >
+                    <i data-lucide="alert-triangle" class="change-request-icon"></i>
+                  </span>
+                  <div>
+                    <p
+                      class="cr-detail-withdraw-confirm-title mb-0"
+                      id="crWithdrawConfirmTitle"
+                    >
+                      Withdraw this request?
+                    </p>
+                    <p
+                      class="cr-detail-withdraw-confirm-copy mb-0"
+                      id="crWithdrawConfirmCopy"
+                    >
+                      This cannot be undone. The pending request will be cancelled.
+                    </p>
+                  </div>
+                </div>
+                <div class="d-flex align-items-center gap-2 flex-shrink-0">
+                  <button
+                    type="button"
+                    class="cr-detail-withdraw-keep-btn"
+                  >
+                    Keep request
+                  </button>
+                  <button
+                    type="button"
+                    class="cr-detail-withdraw-confirm-btn"
+                  >
+                    <span
+                      class="cr-detail-withdraw-spinner spinner-border spinner-border-sm d-none"
+                      role="status"
+                      aria-hidden="true"
+                    ></span>
+                    <i
+                      data-lucide="undo-2"
+                      class="change-request-icon cr-detail-withdraw-icon"
+                      aria-hidden="true"
+                    ></i>
+                    <span class="cr-detail-withdraw-label">Withdraw</span>
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -799,5 +905,6 @@
         </div>
       </div>
     </div>
+    <div class="toastBox"></div>
   </body>
 </html>

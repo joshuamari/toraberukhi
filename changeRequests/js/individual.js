@@ -522,50 +522,98 @@ $(document)
       return;
     }
 
-    const changeRequestId = button.dataset.changeRequestId;
-    const changeType = button.dataset.changeRequestType || "date_change";
-
-    if (!changeRequestId) {
-      alert("Missing change request ID.");
+    const panel = button.closest(".cr-detail-withdraw-panel");
+    if (!panel) {
       return;
     }
 
-    if (
-      !window.confirm(
-        "Withdraw this pending request? This cannot be undone."
-      )
-    ) {
-      return;
-    }
-
-    setWithdrawButtonLoading(button, true);
-
-    withdrawChangeRequest(changeRequestId)
-      .then(() => {
-        applyWithdrawnStatusLocally(changeRequestId, changeType);
-        changeRequestsFetchPromise = null;
-
-        if (changeType === "cancellation") {
-          applyCancellationFilters(false);
-          const { instance } = getBootstrapModal(
-            "cancellationRequestDetailsModal"
-          );
-          instance?.hide();
-        } else {
-          applyDateChangeFilters(false);
-          const { instance } = getBootstrapModal(
-            "dateChangeRequestDetailsModal"
-          );
-          instance?.hide();
-        }
-
-        alert("Request withdrawn successfully.");
-      })
-      .catch((error) => {
-        setWithdrawButtonLoading(button, false);
-        alert(`${error}`);
-      });
+    showWithdrawConfirm(panel);
   });
+
+$(document)
+  .off("click.keepChangeRequest", ".cr-detail-withdraw-keep-btn")
+  .on("click.keepChangeRequest", ".cr-detail-withdraw-keep-btn", function (event) {
+    event.preventDefault();
+
+    const button = event.currentTarget;
+    if (button.disabled) {
+      return;
+    }
+
+    const panel = button.closest(".cr-detail-withdraw-panel");
+    if (!panel) {
+      return;
+    }
+
+    hideWithdrawConfirm(panel);
+  });
+
+$(document)
+  .off("click.confirmWithdrawChangeRequest", ".cr-detail-withdraw-confirm-btn")
+  .on(
+    "click.confirmWithdrawChangeRequest",
+    ".cr-detail-withdraw-confirm-btn",
+    function (event) {
+      event.preventDefault();
+
+      const button = event.currentTarget;
+      if (button.disabled) {
+        return;
+      }
+
+      const panel = button.closest(".cr-detail-withdraw-panel");
+      const changeRequestId = button.dataset.changeRequestId;
+      const changeType = button.dataset.changeRequestType || "date_change";
+      const keepButton = panel?.querySelector(".cr-detail-withdraw-keep-btn");
+
+      if (!changeRequestId) {
+        showToast("error", "Missing change request ID.");
+        return;
+      }
+
+      setWithdrawButtonLoading(button, true);
+      if (keepButton) {
+        keepButton.disabled = true;
+      }
+
+      withdrawChangeRequest(changeRequestId)
+        .then(() => {
+          applyWithdrawnStatusLocally(changeRequestId, changeType);
+          changeRequestsFetchPromise = null;
+
+          if (changeType === "cancellation") {
+            applyCancellationFilters(false);
+            const { instance } = getBootstrapModal(
+              "cancellationRequestDetailsModal"
+            );
+            instance?.hide();
+          } else {
+            applyDateChangeFilters(false);
+            const { instance } = getBootstrapModal(
+              "dateChangeRequestDetailsModal"
+            );
+            instance?.hide();
+          }
+
+          if (panel) {
+            hideWithdrawConfirm(panel);
+          }
+
+          showToast("success", "Request withdrawn successfully.");
+        })
+        .catch((error) => {
+          setWithdrawButtonLoading(button, false);
+          if (keepButton) {
+            keepButton.disabled = false;
+          }
+          showToast("error", `${error}`);
+        });
+    }
+  );
+
+$(document).on("click", ".rmvToast", function () {
+  $(this).closest(".toasty").remove();
+});
 
 $(document).on(
   "click",
@@ -601,6 +649,9 @@ if (dateChangeDetailsModalElement) {
     focusInitialModalControl(dateChangeDetailsModalElement);
   });
   dateChangeDetailsModalElement.addEventListener("hidden.bs.modal", function () {
+    hideWithdrawConfirm(
+      dateChangeDetailsModalElement.querySelector(".cr-detail-withdraw-panel")
+    );
     if (!(isChangeRequestsTourMode && window.PcsKhiTour?.isActive?.())) {
       stopActiveChangeRequestTour();
     }
@@ -620,6 +671,9 @@ if (cancellationDetailsModalElement) {
     focusInitialModalControl(cancellationDetailsModalElement);
   });
   cancellationDetailsModalElement.addEventListener("hidden.bs.modal", function () {
+    hideWithdrawConfirm(
+      cancellationDetailsModalElement.querySelector(".cr-detail-withdraw-panel")
+    );
     if (!(isChangeRequestsTourMode && window.PcsKhiTour?.isActive?.())) {
       stopActiveChangeRequestTour();
     }
@@ -1052,6 +1106,11 @@ function updateWithdrawSection(sectionId, request) {
   const isPending = request?.status === "pending";
   withdrawSection.classList.toggle("d-none", !isPending);
 
+  const panel = withdrawSection.querySelector(".cr-detail-withdraw-panel");
+  if (panel) {
+    hideWithdrawConfirm(panel);
+  }
+
   if (!isPending) {
     return;
   }
@@ -1059,6 +1118,12 @@ function updateWithdrawSection(sectionId, request) {
   const canWithdraw = canWithdrawChangeRequest(request);
   const noteEl = withdrawSection.querySelector(".cr-detail-withdraw-note");
   const buttonEl = withdrawSection.querySelector(".cr-detail-withdraw-btn");
+  const confirmButtonEl = withdrawSection.querySelector(
+    ".cr-detail-withdraw-confirm-btn"
+  );
+  const changeRequestId = String(request.id || "");
+  const changeRequestType =
+    sectionId === "dcDetailWithdrawSection" ? "date_change" : "cancellation";
 
   if (noteEl) {
     noteEl.textContent = canWithdraw
@@ -1069,10 +1134,48 @@ function updateWithdrawSection(sectionId, request) {
   if (buttonEl) {
     setWithdrawButtonLoading(buttonEl, false);
     buttonEl.disabled = !canWithdraw;
-    buttonEl.dataset.changeRequestId = String(request.id || "");
-    buttonEl.dataset.changeRequestType =
-      sectionId === "dcDetailWithdrawSection" ? "date_change" : "cancellation";
+    buttonEl.dataset.changeRequestId = changeRequestId;
+    buttonEl.dataset.changeRequestType = changeRequestType;
   }
+
+  if (confirmButtonEl) {
+    setWithdrawButtonLoading(confirmButtonEl, false);
+    confirmButtonEl.disabled = !canWithdraw;
+    confirmButtonEl.dataset.changeRequestId = changeRequestId;
+    confirmButtonEl.dataset.changeRequestType = changeRequestType;
+  }
+}
+
+function showWithdrawConfirm(panel) {
+  if (!panel) {
+    return;
+  }
+
+  panel.classList.add("is-confirming");
+  panel.querySelector(".cr-detail-withdraw-default")?.classList.add("d-none");
+  panel.querySelector(".cr-detail-withdraw-confirm")?.classList.remove("d-none");
+  renderPaginationIcons();
+
+  const confirmButton = panel.querySelector(".cr-detail-withdraw-confirm-btn");
+  confirmButton?.focus();
+}
+
+function hideWithdrawConfirm(panel) {
+  if (!panel) {
+    return;
+  }
+
+  const confirmButton = panel.querySelector(".cr-detail-withdraw-confirm-btn");
+  const keepButton = panel.querySelector(".cr-detail-withdraw-keep-btn");
+
+  setWithdrawButtonLoading(confirmButton, false);
+  if (keepButton) {
+    keepButton.disabled = false;
+  }
+
+  panel.classList.remove("is-confirming");
+  panel.querySelector(".cr-detail-withdraw-default")?.classList.remove("d-none");
+  panel.querySelector(".cr-detail-withdraw-confirm")?.classList.add("d-none");
 }
 
 function setWithdrawButtonLoading(button, isLoading) {
@@ -1083,13 +1186,16 @@ function setWithdrawButtonLoading(button, isLoading) {
   const spinner = button.querySelector(".cr-detail-withdraw-spinner");
   const icon = button.querySelector(".cr-detail-withdraw-icon");
   const label = button.querySelector(".cr-detail-withdraw-label");
+  const idleLabel = button.classList.contains("cr-detail-withdraw-confirm-btn")
+    ? "Withdraw"
+    : "Withdraw Request";
 
   button.disabled = isLoading;
   spinner?.classList.toggle("d-none", !isLoading);
   icon?.classList.toggle("d-none", isLoading);
 
   if (label) {
-    label.textContent = isLoading ? "Withdrawing..." : "Withdraw Request";
+    label.textContent = isLoading ? "Withdrawing..." : idleLabel;
   }
 }
 
@@ -1575,3 +1681,45 @@ function populateCancellationDetailsModal(request) {
   renderPaginationIcons();
 }
 //#endregion
+
+function showToast(type, str) {
+  const toast = document.createElement("div");
+
+  if (type === "success") {
+    toast.classList.add("toasty", "success");
+    toast.innerHTML = `
+    <i class='bx bx-check text-xl text-[var(--tertiary)]'></i>
+  <div class="flex flex-col py-3">
+    <h5 class="text-md font-semibold leading-2">Success</h5>
+    <p class="text-gray-600 text-sm">${str}</p>
+    <span><i class='rmvToast bx bx-x absolute top-[10px] right-[10px] text-[16px] cursor-pointer' ></i></span>
+  </div>
+    `;
+  } else if (type === "error") {
+    toast.classList.add("toasty", "error");
+    toast.innerHTML = `
+    <i class='bx bx-x text-xl text-[var(--red-color)]'></i>
+  <div class="flex flex-col py-3">
+    <h5 class="text-md font-semibold leading-2">Error</h5>
+    <p class="text-gray-600 text-sm">${str}</p>
+    <span><i class='rmvToast bx bx-x absolute top-[10px] right-[10px] text-[16px] cursor-pointer' ></i></span>
+  </div>
+    `;
+  } else if (type === "warn") {
+    toast.classList.add("toasty", "warn");
+    toast.innerHTML = `
+    <i class='bx bx-info-circle text-lg text-[#ffaa33]'></i>
+    <div class="flex flex-col py-3">
+      <h5 class="text-md font-semibold leading-2">Warning</h5>
+      <p class="text-gray-600 text-sm">${str}</p>
+      <span><i class='rmvToast bx bx-x absolute top-[10px] right-[10px] text-[16px] cursor-pointer' ></i></span>
+    </div>
+      `;
+  }
+
+  $(".toastBox").append(toast);
+
+  setTimeout(() => {
+    toast.remove();
+  }, 8000);
+}
