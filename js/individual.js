@@ -308,6 +308,15 @@ $(document).on("change", "#locSel", function () {
 $(document).on("click", "#btnApply", function () {
   checkDispatch();
 });
+$(document).on("click", "#btnProceedExceedDays", function () {
+  const warningModal = document.getElementById("exceedDaysWarning");
+  if (warningModal) {
+    $(warningModal).one("hidden.bs.modal", function () {
+      fillAttachment();
+    });
+  }
+  hideBootstrapModal("exceedDaysWarning");
+});
 $(document).on("click", ".btn-clear", function () {
   dispatch_days = 0;
   clearInput();
@@ -1601,6 +1610,19 @@ function getDispatchDays() {
     });
   });
 }
+function getEstimatedDispatchDays() {
+  return parseInt(to_add, 10) + parseInt(dispatch_days, 10);
+}
+function willExceedDispatchLimit() {
+  return getEstimatedDispatchDays() > full;
+}
+function showExceedDaysWarning() {
+  const empName = $("#empSel option:selected").text() || "This employee";
+  const totalDays = getEstimatedDispatchDays();
+  $("#exceedDaysEmpName").text(empName);
+  $("#exceedDaysTotal").text(`${totalDays} days`);
+  showBootstrapModal("exceedDaysWarning");
+}
 function countTotal() {
   const daysCount = parseInt(to_add, 10);
   const dispDays = parseInt(dispatch_days, 10);
@@ -1844,6 +1866,10 @@ function checkDispatch() {
     return;
   }
   toggleLoadingAnimation(false);
+  if (willExceedDispatchLimit()) {
+    showExceedDaysWarning();
+    return;
+  }
   fillAttachment();
 }
 function insertDispatch() {

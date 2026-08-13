@@ -78,6 +78,46 @@
 
   <div
     class="modal fade"
+    id="exceedDaysWarning"
+    data-bs-backdrop="static"
+    data-bs-keyboard="false"
+    tabindex="-1"
+    aria-labelledby="exceedDaysWarningLabel"
+    aria-hidden="true"
+  >
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="exceedDaysWarningLabel">
+            Dispatch Days Warning
+          </h1>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="modal"
+            aria-label="Close"
+          ></button>
+        </div>
+        <div class="modal-body">
+          <p class="mb-2">
+            <span class="fw-semibold" id="exceedDaysEmpName"></span>
+            will exceed 183 days of dispatch this year (estimated total:
+            <span class="fw-semibold" id="exceedDaysTotal"></span>). Are you
+            sure you want to proceed?
+          </p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-cancel">Cancel</button>
+          <button type="button" class="btn btn-dispatch" id="btnProceedExceedDays">
+            Proceed
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div
+    class="modal fade"
     id="editEntry"
     data-bs-backdrop="static"
     data-bs-keyboard="false"
