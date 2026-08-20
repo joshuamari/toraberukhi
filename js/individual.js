@@ -2325,6 +2325,9 @@ function fillEmployeeDetails() {
   $("#empLabel").html(`${fullName}`);
   $("#empInitials").html(`${initials}`);
   $("#grpLabel").html(`${grpName}`);
+  if (typeof setAppVersion === "function") {
+    setAppVersion(empDetails && empDetails.app_version);
+  }
 }
 function capitalizeWords(str) {
   return str

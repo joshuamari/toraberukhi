@@ -90,6 +90,7 @@ function getCurrentUserProfile(PDO $connpcs, int $userId): array
     $employee['groupData'] = $mainGroup;
     $employee['groups'] = $groups;
     $employee['type'] = hasAllGroupAccess($connpcs, $userId) ? 1 : 0;
+    $employee['app_version'] = getAppConfig()['version'] ?? '';
 
     return $employee;
 }

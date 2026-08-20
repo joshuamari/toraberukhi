@@ -150,33 +150,63 @@ function getKHIMembers($empnum)
 
     $memsStmt = $connpcs->prepare($memsQ);
     $memsStmt->execute();
+    $memArr = $memsStmt->fetchAll();
 
-    if ($memsStmt->rowCount() > 0) {
-        $memArr = $memsStmt->fetchAll();
+    if (empty($memArr)) {
+        return $members;
+    }
 
-        foreach ($memArr as $mem) {
-            $output = array();
+    $memberIds = array_values(array_unique(array_map(function ($mem) {
+        return (int)$mem['number'];
+    }, $memArr)));
+    $memberIdList = implode(',', $memberIds);
 
-            $khi_id = $mem['number'];
-            $khi_fname = $mem['firstname'];
-            $khi_sname = $mem['surname'];
-            $emp_email = $mem['email'];
-            $adminType = allGroupAccess($khi_id) ? 1 : 0;
-
-            $groupArray = getKHIUserGroups($khi_id);
-            $mainGroup = getKHIMainGroup($khi_id);
-
-            $output['id'] = $khi_id;
-            $output['empID'] = $khi_id;
-            $output['fname'] = $khi_fname;
-            $output['sname'] = $khi_sname;
-            $output['group'] = $mainGroup;
-            $output['groups'] = $groupArray;
-            $output['type'] = $adminType;
-            $output['email'] = $emp_email;
-
-            array_push($members, $output);
+    $groupsByUser = array();
+    $groupsQ = "SELECT kug.`user_id`, gl.`id`, gl.`name`, gl.`abbreviation` AS `abbr`
+                FROM `pcosdb`.`khi_user_groups` AS kug
+                INNER JOIN `kdtphdb_new`.`group_list` AS gl
+                    ON gl.`id` = kug.`group_id`
+                WHERE kug.`user_id` IN ($memberIdList)
+                ORDER BY kug.`id` ASC";
+    $groupsStmt = $connpcs->prepare($groupsQ);
+    $groupsStmt->execute();
+    foreach ($groupsStmt->fetchAll() as $grp) {
+        $uid = (int)$grp['user_id'];
+        if (!isset($groupsByUser[$uid])) {
+            $groupsByUser[$uid] = array();
         }
+        $groupsByUser[$uid][] = [
+            "id" => $grp["id"],
+            "name" => $grp["name"],
+            "abbr" => $grp["abbr"]
+        ];
+    }
+
+    $adminIds = array();
+    $permQ = "SELECT `employee_id`
+              FROM `khi_user_permissions`
+              WHERE `permission_id` = 1
+                AND `employee_id` IN ($memberIdList)";
+    $permStmt = $connpcs->prepare($permQ);
+    $permStmt->execute();
+    foreach ($permStmt->fetchAll() as $row) {
+        $adminIds[(int)$row['employee_id']] = true;
+    }
+
+    foreach ($memArr as $mem) {
+        $khi_id = $mem['number'];
+        $groupArray = isset($groupsByUser[(int)$khi_id]) ? $groupsByUser[(int)$khi_id] : array();
+
+        $members[] = [
+            'id' => $khi_id,
+            'empID' => $khi_id,
+            'fname' => $mem['firstname'],
+            'sname' => $mem['surname'],
+            'group' => !empty($groupArray) ? $groupArray[0] : null,
+            'groups' => $groupArray,
+            'type' => isset($adminIds[(int)$khi_id]) ? 1 : 0,
+            'email' => $mem['email'],
+        ];
     }
 
     return $members;

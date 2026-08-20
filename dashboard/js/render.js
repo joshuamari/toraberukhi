@@ -9,6 +9,9 @@ function renderEmployeeDetails(empDetails) {
   $("#empLabel").html(fullName);
   $("#empInitials").html(initials);
   $("#grpLabel").html(grpName);
+  if (typeof setAppVersion === "function") {
+    setAppVersion(empDetails && empDetails.app_version);
+  }
 }
 
 function destroyChart(instance) {
