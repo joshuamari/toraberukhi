@@ -501,6 +501,45 @@ tbody tr:hover td {
   color: var(--gray-text2) !important;
 }
 
+/* Documents readiness badges — match PCS request list */
+.doc-readiness {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+}
+
+.doc-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 0.375rem;
+  font-size: 10px;
+  font-weight: 600;
+  white-space: nowrap;
+  background-color: #f4f4f4;
+  color: var(--dark);
+}
+
+.doc-badge.is-ok {
+  background-color: rgba(74, 222, 128, 0.15);
+  color: var(--darkest);
+}
+
+.doc-badge.is-missing {
+  background-color: var(--red-100);
+  color: var(--red-200);
+}
+
+.doc-badge.is-process {
+  background-color: var(--yellow-100);
+  color: var(--yellow-200);
+}
+
+.doc-badge.is-expiring {
+  background-color: rgba(236, 143, 94, 0.35);
+  color: var(--orange);
+}
+
 #attachmentModal p {
   font-size: 14px;
   font-family: "Arial", sans-serif;

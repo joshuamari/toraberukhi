@@ -2289,6 +2289,79 @@ function renderRequestTable() {
   renderRequestPagination();
 }
 
+function getDocumentReadinessHtml(item) {
+  const badges = [];
+
+  if (item.passportStatus) {
+    badges.push(documentStatusBadge("Passport", item.passportStatus));
+  } else if (Object.prototype.hasOwnProperty.call(item, "passValid")) {
+    badges.push(
+      item.passValid
+        ? `<span class="doc-badge is-ok">Passport OK</span>`
+        : `<span class="doc-badge is-missing">Missing Passport</span>`,
+    );
+  }
+
+  if (item.visaStatus) {
+    badges.push(documentStatusBadge("Visa", item.visaStatus));
+  } else if (Object.prototype.hasOwnProperty.call(item, "visaValid")) {
+    badges.push(
+      item.visaValid
+        ? `<span class="doc-badge is-ok">Visa OK</span>`
+        : `<span class="doc-badge is-missing">Missing Visa</span>`,
+    );
+  }
+
+  badges.push(getReentryReadinessBadge(item));
+
+  if (!badges.length) {
+    return "—";
+  }
+
+  return `<div class="doc-readiness">${badges.join("")}</div>`;
+}
+
+function getReentryReadinessBadge(item) {
+  const status =
+    item && item.reentryStatus != null && item.reentryStatus !== ""
+      ? String(item.reentryStatus)
+      : "missing";
+
+  if (status === "valid" || status === "valid_expiring") {
+    return `<span class="doc-badge is-ok">Re-entry OK</span>`;
+  }
+
+  if (status === "on_process") {
+    return `<span class="doc-badge is-process">Re-entry On Process</span>`;
+  }
+
+  if (status === "invalid") {
+    return `<span class="doc-badge is-missing">Re-entry Expired</span>`;
+  }
+
+  return `<span class="doc-badge is-missing">Missing Re-entry</span>`;
+}
+
+function documentStatusBadge(label, status, isReentry) {
+  if (isReentry) {
+    return getReentryReadinessBadge({ reentryStatus: status });
+  }
+
+  if (status === "valid") {
+    return `<span class="doc-badge is-ok">${label} OK</span>`;
+  }
+
+  if (status === "valid_expiring") {
+    return `<span class="doc-badge is-expiring">${label} Expiring</span>`;
+  }
+
+  if (status === "on_process") {
+    return `<span class="doc-badge is-process">${label} On Process</span>`;
+  }
+
+  return `<span class="doc-badge is-missing">Missing ${label}</span>`;
+}
+
 function fillTable(sampleData) {
   $("#tableBody").empty();
   var str = "";
@@ -2310,16 +2383,7 @@ function fillTable(sampleData) {
       <td>${formatDate(item.req_date)}</td>
       <td class="whitespace-nowrap">${formatDateRange(item.from, item.to)}</td>
       <td>${getStatusBadgeHtml(getEffectiveDispatchStatus(item))}</td>
-      <td>${
-        item.passValid === true
-          ? `  <span class="validity "><i class='bx bx-check text-[18px]   font-semibold'></i></span>`
-          : ` <span class="validity "><i class='bx bx-x text-[18px] font-semibold'></i></span>`
-      }</td>
-        <td>${
-          item.visaValid === true
-            ? `  <span class="validity "><i class='bx bx-check text-[18px]   font-semibold'></i></span>`
-            : ` <span class="validity "><i class='bx bx-x text-[18px] font-semibold'></i></span>`
-        }</td>
+      <td>${getDocumentReadinessHtml(item)}</td>
       <td>
         <div class="openIcon view-dispatch-request" title="Open item" data-request-id="${item.req_id}">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"   width="144px" height="144px">
@@ -2332,7 +2396,7 @@ function fillTable(sampleData) {
       $("#tableBody").append(str);
     });
   } else {
-    str = `<td colspan="8" class="h-[280px]"><div class="flex items-center justify-center flex-col gap-3 py-20"><img src="../images/empty.png"   class="w-[150px] h-auto opacity-[0.75] pt-20" alt="empty">
+    str = `<td colspan="7" class="h-[280px]"><div class="flex items-center justify-center flex-col gap-3 py-20"><img src="../images/empty.png"   class="w-[150px] h-auto opacity-[0.75] pt-20" alt="empty">
     <h5 class="font-semibold text-[16px] text-[var(--gray-text)]">No item found</h5>
     <p class="text-[var(--gray-text)] pb-20">Try adjusting your search or filter to find what you're looking for.</p>
     </div></td>`;
