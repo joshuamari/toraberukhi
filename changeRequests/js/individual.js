@@ -1378,7 +1378,7 @@ function renderDateChangeTableBody(pageItems) {
         : "";
     $tbody.append(`
       <tr class="date-change-request-row change-request-row" data-request-id="${item.id}"${openTourAttr}>
-        <td>${item.request_id}</td>
+        <td><span class="activity-id-badge date-change">${item.request_id}</span></td>
         <td>${item.employee_name}</td>
         <td>${formatDateRange(item.current_start, item.current_end)}</td>
         <td>${formatDateRange(item.proposed_start, item.proposed_end)}</td>
@@ -1419,7 +1419,7 @@ function renderCancellationTableBody(pageItems) {
         : "";
     $tbody.append(`
       <tr class="cancellation-request-row change-request-row" data-request-id="${item.id}"${openTourAttr}>
-        <td>${item.request_id}</td>
+        <td><span class="activity-id-badge cancellation">${item.request_id}</span></td>
         <td>${item.employee_name}</td>
         <td>${formatDateRange(item.dispatch_start, item.dispatch_end)}</td>
         <td>${formatDate(item.date_requested)}</td>

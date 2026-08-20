@@ -1621,6 +1621,53 @@ function buildChangeRequestDeepLinkUrl(event) {
   )}&openChangeRequestId=${encodeURIComponent(String(changeRequestId).trim())}`;
 }
 
+function getActivityChangeRequestBadgeClass(changeRequestType) {
+  const type = String(changeRequestType || "")
+    .trim()
+    .toLowerCase();
+
+  if (type === "cancellation") {
+    return "cancellation";
+  }
+
+  if (
+    type === "date_change" ||
+    type === "datechange" ||
+    type === "date-change"
+  ) {
+    return "date-change";
+  }
+
+  return "";
+}
+
+function formatActivityChangeRequestDisplayId(event) {
+  const reference = String(event?.changeRequestReference || "").trim();
+  if (reference) {
+    return reference;
+  }
+
+  const changeRequestId = String(event?.changeRequestId || "").trim();
+  if (!changeRequestId) {
+    return "";
+  }
+
+  const badgeClass = getActivityChangeRequestBadgeClass(
+    event?.changeRequestType
+  );
+  const digits = changeRequestId.replace(/\D/g, "") || changeRequestId;
+
+  if (badgeClass === "cancellation") {
+    return `CR-${String(digits).padStart(5, "0")}`;
+  }
+
+  if (badgeClass === "date-change") {
+    return `DCR-${String(digits).padStart(5, "0")}`;
+  }
+
+  return "";
+}
+
 function escapeActivityHtml(value) {
   return String(value ?? "")
     .replace(/&/g, "&amp;")
@@ -1636,9 +1683,10 @@ function buildActivityEventMarkup(event) {
   const occurredAt = escapeActivityHtml(formatActivityDateTime(event?.occurredAt));
   const actorText = getActivityActorText(event);
   const description = String(event?.description || "").trim();
-  const reference = String(
-    event?.changeRequestReference || event?.changeRequestId || ""
-  ).trim();
+  const displayId = formatActivityChangeRequestDisplayId(event);
+  const badgeClass = getActivityChangeRequestBadgeClass(
+    event?.changeRequestType
+  );
   const deepLinkUrl = buildChangeRequestDeepLinkUrl(event);
 
   let actorMarkup = "";
@@ -1656,18 +1704,16 @@ function buildActivityEventMarkup(event) {
   }
 
   let referenceMarkup = "";
-  if (reference && deepLinkUrl) {
-    const linkClass =
-      "underline decoration-2 decoration-[var(--secondary)] text-[var(--dark)] hover:text-[var(--tertiary)] transition";
+  if (displayId && badgeClass && deepLinkUrl) {
     referenceMarkup = `<p class="dispatch-activity-reference"><a href="${escapeActivityHtml(
       deepLinkUrl
-    )}" target="_blank" rel="noopener noreferrer" class="${linkClass}">${escapeActivityHtml(
-      reference
-    )}</a></p>`;
-  } else if (reference) {
-    referenceMarkup = `<p class="dispatch-activity-reference">${escapeActivityHtml(
-      reference
-    )}</p>`;
+    )}" target="_blank" rel="noopener noreferrer" class="activity-id-badge ${badgeClass}" aria-label="Open ${escapeActivityHtml(
+      displayId
+    )}">${escapeActivityHtml(displayId)}</a></p>`;
+  } else if (displayId && badgeClass) {
+    referenceMarkup = `<p class="dispatch-activity-reference"><span class="activity-id-badge ${badgeClass}">${escapeActivityHtml(
+      displayId
+    )}</span></p>`;
   }
 
   return `
@@ -1761,9 +1807,9 @@ function populateDispatchRequestModal(req) {
   const surname = last.toUpperCase();
   const first = given.replace(/\s+/g, "");
   formatStatus(normalizedStatus);
-  $("#openModalRequestId").text(
-    formatRequestReference(req.req_id, "REQ") || "—"
-  );
+  $("#openModalRequestId")
+    .addClass("activity-id-badge dispatch")
+    .text(formatRequestReference(req.req_id, "REQ") || "—");
   formatVisaPassport(visaValidity, passValidity);
   $("#modalEmpName").text(name);
   $("#modalGroup").text(grp);
@@ -2259,7 +2305,7 @@ function fillTable(sampleData) {
           : "";
       str = `
     <tr class="dispatch-request-row" data-request-id="${item.req_id}"${openTourAttr}>
-      <td class="whitespace-nowrap">${requestReference}</td>
+      <td class="whitespace-nowrap"><span class="activity-id-badge dispatch">${requestReference}</span></td>
       <td>${item.emp_name}</td>
       <td>${formatDate(item.req_date)}</td>
       <td class="whitespace-nowrap">${formatDateRange(item.from, item.to)}</td>
