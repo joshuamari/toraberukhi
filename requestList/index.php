@@ -1,4 +1,8 @@
-﻿<!doctype html>
+﻿<?php
+require_once __DIR__ . '/../helpers/asset.php';
+sendHtmlNoCacheHeaders();
+?>
+<!doctype html>
 <html lang="en">
   <head>
     <title>トラベる - KDT</title>
@@ -8,31 +12,31 @@
     <link rel="icon" href="../favicon.ico" type="image/x-icon" />
 
     <!-- CSS -->
-    <link rel="stylesheet" href="../global.css" />
-    <link rel="stylesheet" href="../css/font-awesome.css" />
-    <link rel="stylesheet" href="../css/boxicons.css" />
-    <link rel="stylesheet" href="../css/bootstrap.min.css" />
-    <link rel="stylesheet" href="css/index.css" />
-    <link rel="stylesheet" href="../tailwindcss/output.css" />
-    <link rel="stylesheet" href="../css/vendor/driver.css" />
-    <link rel="stylesheet" href="../css/tour.css" />
+    <link rel="stylesheet" href="<?= asset('../global.css') ?>" />
+    <link rel="stylesheet" href="<?= asset('../css/font-awesome.css') ?>" />
+    <link rel="stylesheet" href="<?= asset('../css/boxicons.css') ?>" />
+    <link rel="stylesheet" href="<?= asset('../css/bootstrap.min.css') ?>" />
+    <link rel="stylesheet" href="<?= asset('css/index.css') ?>" />
+    <link rel="stylesheet" href="<?= asset('../tailwindcss/output.css') ?>" />
+    <link rel="stylesheet" href="<?= asset('../css/vendor/driver.css') ?>" />
+    <link rel="stylesheet" href="<?= asset('../css/tour.css') ?>" />
 
     <!-- JS libs -->
-    <script src="../js/jquery.js"></script>
-    <script src="../js/version.js"></script>
-    <script src="../js/bootstrap.min.js"></script>
-    <script src="../js/html2canvas.js"></script>
-    <script src="../js/jquery.inview.min.js"></script>
-    <script src="../node_modules/lucide/dist/umd/lucide.min.js"></script>
-    <script src="../js/vendor/driver.js.iife.js"></script>
-    <script src="../js/tour.js"></script>
-    <script src="assets/js/dispatchActivity.mock.js"></script>
-    <script src="assets/js/requestList.tourMock.js"></script>
+    <script src="<?= asset('../js/jquery.js') ?>"></script>
+    <script src="<?= asset('../js/version.js') ?>"></script>
+    <script src="<?= asset('../js/bootstrap.min.js') ?>"></script>
+    <script src="<?= asset('../js/html2canvas.js') ?>"></script>
+    <script src="<?= asset('../js/jquery.inview.min.js') ?>"></script>
+    <script src="<?= asset('../node_modules/lucide/dist/umd/lucide.min.js') ?>"></script>
+    <script src="<?= asset('../js/vendor/driver.js.iife.js') ?>"></script>
+    <script src="<?= asset('../js/tour.js') ?>"></script>
+    <script src="<?= asset('assets/js/dispatchActivity.mock.js') ?>"></script>
+    <script src="<?= asset('assets/js/requestList.tourMock.js') ?>"></script>
     <!-- <script src="../js/jquery.table2excel.js"></script> -->
     <!-- <script src="http://js.sentry-cdn.com/996e6a7f7f64d413dd43124ae5dece7e.min.js" crossorigin="anonymous"></script> -->
 
     <!-- Page JS -->
-    <script defer src="js/individual.js"></script>
+    <script defer src="<?= asset('js/individual.js') ?>"></script>
   </head>
 
   <!-- #region modal -->

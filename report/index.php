@@ -1,3 +1,7 @@
+<?php
+require_once __DIR__ . '/../helpers/asset.php';
+sendHtmlNoCacheHeaders();
+?>
 <!doctype html>
 <html lang="en">
   <head>
@@ -9,30 +13,30 @@
     <link rel="icon" href="../favicon.ico" type="image/x-icon" />
 
     <!-- CSS -->
-    <link rel="stylesheet" href="../global.css" />
-    <link rel="stylesheet" href="../css/font-awesome.css" />
-    <link rel="stylesheet" href="../css/boxicons.css" />
-    <link rel="stylesheet" href="../css/bootstrap.min.css" />
-    <link rel="stylesheet" href="css/index.css" />
-    <link rel="stylesheet" href="../tailwindcss/output.css" />
+    <link rel="stylesheet" href="<?= asset('../global.css') ?>" />
+    <link rel="stylesheet" href="<?= asset('../css/font-awesome.css') ?>" />
+    <link rel="stylesheet" href="<?= asset('../css/boxicons.css') ?>" />
+    <link rel="stylesheet" href="<?= asset('../css/bootstrap.min.css') ?>" />
+    <link rel="stylesheet" href="<?= asset('css/index.css') ?>" />
+    <link rel="stylesheet" href="<?= asset('../tailwindcss/output.css') ?>" />
 
     <!-- JS libraries -->
-    <script src="../js/jquery.js"></script>
-    <script src="../js/version.js"></script>
-    <script src="../js/bootstrap.min.js"></script>
-    <script src="../js/html2canvas.js"></script>
-    <script src="../js/jquery.inview.min.js"></script>
-   <script src="../js/tableToExcel.js"></script>
+    <script src="<?= asset('../js/jquery.js') ?>"></script>
+    <script src="<?= asset('../js/version.js') ?>"></script>
+    <script src="<?= asset('../js/bootstrap.min.js') ?>"></script>
+    <script src="<?= asset('../js/html2canvas.js') ?>"></script>
+    <script src="<?= asset('../js/jquery.inview.min.js') ?>"></script>
+   <script src="<?= asset('../js/tableToExcel.js') ?>"></script>
 
     <!-- Page script -->
-    <script src="js/utils.js"></script>
-    <script src="js/state.js"></script>
-    <script src="js/api.js"></script>
-    <script src="js/ui.js"></script>
-    <script src="js/render.js"></script>
-    <script src="js/export.js"></script>
-    <script src="js/events.js"></script>
-    <script src="js/app.js"></script>
+    <script src="<?= asset('js/utils.js') ?>"></script>
+    <script src="<?= asset('js/state.js') ?>"></script>
+    <script src="<?= asset('js/api.js') ?>"></script>
+    <script src="<?= asset('js/ui.js') ?>"></script>
+    <script src="<?= asset('js/render.js') ?>"></script>
+    <script src="<?= asset('js/export.js') ?>"></script>
+    <script src="<?= asset('js/events.js') ?>"></script>
+    <script src="<?= asset('js/app.js') ?>"></script>
   </head>
 
   <!-- #region modal -->

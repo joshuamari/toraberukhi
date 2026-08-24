@@ -1,3 +1,7 @@
+<?php
+require_once __DIR__ . '/../helpers/asset.php';
+sendHtmlNoCacheHeaders();
+?>
 <!doctype html>
 <html lang="en">
   <head>
@@ -7,24 +11,24 @@
 
     <link rel="icon" href="../favicon.ico" type="image/x-icon" />
 
-    <link rel="stylesheet" href="../global.css" />
-    <link rel="stylesheet" href="../css/font-awesome.css" />
-    <link rel="stylesheet" href="../css/boxicons.css" />
-    <link rel="stylesheet" href="../css/bootstrap.min.css" />
-    <link rel="stylesheet" href="../requestList/css/index.css" />
-    <link rel="stylesheet" href="css/index.css" />
-    <link rel="stylesheet" href="../tailwindcss/output.css" />
-    <link rel="stylesheet" href="../css/vendor/driver.css" />
-    <link rel="stylesheet" href="../css/tour.css" />
+    <link rel="stylesheet" href="<?= asset('../global.css') ?>" />
+    <link rel="stylesheet" href="<?= asset('../css/font-awesome.css') ?>" />
+    <link rel="stylesheet" href="<?= asset('../css/boxicons.css') ?>" />
+    <link rel="stylesheet" href="<?= asset('../css/bootstrap.min.css') ?>" />
+    <link rel="stylesheet" href="<?= asset('../requestList/css/index.css') ?>" />
+    <link rel="stylesheet" href="<?= asset('css/index.css') ?>" />
+    <link rel="stylesheet" href="<?= asset('../tailwindcss/output.css') ?>" />
+    <link rel="stylesheet" href="<?= asset('../css/vendor/driver.css') ?>" />
+    <link rel="stylesheet" href="<?= asset('../css/tour.css') ?>" />
 
-    <script src="../js/jquery.js"></script>
-    <script src="../js/version.js"></script>
-    <script src="../js/bootstrap.min.js"></script>
-    <script src="../node_modules/lucide/dist/umd/lucide.min.js"></script>
-    <script src="../js/vendor/driver.js.iife.js"></script>
-    <script src="../js/tour.js"></script>
-    <script src="assets/js/changeRequests.tourMock.js"></script>
-    <script defer src="js/individual.js"></script>
+    <script src="<?= asset('../js/jquery.js') ?>"></script>
+    <script src="<?= asset('../js/version.js') ?>"></script>
+    <script src="<?= asset('../js/bootstrap.min.js') ?>"></script>
+    <script src="<?= asset('../node_modules/lucide/dist/umd/lucide.min.js') ?>"></script>
+    <script src="<?= asset('../js/vendor/driver.js.iife.js') ?>"></script>
+    <script src="<?= asset('../js/tour.js') ?>"></script>
+    <script src="<?= asset('assets/js/changeRequests.tourMock.js') ?>"></script>
+    <script defer src="<?= asset('js/individual.js') ?>"></script>
   </head>
 
   <!-- #region modals -->
