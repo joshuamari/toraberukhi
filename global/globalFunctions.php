@@ -150,63 +150,33 @@ function getKHIMembers($empnum)
 
     $memsStmt = $connpcs->prepare($memsQ);
     $memsStmt->execute();
-    $memArr = $memsStmt->fetchAll();
 
-    if (empty($memArr)) {
-        return $members;
-    }
+    if ($memsStmt->rowCount() > 0) {
+        $memArr = $memsStmt->fetchAll();
 
-    $memberIds = array_values(array_unique(array_map(function ($mem) {
-        return (int)$mem['number'];
-    }, $memArr)));
-    $memberIdList = implode(',', $memberIds);
+        foreach ($memArr as $mem) {
+            $output = array();
 
-    $groupsByUser = array();
-    $groupsQ = "SELECT kug.`user_id`, gl.`id`, gl.`name`, gl.`abbreviation` AS `abbr`
-                FROM `pcosdb`.`khi_user_groups` AS kug
-                INNER JOIN `kdtphdb_new`.`group_list` AS gl
-                    ON gl.`id` = kug.`group_id`
-                WHERE kug.`user_id` IN ($memberIdList)
-                ORDER BY kug.`id` ASC";
-    $groupsStmt = $connpcs->prepare($groupsQ);
-    $groupsStmt->execute();
-    foreach ($groupsStmt->fetchAll() as $grp) {
-        $uid = (int)$grp['user_id'];
-        if (!isset($groupsByUser[$uid])) {
-            $groupsByUser[$uid] = array();
+            $khi_id = $mem['number'];
+            $khi_fname = $mem['firstname'];
+            $khi_sname = $mem['surname'];
+            $emp_email = $mem['email'];
+            $adminType = allGroupAccess($khi_id) ? 1 : 0;
+
+            $groupArray = getKHIUserGroups($khi_id);
+            $mainGroup = getKHIMainGroup($khi_id);
+
+            $output['id'] = $khi_id;
+            $output['empID'] = $khi_id;
+            $output['fname'] = $khi_fname;
+            $output['sname'] = $khi_sname;
+            $output['group'] = $mainGroup;
+            $output['groups'] = $groupArray;
+            $output['type'] = $adminType;
+            $output['email'] = $emp_email;
+
+            array_push($members, $output);
         }
-        $groupsByUser[$uid][] = [
-            "id" => $grp["id"],
-            "name" => $grp["name"],
-            "abbr" => $grp["abbr"]
-        ];
-    }
-
-    $adminIds = array();
-    $permQ = "SELECT `employee_id`
-              FROM `khi_user_permissions`
-              WHERE `permission_id` = 1
-                AND `employee_id` IN ($memberIdList)";
-    $permStmt = $connpcs->prepare($permQ);
-    $permStmt->execute();
-    foreach ($permStmt->fetchAll() as $row) {
-        $adminIds[(int)$row['employee_id']] = true;
-    }
-
-    foreach ($memArr as $mem) {
-        $khi_id = $mem['number'];
-        $groupArray = isset($groupsByUser[(int)$khi_id]) ? $groupsByUser[(int)$khi_id] : array();
-
-        $members[] = [
-            'id' => $khi_id,
-            'empID' => $khi_id,
-            'fname' => $mem['firstname'],
-            'sname' => $mem['surname'],
-            'group' => !empty($groupArray) ? $groupArray[0] : null,
-            'groups' => $groupArray,
-            'type' => isset($adminIds[(int)$khi_id]) ? 1 : 0,
-            'email' => $mem['email'],
-        ];
     }
 
     return $members;
@@ -530,17 +500,13 @@ function buildDispatchEmailTestRecipientFooter(array $recipients): string
     $prodCc = $escapeList($recipients['prod_cc'] ?? []);
 
     return "
-        <table role='presentation' width='100%' cellpadding='0' cellspacing='0' border='0' bgcolor='#F9F9F9' style='margin: 0 0 28px 0; border-collapse: separate; background-color: #F9F9F9; border: 1px solid #E9E9E9; border-radius: 10px;'>
+        <table role='presentation' width='100%' cellpadding='0' cellspacing='0' border='0' style='margin: 0 0 28px 0; border-collapse: collapse;'>
             <tr>
-                <td bgcolor='#F9F9F9' style='padding: 14px 16px; background-color: #F9F9F9; font-family: Arial, Helvetica, sans-serif; font-size: 10px; line-height: 15px; color: #7D7D7D; word-break: break-word; overflow-wrap: anywhere;'>
-                    <strong style='color: #000000;'>[TEST MODE]</strong>
-                    This email was redirected to developers only. Real recipients were NOT notified.
-                    <br><br>
-                    <strong style='color: #000000;'>Actually sent To:</strong> {$actualTo}
-                    <br>
-                    <strong style='color: #000000;'>PROD would To:</strong> {$prodTo}
-                    <br>
-                    <strong style='color: #000000;'>PROD would CC:</strong> {$prodCc}
+                <td style='padding: 16px 18px; background-color: #F9F9F9; border: 1px solid #E8E8E8; border-radius: 10px; font-family: Arial, Helvetica, sans-serif; font-size: 12px; line-height: 1.55; color: #7D7D7D; word-break: break-word; overflow-wrap: anywhere;'>
+                    <p style='margin: 0 0 8px 0; color: #000000;'><strong>[TEST MODE]</strong> This email was redirected to developers only. Real recipients were NOT notified.</p>
+                    <p style='margin: 0 0 4px 0;'><strong style='color: #000000;'>Actually sent To:</strong> {$actualTo}</p>
+                    <p style='margin: 0 0 4px 0;'><strong style='color: #000000;'>PROD would To:</strong> {$prodTo}</p>
+                    <p style='margin: 0;'><strong style='color: #000000;'>PROD would CC:</strong> {$prodCc}</p>
                 </td>
             </tr>
         </table>
@@ -624,11 +590,11 @@ function buildDispatchRequestSubmittedEmailHtml(array $details, array $recipient
     $khiCtaUrl = $requestId > 0
         ? $escape($link . '/PCSKHI/requestList/?request_id=' . $requestId)
         : $escape($link . '/PCSKHI/requestList/');
-    $logoUrl = $escape($link) . '/PCSKHI/images/' . rawurlencode('pcs logo bold.png');
+    $logoUrl = $escape($link) . '/PCSKHI/images/' . rawurlencode('logo name.png');
 
     $requestIdBadge = $requestRefEscaped !== ''
-        ? "<span style=\"display:inline-block;padding:4px 10px;background-color:#4ADE80;color:#000000;border-radius:6px;font-size:12px;font-weight:700;line-height:1.3;\">{$requestRefEscaped}</span>"
-        : "<span style=\"color:#000000;font-size:13px;font-weight:700;\">—</span>";
+        ? "<span style=\"display: inline-block; padding: 4px 10px; background-color: #4ADE80; color: #000000; border-radius: 6px; font-size: 13px; font-weight: 700; line-height: 1.3;\">{$requestRefEscaped}</span>"
+        : "<span style=\"color: #000000; font-size: 14px; font-weight: 700;\">—</span>";
 
     return "
 <!DOCTYPE html>
@@ -639,95 +605,97 @@ function buildDispatchRequestSubmittedEmailHtml(array $details, array $recipient
 <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">
 <title>Dispatch Request Submitted</title>
 </head>
-<body style=\"margin:0;padding:0;background-color:#F9F9F9;color:#000000;\">
-<table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" bgcolor=\"#F9F9F9\" style=\"border-collapse:collapse;background-color:#F9F9F9;width:100%;\">
+<body style=\"margin: 0; padding: 0; background-color: #FFFFFF; color: #000000;\">
+<table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"border-collapse: collapse; background-color: #FFFFFF;\">
     <tr>
-        <td align=\"center\" bgcolor=\"#F9F9F9\" style=\"padding:24px 12px;background-color:#F9F9F9;\">
-            <table role=\"presentation\" width=\"600\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" bgcolor=\"#FFFFFF\" style=\"border-collapse:collapse;width:100%;max-width:600px;background-color:#FFFFFF;font-family:Arial, Helvetica, sans-serif;\">
+        <td align=\"center\" style=\"padding: 24px 16px;\">
+            <table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"border-collapse: collapse; max-width: 600px; width: 100%; font-family: Arial, Helvetica, sans-serif;\">
                 <tr>
-                    <td style=\"padding:28px 34px 24px 34px;border-bottom:1px solid #E9E9E9;\">
-                        <img src=\"{$logoUrl}\" alt=\"トラべる\" width=\"128\" style=\"display:block;width:128px;max-width:100%;height:auto;border:0;\">
+                    <td align=\"left\" style=\"padding: 0 0 28px 0;\">
+                        <img src=\"{$logoUrl}\" alt=\"トラべる\" width=\"140\" style=\"display: block; border: 0; height: auto; max-width: 140px;\">
                     </td>
                 </tr>
                 <tr>
-                    <td style=\"padding:30px 34px 26px 34px;\">
-                        <table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"border-collapse:collapse;width:100%;\">
+                    <td align=\"left\" style=\"padding: 0 0 24px 0; font-size: 34px; line-height: 1.15; font-weight: 700; color: #000000;\">
+                        Dispatch<br>Request Submitted
+                    </td>
+                </tr>
+                <tr>
+                    <td align=\"left\" style=\"padding: 0 0 28px 0; font-size: 15px; line-height: 1.6; color: #000000;\">
+                        <p style=\"margin: 0 0 14px 0;\">Dear President {$presidentSurname}-san,</p>
+                        <p style=\"margin: 0 0 14px 0;\"><strong>{$requesterSurname}-san</strong> has submitted dispatch request for the employee below.</p>
+                        <p style=\"margin: 0;\">Please review the proposed schedule and approve or decline the dispatch request.</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td style=\"padding: 0 0 28px 0;\">
+                        <table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"border-collapse: separate; width: 100%; background-color: #F9F9F9; border: 1px solid #E9E9E9; border-radius: 14px;\">
                             <tr>
-                                <td style=\"font-size:32px;line-height:34px;font-weight:700;color:#000000;padding:0;\">
-                                    Dispatch<br>Request Submitted
+                                <td colspan=\"2\" style=\"padding: 18px 16px 10px 16px; font-size: 14px; line-height: 18px; font-weight: 700; color: #000000; border-bottom: 1px solid #E9E9E9;\">
+                                    Dispatch Request Summary
+                                </td>
+                            </tr>
+                            <tr>
+                                <td width=\"50%\" valign=\"top\" style=\"width: 50%; padding: 14px 14px 14px 16px; border-right: 1px solid #E9E9E9; border-bottom: 1px solid #E9E9E9;\">
+                                    <div style=\"font-size: 10px; line-height: 12px; letter-spacing: 0.04em; text-transform: uppercase; color: #959595; margin: 0 0 6px 0;\">NAME</div>
+                                    <div style=\"font-size: 13px; line-height: 18px; font-weight: 700; color: #000000; word-break: break-word;\">{$employeeName}</div>
+                                </td>
+                                <td width=\"50%\" valign=\"top\" style=\"width: 50%; padding: 14px 16px 14px 14px; border-bottom: 1px solid #E9E9E9;\">
+                                    <div style=\"font-size: 10px; line-height: 12px; letter-spacing: 0.04em; text-transform: uppercase; color: #959595; margin: 0 0 6px 0;\">REQUEST ID</div>
+                                    <div style=\"line-height: 1.45;\">{$requestIdBadge}</div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td width=\"50%\" valign=\"top\" style=\"width: 50%; padding: 14px 14px 14px 16px; border-right: 1px solid #E9E9E9; border-bottom: 1px solid #E9E9E9;\">
+                                    <div style=\"font-size: 10px; line-height: 12px; letter-spacing: 0.04em; text-transform: uppercase; color: #959595; margin: 0 0 6px 0;\">GROUP</div>
+                                    <div style=\"font-size: 13px; line-height: 18px; font-weight: 700; color: #000000; word-break: break-word;\">" . ($groupAbbr !== '' ? $groupAbbr : '—') . "</div>
+                                </td>
+                                <td width=\"50%\" valign=\"top\" style=\"width: 50%; padding: 14px 16px 14px 14px; border-bottom: 1px solid #E9E9E9;\">
+                                    <div style=\"font-size: 10px; line-height: 12px; letter-spacing: 0.04em; text-transform: uppercase; color: #959595; margin: 0 0 6px 0;\">LOCATION</div>
+                                    <div style=\"font-size: 13px; line-height: 18px; font-weight: 700; color: #000000; word-break: break-word;\">" . ($locationName !== '' ? $locationName : '—') . "</div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td width=\"50%\" valign=\"top\" style=\"width: 50%; padding: 14px 14px 16px 16px; border-right: 1px solid #E9E9E9;\">
+                                    <div style=\"font-size: 10px; line-height: 12px; letter-spacing: 0.04em; text-transform: uppercase; color: #959595; margin: 0 0 6px 0;\">DISPATCH DATES</div>
+                                    <div style=\"font-size: 13px; line-height: 18px; font-weight: 700; color: #000000; word-break: break-word;\">" . ($dispatchDates !== '' ? $dispatchDates : '—') . "</div>
+                                </td>
+                                <td width=\"50%\" valign=\"top\" style=\"width: 50%; padding: 14px 16px 16px 14px;\">
+                                    <div style=\"font-size: 10px; line-height: 12px; letter-spacing: 0.04em; text-transform: uppercase; color: #959595; margin: 0 0 6px 0;\">REQUESTER</div>
+                                    <div style=\"font-size: 13px; line-height: 18px; font-weight: 700; color: #000000; word-break: break-word;\">" . ($requesterName !== '' ? $requesterName : '—') . "</div>
                                 </td>
                             </tr>
                         </table>
-
-                        <table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"border-collapse:collapse;width:100%;margin-top:48px;\">
+                    </td>
+                </tr>
+                <tr>
+                    <td align=\"center\" style=\"padding: 0 0 28px 0;\">
+                        <table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"border-collapse: collapse; width: 100%;\">
                             <tr>
-                                <td style=\"font-size:13px;line-height:20px;color:#000000;padding:0 0 16px 0;\">Dear President {$presidentSurname}-san,</td>
-                            </tr>
-                            <tr>
-                                <td style=\"font-size:13px;line-height:20px;color:#000000;padding:0 0 16px 0;\"><strong>{$requesterSurname}-san</strong> has submitted a dispatch request for the employee below.</td>
-                            </tr>
-                            <tr>
-                                <td style=\"font-size:13px;line-height:20px;color:#000000;padding:0;\">Please review the proposed schedule and approve or decline the dispatch request.</td>
-                            </tr>
-                        </table>
-
-                        <table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" bgcolor=\"#F9F9F9\" style=\"border-collapse:separate;width:100%;margin-top:28px;background-color:#F9F9F9;border:1px solid #E9E9E9;border-radius:14px;\">
-                            <tr>
-                                <td colspan=\"2\" bgcolor=\"#F9F9F9\" style=\"padding:18px 16px 10px 16px;font-size:14px;line-height:18px;font-weight:700;color:#000000;border-bottom:1px solid #E9E9E9;background-color:#F9F9F9;\">Dispatch Request Summary</td>
-                            </tr>
-                            <tr>
-                                <td width=\"50%\" valign=\"top\" bgcolor=\"#F9F9F9\" style=\"width:50%;padding:14px 14px 14px 16px;border-right:1px solid #E9E9E9;border-bottom:1px solid #E9E9E9;background-color:#F9F9F9;\">
-                                    <div style=\"font-size:10px;line-height:12px;letter-spacing:0.04em;text-transform:uppercase;color:#959595;margin:0 0 6px 0;\">NAME</div>
-                                    <div style=\"font-size:13px;line-height:18px;font-weight:700;color:#000000;word-break:break-word;\">{$employeeName}</div>
-                                </td>
-                                <td width=\"50%\" valign=\"top\" bgcolor=\"#F9F9F9\" style=\"width:50%;padding:14px 16px 14px 14px;border-bottom:1px solid #E9E9E9;background-color:#F9F9F9;\">
-                                    <div style=\"font-size:10px;line-height:12px;letter-spacing:0.04em;text-transform:uppercase;color:#959595;margin:0 0 6px 0;\">REQUEST ID</div>
-                                    <div style=\"line-height:1.45;\">{$requestIdBadge}</div>
+                                <td align=\"center\" style=\"padding: 0 0 14px 0; font-size: 12px; line-height: 1.5; color: #878787;\">
+                                    Open the request using your application.
                                 </td>
                             </tr>
-                            <tr>
-                                <td width=\"50%\" valign=\"top\" bgcolor=\"#F9F9F9\" style=\"width:50%;padding:14px 14px 14px 16px;border-right:1px solid #E9E9E9;border-bottom:1px solid #E9E9E9;background-color:#F9F9F9;\">
-                                    <div style=\"font-size:10px;line-height:12px;letter-spacing:0.04em;text-transform:uppercase;color:#959595;margin:0 0 6px 0;\">GROUP</div>
-                                    <div style=\"font-size:13px;line-height:18px;font-weight:700;color:#000000;word-break:break-word;\">" . ($groupAbbr !== '' ? $groupAbbr : '—') . "</div>
-                                </td>
-                                <td width=\"50%\" valign=\"top\" bgcolor=\"#F9F9F9\" style=\"width:50%;padding:14px 16px 14px 14px;border-bottom:1px solid #E9E9E9;background-color:#F9F9F9;\">
-                                    <div style=\"font-size:10px;line-height:12px;letter-spacing:0.04em;text-transform:uppercase;color:#959595;margin:0 0 6px 0;\">LOCATION</div>
-                                    <div style=\"font-size:13px;line-height:18px;font-weight:700;color:#000000;word-break:break-word;\">" . ($locationName !== '' ? $locationName : '—') . "</div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td width=\"50%\" valign=\"top\" bgcolor=\"#F9F9F9\" style=\"width:50%;padding:14px 14px 16px 16px;border-right:1px solid #E9E9E9;background-color:#F9F9F9;\">
-                                    <div style=\"font-size:10px;line-height:12px;letter-spacing:0.04em;text-transform:uppercase;color:#959595;margin:0 0 6px 0;\">DISPATCH DATES</div>
-                                    <div style=\"font-size:13px;line-height:18px;font-weight:700;color:#000000;word-break:break-word;\">" . ($dispatchDates !== '' ? $dispatchDates : '—') . "</div>
-                                </td>
-                                <td width=\"50%\" valign=\"top\" bgcolor=\"#F9F9F9\" style=\"width:50%;padding:14px 16px 16px 14px;background-color:#F9F9F9;\">
-                                    <div style=\"font-size:10px;line-height:12px;letter-spacing:0.04em;text-transform:uppercase;color:#959595;margin:0 0 6px 0;\">REQUESTER</div>
-                                    <div style=\"font-size:13px;line-height:18px;font-weight:700;color:#000000;word-break:break-word;\">" . ($requesterName !== '' ? $requesterName : '—') . "</div>
-                                </td>
-                            </tr>
-                        </table>
-
-                        <table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"border-collapse:collapse;width:100%;margin-top:36px;\">
                             <tr>
                                 <td>
-                                    <table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"border-collapse:collapse;width:100%;\">
+                                    <table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"border-collapse: collapse; width: 100%;\">
                                         <tr>
-                                            <td width=\"50%\" valign=\"top\" align=\"center\" style=\"width:50%;padding-right:6px;\">
-                                                <div style=\"margin:0 0 7px 0;font-size:9px;line-height:12px;font-weight:700;color:#959595;\">FOR KDT</div>
-                                                <table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"border-collapse:collapse;width:100%;\">
+                                            <td width=\"50%\" valign=\"top\" align=\"center\" style=\"width: 50%; padding-right: 6px;\">
+                                                <div style=\"margin: 0 0 7px 0; font-size: 11px; line-height: 1.3; font-weight: 700; letter-spacing: 0.04em; color: #959595;\">FOR KDT</div>
+                                                <table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"border-collapse: collapse; width: 100%;\">
                                                     <tr>
-                                                        <td align=\"center\" bgcolor=\"#000000\" style=\"background-color:#000000;border-radius:6px;\">
-                                                            <a href=\"{$kdtCtaUrl}\" style=\"display:block;padding:14px 10px;font-family:Arial, Helvetica, sans-serif;font-size:11px;line-height:15px;font-weight:500;color:#FFFFFF;text-decoration:none;text-align:center;\">Review Dispatch Request&nbsp;&nbsp;→</a>
+                                                        <td align=\"center\" bgcolor=\"#000000\" style=\"border-radius: 8px; background-color: #000000;\">
+                                                            <a href=\"{$kdtCtaUrl}\" style=\"display: block; padding: 12px 10px; font-family: Arial, Helvetica, sans-serif; font-size: 13px; line-height: 1.3; font-weight: 700; color: #FFFFFF; text-decoration: none; border-radius: 8px; text-align: center;\">Review Dispatch Request&nbsp;&nbsp;→</a>
                                                         </td>
                                                     </tr>
                                                 </table>
                                             </td>
-                                            <td width=\"50%\" valign=\"top\" align=\"center\" style=\"width:50%;padding-left:6px;\">
-                                                <div style=\"margin:0 0 7px 0;font-size:9px;line-height:12px;font-weight:700;color:#959595;\">FOR KHI</div>
-                                                <table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"border-collapse:collapse;width:100%;\">
+                                            <td width=\"50%\" valign=\"top\" align=\"center\" style=\"width: 50%; padding-left: 6px;\">
+                                                <div style=\"margin: 0 0 7px 0; font-size: 11px; line-height: 1.3; font-weight: 700; letter-spacing: 0.04em; color: #959595;\">FOR KHI</div>
+                                                <table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"border-collapse: collapse; width: 100%;\">
                                                     <tr>
-                                                        <td align=\"center\" bgcolor=\"#4ADE80\" style=\"background-color:#4ADE80;border-radius:6px;\">
-                                                            <a href=\"{$khiCtaUrl}\" style=\"display:block;padding:14px 10px;font-family:Arial, Helvetica, sans-serif;font-size:11px;line-height:15px;font-weight:600;color:#000000;text-decoration:none;text-align:center;\">View Request Status&nbsp;&nbsp;→</a>
+                                                        <td align=\"center\" bgcolor=\"#4ADE80\" style=\"border-radius: 8px; background-color: #4ADE80;\">
+                                                            <a href=\"{$khiCtaUrl}\" style=\"display: block; padding: 12px 10px; font-family: Arial, Helvetica, sans-serif; font-size: 13px; line-height: 1.3; font-weight: 700; color: #000000; text-decoration: none; border-radius: 8px; text-align: center;\">View Request Status&nbsp;&nbsp;→</a>
                                                         </td>
                                                     </tr>
                                                 </table>
@@ -737,39 +705,29 @@ function buildDispatchRequestSubmittedEmailHtml(array $details, array $recipient
                                 </td>
                             </tr>
                         </table>
-
-                        <table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"border-collapse:collapse;width:100%;margin-top:30px;\">
+                    </td>
+                </tr>
+                <tr>
+                    <td style=\"padding: 0;\">
+                        <!--DISPATCH_EMAIL_TEST_MODE-->
+                    </td>
+                </tr>
+                <tr>
+                    <td style=\"padding: 0 0 28px 0;\">
+                        <table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"border-collapse: collapse;\">
                             <tr>
-                                <td style=\"padding:0;\">
-                                    <!--DISPATCH_EMAIL_TEST_MODE-->
-                                </td>
-                            </tr>
-                        </table>
-
-                        <table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" bgcolor=\"#E8E8E8\" style=\"border-collapse:separate;width:100%;margin-top:0;background-color:#E8E8E8;border-radius:9px;\">
-                            <tr>
-                                <td width=\"42\" valign=\"middle\" bgcolor=\"#E8E8E8\" style=\"width:42px;padding:13px 0 13px 15px;background-color:#E8E8E8;\">
-                                    <table role=\"presentation\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"border-collapse:collapse;\">
-                                        <tr>
-                                            <td align=\"center\" valign=\"middle\" style=\"width:18px;height:18px;border:1px solid #959595;border-radius:50%;color:#878787;font-size:11px;line-height:18px;font-weight:700;\">i</td>
-                                        </tr>
-                                    </table>
-                                </td>
-                                <td bgcolor=\"#E8E8E8\" style=\"padding:12px 15px 12px 4px;font-size:9px;line-height:13px;color:#959595;background-color:#E8E8E8;\">
-                                    This is a system-generated email. Please do not reply to this message.
+                                <td style=\"padding: 14px 16px; background-color: #E8E8E8; border-radius: 10px; font-size: 12px; line-height: 1.55; color: #878787;\">
+                                    This is a system-generated email. Please do not reply to this message.<br>
                                     If you need assistance, contact your トラべる administrator.
                                 </td>
                             </tr>
                         </table>
-
-                        <table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"border-collapse:collapse;width:100%;margin-top:24px;\">
-                            <tr>
-                                <td>
-                                    <img src=\"{$logoUrl}\" alt=\"トラべる\" width=\"84\" style=\"display:block;width:84px;max-width:100%;height:auto;border:0;\">
-                                    <div style=\"margin-top:9px;font-size:9px;line-height:12px;color:#7D7D7D;\">KHI Design &amp; Technical Service, Inc.</div>
-                                </td>
-                            </tr>
-                        </table>
+                    </td>
+                </tr>
+                <tr>
+                    <td align=\"center\" style=\"padding: 8px 0 0 0;\">
+                        <img src=\"{$logoUrl}\" alt=\"トラべる\" width=\"96\" style=\"display: block; border: 0; height: auto; max-width: 96px; margin: 0 auto 10px auto;\">
+                        <div style=\"font-size: 12px; line-height: 1.5; color: #9E9E9E;\">KDT Design &amp; Technical Service, Inc.</div>
                     </td>
                 </tr>
             </table>
@@ -858,7 +816,7 @@ function buildDateChangeRequestSubmittedEmailHtml(array $details, array $changeD
     $changeRequestId = (int)($changeData['change_request_id'] ?? 0);
     $changeDisplayId = trim((string)($changeData['display_id'] ?? ''));
     if ($changeDisplayId === '' && $changeRequestId > 0) {
-        $changeDisplayId = 'DCR-' . str_pad((string)$changeRequestId, 5, '0', STR_PAD_LEFT);
+        $changeDisplayId = 'DCR-' . date('Y') . '-' . str_pad((string)$changeRequestId, 3, '0', STR_PAD_LEFT);
     }
     $changeDisplayIdEscaped = $escape($changeDisplayId);
 
@@ -884,10 +842,10 @@ function buildDateChangeRequestSubmittedEmailHtml(array $details, array $changeD
 <title>Date Change Request Submitted</title>
 </head>
 <body style=\"margin:0;padding:0;background-color:#F9F9F9;color:#000000;\">
-<table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" bgcolor=\"#F9F9F9\" style=\"border-collapse:collapse;background-color:#F9F9F9;width:100%;\">
+<table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"border-collapse:collapse;background-color:#F9F9F9;width:100%;\">
     <tr>
-        <td align=\"center\" bgcolor=\"#F9F9F9\" style=\"padding:24px 12px;background-color:#F9F9F9;\">
-            <table role=\"presentation\" width=\"600\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" bgcolor=\"#FFFFFF\" style=\"border-collapse:collapse;width:100%;max-width:600px;background-color:#FFFFFF;font-family:Arial, Helvetica, sans-serif;\">
+        <td align=\"center\" style=\"padding:24px 12px;\">
+            <table role=\"presentation\" width=\"600\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"border-collapse:collapse;width:100%;max-width:600px;background-color:#FFFFFF;font-family:Arial, Helvetica, sans-serif;\">
                 <tr>
                     <td style=\"padding:28px 34px 24px 34px;border-bottom:1px solid #E9E9E9;\">
                         <img src=\"{$logoUrl}\" alt=\"トラべる\" width=\"128\" style=\"display:block;width:128px;max-width:100%;height:auto;border:0;\">
@@ -915,54 +873,54 @@ function buildDateChangeRequestSubmittedEmailHtml(array $details, array $changeD
                             </tr>
                         </table>
 
-                        <table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" bgcolor=\"#F9F9F9\" style=\"border-collapse:separate;width:100%;margin-top:28px;background-color:#F9F9F9;border:1px solid #E9E9E9;border-radius:14px;\">
+                        <table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"border-collapse:separate;width:100%;margin-top:28px;background-color:#F9F9F9;border:1px solid #E9E9E9;border-radius:14px;\">
                             <tr>
-                                <td colspan=\"2\" bgcolor=\"#F9F9F9\" style=\"padding:18px 16px 10px 16px;font-size:14px;line-height:18px;font-weight:700;color:#000000;border-bottom:1px solid #E9E9E9;background-color:#F9F9F9;\">Date Change Request Summary</td>
+                                <td colspan=\"2\" style=\"padding:18px 16px 10px 16px;font-size:14px;line-height:18px;font-weight:700;color:#000000;border-bottom:1px solid #E9E9E9;\">Date Change Request Summary</td>
                             </tr>
                             <tr>
-                                <td width=\"50%\" valign=\"top\" bgcolor=\"#F9F9F9\" style=\"width:50%;padding:14px 14px 14px 16px;border-right:1px solid #E9E9E9;border-bottom:1px solid #E9E9E9;background-color:#F9F9F9;\">
+                                <td width=\"50%\" valign=\"top\" style=\"width:50%;padding:14px 14px 14px 16px;border-right:1px solid #E9E9E9;border-bottom:1px solid #E9E9E9;\">
                                     <div style=\"font-size:10px;line-height:12px;letter-spacing:0.04em;text-transform:uppercase;color:#959595;margin:0 0 6px 0;\">NAME</div>
                                     <div style=\"font-size:13px;line-height:18px;font-weight:700;color:#000000;word-break:break-word;\">{$employeeName}</div>
                                 </td>
-                                <td width=\"50%\" valign=\"top\" bgcolor=\"#F9F9F9\" style=\"width:50%;padding:14px 16px 14px 14px;border-bottom:1px solid #E9E9E9;background-color:#F9F9F9;\">
+                                <td width=\"50%\" valign=\"top\" style=\"width:50%;padding:14px 16px 14px 14px;border-bottom:1px solid #E9E9E9;\">
                                     <div style=\"font-size:10px;line-height:12px;letter-spacing:0.04em;text-transform:uppercase;color:#959595;margin:0 0 6px 0;\">LOCATION</div>
                                     <div style=\"font-size:13px;line-height:18px;font-weight:700;color:#000000;word-break:break-word;\">" . ($locationName !== '' ? $locationName : '—') . "</div>
                                 </td>
                             </tr>
                             <tr>
-                                <td width=\"50%\" valign=\"top\" bgcolor=\"#F9F9F9\" style=\"width:50%;padding:14px 14px 14px 16px;border-right:1px solid #E9E9E9;border-bottom:1px solid #E9E9E9;background-color:#F9F9F9;\">
+                                <td width=\"50%\" valign=\"top\" style=\"width:50%;padding:14px 14px 14px 16px;border-right:1px solid #E9E9E9;border-bottom:1px solid #E9E9E9;\">
                                     <div style=\"font-size:10px;line-height:12px;letter-spacing:0.04em;text-transform:uppercase;color:#959595;margin:0 0 6px 0;\">DATE CHANGE REQUEST ID</div>
                                     <div style=\"line-height:1.45;\">{$dcBadge}</div>
                                 </td>
-                                <td width=\"50%\" valign=\"top\" bgcolor=\"#F9F9F9\" style=\"width:50%;padding:14px 16px 14px 14px;border-bottom:1px solid #E9E9E9;background-color:#F9F9F9;\">
+                                <td width=\"50%\" valign=\"top\" style=\"width:50%;padding:14px 16px 14px 14px;border-bottom:1px solid #E9E9E9;\">
                                     <div style=\"font-size:10px;line-height:12px;letter-spacing:0.04em;text-transform:uppercase;color:#959595;margin:0 0 6px 0;\">ORIGINAL DISPATCH ID</div>
                                     <div style=\"line-height:1.45;\">{$reqBadge}</div>
                                 </td>
                             </tr>
                             <tr>
-                                <td width=\"50%\" valign=\"top\" bgcolor=\"#F9F9F9\" style=\"width:50%;padding:14px 14px 16px 16px;border-right:1px solid #E9E9E9;background-color:#F9F9F9;\">
+                                <td width=\"50%\" valign=\"top\" style=\"width:50%;padding:14px 14px 16px 16px;border-right:1px solid #E9E9E9;\">
                                     <div style=\"font-size:10px;line-height:12px;letter-spacing:0.04em;text-transform:uppercase;color:#959595;margin:0 0 6px 0;\">GROUP</div>
                                     <div style=\"font-size:13px;line-height:18px;font-weight:700;color:#000000;word-break:break-word;\">" . ($groupAbbr !== '' ? $groupAbbr : '—') . "</div>
                                 </td>
-                                <td width=\"50%\" valign=\"top\" bgcolor=\"#F9F9F9\" style=\"width:50%;padding:14px 16px 16px 14px;background-color:#F9F9F9;\">
+                                <td width=\"50%\" valign=\"top\" style=\"width:50%;padding:14px 16px 16px 14px;\">
                                     <div style=\"font-size:10px;line-height:12px;letter-spacing:0.04em;text-transform:uppercase;color:#959595;margin:0 0 6px 0;\">DISPATCH DATES</div>
                                     <div style=\"font-size:13px;line-height:18px;font-weight:700;color:#000000;word-break:break-word;\">" . ($dispatchDates !== '' ? $dispatchDates : '—') . "</div>
                                 </td>
                             </tr>
                         </table>
 
-                        <table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" bgcolor=\"#F9F9F9\" style=\"border-collapse:separate;width:100%;margin-top:18px;background-color:#F9F9F9;border:1px solid #E9E9E9;border-radius:14px;\">
+                        <table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"border-collapse:separate;width:100%;margin-top:18px;background-color:#F9F9F9;border:1px solid #E9E9E9;border-radius:14px;\">
                             <tr>
-                                <td bgcolor=\"#F9F9F9\" style=\"padding:18px 16px 12px 16px;font-size:14px;line-height:18px;font-weight:700;color:#000000;background-color:#F9F9F9;\">Schedule Comparison</td>
+                                <td style=\"padding:18px 16px 12px 16px;font-size:14px;line-height:18px;font-weight:700;color:#000000;\">Schedule Comparison</td>
                             </tr>
                             <tr>
-                                <td bgcolor=\"#F9F9F9\" style=\"padding:0 12px 14px 12px;background-color:#F9F9F9;\">
+                                <td style=\"padding:0 12px 14px 12px;\">
                                     <table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"border-collapse:collapse;width:100%;\">
                                         <tr>
                                             <td width=\"44%\" valign=\"middle\" style=\"width:44%;\">
-                                                <table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" bgcolor=\"#FFFFFF\" style=\"border-collapse:separate;width:100%;background-color:#FFFFFF;border:1px solid #E9E9E9;border-radius:10px;\">
+                                                <table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"border-collapse:separate;width:100%;background-color:#FFFFFF;border:1px solid #E9E9E9;border-radius:10px;\">
                                                     <tr>
-                                                        <td bgcolor=\"#FFFFFF\" style=\"padding:12px 12px 14px 12px;background-color:#FFFFFF;\">
+                                                        <td style=\"padding:12px 12px 14px 12px;\">
                                                             <div style=\"font-size:10px;line-height:12px;letter-spacing:0.04em;text-transform:uppercase;color:#9E9E9E;margin:0 0 8px 0;\">CURRENT</div>
                                                             <div style=\"font-size:12px;line-height:17px;font-weight:700;color:#000000;word-break:break-word;margin:0 0 8px 0;\">" . ($currentDates !== '' ? $currentDates : '—') . "</div>
                                                             <div style=\"font-size:12px;line-height:16px;font-weight:700;color:#38B365;\">{$currentDays} days</div>
@@ -972,9 +930,9 @@ function buildDateChangeRequestSubmittedEmailHtml(array $details, array $changeD
                                             </td>
                                             <td width=\"12%\" align=\"center\" valign=\"middle\" style=\"width:12%;padding:0 4px;font-size:22px;line-height:22px;font-weight:700;color:#2EAD5C;\">→</td>
                                             <td width=\"44%\" valign=\"middle\" style=\"width:44%;\">
-                                                <table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" bgcolor=\"#FFFFFF\" style=\"border-collapse:separate;width:100%;background-color:#FFFFFF;border:1px solid #E9E9E9;border-radius:10px;\">
+                                                <table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"border-collapse:separate;width:100%;background-color:#FFFFFF;border:1px solid #E9E9E9;border-radius:10px;\">
                                                     <tr>
-                                                        <td bgcolor=\"#FFFFFF\" style=\"padding:12px 12px 14px 12px;background-color:#FFFFFF;\">
+                                                        <td style=\"padding:12px 12px 14px 12px;\">
                                                             <div style=\"font-size:10px;line-height:12px;letter-spacing:0.04em;text-transform:uppercase;color:#9E9E9E;margin:0 0 8px 0;\">PROPOSED</div>
                                                             <div style=\"font-size:12px;line-height:17px;font-weight:700;color:#000000;word-break:break-word;margin:0 0 8px 0;\">" . ($proposedDates !== '' ? $proposedDates : '—') . "</div>
                                                             <div style=\"font-size:12px;line-height:16px;font-weight:700;color:#38B365;\">{$proposedDays} days</div>
@@ -987,7 +945,7 @@ function buildDateChangeRequestSubmittedEmailHtml(array $details, array $changeD
                                 </td>
                             </tr>
                             <tr>
-                                <td bgcolor=\"#F9F9F9\" style=\"padding:0 16px 16px 16px;background-color:#F9F9F9;\">
+                                <td style=\"padding:0 16px 16px 16px;\">
                                     <table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"border-collapse:collapse;width:100%;border-top:1px solid #E9E9E9;\">
                                         <tr>
                                             <td style=\"padding:12px 0 0 0;font-size:10px;line-height:12px;letter-spacing:0.04em;text-transform:uppercase;color:#959595;\">NET CHANGE</td>
@@ -998,9 +956,9 @@ function buildDateChangeRequestSubmittedEmailHtml(array $details, array $changeD
                             </tr>
                         </table>
 
-                        <table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" bgcolor=\"#F9F9F9\" style=\"border-collapse:separate;width:100%;margin-top:18px;background-color:#F9F9F9;border:1px solid #E9E9E9;border-radius:12px;\">
+                        <table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"border-collapse:separate;width:100%;margin-top:18px;background-color:#F9F9F9;border:1px solid #E9E9E9;border-radius:12px;\">
                             <tr>
-                                <td bgcolor=\"#F9F9F9\" style=\"padding:14px 16px;background-color:#F9F9F9;\">
+                                <td style=\"padding:14px 16px;\">
                                     <div style=\"font-size:10px;line-height:12px;letter-spacing:0.04em;text-transform:uppercase;color:#9E9E9E;margin:0 0 8px 0;\">REASON FOR DATE CHANGE</div>
                                     <div style=\"font-size:13px;line-height:20px;color:#000000;word-break:break-word;\">" . ($reason !== '' ? $reason : '—') . "</div>
                                 </td>
@@ -1008,6 +966,9 @@ function buildDateChangeRequestSubmittedEmailHtml(array $details, array $changeD
                         </table>
 
                         <table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"border-collapse:collapse;width:100%;margin-top:30px;\">
+                            <tr>
+                                <td align=\"center\" style=\"padding:0 0 14px 0;font-size:11px;line-height:15px;color:#878787;\">Open the request using your application.</td>
+                            </tr>
                             <tr>
                                 <td>
                                     <table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"border-collapse:collapse;width:100%;\">
@@ -1046,16 +1007,16 @@ function buildDateChangeRequestSubmittedEmailHtml(array $details, array $changeD
                             </tr>
                         </table>
 
-                        <table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" bgcolor=\"#E8E8E8\" style=\"border-collapse:separate;width:100%;margin-top:0;background-color:#E8E8E8;border-radius:9px;\">
+                        <table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"border-collapse:separate;width:100%;margin-top:0;background-color:#E8E8E8;border-radius:9px;\">
                             <tr>
-                                <td width=\"42\" valign=\"middle\" bgcolor=\"#E8E8E8\" style=\"width:42px;padding:13px 0 13px 15px;background-color:#E8E8E8;\">
+                                <td width=\"42\" valign=\"middle\" style=\"width:42px;padding:13px 0 13px 15px;\">
                                     <table role=\"presentation\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"border-collapse:collapse;\">
                                         <tr>
                                             <td align=\"center\" valign=\"middle\" style=\"width:18px;height:18px;border:1px solid #959595;border-radius:50%;color:#878787;font-size:11px;line-height:18px;font-weight:700;\">i</td>
                                         </tr>
                                     </table>
                                 </td>
-                                <td bgcolor=\"#E8E8E8\" style=\"padding:12px 15px 12px 4px;font-size:11px;line-height:16px;color:#7D7D7D;background-color:#E8E8E8;\">
+                                <td style=\"padding:12px 15px 12px 4px;font-size:11px;line-height:16px;color:#7D7D7D;\">
                                     This is a system-generated email. Please do not reply to this message.<br>
                                     If you need assistance, contact your トラべる administrator.
                                 </td>
@@ -1066,7 +1027,7 @@ function buildDateChangeRequestSubmittedEmailHtml(array $details, array $changeD
                             <tr>
                                 <td>
                                     <img src=\"{$logoUrl}\" alt=\"トラべる\" width=\"84\" style=\"display:block;width:84px;max-width:100%;height:auto;border:0;\">
-                                    <div style=\"margin-top:9px;font-size:11px;line-height:14px;color:#7D7D7D;\">KHI Design &amp; Technical Service, Inc.</div>
+                                    <div style=\"margin-top:9px;font-size:11px;line-height:14px;color:#7D7D7D;\">KDT Design &amp; Technical Service, Inc.</div>
                                 </td>
                             </tr>
                         </table>
@@ -1132,7 +1093,7 @@ function buildCancellationRequestSubmittedEmailHtml(array $details, array $chang
     $changeRequestId = (int)($changeData['change_request_id'] ?? 0);
     $changeDisplayId = trim((string)($changeData['display_id'] ?? ''));
     if ($changeDisplayId === '' && $changeRequestId > 0) {
-        $changeDisplayId = 'CR-' . str_pad((string)$changeRequestId, 5, '0', STR_PAD_LEFT);
+        $changeDisplayId = 'CR-' . date('Y') . '-' . str_pad((string)$changeRequestId, 3, '0', STR_PAD_LEFT);
     }
     $changeDisplayIdEscaped = $escape($changeDisplayId);
 
@@ -1159,10 +1120,10 @@ function buildCancellationRequestSubmittedEmailHtml(array $details, array $chang
 <title>Cancellation Request Submitted</title>
 </head>
 <body style=\"margin:0;padding:0;background-color:#F9F9F9;color:#000000;\">
-<table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" bgcolor=\"#F9F9F9\" style=\"border-collapse:collapse;background-color:#F9F9F9;width:100%;\">
+<table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"border-collapse:collapse;background-color:#F9F9F9;width:100%;\">
     <tr>
-        <td align=\"center\" bgcolor=\"#F9F9F9\" style=\"padding:24px 12px;background-color:#F9F9F9;\">
-            <table role=\"presentation\" width=\"600\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" bgcolor=\"#FFFFFF\" style=\"border-collapse:collapse;width:100%;max-width:600px;background-color:#FFFFFF;font-family:Arial, Helvetica, sans-serif;\">
+        <td align=\"center\" style=\"padding:24px 12px;\">
+            <table role=\"presentation\" width=\"600\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"border-collapse:collapse;width:100%;max-width:600px;background-color:#FFFFFF;font-family:Arial, Helvetica, sans-serif;\">
                 <tr>
                     <td style=\"padding:28px 34px 24px 34px;border-bottom:1px solid #E9E9E9;\">
                         <img src=\"{$logoUrl}\" alt=\"トラべる\" width=\"128\" style=\"display:block;width:128px;max-width:100%;height:auto;border:0;\">
@@ -1187,45 +1148,45 @@ function buildCancellationRequestSubmittedEmailHtml(array $details, array $chang
                             </tr>
                         </table>
 
-                        <table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" bgcolor=\"#F9F9F9\" style=\"border-collapse:separate;width:100%;margin-top:28px;background-color:#F9F9F9;border:1px solid #E9E9E9;border-radius:14px;\">
+                        <table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"border-collapse:separate;width:100%;margin-top:28px;background-color:#F9F9F9;border:1px solid #E9E9E9;border-radius:14px;\">
                             <tr>
-                                <td colspan=\"2\" bgcolor=\"#F9F9F9\" style=\"padding:18px 16px 10px 16px;font-size:14px;line-height:18px;font-weight:700;color:#000000;border-bottom:1px solid #E9E9E9;background-color:#F9F9F9;\">Cancellation Request Summary</td>
+                                <td colspan=\"2\" style=\"padding:18px 16px 10px 16px;font-size:14px;line-height:18px;font-weight:700;color:#000000;border-bottom:1px solid #E9E9E9;\">Cancellation Request Summary</td>
                             </tr>
                             <tr>
-                                <td width=\"50%\" valign=\"top\" bgcolor=\"#F9F9F9\" style=\"width:50%;padding:14px 14px 14px 16px;border-right:1px solid #E9E9E9;border-bottom:1px solid #E9E9E9;background-color:#F9F9F9;\">
+                                <td width=\"50%\" valign=\"top\" style=\"width:50%;padding:14px 14px 14px 16px;border-right:1px solid #E9E9E9;border-bottom:1px solid #E9E9E9;\">
                                     <div style=\"font-size:10px;line-height:12px;letter-spacing:0.04em;text-transform:uppercase;color:#959595;margin:0 0 6px 0;\">NAME</div>
                                     <div style=\"font-size:13px;line-height:18px;font-weight:700;color:#000000;word-break:break-word;\">{$employeeName}</div>
                                 </td>
-                                <td width=\"50%\" valign=\"top\" bgcolor=\"#F9F9F9\" style=\"width:50%;padding:14px 16px 14px 14px;border-bottom:1px solid #E9E9E9;background-color:#F9F9F9;\">
+                                <td width=\"50%\" valign=\"top\" style=\"width:50%;padding:14px 16px 14px 14px;border-bottom:1px solid #E9E9E9;\">
                                     <div style=\"font-size:10px;line-height:12px;letter-spacing:0.04em;text-transform:uppercase;color:#959595;margin:0 0 6px 0;\">LOCATION</div>
                                     <div style=\"font-size:13px;line-height:18px;font-weight:700;color:#000000;word-break:break-word;\">" . ($locationName !== '' ? $locationName : '—') . "</div>
                                 </td>
                             </tr>
                             <tr>
-                                <td width=\"50%\" valign=\"top\" bgcolor=\"#F9F9F9\" style=\"width:50%;padding:14px 14px 14px 16px;border-right:1px solid #E9E9E9;border-bottom:1px solid #E9E9E9;background-color:#F9F9F9;\">
+                                <td width=\"50%\" valign=\"top\" style=\"width:50%;padding:14px 14px 14px 16px;border-right:1px solid #E9E9E9;border-bottom:1px solid #E9E9E9;\">
                                     <div style=\"font-size:10px;line-height:12px;letter-spacing:0.04em;text-transform:uppercase;color:#959595;margin:0 0 6px 0;\">CANCELLATION REQUEST ID</div>
                                     <div style=\"line-height:1.45;\">{$crBadge}</div>
                                 </td>
-                                <td width=\"50%\" valign=\"top\" bgcolor=\"#F9F9F9\" style=\"width:50%;padding:14px 16px 14px 14px;border-bottom:1px solid #E9E9E9;background-color:#F9F9F9;\">
+                                <td width=\"50%\" valign=\"top\" style=\"width:50%;padding:14px 16px 14px 14px;border-bottom:1px solid #E9E9E9;\">
                                     <div style=\"font-size:10px;line-height:12px;letter-spacing:0.04em;text-transform:uppercase;color:#959595;margin:0 0 6px 0;\">ORIGINAL DISPATCH ID</div>
                                     <div style=\"line-height:1.45;\">{$reqBadge}</div>
                                 </td>
                             </tr>
                             <tr>
-                                <td width=\"50%\" valign=\"top\" bgcolor=\"#F9F9F9\" style=\"width:50%;padding:14px 14px 16px 16px;border-right:1px solid #E9E9E9;background-color:#F9F9F9;\">
+                                <td width=\"50%\" valign=\"top\" style=\"width:50%;padding:14px 14px 16px 16px;border-right:1px solid #E9E9E9;\">
                                     <div style=\"font-size:10px;line-height:12px;letter-spacing:0.04em;text-transform:uppercase;color:#959595;margin:0 0 6px 0;\">GROUP</div>
                                     <div style=\"font-size:13px;line-height:18px;font-weight:700;color:#000000;word-break:break-word;\">" . ($groupAbbr !== '' ? $groupAbbr : '—') . "</div>
                                 </td>
-                                <td width=\"50%\" valign=\"top\" bgcolor=\"#F9F9F9\" style=\"width:50%;padding:14px 16px 16px 14px;background-color:#F9F9F9;\">
+                                <td width=\"50%\" valign=\"top\" style=\"width:50%;padding:14px 16px 16px 14px;\">
                                     <div style=\"font-size:10px;line-height:12px;letter-spacing:0.04em;text-transform:uppercase;color:#959595;margin:0 0 6px 0;\">DISPATCH DATES</div>
                                     <div style=\"font-size:13px;line-height:18px;font-weight:700;color:#000000;word-break:break-word;\">" . ($dispatchDates !== '' ? $dispatchDates : '—') . "</div>
                                 </td>
                             </tr>
                         </table>
 
-                        <table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" bgcolor=\"#F9F9F9\" style=\"border-collapse:separate;width:100%;margin-top:18px;background-color:#F9F9F9;border:1px solid #E9E9E9;border-radius:12px;\">
+                        <table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"border-collapse:separate;width:100%;margin-top:18px;background-color:#F9F9F9;border:1px solid #E9E9E9;border-radius:12px;\">
                             <tr>
-                                <td bgcolor=\"#F9F9F9\" style=\"padding:14px 16px;background-color:#F9F9F9;\">
+                                <td style=\"padding:14px 16px;\">
                                     <div style=\"font-size:10px;line-height:12px;letter-spacing:0.04em;text-transform:uppercase;color:#9E9E9E;margin:0 0 8px 0;\">REASON FOR CANCELLATION</div>
                                     <div style=\"font-size:13px;line-height:20px;font-weight:700;color:#000000;word-break:break-word;\">" . ($reason !== '' ? $reason : '—') . "</div>
                                 </td>
@@ -1233,6 +1194,9 @@ function buildCancellationRequestSubmittedEmailHtml(array $details, array $chang
                         </table>
 
                         <table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"border-collapse:collapse;width:100%;margin-top:30px;\">
+                            <tr>
+                                <td align=\"center\" style=\"padding:0 0 14px 0;font-size:11px;line-height:15px;color:#878787;\">Open the request using your application.</td>
+                            </tr>
                             <tr>
                                 <td>
                                     <table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"border-collapse:collapse;width:100%;\">
@@ -1271,16 +1235,16 @@ function buildCancellationRequestSubmittedEmailHtml(array $details, array $chang
                             </tr>
                         </table>
 
-                        <table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" bgcolor=\"#E8E8E8\" style=\"border-collapse:separate;width:100%;margin-top:0;background-color:#E8E8E8;border-radius:9px;\">
+                        <table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"border-collapse:separate;width:100%;margin-top:0;background-color:#E8E8E8;border-radius:9px;\">
                             <tr>
-                                <td width=\"42\" valign=\"middle\" bgcolor=\"#E8E8E8\" style=\"width:42px;padding:13px 0 13px 15px;background-color:#E8E8E8;\">
+                                <td width=\"42\" valign=\"middle\" style=\"width:42px;padding:13px 0 13px 15px;\">
                                     <table role=\"presentation\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"border-collapse:collapse;\">
                                         <tr>
                                             <td align=\"center\" valign=\"middle\" style=\"width:18px;height:18px;border:1px solid #959595;border-radius:50%;color:#878787;font-size:11px;line-height:18px;font-weight:700;\">i</td>
                                         </tr>
                                     </table>
                                 </td>
-                                <td bgcolor=\"#E8E8E8\" style=\"padding:12px 15px 12px 4px;font-size:11px;line-height:16px;color:#7D7D7D;background-color:#E8E8E8;\">
+                                <td style=\"padding:12px 15px 12px 4px;font-size:11px;line-height:16px;color:#7D7D7D;\">
                                     This is a system-generated email. Please do not reply to this message.<br>
                                     If you need assistance, contact your トラべる administrator.
                                 </td>
@@ -1291,7 +1255,7 @@ function buildCancellationRequestSubmittedEmailHtml(array $details, array $chang
                             <tr>
                                 <td>
                                     <img src=\"{$logoUrl}\" alt=\"トラべる\" width=\"84\" style=\"display:block;width:84px;max-width:100%;height:auto;border:0;\">
-                                    <div style=\"margin-top:9px;font-size:11px;line-height:14px;color:#7D7D7D;\">KHI Design &amp; Technical Service, Inc.</div>
+                                    <div style=\"margin-top:9px;font-size:11px;line-height:14px;color:#7D7D7D;\">KDT Design &amp; Technical Service, Inc.</div>
                                 </td>
                             </tr>
                         </table>
@@ -1382,7 +1346,7 @@ function buildDateChangeRequestWithdrawnEmailHtml(array $details, array $changeD
     $changeRequestId = (int)($changeData['change_request_id'] ?? 0);
     $changeDisplayId = trim((string)($changeData['display_id'] ?? ''));
     if ($changeDisplayId === '' && $changeRequestId > 0) {
-        $changeDisplayId = 'DCR-' . str_pad((string)$changeRequestId, 5, '0', STR_PAD_LEFT);
+        $changeDisplayId = 'DCR-' . date('Y') . '-' . str_pad((string)$changeRequestId, 3, '0', STR_PAD_LEFT);
     }
     $changeDisplayIdEscaped = $escape($changeDisplayId);
 
@@ -1409,10 +1373,10 @@ function buildDateChangeRequestWithdrawnEmailHtml(array $details, array $changeD
 <title>Date Change Request Withdrawn</title>
 </head>
 <body style=\"margin:0;padding:0;background-color:#F9F9F9;color:#000000;\">
-<table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" bgcolor=\"#F9F9F9\" style=\"border-collapse:collapse;background-color:#F9F9F9;width:100%;\">
+<table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"border-collapse:collapse;background-color:#F9F9F9;width:100%;\">
     <tr>
-        <td align=\"center\" bgcolor=\"#F9F9F9\" style=\"padding:24px 12px;background-color:#F9F9F9;\">
-            <table role=\"presentation\" width=\"600\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" bgcolor=\"#FFFFFF\" style=\"border-collapse:collapse;width:100%;max-width:600px;background-color:#FFFFFF;font-family:Arial, Helvetica, sans-serif;\">
+        <td align=\"center\" style=\"padding:24px 12px;\">
+            <table role=\"presentation\" width=\"600\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"border-collapse:collapse;width:100%;max-width:600px;background-color:#FFFFFF;font-family:Arial, Helvetica, sans-serif;\">
                 <tr>
                     <td style=\"padding:28px 34px 24px 34px;border-bottom:1px solid #E9E9E9;\">
                         <img src=\"{$logoUrl}\" alt=\"トラべる\" width=\"128\" style=\"display:block;width:128px;max-width:100%;height:auto;border:0;\">
@@ -1440,54 +1404,54 @@ function buildDateChangeRequestWithdrawnEmailHtml(array $details, array $changeD
                             </tr>
                         </table>
 
-                        <table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" bgcolor=\"#F9F9F9\" style=\"border-collapse:separate;width:100%;margin-top:28px;background-color:#F9F9F9;border:1px solid #E9E9E9;border-radius:14px;\">
+                        <table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"border-collapse:separate;width:100%;margin-top:28px;background-color:#F9F9F9;border:1px solid #E9E9E9;border-radius:14px;\">
                             <tr>
-                                <td colspan=\"2\" bgcolor=\"#F9F9F9\" style=\"padding:18px 16px 10px 16px;font-size:14px;line-height:18px;font-weight:700;color:#000000;border-bottom:1px solid #E9E9E9;background-color:#F9F9F9;\">Date Change Request Summary</td>
+                                <td colspan=\"2\" style=\"padding:18px 16px 10px 16px;font-size:14px;line-height:18px;font-weight:700;color:#000000;border-bottom:1px solid #E9E9E9;\">Date Change Request Summary</td>
                             </tr>
                             <tr>
-                                <td width=\"50%\" valign=\"top\" bgcolor=\"#F9F9F9\" style=\"width:50%;padding:14px 14px 14px 16px;border-right:1px solid #E9E9E9;border-bottom:1px solid #E9E9E9;background-color:#F9F9F9;\">
+                                <td width=\"50%\" valign=\"top\" style=\"width:50%;padding:14px 14px 14px 16px;border-right:1px solid #E9E9E9;border-bottom:1px solid #E9E9E9;\">
                                     <div style=\"font-size:10px;line-height:12px;letter-spacing:0.04em;text-transform:uppercase;color:#959595;margin:0 0 6px 0;\">NAME</div>
                                     <div style=\"font-size:13px;line-height:18px;font-weight:700;color:#000000;word-break:break-word;\">{$employeeName}</div>
                                 </td>
-                                <td width=\"50%\" valign=\"top\" bgcolor=\"#F9F9F9\" style=\"width:50%;padding:14px 16px 14px 14px;border-bottom:1px solid #E9E9E9;background-color:#F9F9F9;\">
+                                <td width=\"50%\" valign=\"top\" style=\"width:50%;padding:14px 16px 14px 14px;border-bottom:1px solid #E9E9E9;\">
                                     <div style=\"font-size:10px;line-height:12px;letter-spacing:0.04em;text-transform:uppercase;color:#959595;margin:0 0 6px 0;\">LOCATION</div>
                                     <div style=\"font-size:13px;line-height:18px;font-weight:700;color:#000000;word-break:break-word;\">" . ($locationName !== '' ? $locationName : '—') . "</div>
                                 </td>
                             </tr>
                             <tr>
-                                <td width=\"50%\" valign=\"top\" bgcolor=\"#F9F9F9\" style=\"width:50%;padding:14px 14px 14px 16px;border-right:1px solid #E9E9E9;border-bottom:1px solid #E9E9E9;background-color:#F9F9F9;\">
+                                <td width=\"50%\" valign=\"top\" style=\"width:50%;padding:14px 14px 14px 16px;border-right:1px solid #E9E9E9;border-bottom:1px solid #E9E9E9;\">
                                     <div style=\"font-size:10px;line-height:12px;letter-spacing:0.04em;text-transform:uppercase;color:#959595;margin:0 0 6px 0;\">DATE CHANGE REQUEST ID</div>
                                     <div style=\"line-height:1.45;\">{$dcBadge}</div>
                                 </td>
-                                <td width=\"50%\" valign=\"top\" bgcolor=\"#F9F9F9\" style=\"width:50%;padding:14px 16px 14px 14px;border-bottom:1px solid #E9E9E9;background-color:#F9F9F9;\">
+                                <td width=\"50%\" valign=\"top\" style=\"width:50%;padding:14px 16px 14px 14px;border-bottom:1px solid #E9E9E9;\">
                                     <div style=\"font-size:10px;line-height:12px;letter-spacing:0.04em;text-transform:uppercase;color:#959595;margin:0 0 6px 0;\">ORIGINAL DISPATCH ID</div>
                                     <div style=\"line-height:1.45;\">{$reqBadge}</div>
                                 </td>
                             </tr>
                             <tr>
-                                <td width=\"50%\" valign=\"top\" bgcolor=\"#F9F9F9\" style=\"width:50%;padding:14px 14px 16px 16px;border-right:1px solid #E9E9E9;background-color:#F9F9F9;\">
+                                <td width=\"50%\" valign=\"top\" style=\"width:50%;padding:14px 14px 16px 16px;border-right:1px solid #E9E9E9;\">
                                     <div style=\"font-size:10px;line-height:12px;letter-spacing:0.04em;text-transform:uppercase;color:#959595;margin:0 0 6px 0;\">GROUP</div>
                                     <div style=\"font-size:13px;line-height:18px;font-weight:700;color:#000000;word-break:break-word;\">" . ($groupAbbr !== '' ? $groupAbbr : '—') . "</div>
                                 </td>
-                                <td width=\"50%\" valign=\"top\" bgcolor=\"#F9F9F9\" style=\"width:50%;padding:14px 16px 16px 14px;background-color:#F9F9F9;\">
+                                <td width=\"50%\" valign=\"top\" style=\"width:50%;padding:14px 16px 16px 14px;\">
                                     <div style=\"font-size:10px;line-height:12px;letter-spacing:0.04em;text-transform:uppercase;color:#959595;margin:0 0 6px 0;\">DISPATCH DATES</div>
                                     <div style=\"font-size:13px;line-height:18px;font-weight:700;color:#000000;word-break:break-word;\">" . ($dispatchDates !== '' ? $dispatchDates : '—') . "</div>
                                 </td>
                             </tr>
                         </table>
 
-                        <table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" bgcolor=\"#F9F9F9\" style=\"border-collapse:separate;width:100%;margin-top:18px;background-color:#F9F9F9;border:1px solid #E9E9E9;border-radius:14px;\">
+                        <table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"border-collapse:separate;width:100%;margin-top:18px;background-color:#F9F9F9;border:1px solid #E9E9E9;border-radius:14px;\">
                             <tr>
-                                <td bgcolor=\"#F9F9F9\" style=\"padding:18px 16px 12px 16px;font-size:14px;line-height:18px;font-weight:700;color:#000000;background-color:#F9F9F9;\">Requested Schedule Change</td>
+                                <td style=\"padding:18px 16px 12px 16px;font-size:14px;line-height:18px;font-weight:700;color:#000000;\">Requested Schedule Change</td>
                             </tr>
                             <tr>
-                                <td bgcolor=\"#F9F9F9\" style=\"padding:0 12px 14px 12px;background-color:#F9F9F9;\">
+                                <td style=\"padding:0 12px 14px 12px;\">
                                     <table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"border-collapse:collapse;width:100%;\">
                                         <tr>
                                             <td width=\"44%\" valign=\"middle\" style=\"width:44%;\">
-                                                <table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" bgcolor=\"#FFFFFF\" style=\"border-collapse:separate;width:100%;background-color:#FFFFFF;border:1px solid #E9E9E9;border-radius:10px;\">
+                                                <table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"border-collapse:separate;width:100%;background-color:#FFFFFF;border:1px solid #E9E9E9;border-radius:10px;\">
                                                     <tr>
-                                                        <td bgcolor=\"#FFFFFF\" style=\"padding:12px 12px 14px 12px;background-color:#FFFFFF;\">
+                                                        <td style=\"padding:12px 12px 14px 12px;\">
                                                             <div style=\"font-size:10px;line-height:12px;letter-spacing:0.04em;text-transform:uppercase;color:#9E9E9E;margin:0 0 8px 0;\">APPROVED DATES</div>
                                                             <div style=\"font-size:12px;line-height:17px;font-weight:700;color:#000000;word-break:break-word;margin:0 0 8px 0;\">" . ($approvedDates !== '' ? $approvedDates : '—') . "</div>
                                                             <div style=\"font-size:12px;line-height:16px;font-weight:700;color:#38B365;margin:0 0 6px 0;\">{$currentDays} days</div>
@@ -1500,9 +1464,9 @@ function buildDateChangeRequestWithdrawnEmailHtml(array $details, array $changeD
                                                 <img src=\"{$undoIconUrl}\" alt=\"\" width=\"20\" height=\"20\" style=\"display:block;border:0;width:20px;height:20px;margin:0 auto;\">
                                             </td>
                                             <td width=\"44%\" valign=\"middle\" style=\"width:44%;\">
-                                                <table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" bgcolor=\"#FFFFFF\" style=\"border-collapse:separate;width:100%;background-color:#FFFFFF;border:1px solid #E9E9E9;border-radius:10px;\">
+                                                <table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"border-collapse:separate;width:100%;background-color:#FFFFFF;border:1px solid #E9E9E9;border-radius:10px;\">
                                                     <tr>
-                                                        <td bgcolor=\"#FFFFFF\" style=\"padding:12px 12px 14px 12px;background-color:#FFFFFF;\">
+                                                        <td style=\"padding:12px 12px 14px 12px;\">
                                                             <div style=\"font-size:10px;line-height:12px;letter-spacing:0.04em;text-transform:uppercase;color:#9E9E9E;margin:0 0 8px 0;\">WITHDRAWN PROPOSED DATES</div>
                                                             <div style=\"font-size:12px;line-height:17px;font-weight:700;color:#000000;word-break:break-word;margin:0 0 8px 0;\">" . ($proposedDates !== '' ? $proposedDates : '—') . "</div>
                                                             <div style=\"font-size:12px;line-height:16px;font-weight:700;color:#38B365;margin:0 0 6px 0;\">{$proposedDays} days</div>
@@ -1516,7 +1480,7 @@ function buildDateChangeRequestWithdrawnEmailHtml(array $details, array $changeD
                                 </td>
                             </tr>
                             <tr>
-                                <td bgcolor=\"#F9F9F9\" style=\"padding:0 16px 16px 16px;background-color:#F9F9F9;\">
+                                <td style=\"padding:0 16px 16px 16px;\">
                                     <table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"border-collapse:collapse;width:100%;border-top:1px solid #E9E9E9;\">
                                         <tr>
                                             <td style=\"padding:12px 0 0 0;font-size:10px;line-height:12px;letter-spacing:0.04em;text-transform:uppercase;color:#959595;\">NET CHANGE</td>
@@ -1527,9 +1491,9 @@ function buildDateChangeRequestWithdrawnEmailHtml(array $details, array $changeD
                             </tr>
                         </table>
 
-                        <table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" bgcolor=\"#F9F9F9\" style=\"border-collapse:separate;width:100%;margin-top:18px;background-color:#F9F9F9;border:1px solid #E9E9E9;border-radius:12px;\">
+                        <table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"border-collapse:separate;width:100%;margin-top:18px;background-color:#F9F9F9;border:1px solid #E9E9E9;border-radius:12px;\">
                             <tr>
-                                <td bgcolor=\"#F9F9F9\" style=\"padding:14px 16px;background-color:#F9F9F9;\">
+                                <td style=\"padding:14px 16px;\">
                                     <div style=\"font-size:10px;line-height:12px;letter-spacing:0.04em;text-transform:uppercase;color:#9E9E9E;margin:0 0 8px 0;\">REASON FOR DATE WITHDRAWAL</div>
                                     <div style=\"font-size:13px;line-height:20px;color:#000000;word-break:break-word;\">" . ($reason !== '' ? $reason : '—') . "</div>
                                 </td>
@@ -1537,6 +1501,9 @@ function buildDateChangeRequestWithdrawnEmailHtml(array $details, array $changeD
                         </table>
 
                         <table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"border-collapse:collapse;width:100%;margin-top:30px;\">
+                            <tr>
+                                <td align=\"center\" style=\"padding:0 0 14px 0;font-size:11px;line-height:15px;color:#878787;\">Open the request using your application.</td>
+                            </tr>
                             <tr>
                                 <td>
                                     <table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"border-collapse:collapse;width:100%;\">
@@ -1575,16 +1542,16 @@ function buildDateChangeRequestWithdrawnEmailHtml(array $details, array $changeD
                             </tr>
                         </table>
 
-                        <table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" bgcolor=\"#E8E8E8\" style=\"border-collapse:separate;width:100%;margin-top:0;background-color:#E8E8E8;border-radius:9px;\">
+                        <table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"border-collapse:separate;width:100%;margin-top:0;background-color:#E8E8E8;border-radius:9px;\">
                             <tr>
-                                <td width=\"42\" valign=\"middle\" bgcolor=\"#E8E8E8\" style=\"width:42px;padding:13px 0 13px 15px;background-color:#E8E8E8;\">
+                                <td width=\"42\" valign=\"middle\" style=\"width:42px;padding:13px 0 13px 15px;\">
                                     <table role=\"presentation\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"border-collapse:collapse;\">
                                         <tr>
                                             <td align=\"center\" valign=\"middle\" style=\"width:18px;height:18px;border:1px solid #959595;border-radius:50%;color:#878787;font-size:11px;line-height:18px;font-weight:700;\">i</td>
                                         </tr>
                                     </table>
                                 </td>
-                                <td bgcolor=\"#E8E8E8\" style=\"padding:12px 15px 12px 4px;font-size:11px;line-height:16px;color:#7D7D7D;background-color:#E8E8E8;\">
+                                <td style=\"padding:12px 15px 12px 4px;font-size:11px;line-height:16px;color:#7D7D7D;\">
                                     This is a system-generated email. Please do not reply to this message.<br>
                                     If you need assistance, contact your トラべる administrator.
                                 </td>
@@ -1595,7 +1562,7 @@ function buildDateChangeRequestWithdrawnEmailHtml(array $details, array $changeD
                             <tr>
                                 <td>
                                     <img src=\"{$logoUrl}\" alt=\"トラべる\" width=\"84\" style=\"display:block;width:84px;max-width:100%;height:auto;border:0;\">
-                                    <div style=\"margin-top:9px;font-size:11px;line-height:14px;color:#7D7D7D;\">KHI Design &amp; Technical Service, Inc.</div>
+                                    <div style=\"margin-top:9px;font-size:11px;line-height:14px;color:#7D7D7D;\">KDT Design &amp; Technical Service, Inc.</div>
                                 </td>
                             </tr>
                         </table>
@@ -1653,7 +1620,7 @@ function buildCancellationRequestWithdrawnEmailHtml(array $details, array $chang
     $changeRequestId = (int)($changeData['change_request_id'] ?? 0);
     $changeDisplayId = trim((string)($changeData['display_id'] ?? ''));
     if ($changeDisplayId === '' && $changeRequestId > 0) {
-        $changeDisplayId = 'CR-' . str_pad((string)$changeRequestId, 5, '0', STR_PAD_LEFT);
+        $changeDisplayId = 'CR-' . date('Y') . '-' . str_pad((string)$changeRequestId, 3, '0', STR_PAD_LEFT);
     }
     $changeDisplayIdEscaped = $escape($changeDisplayId);
 
@@ -1679,10 +1646,10 @@ function buildCancellationRequestWithdrawnEmailHtml(array $details, array $chang
 <title>Cancellation Request Withdrawn</title>
 </head>
 <body style=\"margin:0;padding:0;background-color:#F9F9F9;color:#000000;\">
-<table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" bgcolor=\"#F9F9F9\" style=\"border-collapse:collapse;background-color:#F9F9F9;width:100%;\">
+<table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"border-collapse:collapse;background-color:#F9F9F9;width:100%;\">
     <tr>
-        <td align=\"center\" bgcolor=\"#F9F9F9\" style=\"padding:24px 12px;background-color:#F9F9F9;\">
-            <table role=\"presentation\" width=\"600\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" bgcolor=\"#FFFFFF\" style=\"border-collapse:collapse;width:100%;max-width:600px;background-color:#FFFFFF;font-family:Arial, Helvetica, sans-serif;\">
+        <td align=\"center\" style=\"padding:24px 12px;\">
+            <table role=\"presentation\" width=\"600\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"border-collapse:collapse;width:100%;max-width:600px;background-color:#FFFFFF;font-family:Arial, Helvetica, sans-serif;\">
                 <tr>
                     <td style=\"padding:28px 34px 24px 34px;border-bottom:1px solid #E9E9E9;\">
                         <img src=\"{$logoUrl}\" alt=\"トラべる\" width=\"128\" style=\"display:block;width:128px;max-width:100%;height:auto;border:0;\">
@@ -1710,45 +1677,45 @@ function buildCancellationRequestWithdrawnEmailHtml(array $details, array $chang
                             </tr>
                         </table>
 
-                        <table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" bgcolor=\"#F9F9F9\" style=\"border-collapse:separate;width:100%;margin-top:28px;background-color:#F9F9F9;border:1px solid #E9E9E9;border-radius:14px;\">
+                        <table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"border-collapse:separate;width:100%;margin-top:28px;background-color:#F9F9F9;border:1px solid #E9E9E9;border-radius:14px;\">
                             <tr>
-                                <td colspan=\"2\" bgcolor=\"#F9F9F9\" style=\"padding:18px 16px 10px 16px;font-size:14px;line-height:18px;font-weight:700;color:#000000;border-bottom:1px solid #E9E9E9;background-color:#F9F9F9;\">Cancellation Request Summary</td>
+                                <td colspan=\"2\" style=\"padding:18px 16px 10px 16px;font-size:14px;line-height:18px;font-weight:700;color:#000000;border-bottom:1px solid #E9E9E9;\">Cancellation Request Summary</td>
                             </tr>
                             <tr>
-                                <td width=\"50%\" valign=\"top\" bgcolor=\"#F9F9F9\" style=\"width:50%;padding:14px 14px 14px 16px;border-right:1px solid #E9E9E9;border-bottom:1px solid #E9E9E9;background-color:#F9F9F9;\">
+                                <td width=\"50%\" valign=\"top\" style=\"width:50%;padding:14px 14px 14px 16px;border-right:1px solid #E9E9E9;border-bottom:1px solid #E9E9E9;\">
                                     <div style=\"font-size:10px;line-height:12px;letter-spacing:0.04em;text-transform:uppercase;color:#959595;margin:0 0 6px 0;\">NAME</div>
                                     <div style=\"font-size:13px;line-height:18px;font-weight:700;color:#000000;word-break:break-word;\">{$employeeName}</div>
                                 </td>
-                                <td width=\"50%\" valign=\"top\" bgcolor=\"#F9F9F9\" style=\"width:50%;padding:14px 16px 14px 14px;border-bottom:1px solid #E9E9E9;background-color:#F9F9F9;\">
+                                <td width=\"50%\" valign=\"top\" style=\"width:50%;padding:14px 16px 14px 14px;border-bottom:1px solid #E9E9E9;\">
                                     <div style=\"font-size:10px;line-height:12px;letter-spacing:0.04em;text-transform:uppercase;color:#959595;margin:0 0 6px 0;\">LOCATION</div>
                                     <div style=\"font-size:13px;line-height:18px;font-weight:700;color:#000000;word-break:break-word;\">" . ($locationName !== '' ? $locationName : '—') . "</div>
                                 </td>
                             </tr>
                             <tr>
-                                <td width=\"50%\" valign=\"top\" bgcolor=\"#F9F9F9\" style=\"width:50%;padding:14px 14px 14px 16px;border-right:1px solid #E9E9E9;border-bottom:1px solid #E9E9E9;background-color:#F9F9F9;\">
+                                <td width=\"50%\" valign=\"top\" style=\"width:50%;padding:14px 14px 14px 16px;border-right:1px solid #E9E9E9;border-bottom:1px solid #E9E9E9;\">
                                     <div style=\"font-size:10px;line-height:12px;letter-spacing:0.04em;text-transform:uppercase;color:#959595;margin:0 0 6px 0;\">CANCELLATION REQUEST ID</div>
                                     <div style=\"line-height:1.45;\">{$crBadge}</div>
                                 </td>
-                                <td width=\"50%\" valign=\"top\" bgcolor=\"#F9F9F9\" style=\"width:50%;padding:14px 16px 14px 14px;border-bottom:1px solid #E9E9E9;background-color:#F9F9F9;\">
+                                <td width=\"50%\" valign=\"top\" style=\"width:50%;padding:14px 16px 14px 14px;border-bottom:1px solid #E9E9E9;\">
                                     <div style=\"font-size:10px;line-height:12px;letter-spacing:0.04em;text-transform:uppercase;color:#959595;margin:0 0 6px 0;\">ORIGINAL DISPATCH ID</div>
                                     <div style=\"line-height:1.45;\">{$reqBadge}</div>
                                 </td>
                             </tr>
                             <tr>
-                                <td width=\"50%\" valign=\"top\" bgcolor=\"#F9F9F9\" style=\"width:50%;padding:14px 14px 16px 16px;border-right:1px solid #E9E9E9;background-color:#F9F9F9;\">
+                                <td width=\"50%\" valign=\"top\" style=\"width:50%;padding:14px 14px 16px 16px;border-right:1px solid #E9E9E9;\">
                                     <div style=\"font-size:10px;line-height:12px;letter-spacing:0.04em;text-transform:uppercase;color:#959595;margin:0 0 6px 0;\">GROUP</div>
                                     <div style=\"font-size:13px;line-height:18px;font-weight:700;color:#000000;word-break:break-word;\">" . ($groupAbbr !== '' ? $groupAbbr : '—') . "</div>
                                 </td>
-                                <td width=\"50%\" valign=\"top\" bgcolor=\"#F9F9F9\" style=\"width:50%;padding:14px 16px 16px 14px;background-color:#F9F9F9;\">
+                                <td width=\"50%\" valign=\"top\" style=\"width:50%;padding:14px 16px 16px 14px;\">
                                     <div style=\"font-size:10px;line-height:12px;letter-spacing:0.04em;text-transform:uppercase;color:#959595;margin:0 0 6px 0;\">DISPATCH DATES</div>
                                     <div style=\"font-size:13px;line-height:18px;font-weight:700;color:#000000;word-break:break-word;\">" . ($dispatchDates !== '' ? $dispatchDates : '—') . "</div>
                                 </td>
                             </tr>
                         </table>
 
-                        <table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" bgcolor=\"#F9F9F9\" style=\"border-collapse:separate;width:100%;margin-top:18px;background-color:#F9F9F9;border:1px solid #E9E9E9;border-radius:12px;\">
+                        <table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"border-collapse:separate;width:100%;margin-top:18px;background-color:#F9F9F9;border:1px solid #E9E9E9;border-radius:12px;\">
                             <tr>
-                                <td bgcolor=\"#F9F9F9\" style=\"padding:14px 16px;background-color:#F9F9F9;\">
+                                <td style=\"padding:14px 16px;\">
                                     <div style=\"font-size:10px;line-height:12px;letter-spacing:0.04em;text-transform:uppercase;color:#9E9E9E;margin:0 0 8px 0;\">REASON FOR WITHDRAWAL</div>
                                     <div style=\"font-size:13px;line-height:20px;font-weight:700;color:#000000;word-break:break-word;\">" . ($reason !== '' ? $reason : '—') . "</div>
                                 </td>
@@ -1756,6 +1723,9 @@ function buildCancellationRequestWithdrawnEmailHtml(array $details, array $chang
                         </table>
 
                         <table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"border-collapse:collapse;width:100%;margin-top:30px;\">
+                            <tr>
+                                <td align=\"center\" style=\"padding:0 0 14px 0;font-size:11px;line-height:15px;color:#878787;\">Open the request using your application.</td>
+                            </tr>
                             <tr>
                                 <td>
                                     <table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"border-collapse:collapse;width:100%;\">
@@ -1794,16 +1764,16 @@ function buildCancellationRequestWithdrawnEmailHtml(array $details, array $chang
                             </tr>
                         </table>
 
-                        <table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" bgcolor=\"#E8E8E8\" style=\"border-collapse:separate;width:100%;margin-top:0;background-color:#E8E8E8;border-radius:9px;\">
+                        <table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"border-collapse:separate;width:100%;margin-top:0;background-color:#E8E8E8;border-radius:9px;\">
                             <tr>
-                                <td width=\"42\" valign=\"middle\" bgcolor=\"#E8E8E8\" style=\"width:42px;padding:13px 0 13px 15px;background-color:#E8E8E8;\">
+                                <td width=\"42\" valign=\"middle\" style=\"width:42px;padding:13px 0 13px 15px;\">
                                     <table role=\"presentation\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"border-collapse:collapse;\">
                                         <tr>
                                             <td align=\"center\" valign=\"middle\" style=\"width:18px;height:18px;border:1px solid #959595;border-radius:50%;color:#878787;font-size:11px;line-height:18px;font-weight:700;\">i</td>
                                         </tr>
                                     </table>
                                 </td>
-                                <td bgcolor=\"#E8E8E8\" style=\"padding:12px 15px 12px 4px;font-size:11px;line-height:16px;color:#7D7D7D;background-color:#E8E8E8;\">
+                                <td style=\"padding:12px 15px 12px 4px;font-size:11px;line-height:16px;color:#7D7D7D;\">
                                     This is a system-generated email. Please do not reply to this message.<br>
                                     If you need assistance, contact your トラべる administrator.
                                 </td>
@@ -1814,7 +1784,7 @@ function buildCancellationRequestWithdrawnEmailHtml(array $details, array $chang
                             <tr>
                                 <td>
                                     <img src=\"{$logoUrl}\" alt=\"トラべる\" width=\"84\" style=\"display:block;width:84px;max-width:100%;height:auto;border:0;\">
-                                    <div style=\"margin-top:9px;font-size:11px;line-height:14px;color:#7D7D7D;\">KHI Design &amp; Technical Service, Inc.</div>
+                                    <div style=\"margin-top:9px;font-size:11px;line-height:14px;color:#7D7D7D;\">KDT Design &amp; Technical Service, Inc.</div>
                                 </td>
                             </tr>
                         </table>
