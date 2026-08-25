@@ -8,6 +8,9 @@ sendHtmlNoCacheHeaders();
     <title>トラベる</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta charset="UTF-8" />
+
+    <!-- favicon -->
+    <link rel="icon" href="../favicon.ico" type="image/x-icon" />
     <!-- CSS -->
     <link rel="stylesheet" href="<?= asset('../global.css') ?>" />
     <link rel="stylesheet" href="<?= asset('../css/font-awesome.css') ?>" />
@@ -185,13 +188,126 @@ sendHtmlNoCacheHeaders();
 
             <div class="w-100 h-[calc(100%-50px)]">
               <div
-                class="grid grid-cols-1 xl:grid-cols-2 gap-6 relative items-center 2xl:px-[150px] xl:pt-[50px] xl:pb-[50px] px-[14px] pt-[14px] pb-[14px]"
-              >
+                class="grid grid-cols-1 xl:grid-cols-2 gap-6 relative items-center 2xl:px-[150px] xl:pt-[50px] xl:pb-[50px] px-[14px] pt-[14px] pb-[14px]">
+                
+                <a
+                  href="./manuals/toraberu_Requesting_a_Date_Change.pdf"
+                  class="h-full flex items-center justify-center bg-[var(--dark)] rounded-lg border-0"
+                  target="_blank">
+                  <div
+                    class="border-[var(--gray)] rounded-lg border-[1px] p-3 bg-white w-full flex gap-3 item-manual"
+                  >
+                    <div class="flex items-start justify-center">
+                      <span
+                        class="h-[32px] w-[32px] bg-[var(--main)] rounded-md flex justify-center items-center"
+                        ><i
+                          class="bx bxs-plane-alt text-[var(--darkest)] text-[20px]"
+                        ></i
+                      ></span>
+                    </div>
+
+                    <div class="flex flex-col justify-between">
+                      <div>
+                        <h5 class="text-[18px] font-semibold">
+                        How to request a date change?
+                        </h5>
+                        <p class="font-[400] text-pretty py-2">
+                        Learn how to request a change to the approved dispatch dates
+                        </p>
+                      </div>
+                      <button
+                        class="text-xs text-[var(--gray-text)] mt-3 self-start"
+                      >
+                        <i
+                          class="bx bx-right-top-arrow-circle text-[var(--gray-text)] text-xs"
+                        ></i>
+
+                        Click to view the manual
+                      </button>
+                    </div>
+                  </div>
+                </a>
+
+                <a
+                  href="./manuals/toraberu_Requesting_a_Cancellation.pdf"
+                  class="h-full flex items-center justify-center bg-[var(--dark)] rounded-lg border-0"
+                  target="_blank">
+                  <div
+                    class="border-[var(--gray)] rounded-lg border-[1px] p-3 bg-white w-full flex gap-3 item-manual"
+                  >
+                    <div class="flex items-start justify-center">
+                      <span
+                        class="h-[32px] w-[32px] bg-[var(--main)] rounded-md flex justify-center items-center"
+                        ><i
+                          class="bx bxs-plane-alt text-[var(--darkest)] text-[20px]"
+                        ></i
+                      ></span>
+                    </div>
+
+                    <div class="flex flex-col justify-between">
+                      <div>
+                        <h5 class="text-[18px] font-semibold">
+                        How to request a cancellation?
+                        </h5>
+                        <p class="font-[400] text-pretty py-2">
+                        Learn how to request the cancellation of an approved dispatch
+                        </p>
+                      </div>
+                      <button
+                        class="text-xs text-[var(--gray-text)] mt-3 self-start"
+                      >
+                        <i
+                          class="bx bx-right-top-arrow-circle text-[var(--gray-text)] text-xs"
+                        ></i>
+
+                        Click to view the manual
+                      </button>
+                    </div>
+                  </div>
+                </a>
+
+                <a
+                  href="./manuals/toraberu_Withdrawing_a_Request.pdf"
+                  class="h-full flex items-center justify-center bg-[var(--dark)] rounded-lg border-0"
+                  target="_blank">
+                  <div
+                    class="border-[var(--gray)] rounded-lg border-[1px] p-3 bg-white w-full flex gap-3 item-manual"
+                  >
+                    <div class="flex items-start justify-center">
+                      <span
+                        class="h-[32px] w-[32px] bg-[var(--main)] rounded-md flex justify-center items-center"
+                        ><i
+                          class="bx bxs-plane-alt text-[var(--darkest)] text-[20px]"
+                        ></i
+                      ></span>
+                    </div>
+
+                    <div class="flex flex-col justify-between">
+                      <div>
+                        <h5 class="text-[18px] font-semibold">
+                        How to withdraw a change request?
+                        </h5>
+                        <p class="font-[400] text-pretty py-2">
+                        Learn how to withdraw a pending date change or cancellation request
+                        </p>
+                      </div>
+                      <button
+                        class="text-xs text-[var(--gray-text)] mt-3 self-start"
+                      >
+                        <i
+                          class="bx bx-right-top-arrow-circle text-[var(--gray-text)] text-xs"
+                        ></i>
+
+                        Click to view the manual
+                      </button>
+                    </div>
+                  </div>
+                </a>
+
                 <a
                   href="./manuals/KHI Toraberu - Request Dispatch (step by step) R03.pdf"
                   class="h-full flex items-center justify-center bg-[var(--dark)] rounded-lg border-0"
-                  target="_blank"
-                >
+                  target="_blank">
                   <div
                     class="border-[var(--gray)] rounded-lg border-[1px] p-3 bg-white w-full flex gap-3 item-manual"
                   >
@@ -226,18 +342,14 @@ sendHtmlNoCacheHeaders();
                     </div>
                   </div>
                 </a>
-                <a
-                  href="./manuals/KHI Toraberu - Work History R02.pdf"
+                <a href="./manuals/KHI Toraberu - Work History R02.pdf"
                   class="h-full flex items-center justify-center bg-[var(--dark)] rounded-lg border-0"
-                  target="_blank"
-                >
+                  target="_blank">
                   <div
-                    class="border-[var(--gray)] rounded-lg border-[1px] p-3 bg-white w-full flex gap-3 item-manual"
-                  >
+                    class="border-[var(--gray)] rounded-lg border-[1px] p-3 bg-white w-full flex gap-3 item-manual">
                     <div class="flex items-start justify-center">
                       <span
-                        class="h-[32px] w-[32px] bg-[var(--main)] rounded-md flex justify-center items-center"
-                      >
+                        class="h-[32px] w-[32px] bg-[var(--main)] rounded-md flex justify-center items-center">
                         <i
                           class="bx bxs-plane-alt text-[var(--darkest)] text-[20px]"
                         ></i
