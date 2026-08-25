@@ -975,9 +975,6 @@ function buildDateChangeRequestSubmittedEmailHtml(array $details, array $changeD
 
                         <table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"border-collapse:collapse;width:100%;margin-top:30px;\">
                             <tr>
-                                <td align=\"center\" style=\"padding:0 0 14px 0;font-size:11px;line-height:15px;color:#878787;\">Open the request using your application.</td>
-                            </tr>
-                            <tr>
                                 <td>
                                     <table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"border-collapse:collapse;width:100%;\">
                                         <tr>
@@ -1202,9 +1199,6 @@ function buildCancellationRequestSubmittedEmailHtml(array $details, array $chang
                         </table>
 
                         <table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"border-collapse:collapse;width:100%;margin-top:30px;\">
-                            <tr>
-                                <td align=\"center\" style=\"padding:0 0 14px 0;font-size:11px;line-height:15px;color:#878787;\">Open the request using your application.</td>
-                            </tr>
                             <tr>
                                 <td>
                                     <table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"border-collapse:collapse;width:100%;\">
@@ -1510,9 +1504,6 @@ function buildDateChangeRequestWithdrawnEmailHtml(array $details, array $changeD
 
                         <table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"border-collapse:collapse;width:100%;margin-top:30px;\">
                             <tr>
-                                <td align=\"center\" style=\"padding:0 0 14px 0;font-size:11px;line-height:15px;color:#878787;\">Open the request using your application.</td>
-                            </tr>
-                            <tr>
                                 <td>
                                     <table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"border-collapse:collapse;width:100%;\">
                                         <tr>
@@ -1731,9 +1722,6 @@ function buildCancellationRequestWithdrawnEmailHtml(array $details, array $chang
                         </table>
 
                         <table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"border-collapse:collapse;width:100%;margin-top:30px;\">
-                            <tr>
-                                <td align=\"center\" style=\"padding:0 0 14px 0;font-size:11px;line-height:15px;color:#878787;\">Open the request using your application.</td>
-                            </tr>
                             <tr>
                                 <td>
                                     <table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"border-collapse:collapse;width:100%;\">
