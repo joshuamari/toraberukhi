@@ -5,7 +5,7 @@ function getWhatsNewReleases(string $currentVersion = ''): array
     $releases = [
         [
             'version' => '1.1.0',
-            'date' => '2026-08-20',
+            'date' => '2026-08-25',
             'highlights' => [
                 [
                     'type' => 'added',
