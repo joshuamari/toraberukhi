@@ -35,9 +35,10 @@ Planned for next week. Includes all changes from 2026-03-06 through 2026-08-20.
 - API layer under `/api`, `bootstrap.php`, `.env` (dotenv), and service-based architecture (`AuthService`, `LoginService`, `GroupService`, `DashboardService`, `ReportService`, `AppSettingsService`, `RequestListService`)
 - New API endpoints: `/api/session.php`, `/api/logout.php`, `/api/groups.php`, `/login/api/login.php`, `/dashboard/api/get_summary.php`, `/dashboard/api/get_dispatch_list.php`, `/dashboard/api/get_expiring_passport.php`, `/dashboard/api/get_expiring_visa.php`, `/report/api/get_report.php`, `/report/api/get_years.php`
 - Multi-group assignment on Admin (Tom Select UI) and login/session support for users in more than one group
-- Date-change and cancellation request submission from Request List (KHI submits; PCS reviews)
+- Date-change and cancellation request submission from Request List (KHI submits; PCS reviews) *(requested by Kondo-san)*
 - Change Requests page to view submitted date-change/cancellation requests and withdraw them
 - Request List Activity History (derived from `request_list` + `request_change_list`), including withdraw logs
+- Re-entry permit status on the Request List Document column, the dashboard dispatch list, and the Yearly Dispatch Report *(requested by Admin group)*
 - HTML email templates and sending for dispatch, date-change, and cancellation **submission** and **withdrawal**
 - In-app guides (Request List and Change Requests), with translations
 - 183-day dispatch warning on new request
@@ -72,11 +73,14 @@ Planned for next week. Includes all changes from 2026-03-06 through 2026-08-20.
 
 - Bundled `tailwindcss.js` / `tailwindcss.min.css` (replaced by the npm Tailwind build)
 - Browser `alert()` / `confirm()` on Change Requests withdraw
+- “Total Past 1 Year” column on the Yearly Dispatch Report, replaced by the “Re-entry Permit” column (the “Total Days past 1 year” column on the Dispatch Request page is unchanged) *(requested by Admin group)*
 - “Open the request using your application” line from emails
 - `.env.example` (removed 2026-07-31; recreate `.env` from the keys in Notes)
 
 ### Notes
 
+- Requested by Kondo-san: date-change request submission; cancellation request submission
+- Requested by Admin group: re-entry permit status; removal of the “Total Past 1 Year” column on the Yearly Dispatch Report
 - **Required after pull:** `composer install` and a configured `.env` at the repo root (`.gitignore`d). There is no `.env.example` in the tree. Required DB keys: `DB_KDT_*`, `DB_PCS_*`, `DB_NEW_*`. Also set `APP_ENV`, `APP_DEBUG`, `EMAIL_ENABLED`, and mail keys (`MAIL_FROM_ADDRESS`, `MAIL_FROM_NAME`, `MAIL_FORCE_TO` / `MAIL_FORCE_CC` as needed).
 - **Required after pull:** `npm install` (Lucide, Tom Select, Tailwind). Optional CSS watch: `npm run build-css`
 - Existing endpoints under `/php` and `/global` remain for backward compatibility
