@@ -15,3 +15,6 @@ mail.html
 
 #ignore environment config
 .env
+
+#ignore node modules
+node_modules/
