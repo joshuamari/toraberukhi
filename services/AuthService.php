@@ -83,7 +83,7 @@ function getCurrentUserProfile(PDO $connpcs, int $userId): array
     }
 
     $groups = getAccessibleGroups($connpcs, $userId);
-    $mainGroup = getMainGroupFromGroups($groups);
+    $mainGroup = getMainGroupFromGroups(getAssignedGroups($connpcs, $userId));
 
     $employee['id'] = (int) $employee['id'];
     $employee['group'] = $mainGroup ? $mainGroup['name'] : null;

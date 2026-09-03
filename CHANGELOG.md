@@ -26,9 +26,29 @@ This project uses [Semantic Versioning](https://semver.org/).
 - Optional context, warnings, or migration notes
 -->
 
-## [Unreleased] - 1.1.0
+## [1.1.1] - 2026-09-04
 
-Planned for next week. Includes all changes from 2026-03-06 through 2026-08-20.
+### Added
+
+- CLI/SQL migrations `migrations/2026-09-03_rename_environmental_plant_dept.php` and `migrations/2026-09-03_rename_environmental_plant_dept.sql`
+
+### Changed
+
+- `requesters_dep` id 7 renamed from Environmental Plant Dept. to Environmental Equipment Dept.
+
+### Fixed
+
+- Dashboard and Report navbar showed the first alphabetically accessible group (e.g. Accounting Group) instead of the user's assigned main group for all-access users
+
+### Notes
+
+- **Required after pull:** run `php migrations/2026-09-03_rename_environmental_plant_dept.php` or the SQL in `migrations/2026-09-03_rename_environmental_plant_dept.sql` (renames Environmental Plant Dept. to Environmental Equipment Dept. in `requesters_dep`; safe to re-run)
+
+---
+
+## [1.1.0] - 2026-08-25
+
+Includes all changes from 2026-03-06 through 2026-08-20.
 
 ### Added
 

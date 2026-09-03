@@ -4,6 +4,20 @@ function getWhatsNewReleases(string $currentVersion = ''): array
 {
     $releases = [
         [
+            'version' => '1.1.1',
+            'date' => '2026-09-04',
+            'highlights' => [
+                [
+                    'type' => 'changed',
+                    'text' => 'Environmental Plant Dept. renamed to Environmental Equipment Dept.',
+                ],
+                [
+                    'type' => 'fixed',
+                    'text' => 'Dashboard and Report now show your assigned group in the navbar',
+                ],
+            ],
+        ],
+        [
             'version' => '1.1.0',
             'date' => '2026-08-25',
             'highlights' => [
