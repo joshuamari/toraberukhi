@@ -603,6 +603,19 @@ function buildDispatchRequestSubmittedEmailHtml(array $details, array $recipient
 <meta charset=\"UTF-8\">
 <meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">
 <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">
+<style type=\"text/css\">
+body, table, td, div, p, a, span {
+    font-family: Arial, Helvetica, sans-serif;
+}
+</style>
+
+<!--[if mso]>
+<style type=\"text/css\">
+body, table, td, div, p, a, span {
+    font-family: Arial, Helvetica, sans-serif !important;
+}
+</style>
+<![endif]-->
 <title>Dispatch Request Submitted</title>
 </head>
 <body bgcolor=\"#F9F9F9\" style=\"margin:0;padding:0;background-color:#F9F9F9;color:#000000;\">
@@ -847,6 +860,19 @@ function buildDateChangeRequestSubmittedEmailHtml(array $details, array $changeD
 <meta charset=\"UTF-8\">
 <meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">
 <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">
+<style type=\"text/css\">
+body, table, td, div, p, a, span {
+    font-family: Arial, Helvetica, sans-serif;
+}
+</style>
+
+<!--[if mso]>
+<style type=\"text/css\">
+body, table, td, div, p, a, span {
+    font-family: Arial, Helvetica, sans-serif !important;
+}
+</style>
+<![endif]-->
 <title>Date Change Request Submitted</title>
 </head>
 <body style=\"margin:0;padding:0;background-color:#F9F9F9;color:#000000;\">
@@ -1122,6 +1148,19 @@ function buildCancellationRequestSubmittedEmailHtml(array $details, array $chang
 <meta charset=\"UTF-8\">
 <meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">
 <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">
+<style type=\"text/css\">
+body, table, td, div, p, a, span {
+    font-family: Arial, Helvetica, sans-serif;
+}
+</style>
+
+<!--[if mso]>
+<style type=\"text/css\">
+body, table, td, div, p, a, span {
+    font-family: Arial, Helvetica, sans-serif !important;
+}
+</style>
+<![endif]-->
 <title>Cancellation Request Submitted</title>
 </head>
 <body style=\"margin:0;padding:0;background-color:#F9F9F9;color:#000000;\">
@@ -1372,6 +1411,19 @@ function buildDateChangeRequestWithdrawnEmailHtml(array $details, array $changeD
 <meta charset=\"UTF-8\">
 <meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">
 <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">
+<style type=\"text/css\">
+body, table, td, div, p, a, span {
+    font-family: Arial, Helvetica, sans-serif;
+}
+</style>
+
+<!--[if mso]>
+<style type=\"text/css\">
+body, table, td, div, p, a, span {
+    font-family: Arial, Helvetica, sans-serif !important;
+}
+</style>
+<![endif]-->
 <title>Date Change Request Withdrawn</title>
 </head>
 <body style=\"margin:0;padding:0;background-color:#F9F9F9;color:#000000;\">
@@ -1642,6 +1694,19 @@ function buildCancellationRequestWithdrawnEmailHtml(array $details, array $chang
 <meta charset=\"UTF-8\">
 <meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">
 <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">
+<style type=\"text/css\">
+body, table, td, div, p, a, span {
+    font-family: Arial, Helvetica, sans-serif;
+}
+</style>
+
+<!--[if mso]>
+<style type=\"text/css\">
+body, table, td, div, p, a, span {
+    font-family: Arial, Helvetica, sans-serif !important;
+}
+</style>
+<![endif]-->
 <title>Cancellation Request Withdrawn</title>
 </head>
 <body style=\"margin:0;padding:0;background-color:#F9F9F9;color:#000000;\">
