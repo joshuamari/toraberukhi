@@ -4,6 +4,16 @@ function getWhatsNewReleases(string $currentVersion = ''): array
 {
     $releases = [
         [
+            'version' => '1.1.2',
+            'date' => '2026-09-29',
+            'highlights' => [
+                [
+                    'type' => 'changed',
+                    'text' => 'Dispatch request copy contact information updated',
+                ],
+            ],
+        ],
+        [
             'version' => '1.1.1',
             'date' => '2026-09-04',
             'highlights' => [

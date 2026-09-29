@@ -1018,7 +1018,7 @@ sendHtmlNoCacheHeaders();
                     class="w-full bg-[var(--white)] font-['Arial'] font-semibold"
                     id="printGAPName"
                   >
-                    Mr. T. Kurosumi
+                    Mr. T. Asano
                   </span>
                 </p>
                 <p class="font-['Arial']">
@@ -1037,7 +1037,7 @@ sendHtmlNoCacheHeaders();
                     class="w-full bg-[var(--white)] font-['Arial'] font-semibold"
                     id="printCDCPName"
                   >
-                    Mr. H. Kanari
+                    Mr. Y. Naruyama
                   </span>
                 </p>
                 <p class="font-['Arial']">
@@ -1675,7 +1675,7 @@ sendHtmlNoCacheHeaders();
                           class="input"
                           id="gapName"
                           placeholder="Placeholder Name"
-                          value="Mr. T. Kurosumi"
+                          value="Mr. T. Asano"
                         />
                       </div>
 
@@ -1710,7 +1710,7 @@ sendHtmlNoCacheHeaders();
                           class="input"
                           id="cdcpName"
                           placeholder="Placeholder Name"
-                          value="Mr. H. Kanari"
+                          value="Mr. Y. Naruyama"
                         />
                       </div>
 

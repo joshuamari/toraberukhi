@@ -26,6 +26,14 @@ This project uses [Semantic Versioning](https://semver.org/).
 - Optional context, warnings, or migration notes
 -->
 
+## [1.1.2] - 2026-09-29
+
+### Changed
+
+- Dispatch request copy contact information updated
+
+---
+
 ## [1.1.1] - 2026-09-04
 
 ### Added

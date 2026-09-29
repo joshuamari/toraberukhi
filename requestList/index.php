@@ -1149,7 +1149,7 @@ sendHtmlNoCacheHeaders();
                     class="w-full bg-[var(--white)] font-['Arial'] font-semibold"
                     id="printGAPName"
                   >
-                    Mr. T. Kurosumi
+                    Mr. T. Asano
                   </span>
                 </p>
                 <p class="font-['Arial']">
@@ -1168,7 +1168,7 @@ sendHtmlNoCacheHeaders();
                     class="w-full bg-[var(--white)] font-['Arial'] font-semibold"
                     id="printCDCPName"
                   >
-                    Mr. H. Kanari
+                    Mr. Y. Naruyama
                   </span>
                 </p>
                 <p class="font-['Arial']">

@@ -3,7 +3,7 @@
 function getAppConfig(): array
 {
     return [
-        'version' => '1.1.1',
+        'version' => '1.1.2',
         'env' => appEnv(),
         'debug' => envBool('APP_DEBUG', false),
 
